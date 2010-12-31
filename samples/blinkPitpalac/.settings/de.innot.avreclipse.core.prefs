@@ -1,0 +1,24 @@
+#Tue Jun 23 19:26:30 EEST 2009
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/ClockFrequency=8000000
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/ExtRAMSize=0
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/ExtendedRAM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/MCUType=at90usb1287
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/UseEEPROM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/UseExtendedRAMforHeap=true
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/BitBangDelay=
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/Bitclock=
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/EEPROMFile=
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/EEPROMFromConfig=true
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/FlashFile=
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/FlashFromConfig=true
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/NoChipErase=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/NoSigCheck=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/NoVerify=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/NoWrite=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/OtherOptions=
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/ProgrammerID=
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/UseCounter=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/WriteEEPROM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.383635697.1261197557/avrdude/WriteFlash=true
+avrtarget/perConfig=true
+eclipse.preferences.version=1
