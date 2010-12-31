@@ -1,0 +1,111 @@
+The variables defined in config files use the following naming convention:
+
+// debug enabled with compile command line
+g++ ... -DDEBUG=1
+
+#if defined(DEBUG)
+...
+#endif
+
+// ---------------------------------------------------------------------------
+
+#define OS_CONFIG_ARCH_AVR					1
+#define OS_CONFIG_FAMILY_AT90USB			1
+#define OS_CONFIG_VARIANT_AT90USB1287		1
+#define OS_CONFIG_BOARD_STK525				1
+
+// ---------------------------------------------------------------------------
+
+// specific debug enables
+
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+...
+#endif
+
+#if defined(DEBUG) && defined(OS_DEBUG_DEVICECHARACTERUSB_READ)
+...
+#
+
+#if defined(DEBUG) && defined(APP_DEBUG_PULSECOUNTER_ISR2)
+...
+#
+
+// ---------------------------------------------------------------------------
+
+// selection of included/excluded code
+#define OS_INCLUDE_xxx 			(1)
+#define OS_EXCLUDE_xxx 			(1)
+
+#if defined(OS_INCLUDE_xxx)
+...
+#endif
+
+#if !defined(OS_EXCLUDE_xxx)
+...
+#endif
+
+
+#if defined(OS_INCLUDE_CALL_SECOND_FROM_TICK)
+...
+#endif
+
+#if defined(OS_EXCLUDE_CALL_SECOND_FROM_TICK)
+...
+#endif
+
+// selection of included/excluded methods
+#define OS_INCLUDE_MYCLASS_MYMETHOD		(1)
+#define OS_EXCLUDE_MYCLASS_MYMETHOD		(1)
+
+#if defined(OS_INCLUDE_MYCLASS_MYMETHOD)
+myclass::mymethod()
+{
+...
+}
+#endif
+
+#if defined(OS_EXCLUDE_MYCLASS_MYMETHOD)
+myclass::mymethod()
+{
+...
+}
+#endif
+
+// selection of included/excluded members
+#define OS_INCLUDE_MYCLASS_MEMBER_MYVARIABLE (1)
+#define OS_EXCLUDE_MYCLASS_MEMBER_MYVARIABLE (1)
+
+class myclass {
+...
+#if defined(OS_INCLUDE_MYCLASS_MEMBER_MYVARIABLE)
+type_t myvariable;
+#endif
+
+#if defined(OS_EXCLUDE_MYCLASS_MEMBER_MYVARIABLE)
+type_t myvariable;
+#endif
+
+...
+}
+
+
+// configuration variables, with various types
+#define OS_CFGBOOL_xxx 		(true)
+#define OS_CFGINT_xxx		(1)
+#define OS_CFGINT8_xxx		(1)
+#define OS_CFGINT16_xxx		(1)
+#define OS_CFGLONG_xxx		(1)
+
+// generic config variables
+#define OS_CONFIG_xxx		(1)
+
+#if (OS_CFGBOOL_xxx)
+...
+#endif
+
+// specific configuration
+#define OS_CFGINT_SDI12SENSOR_BUFFER_SIZE 	(75+5)
+
+// ---------------------------------------------------------------------------
+
+#define OS_INCLUDE_NEW_DELETE	(1)

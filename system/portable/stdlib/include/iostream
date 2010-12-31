@@ -1,0 +1,21 @@
+/*
+ *	Copyright (C) 2007-2008 Liviu Ionescu.
+ * 	Based on open source code with Embedded C++ constraints.
+ *
+ *	This file is part of the uOS++ distribution.
+ */
+
+#ifndef IOSTREAM_
+#define IOSTREAM_
+
+#include "portable/stdlib/include/istream"
+#include "portable/stdlib/include/ostream"
+
+class iostream : public ostream, public istream
+  {
+public:
+  iostream(streambuf* sb);
+  virtual ~iostream();
+  };
+
+#endif /*IOSTREAM_*/

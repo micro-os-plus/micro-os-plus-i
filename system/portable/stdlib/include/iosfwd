@@ -1,0 +1,18 @@
+/*
+ *	Copyright (C) 2007-2008 Liviu Ionescu.
+ * 	Based on open source code with Embedded C++ constraints.
+ *
+ *	This file is part of the uOS++ distribution.
+ */
+
+#ifndef IOSFWD_
+#define IOSFWD_
+
+// 27.2 Forward declarations
+// <iosfwd>
+class ios;
+class streambuf;
+class istream;
+class ostream;
+
+#endif /*IOSFWD_*/

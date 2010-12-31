@@ -1,0 +1,140 @@
+/*
+ *	Copyright (C) 2007-2008 Liviu Ionescu.
+ * 	Based on open source code with Embedded C++ constraints.
+ *
+ *	This file is part of the uOS++ distribution.
+ */
+
+#ifndef OSTREAM_
+#define OSTREAM_
+
+#include "portable/kernel/include/OS.h"
+#include "portable/stdlib/include/ios"
+#include "portable/stdlib/include/streambuf"
+
+// <ostream>
+
+typedef class ostream ostream;
+
+class ostream : public ios
+  {
+
+public:
+
+  // 27.6.2.2 Constructor/destructor:
+
+  explicit ostream(streambuf * sb);
+  //explicit ostream( OSDeviceCharacter * dev );
+  //explicit ostream( OSDeviceDebug * dbg );
+
+  // the only virtual function!
+  virtual ~ ostream();
+
+  // 27.6.2.3 Prefix/suffix:
+#if 0
+
+  class sentry;
+#endif
+
+  // 27.6.2.5 Formatted output:
+
+  ostream & operator <<(ostream &( *pf ) ( ostream & ));
+  ostream & operator <<(ios &( *pf ) ( ios & ));
+  ostream & operator <<(ios_base &( *pf ) ( ios_base & ));
+
+  ostream & operator <<(bool n);
+  ostream & operator <<(short n);
+  ostream & operator <<(unsigned short n);
+  ostream & operator <<(int n);
+  ostream & operator <<(unsigned int n);
+
+#if defined(OS_INCLUDE_OSTREAM_LONG)
+
+  ostream & operator <<(long n);
+  ostream & operator <<(unsigned long n);
+
+#endif
+
+#if defined(OS_INCLUDE_OSTREAM_FLOAT)
+
+  ostream & operator <<( float f );
+  ostream & operator <<( double f );
+  ostream & operator <<( long double f );
+
+#endif
+
+  ostream & operator <<(void *p);
+  ostream & operator <<(streambuf * sb);
+
+  // 27.6.2.6 Unformatted output:
+
+  ostream & put(char c) __attribute__( ( noinline ) );
+  ostream & write(const char *s, streamsize n) __attribute__( ( noinline ) );
+  ostream & flush() __attribute__( ( noinline ) );
+
+  // 27.6.2.4 seeks:
+
+  pos_type tellp();
+  ostream & seekp(pos_type);
+  ostream & seekp(off_type, ios_base::seekdir);
+  };
+
+// 27.6.2.3 Class ostream::sentry
+#if 0
+class ostream::sentry
+  {
+  public:
+
+    explicit sentry( ostream & os );
+    ~sentry();
+
+    operator bool();
+
+  private:
+    bool ok_; // exposition only
+
+  };
+#endif
+
+// 27.6.2.5.4 character inserters
+ostream & operator <<(ostream &, char);
+// signed and unsigned
+ostream & operator <<(ostream &, signed char);
+ostream & operator <<(ostream &, unsigned char);
+
+ostream & operator <<(ostream &, const char *);
+// signed and unsigned
+ostream & operator <<(ostream &, const signed char *);
+ostream & operator <<(ostream &, const unsigned char *);
+
+ostream & endl(ostream & os);
+ostream & ends(ostream & os);
+ostream & flush(ostream & os);
+
+// ---
+
+inline ostream & ostream::operator <<( ostream &( *pf ) ( ostream & ) )
+  {
+    return pf( *this );
+  }
+
+inline ostream & ostream::operator <<( ios &( *pf ) ( ios & ) )
+  {
+    pf( *this );
+    return *this;
+  }
+
+inline ostream & ostream::operator <<( ios_base &( *pf ) ( ios_base & ) )
+  {
+    pf( *this );
+    return *this;
+  }
+
+#if 0
+inline ostream::sentry::operator bool()
+  {
+    return ok_;
+  }
+#endif
+
+#endif /*OSTREAM_ */

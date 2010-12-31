@@ -1,0 +1,16 @@
+/*
+ *      Copyright (C) 2008 Liviu Ionescu.
+ *
+ *      This file is part of the uOS++ distribution.
+ */
+
+#ifndef HAL_DEVICEMEMCARDSPI_DEFINES_H_
+#define HAL_DEVICEMEMCARDSPI_DEFINES_H_
+
+#define OS_CONFIG_DEVICEMEMCARDSPI_PORT_INIT    DDRB
+#define OS_CONFIG_DEVICEMEMCARDSPI_MISO_BIT     3
+#define OS_CONFIG_DEVICEMEMCARDSPI_MOSI_BIT     2
+#define OS_CONFIG_DEVICEMEMCARDSPI_SCK_BIT      1
+#define OS_CONFIG_DEVICEMEMCARDSPI_SS_BIT       0
+
+#endif /*HAL_DEVICEMEMCARDSPI_DEFINES_H_*/

@@ -1,0 +1,636 @@
+Embedded C++ Programming Guide
+
+A.    Migrating from C language to C++ language
+
+A.1   Character constant
+
+      Note
+
+          In C, a character constant has type int.  In C++, it has
+          type char.
+
+      Example
+
+          i = sizeof('a');
+
+          In C, this stores sizeof(int) (which is likely to be
+          greater than 1) into i.  In C++, it stores sizeof(char)
+          (which is always 1) into i.
+
+      Guideline
+
+          When migrating code from C to C++, rewrite expressions
+          that depend on the size of a character constant to remove
+          the dependency.
+
+A.2   Object declaration at file scope
+
+      Note
+
+          In C++, a declaration of an object at file scope without a
+          storage class specifier is a definition of that object
+          with external linkage.  If the definition does not have an
+          initializer, the object has initial value 0.  (As in C, an
+          object declared in a C++ program must be defined exactly
+          once.)
+
+          In C, a declaration of an object at file scope without a
+          storage class specifier and without an initializer is a
+          tentative definition, which may appear more than once in a
+          translation unit.
+
+      Example
+
+          int a;          /* (1) */
+          int a = 10;     /* (2) */
+
+          In C, (1) is a tentative definition.  Since (2) is
+          unequivocally a definition, C treats (1) as a mere
+          declaration.
+
+          In C++, both (1) and (2) are definitions.  In the
+          presence of (1), (2) is a duplicate definition, and
+          therefore an error.
+
+      Guideline
+
+          In C++, a declaration of an object at file scope is just a
+          declaration (and not also a definition) if and only if it
+          has an explicit extern specifier and no initializer.
+
+          Each object declared at file scope must be defined exactly
+          once.  All but one declaration must have both an explicit
+          extern specifier and no initializer.
+
+A.3   const type qualifier
+
+      Note
+
+          In C, a const-qualified object at file scope without an
+          explicit storage class specifier has external linkage.  In
+          C++, it has internal linkage.
+
+      Example
+
+          +- file1 --------------------+
+          |      extern const int n;   |
+          +----------------------------+
+          +- file2 --------------------+
+          |      const int n = 10;     |
+          +----------------------------+
+
+          In C, object n of file2 has external linkage, so it can
+          satisfy the reference to n (also with external linkage) in
+          file1.  In C++, object n in file2 has internal linkage,
+          and will not satisfy the reference to n in file1.
+
+      Guideline
+
+          Const-qualified objects with external linkage must have an
+          explicit extern specifier.
+
+A.4   Conversion to void *
+
+      Note
+
+          In C, there is a standard conversion from void * to T *
+          (for any object type T).  In C++, there is no such
+          conversion.  Such conversions require a cast in C++.
+
+          The following Standard C library functions return void *:
+
+              calloc, malloc, realloc, bsearch, memcpy, memmove,
+              memchr, memset
+
+          C++ requires an explicit cast when assigning the return
+          value of such a function to a pointer to non-void type.
+
+      Example
+
+          int* p;
+          p = malloc(10 * sizeof(int));
+
+          In C++, the assignment to p requires an explicit cast, as
+          in
+
+          p = (int *)malloc(10 * sizeof(int));
+
+      Guideline
+
+          In C++, use operator new instead of calloc, malloc, or
+          realloc.  (See item A.12).
+
+          Ignore the return value of a memcpy, memmove, and memset.
+          (They just return their first argument converted to void
+          *.)
+
+          For all other functions that return void * (standard or
+          user-defined), use an explicit cast when converting the
+          return value to another pointer type.
+
+A.5   Enumeration type
+
+      Note
+
+          In C, enumerations are integral types.  A program can
+          convert from an enumeration type to an integral type, and
+          back, without a cast.  A C program can apply ++ and -- to
+          an enumeration object.
+
+          In C++, each enumeration is a distinct type.  There are
+          standard conversions from enumeration type to integral
+          types, but not from integral types to enumeration types.
+          A C++ program cannot apply built-in ++ and --, nor any
+          compound assignment (such as +=) to an enumeration object.
+
+      Example
+
+          enum RGB { red, green, blue } rgb;
+          ++rgb;
+
+          ++rgb is an error in C++ if it uses the built-in ++
+          operator.  It means the same as
+
+          rgb = rgb + 1;
+
+          This is also an error unless you write it with a cast:
+
+          rgb = RGB(rgb + 1);
+
+          The best alternative is to implement an operator++ for
+          type RGB, as in
+
+          RBG &operator++(RGB &x)
+          {
+              return x = RGB(x + 1);
+          }
+
+      Guideline
+
+          When converting a C program to C++, provide typesafe
+          implementations for operator++ and operator-- as needed
+          for enumeration types.
+
+A.6   Type definition in cast, parameter declaration, or sizeof
+
+      Note
+
+          In C, types can be defined in a cast expression, parameter
+          declaration or sizeof expression.  In C++ they cannot.
+
+      Example
+
+          void func(struct TAG { int a; } st)
+          {
+              ...
+          }
+
+          Here, TAG is defined in the parameter declaration.
+
+      Guideline
+
+          Define a type used in a parameter declaration in the scope
+          enclosing the function declaration, or some larger
+          enclosing scope.
+
+          Define a type used in a cast expression or sizeof
+          expression in the scope enclosing the expression, or some
+          larger enclosing scope.
+
+A.7   Transfer of control past the definition of a local object
+
+      Note
+
+          In C, a goto or switch statement may transfer control
+          beyond the definition of an object at block scope,
+          possibly bypassing initialization.  In C++, it may not.
+
+      Example
+
+          goto LABEL;
+          {
+              int v = 0;
+              ...
+          LABEL:
+              ...
+          }
+
+          This is valid in C, assuming the code following LABEL:
+          does not depend on v being initialized to 0.  It is always
+          an error in C++.
+
+      Guideline
+
+          Do not use goto or switch statements to bypass
+          initialization of a local object.
+
+A.8   Character array initialization
+
+      Note
+
+          A C program can initialize an array of characters using a
+          string literal that defines one more character (counting
+          the terminating '\0') than the array can hold.
+          A C++ program cannot.
+
+      Example
+
+          char s[3] = "abc";
+
+          The size of the array is three, though the size of the
+          string literal is 4.  This is valid in C, but not C++.
+
+      Guideline
+
+          Do not initialize an array of characters using a string
+          literal with more characters (including the '\0') than the
+          array. Therefore, it is necessary to specify the correct size of 
+          a string literal (char s[4] = "abc";). 
+          However, because the result of the expectation always can be
+          obtained even if the size of the string literal is changed,
+          the method of not describing the size (char s[] = "abc";) is 
+          recommended.
+
+A.9   Prototype declaration
+
+      Note
+
+          A C++ program requires that you declare a function
+          prototype before calling the function. In C, a call to
+          an undeclared function is permissible.  Moreover, a C++
+          program interprets the function declarator 'f()' as
+          equivalent to 'f(void)' -- a function with no arguments.
+          In C, the same declaration leaves the number and types
+          of the parameters unspecified.
+
+      Example
+
+          extern void func();
+          ....
+          sub();
+          func(0);
+
+          The call to function 'sub' is an error because there is no
+          prototype declaration.  The call to function 'func' is
+          also an error because its declaration says it has no
+          arguments.
+
+      Guideline
+
+          Always declare the prototype before calling a function.
+          To emphasize that function 'f' is called with no
+          arguments, write its declarator as 'f(void)'.
+
+A.10  Keywords added in C++
+
+      Note
+
+          The following C++ keywords are not keywords in C:
+
+          asm             bool            catch           class
+          const_cast      delete          dynamic_cast    explicit
+          false           friend          inline          mutable
+          namespace       new             operator        private
+          protected       public          reinterpret_cast
+          static_cast     template        this            throw
+          true            try             typeid          typename
+          using           virtual         wchar_t
+
+      Example
+
+          int class, new, old;
+
+          This declaration is valid in C, but not in C++.
+
+      Guideline
+
+          Do not use a C++ keyword as an identifier.
+
+A.11  Scope of nested types
+      Note
+
+          In C, the name of a type defined inside a struct or union
+          is actually in same scope as the name of the enclosing
+          struct or union.  In C++, the name of the nested type is
+          within the scope of the enclosing struct or union.
+
+      Example
+
+          struct S {
+              int a;
+              struct T {
+                  int t;
+              } b;
+              int c;
+              enum E { V1, V2 } e;
+          };
+
+          struct T x;
+          enum E y;
+
+          The declarations for x and y are valid in C, but not in
+          C++.  In C++, the names T and E are not in scope outside
+          the definition of struct S.
+
+      Guideline
+
+          Do not define the name of a type as nested unless all uses
+          of that name are also in the scope of the enclosing
+          struct/union.
+
+A.12  Dynamic memory management
+
+      Note
+
+          There is no guarantee that new and delete apply the same
+          memory management policy to the same memory as do malloc
+          and free.  Therefore, a program cannot delete memory
+          unless that memory was previously acquired by new, and it
+          cannot free memory unless that memory was acquired by
+          malloc (or calloc or realloc).
+
+      Example
+
+          int (*p)[10];
+          p = (int (*)[10])malloc(sizeof(*p));
+          ....
+          delete p;
+
+          The delete expression has undefined behavior.
+
+      Guideline
+
+          In C++, avoid malloc, calloc, realloc and free; use only
+          new and delete.
+
+A.13  '/*' after '/'
+
+      Note
+
+          Writing the C-style comment '/* */' immediately after
+          the token '/' is interpreted as the C++-style comment
+          '//' instead.
+
+      Example
+
+          i = j //* comment */ k ;
+
+          The sequence '//' is interpreted as a comment delimiter.
+          The expression is interpreted not as 'i = j / k;' but as
+          'i = j'.
+
+      Guideline
+
+          Avoiding writing a C-style comment '/**/' immediately
+          after the token '/'.
+
+B.    Guidelines for Code Size
+
+B.1   Object initialization
+
+      Note
+
+          There are various ways to specify the initialization of an
+          object.  Some initializations generate unnecessary
+          temporary objects, and result in larger code size.
+
+          For example:
+
+          T x(i)        // (1)
+
+          T x = i;      // (2)
+
+          T x = T(i)    // (3)
+
+          T x;          // (4)
+          x = i;        //
+
+          (1) This applies a constructor directly to object x
+              without using a temporary object, as if by calling:
+
+              x.T(i);             // apply constructor to x
+
+          (2) In some implementations, this applies a constructor
+              directly to x as above.  In others, it constructs a
+              temporary object, and initializes x from the
+              temporary, as if by calling:
+
+              temp.T(i);        // apply constructor to temp
+              x.T(temp);        // apply copy constructor to x
+              temp.~T();        // apply destructor to temp
+
+          (3) This is the same as (2).
+
+          (4) This initializes x using T's default constructor, then
+              later assigns a new value to x using an assignment
+              operator.  The assignment operator may release
+              resources that x is using and acquire new resources.
+
+              x.T();           // apply default constructor to x
+              x.operator=(i);  // apply assignment operator to x
+
+      Guideline
+
+          Use declarations of form (1) above in preference to the
+          other forms.
+
+B.2   Inline specifier
+
+      Note
+
+          Inline expansion reduces the overhead of function entry
+          and exit, but it may increase code size.
+
+          Member functions in class definitions are expanded inline
+          by default.
+
+      Guideline
+
+          Use inline specifier for only small functions.  A member
+          function for which inline expansion is not appropriate
+          should be defined outside the class definition, so that it
+          is not inline expanded.
+
+B.3   Temporary objects for return values
+
+      Note
+
+          Calling a Function that returns an object by value may
+          create and destroy a temporary object, thus increasing by
+          code size and execution time.
+
+      Example
+
+          class Matrix {
+              int a, b;
+          public:
+              Matrix &operator+=(const Matrix &);
+              friend
+                  Matrix operator+(const Matrix &, const Matrix &);
+          };
+
+          Matrix operator +(const Matrix &, const Matrix &)
+          {
+              ...
+          }
+
+          void func()
+          {
+              Matrix a,b;
+              a = a + b;        // (1)
+              a += b;           // (2)
+          }
+
+          (1) calls operator+, which returns a Matrix by value.  In
+          some implementations this creates (and later destroys) a
+          temporary Matrix object.
+
+          (2) calls operator+=, which generates no temporary Matrix
+          objects.
+
+      Guideline
+
+          For objects of class types, use compound assignment
+          operators (such as += in preference to + and =) to avoid
+          creating and destroying temporary objects unnecessarily.
+
+B.4   Operators new and delete
+
+      Guideline
+
+          Implement class-specific operators new and delete as
+          needed to improve the speed and memory utilization of
+          dynamic memory management.
+
+B.5   Initialization of global objects
+
+      Note
+
+          The order of initialization of global objects is
+          implementation-dependent.  However, the order of
+          initialization in a single translation unit is guaranteed
+          to be the order of declaration.
+
+      Example
+
+          file1           file2             file3
+
+          int a = f();    int b = f();      int f(void)
+                                            {
+                                                static int a = 0;
+                                                return a++;
+                                            }
+
+          The program may initialize 'a' with 0 and 'b' with 1, or
+          vice versa, depending on the order the implementation
+          chooses to initialize them.
+
+          It is possible to make the initialization order well
+          defined by moving the declaration of 'b' in file2 to
+          file1, as in:
+
+          file1           file2             file3
+
+          int a = f();                      int f(void)
+          int b = f();                      {
+                                                static int a = 0;
+                                                return a++;
+                                            }
+
+          The order of initialization is a, then b.
+
+      Guideline
+
+          Avoid coding which depends on the initialization order of
+          global objects across translation units.
+
+C.    Guidelines for speed
+
+C.1   new and delete for array of class objects
+
+      Note
+
+          Declaration of an array of class objects calls its
+          element's constructor for each element.  The program calls
+          the destructor for each element when the array goes out of
+          scope.  The processing time of the constructor/destructor
+          may be unexpectedly long.  This can be a problem for
+          real-time processing.
+
+      Guideline
+
+          Avoid creating and destroying a large array of class
+          objects during time-critical processing.
+
+C.2   Object declaration in loops
+
+      Note
+
+          When a class variable is declared in a loop, its
+          constructor and destructor are called in each iteration.
+          The overhead of construction and destruction may slow the
+          loop.
+
+      Example
+
+          for (i = 0; i < 1000; i++)
+          {
+              FOO a;
+              ...
+          }
+
+      Guideline
+
+          Avoid declaring a class variable inside a loop.  Declare
+          it outside the loop instead.
+
+D.    Guidelines for ROMable code
+
+D.1   const objects in ROM
+
+      Note
+
+          In general, a const-qualified object can reside in ROM if
+          it:
+
+          --  has static storage duration,
+
+          -- is initialized by a constant expression, and
+
+          --  has a POD (plain old data) type.
+
+          A POD type is any of:
+
+          --  a scalar (arithmetic, enumeration or pointer) type
+
+          --  a class, struct, or union all of whose data members
+              are public and of POD types, and with no user-defined
+              constructor or destructor, no base classes, and no
+              virtual functions
+
+          --  an array with elements of POD type
+
+      Example
+
+          static const char lang[] = "EC++";
+
+          class A {
+              int a;
+          public:
+              A();
+              ~A();
+          };
+
+          const A x;
+
+          'lang' may be placed in ROM; 'x' may not.
+
+      Guideline
+
+          Declare objects to be placed in ROM with POD types and
+          with constant initializers.
+
+NOTE: The form of presentation used here, and several of the specific
+guidelines, were inspired by the excellent book by Thomas Plum and
+Dan Saks, 'C++ Programming Guidelines' (Plum Hall Inc., 1991).
+

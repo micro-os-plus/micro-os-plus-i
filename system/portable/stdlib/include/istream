@@ -1,0 +1,142 @@
+/*
+ *	Copyright (C) 2007-2008 Liviu Ionescu.
+ * 	Based on open source code with Embedded C++ constraints.
+ *
+ *	This file is part of the uOS++ distribution.
+ */
+
+#ifndef ISTREAM_
+#define ISTREAM_
+
+#include "portable/kernel/include/OS.h"
+#include "portable/stdlib/include/ios"
+#include "portable/stdlib/include/streambuf"
+#include "portable/stdlib/include/ostream"
+
+#define __STRING_MAX_UNITS	65535
+
+typedef class istream istream;
+
+// 27.6 Formatting and manipulators
+
+// <istream>
+
+class istream : public ios
+  {
+
+public:
+  // 27.6.1.1.1 Constructor/destructor:
+
+  explicit istream(streambuf* sb);
+  //explicit istream( OSDeviceCharacter * dev );
+
+  virtual ~istream();
+
+  // 27.6.1.1.2 Prefix/suffix:
+
+  //class sentry;
+
+  // 27.6.1.2 Formatted input:
+
+  istream& operator>>(istream&( *pf ) ( istream& ));
+  istream& operator>>(ios&( *pf ) ( ios& ));
+  istream& operator>>(ios_base&( *pf ) ( ios_base& ));
+
+  istream& operator>>(bool& n);
+  istream& operator>>(short& n);
+  istream& operator>>(unsigned short& n);
+  istream& operator>>(int& n);
+  istream& operator>>(unsigned int& n);
+
+#if defined(OS_INCLUDE_ISTREAM_LONG)
+
+  istream& operator>>( long& n );
+  istream& operator>>( unsigned long& n );
+
+#endif
+
+#if defined(OS_INCLUDE_ISTREAM_FLOAT)
+
+  istream& operator>>( float& f );
+  istream& operator>>( double& f );
+  istream& operator>>( long double& f );
+
+#endif
+
+  istream& operator>>(void*& p);
+  istream& operator>>(streambuf* sb);
+
+  // 27.6.1.3 Unformatted input:
+
+  streamsize gcount() const;
+  int get();
+  istream& get(char& c);
+  istream& get(char* s, streamsize n);
+  istream& get(char* s, streamsize n, char delim);
+  istream& get(streambuf& sb);
+  istream& get(streambuf& sb, char delim);
+
+  istream& getline(char* s, streamsize n);
+  istream& getline(char* s, streamsize n, char delim);
+
+  istream& ignore(streamsize n = 1, int delim = traits::eof());
+
+  int peek();
+  istream& read(char* s, streamsize n);
+  streamsize readsome(char* s, streamsize n);
+
+  istream& putback(char c);
+  istream& unget();
+
+  int sync();
+
+  pos_type tellg();
+  istream& seekg(pos_type);
+  istream& seekg(off_type, ios_base::seekdir);
+
+protected:
+  streamsize count_last_ufmt_input;
+
+  };
+
+#if 0
+// 27.6.1.1.2 Class istream::sentry
+
+class istream::sentry
+  {
+  public:
+
+    explicit sentry( istream& is, bool noskipws = false );
+    ~sentry();
+
+    operator bool();
+
+  private:
+    bool ok_; // exposition only
+  };
+#endif
+
+// 27.6.1.2.3 character extraction templates:
+istream& operator>>(istream&, char&);
+istream& operator>>(istream&, unsigned char&);
+istream& operator>>(istream&, signed char&);
+
+istream& operator>>(istream&, char*);
+istream& operator>>(istream&, unsigned char*);
+istream& operator>>(istream&, signed char*);
+
+istream& ws(istream &is);
+
+inline streamsize istream::gcount() const
+  {
+    return count_last_ufmt_input;
+  }
+
+#if 0
+inline istream::sentry::operator bool()
+  {
+    return ok_;
+  }
+#endif
+
+#endif /*ISTREAM_*/

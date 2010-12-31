@@ -1,0 +1,88 @@
+[20090623 - v3.0]
+
+Version 3.0 of uOS++ is the first multiplatform implementation of this 
+micro OS. In addition to the original AVR version, the system runs now 
+on ARM Cortex M3, in particular the STM32F10X family.
+
+While porting on ARM the context switching code was cleaned, no flag to
+differentiate between ISR and yield() is needed and the support for
+returning a value was moved outside the context switching routine,
+in the eventWait() method.
+
+The port on ARM Cortex M3 was a joy, not only due to the standard features,
+like the system timer (SysTick), but also due to the PendSV mechanism (that 
+allows to move all interrupt context switching code to a single place) and 
+the "svc" exception (used to implement yield()).
+
+In the first 3.x release the following samples are functional on both 
+AVR and ARM Cortex M3:
+
+- minimal
+- calibrateBusyWait
+- blinkX3
+- blinkX3Sync
+- blinkPitpalac
+
+The USART and USB code was not yet ported.
+
+Other changes:
+
+- the AVR build process uses the Eclipse AVR Plugin and WinAVR
+- the ARM build process uses the Eclipse GNU ARM Plugin and Code Sourcery G++ Lite
+  
+
+[20080317 - v2.0]
+
+Version 2.x of uOS++ is a major code restructuring and cleanup, done after the
+first commercial/production grade products based on it were released:
+- Metrilog M512 SDI12 sensor, 
+- Aviation Instruments A07523 USB I2C interface and 
+- Aviation Instruments A07527 CAN/SD flight data recorder.
+
+Another goal for restructuring the code was to make it more Eclipse indexer friendly;
+now the system directories are part of each Eclipse project (via a custom Eclipse 
+link) and all sources are properly indexed, conditional code being correctly shown
+according to build target and project preprocessor definitions. 
+
+
+Major additions
+---------------
+
+- interruptible tasks. 
+
+Tasks can now be forced into an 'interrupted' state, when further blocking system 
+calls are returned immediatelly and timer sleeps are cancelled. This allows deep
+nested code to be terminated in an orderly manner.
+
+- virtual watchdogs.
+
+Virtual Watchdogs are system objects living on the system seconds timer used to
+force a soft reset if not re-armed in a certain period.
+
+- sleep and deep sleep modes
+
+For low power devices, if no more active tasks exists and no tasks are waiting
+for timer wakeups, the processor will enter sleep mode, and only selected
+events will wake the processor.
+
+In extreme conditions even a deep sleep mode is available, when the overall 
+power usage can be reduced to some tens of microamps.
+
+- flash/EEPROM support code
+
+- experimental CAN suport
+
+
+Major improvements
+------------------
+
+- SDI12Sensor code reaches production grade status, with many improvements
+
+
+Major bug fixes
+---------------
+
+- sleep(1) race condition fixed
+
+- some critical sections fixed
+

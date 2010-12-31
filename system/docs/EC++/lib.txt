@@ -1,0 +1,1444 @@
+// 18. Language support library
+
+
+// 18.1 Types
+// <cstddef>
+#define NULL
+typedef ptrdiff_t;
+typedef size_t;
+#define offsetof
+
+
+// 18.2 Implementation properties
+// 18.2.2 C library
+// <climits>
+#define CHAR_BIT
+#define CHAR_MAX
+#define CHAR_MIN
+#define INT_MAX
+#define INT_MIN
+#define LONG_MAX
+#define LONG_MIN
+#define MB_LEN_MAX
+#define SCHAR_MAX
+#define SCHAR_MIN
+#define SHRT_MIN
+#define SHRT_MAX
+#define UCHAR_MAX
+#define UINT_MAX
+#define ULONG_MAX
+#define USHRT_MAX
+
+
+// <cfloat>
+#define DBL_DIG
+#define DBL_EPSILON
+#define DBL_MANT_DIG
+#define DBL_MAX
+#define DBL_MAX_10_EXP
+#define DBL_MAX_EXP
+#define DBL_MIN
+#define DBL_MIN_10_EXP
+#define DBL_MIN_EXP
+#define FLT_DIG
+#define FLT_EPSILON
+#define FLT_MANT_DIG
+#define FLT_MAX
+#define FLT_MAX_10_EXP
+#define FLT_MAX_EXP
+#define FLT_MIN
+#define FLT_MIN_10_EXP
+#define FLT_MIN_EXP
+#define FLT_RADIX
+#define FLT_ROUNDS
+#define LDBL_DIG
+#define LDBL_EPSILON
+#define LDBL_MANT_DIG
+#define LDBL_MAX
+#define LDBL_MAX_10_EXP
+#define LDBL_MAX_EXP
+#define LDBL_MIN
+#define LDBL_MIN_10_EXP
+#define LDBL_MIN_EXP
+
+
+// 18.4 Dynamic memory management
+// <new>
+// 18.4.1 Storage allocation and deallocation
+void *operator new(size_t size);
+void operator delete(void *ptr);
+void *operator new[] (size_t size);
+void operator delete[](void *ptr);
+void *operator new(size_t size,void *ptr);
+void *operator new[](size_t size,void *ptr);
+void operator delete(void *ptr,void *);
+void operator delete[](void *ptr,void *);
+// 18.4.2.2 Type new_handler
+typedef void (*new_handler)();
+// 18.4.2.3 set_new_handler
+new_handler set_new_handler(new_handler new_P);
+
+
+// 18.7 Other runtime support
+// <cstdarg>
+#define va_arg
+#define va_end
+#define va_start
+typedef va_list;
+
+
+// <csetjmp>
+#define setjmp
+typedef jmp_buf;
+longjmp(jmp_buf jbuf,int val);
+
+
+// 19. Diagnostics library
+
+
+// 19.3 error numbers
+// <cerrno>
+#define EDOM
+#define ERANGE
+#define errno
+
+
+// 20. General utilities library
+
+
+// 20.4.6 C Library
+// <cstdlib>
+void * calloc(size_t, size_t);
+void * malloc(size_t);
+void * realloc(void *, size_t);
+void free(void *);
+
+
+// <cstring>
+#define NULL
+typedef size_t;
+const void* memchr(const void* s, int c, size_t n);
+void* memchr( void* s, int c, size_t n);
+int memcmp(const void *, const void *, size_t);
+void * memcpy(void *, const void *, size_t);
+void * memmove(void *, const void *, size_t);
+void * memset(void *, int, size_t);
+
+
+// 21. Strings library
+
+
+// 21.1 String classes
+// <string>
+
+
+// subclause 21.3, string:
+class string;
+
+
+string operator + (const string &lhs,const string &rhs);
+string operator + (const char *lhs,const string &rhs);
+string operator + (char lhs,const string &rhs);
+string operator + (const string &lhs,const char *rhs);
+string operator + (const string &lhs,char rhs);
+
+
+bool operator == (const string &lhs,const string &rhs);
+bool operator == (const char *lhs,const string &rhs);
+bool operator == (const string &lhs,const char *rhs);
+bool operator != (const string &lhs,const string &rhs);
+bool operator != (const char *lhs,const string &rhs);
+bool operator != (const string &lhs,const char *rhs);
+
+
+bool operator < (const string &lhs,const string &rhs);
+bool operator < (const char *lhs,const string &rhs);
+bool operator < (const string &lhs,const char *rhs);
+bool operator > (const string &lhs,const string &rhs);
+bool operator > (const char *lhs,const string &rhs);
+bool operator > (const string &lhs,const char *rhs);
+
+
+bool operator <= (const string &lhs,const string &rhs);
+bool operator <= (const char *lhs,const string &rhs);
+bool operator <= (const string &lhs,const char *rhs);
+bool operator >= (const string &lhs,const string &rhs);
+bool operator >= (const char *lhs,const string &rhs);
+bool operator >= (const string &lhs,const char *rhs);
+
+
+// subclause 21.3.7.8:
+void swap(string &lhs, string &rhs);
+
+
+istream & operator >> (istream &is,string &str);
+ostream & operator << (ostream &os,const string &str);
+istream & getline (istream &is,string &str,char delim);
+istream & getline (istream &is,string &str);
+
+
+
+// 21.3 Class string
+
+
+class string {
+
+public:
+
+// types:
+
+typedef implementation defined iterator; // See 23.1
+
+typedef implementation defined const_iterator; // See 23.1
+
+
+static const size_t npos = -1; 
+
+// 21.3.1 construct/copy/destroy:
+
+explicit string(void);
+
+string(const string& str, size_t pos = 0, size_t n = npos);
+
+string(const char* s, size_t n);
+
+string(const char* s);
+
+string(size_t n, char c);
+~string();
+
+string& operator=(const string& str);
+
+string& operator=(const char* s);
+
+string& operator=(char c);
+
+
+// 21.3.2 iterators:
+
+iterator begin();
+
+const_iterator begin()const;
+
+iterator end();
+
+const_iterator end()const;
+
+
+// 21.3.3 capacity:
+
+size_t size()const;
+
+size_t length()const;
+
+size_t max_size()const;
+
+void resize(size_t n, char c);
+
+void resize(size_t n);
+
+size_t capacity()const;
+
+void reserve(size_t res_arg = 0);
+
+void clear();
+
+bool empty()const;
+
+
+// 21.3.4 element access:
+
+const char & operator[](size_t pos)const;
+
+char & operator[](size_t pos);
+
+const char & at(size_t n)const;
+
+char & at(size_t n);
+
+
+// 21.3.5 modifiers:
+
+string& operator+=(const string& str);
+
+string& operator+=(const char* s);
+
+string& operator+=(char c);
+
+string& append(const string& str);
+
+string& append(const string& str, size_t pos, size_t n);
+
+string& append(const char* s, size_t n);
+
+string& append(const char* s);
+
+string& append(size_t n, char c);
+
+
+string& assign(const string&);
+
+string& assign(const string& str, size_t pos, size_t n);
+
+string& assign(const char* s, size_t n);
+
+string& assign(const char* s);
+
+string& assign(size_t n, char c);
+
+
+string& insert(size_t pos1, const string& str);
+
+string& insert(size_t pos1, const string& str,
+size_t pos2, size_t n);
+
+string& insert(size_t pos, const char* s, size_t n);
+
+string& insert(size_t pos, const char* s);
+
+string& insert(size_t pos, size_t n, char c);
+
+iterator insert(iterator p, char c = char());
+
+void insert(iterator p, size_t n, char c);
+
+
+string& erase(size_t pos = 0, size_t n = npos);
+
+iterator erase(iterator position);
+
+iterator erase(iterator first, iterator last);
+
+
+string& replace(size_t pos1, size_t n1, const string& str);
+
+string& replace(size_t pos1, size_t n1, const string& str,
+size_t pos2, size_t n2);
+
+string& replace(size_t pos, size_t n1, const char* s, size_t n2);
+
+string& replace(size_t pos, size_t n1, const char* s);
+
+string& replace(size_t pos, size_t n1, size_t n2, char c);
+
+string& replace(iterator i1, iterator i2, const string& str);
+
+string& replace(iterator i1, iterator i2, const char* s, size_t n);
+
+string& replace(iterator i1, iterator i2, const char* s);
+
+string& replace(iterator i1, iterator i2, size_t n, char c);
+
+
+size_t copy(char* s, size_t n, size_t pos = 0)const;
+
+void swap(string&);
+
+
+// 21.3.6 string operations:
+
+const char* c_str()const; // explicit
+
+const char* data()const;
+
+
+size_t find (const string& str, size_t pos = 0)const;
+
+size_t find (const char* s, size_t pos, size_t n)const;
+
+size_t find (const char* s, size_t pos = 0)const;
+
+size_t find (char c, size_t pos = 0)const;
+
+size_t rfind(const string& str, size_t pos = npos)const;
+
+size_t rfind(const char* s, size_t pos, size_t n)const;
+
+size_t rfind(const char* s, size_t pos = npos)const;
+
+size_t rfind(char c, size_t pos = npos)const;
+
+
+size_t find_first_of(const string& str, size_t pos = 0)const;
+
+size_t find_first_of(const char* s, size_t pos, size_t n)const;
+
+size_t find_first_of(const char* s, size_t pos = 0)const;
+
+size_t find_first_of(char c, size_t pos = 0)const;
+
+size_t find_last_of (const string& str, size_t pos = npos)const;
+
+size_t find_last_of (const char* s, size_t pos, size_t n) const;
+
+size_t find_last_of (const char* s, size_t pos = npos) const;
+
+size_t find_last_of (char c, size_t pos = npos) const;
+
+
+size_t find_first_not_of(const string& str, size_t pos = 0) const;
+
+size_t find_first_not_of(const char* s, size_t pos, size_t n) const;
+
+size_t find_first_not_of(const char* s, size_t pos = 0) const;
+
+size_t find_first_not_of(char c, size_t pos = 0) const;
+
+size_t find_last_not_of (const string& str, size_t pos = npos) const;
+
+size_t find_last_not_of (const char* s, size_t pos, size_t n) const;
+
+size_t find_last_not_of (const char* s, size_t pos = npos) const;
+
+size_t find_last_not_of (char c, size_t pos = npos) const;
+
+
+string substr(size_t pos = 0, size_t n = npos) const;
+
+int compare(const string& str) const;
+
+int compare(size_t pos1, size_t n1, const string& str) const;
+
+int compare(size_t pos1, size_t n1, const string& str,
+size_t pos2, size_t n2) const;
+
+int compare(const char* s) const;
+
+int compare(size_t pos1, size_t n1,
+const char* s, size_t n2 = npos) const;
+
+};
+
+// 21.4 Null-terminated sequence utilities
+// <cctype>
+int isalnum(int);
+int isalpha(int);
+int iscntrl(int);
+int isdigit(int);
+int isgraph(int);
+int islower(int);
+int isprint(int);
+int ispunct(int);
+int isspace(int);
+int isupper(int);
+int isxdigit(int);
+int tolower(int);
+int toupper(int);
+
+
+// <cstring>
+#define NULL
+typedef size_type;
+char * strcat(char *, const char *);
+const char* strchr(const char* s, int c);
+char* strchr( char* s, int c);
+int strcmp(const char *, const char *);
+char * strcpy(char *, const char *);
+size_t strcspn(const char *, const char *);
+size_t strlen(const char *);
+char * strncat(char *, const char *, size_t);
+int strncmp(const char *, const char *, size_t);
+char * strncpy(char *, const char *, size_t);
+const char* strpbrk(const char* s1, const char* s2);
+char* strpbrk( char* s1, const char* s2);
+const char* strrchr(const char* s, int c);
+char* strrchr( char* s, int c);
+size_t strspn(const char *, const char *);
+const char* strstr(const char* s1, const char* s2);
+char* strstr( char* s1, const char* s2);
+char * strtok(char *, const char *);
+
+
+// <cstdlib>
+#define MB_CUR_MAX
+long atol(const char *);
+double atof(const char *);
+int atoi(const char *);
+double strtod(const char *, char **);
+long strtol(const char *, char **, int);
+unsigned long strtoul(const char *, char **, int);
+
+
+// 22. Localization library
+// Not Support
+
+
+// 23. Containers library
+// Not Support
+
+
+// 24. Iterators library
+// Not Support
+
+
+// 25. Algolithms library
+
+
+// 25.4 C Library algolithms
+// <cstdlib>
+void * bsearch(const void *, const void *, size_t, size_t,
+int (*)(const void *, const void *));
+void qsort(void* base,size_t nmemb, size_t size, 
+int (*compar) (const void*, const void*));
+
+
+// 26. Numerics library
+
+
+// 26.2 Complex numbers
+// <complex>
+class float_complex; // based on float
+class double_complex; // based on double
+
+
+
+// 26.2.3 complex specialization
+
+class float_complex {
+
+public:
+
+typedef float value_type;
+
+
+float_complex(float re = 0.0f, float im = 0.0f);
+
+explicit float_complex(const double_complex&);
+
+float real() const;
+
+float imag() const;
+
+
+float_complex& operator= (float);
+
+float_complex& operator+=(float);
+
+float_complex& operator-=(float);
+
+float_complex& operator*=(float);
+
+float_complex& operator/=(float);
+
+
+float_complex& operator=(const float_complex&);
+
+float_complex& operator+=(const float_complex&);
+
+float_complex& operator-=(const float_complex&);
+
+float_complex& operator*=(const float_complex&);
+
+float_complex& operator/=(const float_complex&);
+
+};
+
+class double_complex {
+
+public:
+
+typedef double value_type;
+
+
+double_complex(double re = 0.0, double im = 0.0);
+
+double_complex(const float_complex&);
+
+double real() const;
+
+double imag() const;
+
+
+double_complex& operator= (double);
+
+double_complex& operator+=(double);
+
+double_complex& operator-=(double);
+
+double_complex& operator*=(double);
+
+double_complex& operator/=(double);
+
+
+double_complex& operator=(const double_complex&);
+
+double_complex& operator+=(const double_complex&);
+
+double_complex& operator-=(const double_complex&);
+
+double_complex& operator*=(const double_complex&);
+
+double_complex& operator/=(const double_complex&);
+
+};
+
+// 26.2.6 complex non-member functions
+float_complex operator+(const float_complex&, const float_complex&);
+float_complex operator+(const float_complex&, const float&);
+float_complex operator+(const float&, const float_complex&);
+float_complex operator-(const float_complex&, const float_complex&);
+float_complex operator-(const float_complex&, const float&);
+float_complex operator-(const float&, const float_complex&);
+float_complex operator*(const float_complex&, const float_complex&);
+float_complex operator*(const float_complex&, const float&);
+float_complex operator*(const float&, const float_complex&);
+float_complex operator/(const float_complex&, const float_complex&);
+float_complex operator/(const float_complex&, const float&);
+float_complex operator/(const float&, const float_complex&);
+float_complex operator+(const float_complex&);
+float_complex operator-(const float_complex&);
+bool operator==(const float_complex&, const float_complex&);
+bool operator==(const float_complex&, const float&);
+bool operator==(const float&, const float_complex&);
+bool operator!=(const float_complex&, const float_complex&);
+bool operator!=(const float_complex&, const float&);
+bool operator!=(const float&, const float_complex&);
+istream& operator>>(istream&, float_complex&);
+ostream& operator<<(ostream&, const float_complex&);
+
+
+double_complex operator+(const double_complex&, const double_complex&);
+double_complex operator+(const double_complex&, const double&);
+double_complex operator+(const double&, const double_complex&);
+double_complex operator-(const double_complex&, const double_complex&);
+double_complex operator-(const double_complex&, const double&);
+double_complex operator-(const double&, const double_complex&);
+double_complex operator*(const double_complex&, const double_complex&);
+double_complex operator*(const double_complex&, const double&);
+double_complex operator*(const double&, const double_complex&);
+double_complex operator/(const double_complex&, const double_complex&);
+double_complex operator/(const double_complex&, const double&);
+double_complex operator/(const double&, const double_complex&);
+double_complex operator+(const double_complex&);
+double_complex operator-(const double_complex&);
+bool operator==(const double_complex&, const double_complex&);
+bool operator==(const double_complex&, const double&);
+bool operator==(const double&, const double_complex&);
+bool operator!=(const double_complex&, const double_complex&);
+bool operator!=(const double_complex&, const double&);
+bool operator!=(const double&, const double_complex&);
+istream& operator>>(istream&, double_complex&);
+ostream& operator<<(ostream&, const double_complex&);
+
+
+// 26.2.7 complex value operations
+float real(const float_complex&);
+float imag(const float_complex&);
+float abs(const float_complex&);
+float arg(const float_complex&);
+float norm(const float_complex&);
+float_complex conj(const float_complex&);
+float_complex polar(const float&, const float&);
+
+
+double real(const double_complex&);
+double imag(const double_complex&);
+double abs(const double_complex&);
+double arg(const double_complex&);
+double norm(const double_complex&);
+double_complex conj(const double_complex&);
+double_complex polar(const double&, const double&);
+
+
+// 26.2.8 complex transcendentals
+float_complex cos (const float_complex&);
+float_complex cosh (const float_complex&);
+float_complex exp (const float_complex&);
+float_complex log (const float_complex&);
+float_complex log10(const float_complex&);
+
+
+float_complex pow(const float_complex&, int);
+float_complex pow(const float_complex&, const float&);
+float_complex pow(const float_complex&, const float_complex&);
+float_complex pow(const float&, const float_complex&);
+float_complex sin (const float_complex&);
+float_complex sinh (const float_complex&);
+float_complex sqrt (const float_complex&);
+float_complex tan (const float_complex&);
+float_complex tanh (const float_complex&);
+
+
+double_complex cos (const double_complex&);
+double_complex cosh (const double_complex&);
+double_complex exp (const double_complex&);
+double_complex log (const double_complex&);
+double_complex log10(const double_complex&);
+
+
+double_complex pow(const double_complex&, int);
+double_complex pow(const double_complex&, const double&);
+double_complex pow(const double_complex&, const double_complex&);
+double_complex pow(const double&, const double_complex&);
+double_complex sin (const double_complex&);
+double_complex sinh (const double_complex&);
+double_complex sqrt (const double_complex&);
+double_complex tan (const double_complex&);
+double_complex tanh (const double_complex&);
+
+
+// 26.5 C Library
+// <cmath>
+#define HUGE_VAL
+float acos(float);
+float asin(float);
+float atan(float);
+float atan2(float,float);
+float ceil(float);
+float cos(float);
+float cosh(float);
+float exp(float);
+float fabs(float);
+float floor(float);
+float fmod(float,float);
+float frexp(float,int *);
+float modf(float,float *);
+float ldexp(float,int );
+float log(float);
+float log10(float);
+float pow(float,float);
+float pow(float,int);
+float sin(float);
+float sinh(float);
+float sqrt(float);
+float tan(float);
+float tanh(float);
+
+
+double acos(double);
+double asin(double);
+double atan(double);
+double atan2(double,double);
+double ceil(double);
+double cos(double);
+double cosh(double);
+double exp(double);
+double fabs(double);
+double floor(double);
+double fmod(double,double);
+double frexp(double,int *);
+double modf(double,double *);
+double ldexp(double,int);
+double log(double);
+double log10(double);
+double pow(double,double);
+double pow(double,int);
+double sin(double);
+double sinh(double);
+double sqrt(double);
+double tan(double);
+double tanh(double);
+
+
+// <cstdlib>
+#define RAND_MAX
+typedef div_t;
+typedef ldiv_t;
+int abs(int);
+float abs(float);
+double abs(double); // fabs();
+div_t div(int,int);
+long int labs(long int);
+ldiv_t ldiv(long int,long int);
+void srand(unsigned int);
+int rand(void);
+
+
+// 27. Input/output library
+
+
+// 27.2 Forward declarations
+// <iosfwd>
+class ios;
+class streambuf;
+class istream;
+class ostream;
+
+
+// 27.3 Standard iostream objects
+// <iostream>
+extern istream cin;
+extern ostream cout;
+
+
+// 27.4 Iostream base calsses
+// <ios>
+typedef OFF_T streamoff;
+typedef SZ_T streamsize;
+
+
+class ios_base;
+class ios;
+
+
+// 27.4.6, manipulators:
+ios_base& boolalpha (ios_base& str);
+ios_base& noboolalpha(ios_base& str);
+ios_base& showbase (ios_base& str);
+ios_base& noshowbase (ios_base& str);
+ios_base& showpoint (ios_base& str);
+ios_base& noshowpoint(ios_base& str);
+ios_base& showpos (ios_base& str);
+ios_base& noshowpos (ios_base& str);
+ios_base& skipws (ios_base& str);
+ios_base& noskipws (ios_base& str);
+ios_base& uppercase (ios_base& str);
+ios_base& nouppercase(ios_base& str);
+// 27.4.6.2 adjustfield:
+ios_base& internal (ios_base& str);
+ios_base& left (ios_base& str);
+ios_base& right (ios_base& str);
+// 27.4.6.3 basefield:
+ios_base& dec (ios_base& str);
+ios_base& hex (ios_base& str);
+ios_base& oct (ios_base& str);
+// 27.4.6.4 floatfield:
+ios_base& fixed (ios_base& str);
+ios_base& scientific (ios_base& str);
+
+
+
+// 27.4.2 Class ios_base
+
+class ios_base {
+
+public:
+
+// class failure;
+
+
+typedef T1 fmtflags;
+
+static const fmtflags boolalpha;
+
+static const fmtflags dec;
+
+static const fmtflags fixed;
+
+static const fmtflags hex;
+
+static const fmtflags internal;
+
+static const fmtflags left;
+
+static const fmtflags oct;
+
+static const fmtflags right;
+
+static const fmtflags scientific;
+
+static const fmtflags showbase;
+
+static const fmtflags showpoint;
+
+static const fmtflags showpos;
+
+static const fmtflags skipws;
+
+static const fmtflags unitbuf;
+
+static const fmtflags uppercase;
+
+static const fmtflags adjustfield;
+
+static const fmtflags basefield;
+
+static const fmtflags floatfield;
+
+
+typedef T2 iostate;
+
+static const iostate badbit;
+
+static const iostate eofbit;
+
+static const iostate failbit;
+
+static const iostate goodbit;
+
+
+typedef T3 openmode;
+
+static const openmode app;
+
+static const openmode ate;
+
+static const openmode binary;
+
+static const openmode in;
+
+static const openmode out;
+
+static const openmode trunc;
+
+
+typedef T4 seekdir;
+
+static const seekdir beg;
+
+static const seekdir cur;
+
+static const seekdir end;
+
+
+class Init;
+
+
+// 27.4.2.2 fmtflags state:
+
+fmtflags flags() const;
+
+fmtflags flags(fmtflags fmtfl);
+
+fmtflags setf(fmtflags fmtfl);
+
+fmtflags setf(fmtflags fmtfl, fmtflags mask);
+
+void unsetf(fmtflags mask);
+
+
+streamsize precision() const;
+
+streamsize precision(streamsize prec);
+
+streamsize width() const;
+
+streamsize width(streamsize wide);
+
+
+// 27.4.2.5 storage:
+
+static int xalloc();
+
+long& iword(int index);
+
+void*& pword(int index);
+
+
+// destructor
+
+~ios_base();
+
+
+// 27.4.2.6 callbacks;
+
+enum event { erase_event, imbue_event, copyfmt_event };
+
+typedef void (*event_callback)(event, ios_base&, int index);
+
+void register_callback(event_callback fn, int index);
+
+
+static bool sync_with_stdio(bool sync = true);
+
+
+protected:
+
+ios_base();
+
+
+private:
+
+// static int index; exposition only
+
+// long* iarray; exposition only
+
+// void** parray; exposition only
+
+};
+
+
+// 27.4.2.1.6 Class ios_base::Init
+
+class ios_base::Init {
+
+public:
+
+Init();
+
+~Init();
+
+private:
+
+// static int init_cnt; exposition only
+
+};
+
+
+// 27.4.5 Class ios
+
+class ios : public ios_base {
+
+public:
+
+// Types:
+
+typedef INT_T int_type;
+
+typedef POS_T pos_type;
+
+typedef OFF_T off_type;
+
+
+operator void*() const;
+
+bool operator!() const;
+
+iostate rdstate() const;
+
+void clear(iostate state = goodbit);
+
+void setstate(iostate state);
+
+bool good() const;
+
+bool eof() const;
+
+bool fail() const;
+
+bool bad() const;
+
+
+iostate exceptions() const;
+
+void exceptions(iostate except);
+
+
+// 27.4.5.1 Constructor/destructor:
+
+explicit ios(streambuf* sb);
+
+virtual ~ios();
+
+
+// 27.4.5.2 Members:
+
+ostream* tie() const;
+
+ostream* tie(ostream* tiestr);
+
+streambuf* rdbuf() const;
+
+streambuf* rdbuf(streambuf* sb);
+
+ios& copyfmt(const ios& rhs);
+
+char fill() const;
+
+char fill(char ch);
+
+
+protected:
+
+ios();
+
+void init(streambuf* sb);
+
+};
+
+
+// 27.5.2 Class streambuf
+
+// <streambuf>
+
+class streambuf {
+
+public:
+
+// Types:
+
+typedef INT_T int_type;
+
+typedef POS_T pos_type;
+
+typedef OFF_T off_type;
+
+virtual ~streambuf();
+
+
+// 27.5.2.2.2 buffer and positioning:
+
+streambuf* pubsetbuf(char* s, streamsize n);
+
+pos_type pubseekoff(off_type off, ios_base::seekdir way,
+ios_base::openmode which = ios_base::in | ios_base::out);
+
+pos_type pubseekpos(pos_type sp,
+ios_base::openmode which = ios_base::in | ios_base::out);
+
+int pubsync();
+
+
+// Get and put areas:
+
+// 27.5.2.2.3 Get area:
+
+streamsize in_avail();
+
+int_type snextc();
+
+int_type sbumpc();
+
+int_type sgetc();
+
+int sgetn(char* s, streamsize n);
+
+// 27.5.2.2.4 Putback:
+
+int_type sputbackc(char c);
+
+int sungetc();
+
+// 27.5.2.2.5 Put area:
+
+int sputc(char c);
+
+int_type sputn(const char* s, streamsize n);
+
+protected:
+
+streambuf();
+
+// 27.5.2.3.1 Get area:
+
+char* eback() const;
+
+char* gptr() const;
+
+char* egptr() const;
+
+void gbump(int n);
+
+void setg(char* gbeg, char* gnext, char* gend);
+
+// 27.5.2.3.2 Put area:
+
+char* pbase() const;
+
+char* pptr() const;
+
+char* epptr() const;
+
+void pbump(int n);
+void setp(char* pbeg, char* pend);
+
+// 27.5.2.4 virtual functions:
+
+// 27.5.2.4.2 management and positioning:
+
+virtual streambuf* setbuf(char* s, streamsize n);
+
+virtual pos_type seekoff(off_type off, ios_base::seekdir way,
+ios_base::openmode which = ios_base::in | ios_base::out);
+
+virtual pos_type seekpos(pos_type sp,
+ios_base::openmode which = ios_base::in | ios_base::out);
+
+virtual int sync();
+
+// 27.5.2.4.3 Get area:
+
+virtual int showmanyc();
+
+virtual streamsize xsgetn(char* s, streamsize n);
+
+virtual int_type underflow();
+
+virtual int_type uflow();
+
+// 27.5.2.4.4 Putback:
+
+virtual int_type pbackfail(int_type c = EOF);
+
+// 27.5.2.2.5 Put area:
+
+virtual streamsize xsputn(const char* s, streamsize n);
+
+virtual int_type overflow (int_type c = EOF);
+
+};
+
+
+// 27.6 Formatting and manipulators
+
+// <istream>
+
+class istream : public ios {
+
+public:
+
+// Types (inherited from ios):
+
+// typedef INT_T int_type;
+
+// typedef POS_T pos_type;
+
+// typedef OFF_T off_type;
+
+
+// 27.6.1.1.1 Constructor/destructor:
+
+explicit istream(streambuf* sb);
+
+virtual ~istream();
+
+
+// 27.6.1.1.2 Prefix/suffix:
+
+class sentry;
+
+
+// 27.6.1.2 Formatted input:
+
+istream& operator>> (istream& (*pf)(istream&));
+
+istream& operator>> (ios& (*pf)(ios&));
+
+istream& operator>> (ios_base& (*pf)(ios_base&));
+
+
+istream& operator>>(bool& n);
+
+istream& operator>>(short& n);
+
+istream& operator>>(unsigned short& n);
+
+istream& operator>>(int& n);
+
+istream& operator>>(unsigned int& n);
+
+istream& operator>>(long& n);
+
+istream& operator>>(unsigned long& n);
+
+istream& operator>>(float& f);
+
+istream& operator>>(double& f);
+
+istream& operator>>(long double& f);
+
+istream& operator>>(void*& p);
+
+istream& operator>>(streambuf* sb);
+
+
+// 27.6.1.3 Unformatted input:
+
+streamsize gcount() const;
+
+int_type get();
+
+istream& get(char& c);
+
+istream& get(char* s, streamsize n);
+
+istream& get(char* s, streamsize n, char delim);
+
+istream& get(streambuf& sb);
+
+istream& get(streambuf& sb, char delim);
+
+
+istream& getline(char* s, streamsize n);
+
+istream& getline(char* s, streamsize n, char delim);
+
+
+istream& ignore(streamsize n = 1, int_type delim = EOF);
+
+int_type peek();
+
+istream& read (char* s, streamsize n);
+
+streamsize readsome(char* s, streamsize n);
+
+
+istream& putback(char c);
+
+istream& unget();
+
+int sync();
+
+
+pos_type tellg();
+
+istream& seekg(pos_type);
+
+istream& seekg(off_type, ios_base::seekdir);
+
+};
+
+
+// 27.6.1.1.2 Class istream::sentry
+
+class istream::sentry {
+
+bool ok_; // exposition only
+
+public:
+
+explicit sentry(istream& is, bool noskipws = false);
+
+~sentry();
+
+operator bool() { return ok_; }
+
+};
+
+// 27.6.1.2.3 character extraction templates:
+istream& operator>>(istream&, char&);
+istream& operator>>(istream&, unsigned char&);
+istream& operator>>(istream&, signed char&);
+
+
+istream& operator>>(istream&, char*);
+istream& operator>>(istream&, unsigned char*);
+istream& operator>>(istream&, signed char*);
+
+
+istream& ws(istream &is);
+
+
+
+// <ostream>
+
+class ostream : public ios {
+
+public:
+
+// Types (inherited from ios):
+
+// typedef INT_T int_type;
+
+// typedef POS_T pos_type;
+
+// typedef OFF_T off_type;
+
+
+// 27.6.2.2 Constructor/destructor:
+
+explicit ostream(streambuf* sb);
+
+virtual ~ostream();
+
+
+// 27.6.2.3 Prefix/suffix:
+
+class sentry;
+
+
+// 27.6.2.5 Formatted output:
+
+ostream& operator<< (ostream& (*pf)(ostream&));
+
+ostream& operator<< (ios& (*pf)(ios&));
+
+ostream& operator<< (ios_base& (*pf)(ios_base&));
+
+
+ostream& operator<<(bool n);
+
+ostream& operator<<(short n);
+
+ostream& operator<<(unsigned short n);
+
+ostream& operator<<(int n);
+
+ostream& operator<<(unsigned int n);
+
+ostream& operator<<(long n);
+
+ostream& operator<<(unsigned long n);
+
+ostream& operator<<(float f);
+
+ostream& operator<<(double f);
+
+ostream& operator<<(long double f);
+
+ostream& operator<<(void* p);
+
+ostream& operator<<(streambuf* sb);
+
+
+// 27.6.2.6 Unformatted output:
+
+ostream& put(char c);
+
+ostream& write(const char* s, streamsize n);
+
+ostream& flush();
+
+
+// 27.6.2.4 seeks:
+
+pos_type tellp();
+
+ostream& seekp(pos_type);
+
+ostream& seekp(off_type, ios_base::seekdir);
+
+};
+
+
+// 27.6.2.3 Class ostream::sentry
+
+class ostream::sentry {
+
+bool ok_; // exposition only
+
+public:
+
+explicit sentry(ostream& os);
+
+~sentry();
+
+operator bool() { return ok_; }
+
+};
+
+// 27.6.2.5.4 character inserters
+ostream& operator<<(ostream&, char);
+// signed and unsigned
+ostream& operator<<(ostream&, signed char);
+ostream& operator<<(ostream&, unsigned char);
+
+
+ostream& operator<<(ostream&, const char*);
+// signed and unsigned
+ostream& operator<<(ostream&, const signed char*);
+ostream& operator<<(ostream&, const unsigned char*);
+
+
+ostream& endl(ostream &os);
+ostream& ends(ostream &os);
+ostream& flush(ostream &os);
+
+
+// <iomaip>
+// Types T1, T2, ... are unspecified
+// implementation types
+T1 resetiosflags(ios_base::fmtflags mask);
+T2 setiosflags (ios_base::fmtflags mask);
+T3 setbase(int base);
+T4 setfill(char c);
+T5 setprecision(int n);
+T6 setw(int n);
+
+
+// 27.8 File streams
+// <cstdio>
+#define EOF
+#define NULL
+typedef size_t;
+int getchar(void);
+char *gets(char *);
+int printf(const char *, ...);
+int putchar(int);
+int puts(char *);
+int scanf(const char *, ...);
+int sprintf(char *, const char *, ...);
+int sscanf(const char *, const char *, ...);
+int vprintf(const char *, va_list);
+int vsprintf(char *, const char *, va_list);
+

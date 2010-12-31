@@ -1,0 +1,40 @@
+
+- recommended method name convention
+
+	implXXX() for implementation dependent code
+	
+	appXXX() for application code vs. common/system code
+	
+	
+- recommended interrupt code:
+
+class XXX 
+  {
+public:
+  ...
+  static void interruptServiceRoutine(void);
+  };
+
+// ...
+  
+extern "C"
+void  INT7_vect(void) __attribute__((signal, naked));
+
+void INT7_vect(void)
+  {
+    // interrupts disabled in here
+    OSScheduler::interruptEnter(); 
+      {
+        XXX::interruptServiceRoutine();
+      }
+    OSScheduler::interruptExit();
+    // interrupts enabled after this point
+  }
+
+The provided enter/exit routines handle context save/restore, activity led
+and everything else needed.
+
+My suggestion is to keep the interruptServiceRoutine() static;
+if non-static objects need to be accessed, static pointers to that
+objects are necessary.
+  

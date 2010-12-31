@@ -1,0 +1,520 @@
+/*
+ *	Copyright (C) 2007-2008 Liviu Ionescu.
+ * 	Based on open source code with Embedded C++ constraints.
+ *
+ *	This file is part of the uOS++ distribution.
+ */
+
+#ifndef IOS_
+#define IOS_
+
+#include "portable/stdlib/include/iosfwd"
+
+//typedef OFF_T streamoff;
+typedef signed long int streamoff;
+//typedef SZ_T streamsize;(like size of write)
+typedef int streamsize;
+
+typedef int off_type;
+//typedef signed long int off_type;
+typedef unsigned long pos_type;
+
+// <ios>
+
+class ios_base;
+class ios;
+
+typedef class streambuf streambuf;
+
+// 27.4.6, manipulators:
+ios_base & boolalpha(ios_base & str);
+ios_base & noboolalpha(ios_base & str);
+ios_base & showbase(ios_base & str);
+ios_base & noshowbase(ios_base & str);
+ios_base & showpoint(ios_base & str);
+ios_base & noshowpoint(ios_base & str);
+ios_base & showpos(ios_base & str);
+ios_base & noshowpos(ios_base & str);
+ios_base & skipws(ios_base & str);
+ios_base & noskipws(ios_base & str);
+ios_base & uppercase(ios_base & str);
+ios_base & nouppercase(ios_base & str);
+// 27.4.6.2 adjustfield:
+ios_base & internal(ios_base & str);
+ios_base & left(ios_base & str);
+ios_base & right(ios_base & str);
+// 27.4.6.3 basefield:
+ios_base & dec(ios_base & str);
+ios_base & hex(ios_base & str);
+ios_base & oct(ios_base & str);
+// 27.4.6.4 floatfield:
+ios_base & fixed(ios_base & str);
+ios_base & scientific(ios_base & str);
+
+// 27.4.2 Class ios_base
+
+class ios_base
+  {
+
+public:
+  //typedef T1 fmtflags;
+  typedef unsigned short fmtflags;
+
+  // class failure;
+
+
+  static const fmtflags skipws = 0x0001;
+
+  static const fmtflags left = 0x0002;
+  static const fmtflags right = 0x0004;
+  static const fmtflags internal = 0x0008;
+
+  static const fmtflags boolalpha = 0x0010;
+
+  static const fmtflags dec = 0x0020;
+  static const fmtflags oct = 0x0040;
+  static const fmtflags hex = 0x0080;
+
+  static const fmtflags scientific = 0x0100;
+  static const fmtflags fixed = 0x0200;
+
+  static const fmtflags showbase = 0x0400;
+  static const fmtflags showpoint = 0x0800;
+  static const fmtflags showpos = 0x1000;
+  static const fmtflags uppercase = 0x2000;
+
+  static const fmtflags adjustfield = left | right | internal;
+  static const fmtflags basefield = dec | oct | hex;
+  static const fmtflags floatfield = fixed | scientific;
+
+  static const fmtflags unitbuf = 0x4000;
+
+  //typedef T2 iostate;
+  typedef unsigned char iostate;
+
+  static const iostate goodbit = 0x00;
+  static const iostate badbit = 0x01;
+  static const iostate eofbit = 0x02;
+  static const iostate failbit = 0x04;
+
+  //typedef T3 openmode;
+  typedef unsigned char openmode;
+
+  static const openmode app = 0x01;
+  static const openmode ate = 0x02;
+  static const openmode binary = 0x04;
+  static const openmode in = 0x08;
+  static const openmode out = 0x10;
+  static const openmode trunc = 0x20;
+
+  //typedef T4 seekdir;
+  typedef unsigned char seekdir;
+
+  static const seekdir beg = 0x01;
+  static const seekdir cur = 0x02;
+  static const seekdir end = 0x04;
+
+#if 0
+
+  class Init;
+#endif
+
+  // 27.4.2.2 fmtflags state:
+
+  fmtflags flags() const;
+  fmtflags flags(fmtflags fmtfl);
+  fmtflags setf(fmtflags fmtfl);
+  fmtflags setf(fmtflags fmtfl, fmtflags mask);
+  void unsetf(fmtflags mask);
+
+  streamsize precision() const;
+  streamsize precision(streamsize prec);
+
+  streamsize width() const;
+  streamsize width(streamsize wide);
+
+  // 27.4.2.5 storage:
+
+#if 0
+
+  static int xalloc();
+  long &iword( int index );
+  void *&pword( int index );
+#endif
+
+  // destructor
+
+  ~ios_base();
+
+  // 27.4.2.6 callbacks;
+#if 0
+
+  enum event
+    { erase_event, imbue_event, copyfmt_event};
+
+  typedef void( *event_callback ) ( event, ios_base &, int index );
+
+  void register_callback( event_callback fn, int index );
+
+  static bool sync_with_stdio( bool sync = true )
+    {
+      return true;
+    }
+#endif
+
+protected:
+  ios_base();
+
+private:
+  fmtflags m_format;
+  iostate m_state;
+  streamsize m_precision;
+  streamsize m_width;
+
+  // static int index; exposition only
+
+  // long* iarray; exposition only
+
+  // void** parray; exposition only
+
+  };
+
+#if 0
+// 27.4.2.1.6 Class ios_base::Init
+
+class
+ios_base::Init
+  {
+
+  public:
+
+    Init();
+
+    ~Init();
+
+  private:
+
+    static int init_cnt; //exposition only
+
+  };
+#endif
+
+// 27.4.5 Class ios
+
+class ios : public ios_base
+  {
+
+public:
+
+  operator void *() const;
+  bool operator !() const;
+
+  iostate rdstate() const;
+  void clear(iostate state = goodbit);
+  void setstate(iostate state);
+  bool good() const;
+  bool eof() const;
+  bool fail() const;
+  bool bad() const;
+
+  //-- iostate exceptions()const;
+  //-- void exceptions(iostate except);
+
+
+  // 27.4.5.1 Constructor/destructor:
+
+  explicit ios(streambuf * sb);
+  //explicit ios( OSDeviceCharacter * dev );
+  //explicit ios( OSDeviceDebug * dbg );
+  virtual ~ios();
+
+  // 27.4.5.2 Members:
+#if 0
+
+  ostream *tie() const;
+  ostream *tie( ostream * tiestr );
+#endif
+
+  streambuf *rdbuf() const;
+  streambuf *rdbuf(streambuf * sb);
+
+  //-- ios & copyfmt(const ios & rhs);
+
+  char fill() const;
+  char fill(char ch);
+
+protected:
+  char m_fill_char;
+  //iostate m_state;
+
+  //ostream *m_tied;
+  streambuf *m_streambuf;
+  //OSDeviceCharacter *m_device;
+  //OSDeviceDebug *m_debug;
+
+  ios();
+  void init(streambuf * sb/* , OSDeviceCharacter * dev, OSDeviceDebug * dbg */);
+
+  };
+
+inline ios_base::fmtflags ios_base::flags() const
+  {
+    return m_format;
+  }
+
+inline ios_base::fmtflags ios_base::flags(fmtflags fmtfl)
+  {
+    fmtflags temp = m_format;
+    m_format = fmtfl;
+    return temp;
+  }
+
+inline ios_base::fmtflags ios_base::setf(fmtflags fmtfl)
+  {
+    return flags(flags() | fmtfl);
+  }
+
+inline ios_base::fmtflags ios_base::setf(fmtflags fmtfl, fmtflags mask)
+  {
+    return flags( (flags() & ~mask ) | (fmtfl & mask ));
+  }
+
+inline void ios_base::unsetf(fmtflags mask)
+  {
+    m_format &= ~mask;
+  }
+
+inline streamsize ios_base::precision() const
+  {
+    return m_precision;
+  }
+
+inline streamsize ios_base::width() const
+  {
+    return m_width;
+  }
+
+inline ios::operator void *() const
+  {
+    if ( fail() )
+      {
+        return 0;
+      }
+    return ( void * ) ( 1 ); //Must return a non-NULL pointer(though it can be *any* pointer)
+  }
+
+inline bool ios::operator !() const
+  {
+    return fail();
+  }
+
+inline ios_base::iostate ios::rdstate() const
+  {
+    return flags();
+  }
+
+inline void ios::clear(ios_base::iostate state)
+  {
+    if (rdbuf() != 0)
+      {
+        flags(state);
+      }
+    else
+      {
+        flags(state | ios_base::badbit);
+      }
+  }
+
+inline bool ios::good() const
+  {
+    return (rdstate() == 0);
+  }
+
+inline bool ios::eof() const
+  {
+    if (rdstate() & eofbit)
+      {
+        return true;
+      }
+    return false;
+  }
+
+inline bool ios::fail() const
+  {
+    if (flags() & (failbit | badbit ))
+      {
+        return true;
+      }
+    return false;
+  }
+
+inline bool ios::bad() const
+  {
+    if (flags() & badbit)
+      {
+        return true;
+      }
+    return false;
+  }
+
+#if 0
+inline ostream *
+ios::tie() const
+  {
+    return m_tied;
+  }
+#endif
+
+inline streambuf * ios::rdbuf() const
+  {
+    return m_streambuf;
+  }
+
+//-- ios & copyfmt(const ios & rhs);
+
+inline char ios::fill() const
+  {
+    return m_fill_char;
+  }
+
+//ios_base manipulators
+
+inline ios_base & boolalpha(ios_base & str)
+  {
+    str.setf(ios_base::boolalpha);
+    return str;
+  }
+
+inline ios_base& noboolalpha(ios_base & str)
+  {
+    str.unsetf(ios_base::boolalpha);
+    return str;
+  }
+
+inline ios_base& showbase(ios_base & str)
+  {
+    str.setf(ios_base::showbase);
+    return str;
+  }
+
+inline ios_base& noshowbase(ios_base & str)
+  {
+    str.unsetf(ios_base::showbase);
+    return str;
+  }
+
+inline ios_base& showpoint(ios_base & str)
+  {
+    str.setf(ios_base::showpoint);
+    return str;
+  }
+
+inline ios_base& noshowpoint(ios_base & str)
+  {
+    str.unsetf(ios_base::showpoint);
+    return str;
+  }
+
+inline ios_base& showpos(ios_base & str)
+  {
+    str.setf(ios_base::showpos);
+    return str;
+  }
+
+inline ios_base& noshowpos(ios_base & str)
+  {
+    str.unsetf(ios_base::showpos);
+    return str;
+  }
+
+inline ios_base & skipws(ios_base & str)
+  {
+    str.setf(ios_base::skipws);
+    return str;
+  }
+
+inline ios_base & noskipws(ios_base & str)
+  {
+    str.unsetf(ios_base::skipws);
+    return str;
+  }
+
+inline ios_base & uppercase(ios_base & str)
+  {
+    str.setf(ios_base::uppercase);
+    return str;
+  }
+
+inline ios_base & nouppercase(ios_base & str)
+  {
+    str.unsetf(ios_base::uppercase);
+    return str;
+  }
+
+//inline ios_base & unitbuf(ios_base & str)
+//{
+//  str.setf(ios_base::unitbuf);
+//  return str;
+//}
+
+//inline ios_base & nounitbuf(ios_base & str)
+//{
+//  str.unsetf(ios_base::unitbuf);
+//  return str;
+//}
+
+
+inline ios_base & internal(ios_base & str)
+  {
+    str.setf(ios_base::internal, ios_base::adjustfield);
+    return str;
+  }
+
+inline ios_base & left(ios_base & str)
+  {
+    str.setf(ios_base::left, ios_base::adjustfield);
+    return str;
+  }
+
+inline ios_base & right(ios_base & str)
+  {
+    str.setf(ios_base::right, ios_base::adjustfield);
+    return str;
+  }
+
+inline ios_base & dec(ios_base & str)
+  {
+    str.setf(ios_base::dec, ios_base::basefield);
+    return str;
+  }
+
+inline ios_base & hex(ios_base & str)
+  {
+    str.setf(ios_base::hex, ios_base::basefield);
+    return str;
+  }
+
+inline ios_base & oct(ios_base & str)
+  {
+    str.setf(ios_base::oct, ios_base::basefield);
+    return str;
+  }
+
+#if defined(OS_INCLUDE_OSTREAM_FLOAT)|| defined(OS_INCLUDE_ISTREAM_FLOAT)
+
+inline ios_base &
+fixed( ios_base & str )
+  {
+    str.setf( ios_base::fixed, ios_base::floatfield );
+    return str;
+  }
+
+inline ios_base &
+scientific( ios_base & str )
+  {
+    str.setf( ios_base::scientific, ios_base::floatfield );
+    return str;
+  }
+#endif
+
+#endif /*IOS_ */

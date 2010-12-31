@@ -1,0 +1,5 @@
+avr-objcopy -O ihex -j .text -j .data "%1.elf" "%1-flash.hex"
+avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0  "%1.elf" "%1-eeprom.hex"
+if not exist "%1-eeprom.hex" echo :00000001FF > "%1-eeprom.hex"
+avr-objdump -h -S "%1.elf" > "%1-list.txt"
+avr-size --format=avr --mcu="%2" "%1.elf"

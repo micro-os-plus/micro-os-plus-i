@@ -1,0 +1,133 @@
+/*
+ *	Copyright (C) 2007-2008 Liviu Ionescu.
+ * 	Based on open source code with Embedded C++ constraints.
+ *
+ *	This file is part of the uOS++ distribution.
+ */
+
+#ifndef CHAR_TRAITS_H_
+#define CHAR_TRAITS_H_
+
+#include <string.h>
+
+// character traits
+
+struct traits
+  {
+
+    //-- typedef char char;
+    //-- typedef short int int;
+    //-- typedef char_traits_off_type off_type;
+    //-- typedef char_traits_off_type pos_type;
+    //typedef char state_type;
+
+    inline static void assign( char & c, const char & d )
+    {
+      c = d;
+    }
+
+    static bool eq( const char& c1, const char& c2 )
+    {
+      if ( c1 == c2 )
+        return true;
+      else
+        return false;
+    }
+
+    static char to_char( const int & i )
+    {
+      return ( char ) i;
+    }
+
+    inline static int to_int( const char & c )
+    {
+      return ( short int ) ( unsigned char ) c;
+    }
+
+    inline static bool eq_int( const int & a, const int & b )
+    {
+      if ( a == b )
+        {
+          return true;
+        }
+
+      return false;
+    }
+
+
+    inline static bool lt( const char& c1, const char& c2 )
+    {
+      if ( strncmp( &c1, &c2, 1 ) < 0 )
+        {
+          return true;
+        }
+
+      return false;
+    }
+
+    inline static char* move( char* s1, const char* s2, size_t n )
+    {
+      return ( char* ) memmove( s1, s2, n );
+    }
+
+    inline static char* copy( char* s1, const char* s2, size_t n )
+    {
+      for ( unsigned long int i = 0; i < n; ++i )
+        {
+          assign( s1[ i ], s2[ i ] );
+        }
+
+      return s1 + n;
+    }
+
+    inline static char* assign( char* s, size_t n, char a )
+    {
+      return ( char * ) memset( s, a, n );
+    }
+
+    inline static int compare( const char* s1, const char* s2, size_t n )
+    {
+      return strncmp( s1, s2, n );
+    }
+
+    inline static size_t length( const char* s )
+    {
+      return strlen( s );
+    }
+
+    static const char* find( const char* s, int n, const char& a );
+
+    inline static char eos()
+    {
+      return '\0';
+    }
+
+    inline static int eof()
+    {
+      return -1;
+    }
+
+    inline static int not_eof( const int & i )
+    {
+      if ( i == -1 )
+        {
+          return 0;
+        }
+      else
+        {
+          return i;
+        }
+    }
+
+    #if 0
+    static state_type get_state( pos_type p )
+    {
+      p = p;
+      state_type a;
+      return a;
+    }
+    #endif
+
+  };
+
+#endif /*CHAR_TRAITS_H_*/

@@ -1,0 +1,125 @@
+C/C++ Build
+
+Starting with version 3.x, the development was moved to dedicated plugins.
+
+Examples for compile options are:
+
+Debug-Olimex-STM32-H103
+-----------------------
+
+AS
+
+-x assembler-with-cpp -DOS_CONFIG_DEBUG_DEVICE_I2C=1 -D"OS_CONFIG_BOARD_=1" -DDEBUG=1 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus/include" 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system" 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system\hal\arch\arm_cortex_m3\stm32f10x\lib\include" 
+-Wall -Wextra -c -fmessage-length=0 
+-mcpu=cortex-m3 -mthumb -g3 -gdwarf-2
+
+C
+
+-DOS_CONFIG_DEBUG_DEVICE_I2C=1 -D"OS_CONFIG_BOARD_=1" -DDEBUG=1 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus/include" 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system" 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system\hal\arch\arm_cortex_m3\stm32f10x\lib\include" 
+-O0 -Wall -Wextra -fsigned-char -c -fmessage-length=0 -fno-inline-functions 
+-mcpu=cortex-m3 -mthumb -g3 -gdwarf-2
+
+C++
+
+-DOS_CONFIG_DEBUG_DEVICE_I2C=1 -D"OS_CONFIG_BOARD_=1" -DDEBUG=1 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus/include" 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system" 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system\hal\arch\arm_cortex_m3\stm32f10x\lib\include" 
+-O0 -Wall -Wextra -fno-exceptions -fsigned-char -c -fmessage-length=0 -fno-rtti -fno-inline-functions -Wabi 
+-mcpu=cortex-m3 -mthumb -g3 -gdwarf-2
+
+LD
+
+-T"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system\hal\boards\Olimex\stm32_h103\stm32_h103_rom.ld" 
+-nostartfiles 
+-L"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system" -Wl,-Map,XXXX.map -v 
+-mcpu=cortex-m3 -mthumb -g3 -gdwarf-2
+
+Debug-Atmel-STK525
+------------------
+
+ASM
+
+-x assembler-with-cpp 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\minimal/include" 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system" 
+-g3 -gdwarf-2 -mmcu=at90usb1287
+
+C
+
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\minimal/include" 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system" 
+-DOS_CONFIG_DEBUG_DEVICE_I2C=1 -DDEBUG=1 -D"OS_CONFIG_BOARD_ATMEL_STK525=1" 
+-Wall -g3 -gdwarf-2 -O0 -std=gnu99 -Wextra
+-mmcu=at90usb1287 -DF_CPU=8000000UL
+
+C++
+
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\minimal/include" 
+-I"X:\Users\ilg\Vault\Projects\workspace-3.3-AVR\micro-os-plus\system" 
+-DDEBUG=1 -DOS_CONFIG_DEBUG_DEVICE_I2C=1 -D"OS_CONFIG_BOARD_ATMEL_STK525=1" 
+-Wall -g3 -gdwarf-2 -O0 -std=gnu++98 -fno-exceptions -Wextra -fno-rtti -Wabi -fmessage-length=0 -fno-inline-functions 
+-mmcu=at90usb1287 -DF_CPU=8000000UL
+
+LD
+
+-Wl,-Map,minimal.map,--cref -v -mmcu=at90usb1287
+
+
+
+For compatibility reasons, here are the settings when used without these plugins:
+
+Tool Settings
+-------------
+
+GCC C++ Compiler
+	Command: avr-g++
+
+	Preprocessor
+		DEBUG=1
+
+	Directories
+		"${workspace_loc:/minimal/include}"
+		"${workspace_loc:/system}"
+
+	Optimization
+		Optimization level: -O3
+
+	Debugging
+		Debug level: None
+		Other debugging flags: -gdwarf-2
+
+	Warnings
+		All warnings -Wall
+
+	Miscellaneous
+		-c -fmessage-length=0 -mmcu=at90usb1287 -Wextra -fno-rtti -fno-exceptions -Wabi 
+
+
+GCC C++ Linker
+	Command: avr-g++ -v -mmcu=at90usb1287
+
+	Miscellaneous
+		Other options
+			-Map=map.txt
+			-cref
+
+
+
+Build Settings
+--------------
+
+Artifact name: minimal.elf
+
+
+Build steps
+-----------
+
+avr-bins minimal at90usb1287
+
