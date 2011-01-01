@@ -40,4 +40,4 @@ void OSDeviceDebug::putString_P(const char * PROGMEM pc)
   }
 
 #endif /*DEBUG*/
-#endif /*OS_CONFIG_ARCH_AVR*/
+#endif /*OS_CONFIG_ARCH_ARM_CORTEX_M3*/
