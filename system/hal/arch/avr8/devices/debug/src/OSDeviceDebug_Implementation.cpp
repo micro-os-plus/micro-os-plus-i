@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_CONFIG_ARCH_AVR) 
+#if defined(OS_CONFIG_ARCH_AVR8) 
 #if defined(DEBUG)
 
 #include "portable/kernel/include/OS.h"
@@ -40,4 +40,4 @@ void OSDeviceDebug::putString_P(const char * PROGMEM pc)
   }
 
 #endif /*DEBUG*/
-#endif /*OS_CONFIG_ARCH_AVR*/
+#endif /*OS_CONFIG_ARCH_AVR8*/

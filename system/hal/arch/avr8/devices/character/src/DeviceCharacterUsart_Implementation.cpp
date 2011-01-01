@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_DEVICECHARACTERUSART) && !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART) && defined(OS_CONFIG_ARCH_AVR)
+#if defined(OS_INCLUDE_DEVICECHARACTERUSART) && !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART) && defined(OS_CONFIG_ARCH_AVR8)
 
 #include "portable/devices/character/include/DeviceCharacterUsart.h"
 

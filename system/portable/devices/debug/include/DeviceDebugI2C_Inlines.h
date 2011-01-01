@@ -58,7 +58,7 @@ extern void masterCleanup(void);
 static const int I2C_WRITE = 0x0;
 static const int I2C_READ = 0x1;
 
-#if defined(OS_CONFIG_ARCH_AVR)
+#if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/devices/debug/include/DeviceDebugI2CEmuMaster_Inlines.h"
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #if defined(OS_CONFIG_FAMILY_STM32F10X)

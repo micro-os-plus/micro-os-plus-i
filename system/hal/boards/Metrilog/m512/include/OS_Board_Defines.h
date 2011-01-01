@@ -9,7 +9,7 @@
 
 // 644p variant includes 324p and 164p
 
-#define OS_CONFIG_ARCH_AVR                              1
+#define OS_CONFIG_ARCH_AVR8                              1
 #define OS_CONFIG_FAMILY_ATMEGA                         1
 #define OS_CONFIG_VARIANT_ATMEGA644P                    1
 #if !defined(OS_CONFIG_BOARD_METRILOG_M512)

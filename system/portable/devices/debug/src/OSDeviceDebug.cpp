@@ -251,7 +251,7 @@ void OSDeviceDebug::putPC(const char * PROGMEM pc)
         int i;
         i = 0;
 
-#if defined(OS_CONFIG_ARCH_AVR)
+#if defined(OS_CONFIG_ARCH_AVR8)
         unsigned char buff[ 5 ];
         unsigned short l;
         l = (unsigned short)pc;

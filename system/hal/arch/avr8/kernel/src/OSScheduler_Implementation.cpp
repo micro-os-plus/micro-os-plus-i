@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-#if defined(OS_CONFIG_ARCH_AVR)
+#if defined(OS_CONFIG_ARCH_AVR8)
 
 OSStack_t * OSScheduler::stackInitialize(OSStack_t * pStackTop, void(*pCode)(
     void *), void *pParams, unsigned char id)

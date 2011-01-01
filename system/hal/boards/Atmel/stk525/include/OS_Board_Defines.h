@@ -7,7 +7,7 @@
 #ifndef HAL_BOARD_OS_DEFINES_H_
 #define HAL_BOARD_OS_DEFINES_H_
 
-#define OS_CONFIG_ARCH_AVR                              1
+#define OS_CONFIG_ARCH_AVR8                              1
 #define OS_CONFIG_FAMILY_AT90USB			1
 #define OS_CONFIG_VARIANT_AT90USB1287                   1
 #if !defined(OS_CONFIG_BOARD_ATMEL_STK525)

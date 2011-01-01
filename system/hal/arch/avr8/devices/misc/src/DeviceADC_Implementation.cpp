@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_CONFIG_ARCH_AVR) 
+#if defined(OS_CONFIG_ARCH_AVR8) 
 #if defined(OS_INCLUDE_DEVICEADC)
 
 #include "portable/devices/misc/include/DeviceADC.h"
@@ -114,5 +114,5 @@ namespace DeviceADC
 #endif
 
 #endif /*OS_INCLUDE_DEVICEADC*/
-#endif /*OS_CONFIG_ARCH_AVR*/
+#endif /*OS_CONFIG_ARCH_AVR8*/
 

@@ -40,7 +40,7 @@ private:
 #error "Missing OS_CONFIG_BOARD_* definition"
 #endif
 
-#if defined(OS_CONFIG_ARCH_AVR)  
+#if defined(OS_CONFIG_ARCH_AVR8)  
 #include "hal/arch/avr8/devices/misc/include/DeviceLM74_Inlines.h"
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"

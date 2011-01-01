@@ -8,7 +8,7 @@
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-#if defined(OS_CONFIG_ARCH_AVR)
+#if defined(OS_CONFIG_ARCH_AVR8)
 
 #include "portable/kernel/include/OS.h"
 
@@ -218,6 +218,6 @@ TIMER2_OVF_vect(void)
 
 #endif
 
-#endif /* defined(OS_CONFIG_ARCH_AVR) */
+#endif /* defined(OS_CONFIG_ARCH_AVR8) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */

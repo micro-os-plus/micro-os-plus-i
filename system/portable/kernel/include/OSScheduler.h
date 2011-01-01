@@ -309,7 +309,7 @@ inline unsigned char OSReadyList::getCount(void)
 
 //-----------------------------------------------------------------------------
 
-#if defined(OS_CONFIG_ARCH_AVR)
+#if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/include/OSScheduler_Arch_Inlines.h"
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #include "hal/arch/arm_cortex_m3/kernel/include/OSScheduler_Arch_Inlines.h"

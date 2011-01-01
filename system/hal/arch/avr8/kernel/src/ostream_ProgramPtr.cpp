@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-#if defined(OS_INCLUDE_OSTREAM_PROGRAMPTR) && defined(OS_CONFIG_ARCH_AVR)
+#if defined(OS_INCLUDE_OSTREAM_PROGRAMPTR) && defined(OS_CONFIG_ARCH_AVR8)
 
 #include "hal/arch/avr8/kernel/include/ostream_ProgramPtr.h"
 

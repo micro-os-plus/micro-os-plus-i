@@ -103,7 +103,7 @@ void OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint,
         / sizeof(OSStack_t) - 1]), entryPoint, pParameters, m_id);
 
     // pStack points to first register on arm and
-    // to byte before first register on AVR
+    // to byte before first register on AVR8
 
 #if defined(DEBUG) && false
       {

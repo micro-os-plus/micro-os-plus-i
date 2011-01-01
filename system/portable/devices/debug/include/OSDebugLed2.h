@@ -28,7 +28,7 @@ inline OSDebugLed2::OSDebugLed2()
   {
   }
 
-#if defined(OS_CONFIG_ARCH_AVR)
+#if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/devices/debug/include/OSDebugLed2_Inlines.h"
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #if defined(OS_CONFIG_FAMILY_STM32F10X)

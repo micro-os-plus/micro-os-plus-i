@@ -51,7 +51,7 @@
 #endif
 
 // include architecture OS definitions
-#if defined(OS_CONFIG_ARCH_AVR)
+#if defined(OS_CONFIG_ARCH_AVR8)
 #  include "hal/arch/avr8/kernel/include/OS_Arch_Defines.h"
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #  include "hal/arch/arm_cortex_m3/kernel/include/OS_Arch_Defines.h"
