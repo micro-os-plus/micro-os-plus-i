@@ -28,7 +28,7 @@ public:
 #endif
 
 #if defined(OS_CONFIG_ARCH_AVR)  
-#include "hal/arch/avr/devices/misc/include/DeviceCANTransceiver_Inlines.h"
+#include "hal/arch/avr8/devices/misc/include/DeviceCANTransceiver_Inlines.h"
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif

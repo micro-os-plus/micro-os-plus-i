@@ -114,7 +114,7 @@ public:
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART)
 
 #if defined(OS_CONFIG_ARCH_AVR)
-#include "hal/arch/avr/devices/character/include/DeviceCharacterUsart_Inlines.h"
+#include "hal/arch/avr8/devices/character/include/DeviceCharacterUsart_Inlines.h"
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 

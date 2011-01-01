@@ -144,7 +144,7 @@ inline unsigned char OS::getResetBits(void)
 extern "C" OSStack_t **g_ppCurrentStack;
 
 #if defined(OS_CONFIG_ARCH_AVR)
-#include "hal/arch/avr/kernel/include/OS_Arch_Inlines.h"
+#include "hal/arch/avr8/kernel/include/OS_Arch_Inlines.h"
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #include "hal/arch/arm_cortex_m3/kernel/include/OS_Arch_Inlines.h"
 #if defined(OS_CONFIG_FAMILY_STM32F10X)

@@ -107,7 +107,7 @@ private:
 #endif
 
 #if defined(OS_CONFIG_ARCH_AVR)  
-#include "hal/arch/avr/tasks/include/CANLeds_Inlines.h"
+#include "hal/arch/avr8/tasks/include/CANLeds_Inlines.h"
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif

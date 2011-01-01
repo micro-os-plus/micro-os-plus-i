@@ -59,7 +59,7 @@ static const int I2C_WRITE = 0x0;
 static const int I2C_READ = 0x1;
 
 #if defined(OS_CONFIG_ARCH_AVR)
-#include "hal/arch/avr/devices/debug/include/DeviceDebugI2CEmuMaster_Inlines.h"
+#include "hal/arch/avr8/devices/debug/include/DeviceDebugI2CEmuMaster_Inlines.h"
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #if defined(OS_CONFIG_FAMILY_STM32F10X)
 #include "hal/arch/arm_cortex_m3/stm32f10x/devices/debug/include/DeviceDebugI2CEmuMaster_Family_Inlines.h"

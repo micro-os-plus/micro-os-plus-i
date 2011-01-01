@@ -8,7 +8,7 @@
 
 #if defined(OS_INCLUDE_DEVICECAN_MCP2510)
 
-#include "hal/arch/avr/devices/block/include/DeviceCAN_MCP2510.h"
+#include "hal/arch/avr8/devices/block/include/DeviceCAN_MCP2510.h"
 
 //namespace DeviceCAN_AT90CAN
 //{

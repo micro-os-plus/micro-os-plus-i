@@ -8,7 +8,7 @@
 
 #if defined(OS_INCLUDE_DEVICECAN_AT90CAN)
 
-#include "hal/arch/avr/at90can/devices/block/include/DeviceCAN_AT90CAN.h"
+#include "hal/arch/avr8/at90can/devices/block/include/DeviceCAN_AT90CAN.h"
 
 //#include "portable/devices/debug/include/OSDebugLed2.h"
 

@@ -8,7 +8,7 @@
 
 #include "portable/kernel/src/OS.cpp"
 //#if defined(OS_CONFIG_ARCH_AVR)
-#include "hal/arch/avr/kernel/src/OS_Implementation.cpp"
+#include "hal/arch/avr8/kernel/src/OS_Implementation.cpp"
 //#else
 //#error "Missing OS_CONFIG_ARCH_* definition"
 //#endif
@@ -17,7 +17,7 @@
 
 #include "portable/kernel/src/OSScheduler.cpp"
 //#if defined(OS_CONFIG_ARCH_AVR)
-#include "hal/arch/avr/kernel/src/OSScheduler_Implementation.cpp"
+#include "hal/arch/avr8/kernel/src/OSScheduler_Implementation.cpp"
 //#else
 //#error "Missing OS_CONFIG_ARCH_* definition"
 //#endif
@@ -32,7 +32,7 @@
 #include "portable/kernel/src/OSTimerSeconds.cpp"
 //#endif
 //#if defined(OS_CONFIG_ARCH_AVR)
-#include "hal/arch/avr/kernel/src/OSTimer_Implementation.cpp"
+#include "hal/arch/avr8/kernel/src/OSTimer_Implementation.cpp"
 //#else
 //#error "Missing OS_CONFIG_ARCH_* definition"
 //#endif
@@ -89,7 +89,7 @@
 //#if defined(OS_INCLUDE_OSUSBDEVICE)
 #include "portable/devices/usb/src/OSUsbDevice.cpp"
 //#if defined(OS_CONFIG_FAMILY_AT90USB)
-#include "hal/arch/avr/at90usb/devices/usb/src/OSUsbDevice_Implementation.cpp"
+#include "hal/arch/avr8/at90usb/devices/usb/src/OSUsbDevice_Implementation.cpp"
 //#else
 //#error "Unsupported processor family"
 //#endif
@@ -106,7 +106,7 @@
 
 //#if defined(OS_INCLUDE_DEVICECHARACTERUSART)
 //#if defined(OS_CONFIG_FAMILY_AT90USB)
-//#include "hal/arch/avr/at90usb/devices/character/src/DeviceCharacterUsart_Implementation.cpp"
+//#include "hal/arch/avr8/at90usb/devices/character/src/DeviceCharacterUsart_Implementation.cpp"
 //#else
 //#error "Unsupported processor family"
 //#endif
@@ -116,7 +116,7 @@
 //#if defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART1)
 #include "portable/devices/character/src/DeviceCharacterMultiUsart1.cpp"
 //#if defined(OS_CONFIG_FAMILY_AT90USB)
-//#include "hal/arch/avr/at90usb/devices/character/src/DeviceCharacterMultiUsart1_Implementation.cpp"
+//#include "hal/arch/avr8/at90usb/devices/character/src/DeviceCharacterMultiUsart1_Implementation.cpp"
 //#else
 //#error "Unsupported processor family"
 //#endif
@@ -129,7 +129,7 @@
 //#if defined(OS_INCLUDE_DEVICECHARACTERUSB)
 #include "portable/devices/character/src/DeviceCharacterUsb.cpp"
 //#if defined(OS_CONFIG_FAMILY_AT90USB)
-#include "hal/arch/avr/at90usb/devices/character/src/DeviceCharacterUsb_Implementation.cpp"
+#include "hal/arch/avr8/at90usb/devices/character/src/DeviceCharacterUsb_Implementation.cpp"
 //#else
 //#error "Unsupported processor family"
 //#endif
@@ -150,7 +150,7 @@
 //#if defined(OS_INCLUDE_OSTREAM_PROGRAMPTR)
 
 //#if defined(OS_CONFIG_ARCH_AVR)
-#include "hal/arch/avr/kernel/src/ostream_ProgramPtr.cpp"
+#include "hal/arch/avr8/kernel/src/ostream_ProgramPtr.cpp"
 //#else
 //#error "Unsupported architecture"
 //#endif

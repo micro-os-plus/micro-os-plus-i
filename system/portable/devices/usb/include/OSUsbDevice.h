@@ -11,7 +11,7 @@
 #include "portable/devices/usb/include/OSUsbDeviceDescriptors.h"
 
 #if defined(OS_CONFIG_FAMILY_AT90USB)
-#include "hal/arch/avr/at90usb/devices/usb/include/OSUsbDevice_Defines.h"
+#include "hal/arch/avr8/at90usb/devices/usb/include/OSUsbDevice_Defines.h"
 #else
 #error "Unsupported processor family"
 #endif
@@ -229,7 +229,7 @@ public:
   };
 
 #if defined(OS_CONFIG_FAMILY_AT90USB)
-#include "hal/arch/avr/at90usb/devices/usb/include/OSUsbDevice_Inlines.h"
+#include "hal/arch/avr8/at90usb/devices/usb/include/OSUsbDevice_Inlines.h"
 #else
 #error "Unsupported processor family"
 #endif

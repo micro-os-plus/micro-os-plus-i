@@ -23,8 +23,8 @@ protected:
   static unsigned char implSpiReadWrite(unsigned char c);
   };
 
-#include "hal/arch/avr/at90usb/devices/block/include/DeviceMemCardSPI_Defines.h"
+#include "hal/arch/avr8/at90usb/devices/block/include/DeviceMemCardSPI_Defines.h"
 
-#include "hal/arch/avr/devices/block/include/DeviceMemCardSPI_Inlines.h"
+#include "hal/arch/avr8/devices/block/include/DeviceMemCardSPI_Inlines.h"
 
 #endif /*DEVICEMEMCARDSPI_H_*/

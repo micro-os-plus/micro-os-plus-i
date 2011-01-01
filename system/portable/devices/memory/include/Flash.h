@@ -15,7 +15,7 @@ class Flash
   {
 
 #if defined(OS_CONFIG_ARCH_AVR)
-#include "hal/arch/avr/devices/memory/include/Flash_Constants.h"
+#include "hal/arch/avr8/devices/memory/include/Flash_Constants.h"
 #endif
 
 public:
@@ -46,7 +46,7 @@ public:
   };
 
 #if defined(OS_CONFIG_ARCH_AVR)
-#include "hal/arch/avr/devices/memory/include/Flash_Inlines.h"
+#include "hal/arch/avr8/devices/memory/include/Flash_Inlines.h"
 #endif
 
 #if defined(OS_EXCLUDE_MULTITASKING)

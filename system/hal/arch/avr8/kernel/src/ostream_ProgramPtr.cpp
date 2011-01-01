@@ -8,7 +8,7 @@
 
 #if defined(OS_INCLUDE_OSTREAM_PROGRAMPTR) && defined(OS_CONFIG_ARCH_AVR)
 
-#include "hal/arch/avr/kernel/include/ostream_ProgramPtr.h"
+#include "hal/arch/avr8/kernel/include/ostream_ProgramPtr.h"
 
 ostream & operator <<(ostream & out, OSProgramPtr_t pc)
   {
