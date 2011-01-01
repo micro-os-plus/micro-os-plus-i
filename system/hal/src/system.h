@@ -4,10 +4,14 @@
  *	This file is part of the uOS++ distribution.
  */
 
+/*
+ * Important notice: Starting with 3.0 this file is deprecated 
+ * and may not be maintained in future versions. 
+ */
 #include "portable/kernel/include/uOS.h"
 
 #include "portable/kernel/src/OS.cpp"
-//#if defined(OS_CONFIG_ARCH_AVR)
+//#if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/src/OS_Implementation.cpp"
 //#else
 //#error "Missing OS_CONFIG_ARCH_* definition"
@@ -16,7 +20,7 @@
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
 #include "portable/kernel/src/OSScheduler.cpp"
-//#if defined(OS_CONFIG_ARCH_AVR)
+//#if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/src/OSScheduler_Implementation.cpp"
 //#else
 //#error "Missing OS_CONFIG_ARCH_* definition"
@@ -31,7 +35,7 @@
 //#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
 #include "portable/kernel/src/OSTimerSeconds.cpp"
 //#endif
-//#if defined(OS_CONFIG_ARCH_AVR)
+//#if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/src/OSTimer_Implementation.cpp"
 //#else
 //#error "Missing OS_CONFIG_ARCH_* definition"
@@ -149,7 +153,7 @@
 //#if defined(OS_INCLUDE_OSTREAM_PROGRAMPTR)
 //#if defined(OS_INCLUDE_OSTREAM_PROGRAMPTR)
 
-//#if defined(OS_CONFIG_ARCH_AVR)
+//#if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/src/ostream_ProgramPtr.cpp"
 //#else
 //#error "Unsupported architecture"
