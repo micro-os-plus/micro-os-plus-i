@@ -53,8 +53,10 @@ DeviceCharacterI2C::~DeviceCharacterI2C()
 
 int DeviceCharacterI2C::implOpen(void)
   {
+#if defined(DEBUG)
     OSDeviceDebug::putString("DeviceCharacterI2C::implOpen()");
     OSDeviceDebug::putNewLine();
+#endif
 
     TWBR = 2; // 400000 at 8MHz
     TWSR = 0; // prescaller = 1
@@ -76,8 +78,10 @@ OSEvent_t DeviceCharacterI2C::implGetOpenEvent(void)
 
 int DeviceCharacterI2C::implClose(void)
   {
+#if defined(DEBUG)
     OSDeviceDebug::putString("DeviceCharacterI2C::implClose()");
     OSDeviceDebug::putNewLine();
+#endif
 
     TWCR = 0; // disable interface
 
@@ -146,7 +150,7 @@ void DeviceCharacterI2C::interruptServiceRoutine(void)
       if ( !m_rxBuf.isFull())
         {
           m_rxBuf.put(portRead());
-          os.sched.eventNotify(getReadEvent());
+          os.sched.eventNotify(implGetReadEvent());
           if ( !m_rxBuf.isFull())
             TWCR |= _BV(TWEA); // ACK
           else
@@ -172,10 +176,12 @@ void DeviceCharacterI2C::interruptServiceRoutine(void)
       break;
 
     default:
+#if defined(DEBUG)
       OSDeviceDebug::putHex(status);
       OSDeviceDebug::putChar(' ');
       OSDeviceDebug::putHex(TWDR);
       OSDeviceDebug::putChar('|');
+#endif
       ;
       }
 
