@@ -1,4 +1,4 @@
-#Thu Jun 18 22:47:24 EEST 2009
+#Sun Jan 02 14:44:59 EET 2011
 avrtarget/ClockFrequency=8000000
 avrtarget/ExtRAMSize=0
 avrtarget/ExtendedRAM=false
@@ -11,6 +11,12 @@ avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.1155727497/Exte
 avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.1155727497/MCUType=at90usb1287
 avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.1155727497/UseEEPROM=false
 avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.1155727497/UseExtendedRAMforHeap=true
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.893033942/ClockFrequency=8000000
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.893033942/ExtRAMSize=0
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.893033942/ExtendedRAM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.893033942/MCUType=at90usb1287
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.893033942/UseEEPROM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.893033942/UseExtendedRAMforHeap=true
 avrtarget/org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1759116936.121083752/ClockFrequency=1000000
 avrtarget/org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1759116936.121083752/ExtRAMSize=0
 avrtarget/org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1759116936.121083752/ExtendedRAM=false
