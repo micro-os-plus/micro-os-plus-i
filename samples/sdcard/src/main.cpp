@@ -15,12 +15,12 @@
 DeviceCharacterUsb devUsb;
 
 // USART buffers
-unsigned char tx_store[OS_CONFIG_TTYUSART_TXBUF_SIZE ];
-unsigned char rx_store[OS_CONFIG_TTYUSART_RXBUF_SIZE ];
+unsigned char tx_store[OS_CFGINT_DEVICECHARACTERMULTIUSART1_TXBUF_SIZE ];
+unsigned char rx_store[OS_CFGINT_DEVICECHARACTERMULTIUSART1_RXBUF_SIZE ];
 
 // USART device
-DeviceCharacterUsart devUsart(tx_store, OS_CONFIG_TTYUSART_TXBUF_SIZE,
-    rx_store, OS_CONFIG_TTYUSART_RXBUF_SIZE);
+DeviceCharacterMultiUsart1 devUsart(tx_store, sizeof(tx_store), rx_store,
+    sizeof(rx_store));
 
 DeviceMemCard card;
 
