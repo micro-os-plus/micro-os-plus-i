@@ -63,7 +63,7 @@
 								<option id="de.innot.avreclipse.compiler.option.optimize.shortenums.154093758" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.compiler.option.optimize.shortenums" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.compiler.option.optimize.packstruct.1022046618" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.compiler.option.optimize.packstruct" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.compiler.option.debug.type.180629241" name="Debug Info Format" superClass="de.innot.avreclipse.compiler.option.debug.type" value="de.innot.avreclipse.compiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.otherflags.605826477" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra  -Wa,-adhlns=&quot;$@.lst&quot;" valueType="string"/>
+								<option id="de.innot.avreclipse.compiler.option.otherflags.605826477" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra  -Wa,-adhlns=&quot;$@.lst&quot; -fmessage-length=0" valueType="string"/>
 								<inputType id="de.innot.avreclipse.compiler.winavr.input.15786046" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
 							</tool>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="de.innot.avreclipse.tool.cppcompiler.app.debug.1333751368" name="AVR C++ Compiler" superClass="de.innot.avreclipse.tool.cppcompiler.app.debug">
@@ -89,7 +89,7 @@
 							</tool>
 							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.697425756" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug"/>
 							<tool errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.tool.cpplinker.app.debug.1437490286" name="AVR C++ Linker" superClass="de.innot.avreclipse.tool.cpplinker.app.debug">
-								<option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.1782425610" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="" valueType="string"/>
+								<option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.1782425610" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="-Xlinker --cref  -Xlinker --gc-section" valueType="string"/>
 								<inputType id="de.innot.avreclipse.tool.cpplinker.input.2023698159" name="OBJ Files" superClass="de.innot.avreclipse.tool.cpplinker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -15113,7 +15113,7 @@
 								<option id="de.innot.avreclipse.compiler.option.optimize.shortenums.290557695" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.compiler.option.optimize.shortenums" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.compiler.option.optimize.packstruct.1892873824" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.compiler.option.optimize.packstruct" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.compiler.option.debug.type.670086615" name="Debug Info Format" superClass="de.innot.avreclipse.compiler.option.debug.type" value="de.innot.avreclipse.compiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.otherflags.1217209482" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra  -Wa,-adhlns=&quot;$@.lst&quot;" valueType="string"/>
+								<option id="de.innot.avreclipse.compiler.option.otherflags.1217209482" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra  -Wa,-adhlns=&quot;$@.lst&quot; -fmessage-length=0" valueType="string"/>
 								<inputType id="de.innot.avreclipse.compiler.winavr.input.1877799179" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
 							</tool>
 							<tool id="de.innot.avreclipse.tool.cppcompiler.app.debug.995777575" name="AVR C++ Compiler" superClass="de.innot.avreclipse.tool.cppcompiler.app.debug">
