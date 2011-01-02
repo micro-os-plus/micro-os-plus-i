@@ -78,7 +78,7 @@ c            = cli.readLine(cin, cout);
 
                 break;
               }
-            else if (c == OSError::TIMEOUT)
+            else if (c == OSReturn::OS_TIMEOUT)
               {
                 if (os.isDebug)
                 clog << "timeout" << endl;

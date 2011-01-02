@@ -1,0 +1,21 @@
+#Sun Jan 02 19:02:53 EET 2011
+avrtarget/ClockFrequency=8000000
+avrtarget/ExtRAMSize=0
+avrtarget/ExtendedRAM=false
+avrtarget/MCUType=at90usb1287
+avrtarget/UseEEPROM=false
+avrtarget/UseExtendedRAMforHeap=true
+avrtarget/de.innot.avreclipse.configuration.app.debug.1023420021/ClockFrequency=8000000
+avrtarget/de.innot.avreclipse.configuration.app.debug.1023420021/ExtRAMSize=0
+avrtarget/de.innot.avreclipse.configuration.app.debug.1023420021/ExtendedRAM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1023420021/MCUType=at90usb1287
+avrtarget/de.innot.avreclipse.configuration.app.debug.1023420021/UseEEPROM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1023420021/UseExtendedRAMforHeap=true
+avrtarget/de.innot.avreclipse.configuration.app.release.1748078165/ClockFrequency=8000000
+avrtarget/de.innot.avreclipse.configuration.app.release.1748078165/ExtRAMSize=0
+avrtarget/de.innot.avreclipse.configuration.app.release.1748078165/ExtendedRAM=false
+avrtarget/de.innot.avreclipse.configuration.app.release.1748078165/MCUType=at90usb1287
+avrtarget/de.innot.avreclipse.configuration.app.release.1748078165/UseEEPROM=false
+avrtarget/de.innot.avreclipse.configuration.app.release.1748078165/UseExtendedRAMforHeap=true
+avrtarget/perConfig=true
+eclipse.preferences.version=1
