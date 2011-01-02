@@ -332,12 +332,9 @@ void AppSDI12Sensor::processPeriodicMeasurements(void)
       }
   }
 
-namespace AppSDI12Sensor
-  {
-    unsigned char m_stackSDI12[APP_CFGINT_SDI12SENSOR_PROTO_STACK_SIZE];
-    unsigned char m_stackAquire[APP_CFGINT_SDI12SENSOR_DACQ_STACK_SIZE];
-    unsigned char m_stackPeriodic[APP_CFGINT_SDI12SENSOR_PERIODIC_STACK_SIZE];
+    unsigned char AppSDI12Sensor::m_stackSDI12[APP_CFGINT_SDI12SENSOR_PROTO_STACK_SIZE];
+    unsigned char AppSDI12Sensor::m_stackAquire[APP_CFGINT_SDI12SENSOR_DACQ_STACK_SIZE];
+    unsigned char AppSDI12Sensor::m_stackPeriodic[APP_CFGINT_SDI12SENSOR_PERIODIC_STACK_SIZE];
 
-    unsigned short ms_periodic;
-  }
+    unsigned short AppSDI12Sensor::ms_periodic;
 
