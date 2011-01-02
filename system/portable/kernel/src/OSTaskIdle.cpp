@@ -38,11 +38,13 @@ void OSTaskIdle::taskMain(void)
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
         if (!enterSleep())
-#else
           {
             OSScheduler::ledActiveOff(); // turn activity led off
             OS::CPUidle();
           }
+#else
+            OSScheduler::ledActiveOff(); // turn activity led off
+            OS::CPUidle();
 #endif
 
         // OSScheduler::yield(); //??
