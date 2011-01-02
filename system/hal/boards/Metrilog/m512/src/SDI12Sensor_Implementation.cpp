@@ -139,7 +139,7 @@ void USART0_RX_vect(void)
 
         if (OSScheduler::requireContextSwitch())
           {
-            OSScheduler::contextSwitch(true);
+            OSScheduler::contextSwitch();
           }
       }
     OSScheduler::contextRestore();
