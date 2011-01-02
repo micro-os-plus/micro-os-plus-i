@@ -10,6 +10,10 @@
 			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 				<dictionary>
+					<key>?children?</key>
+					<value>?name?=outputEntries\|?children?=?name?=entry\\\\\\\|\\\|?name?=entry\\\\\\\|\\\|?name?=entry\\\\\\\|\\\|?name?=entry\\\\\\\|\\\|\||</value>
+				</dictionary>
+				<dictionary>
 					<key>?name?</key>
 					<value></value>
 				</dictionary>
@@ -27,11 +31,11 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildCommand</key>
-					<value>cs-make</value>
+					<value>make</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/minimal/Debug-Olimex-STM32-H103}</value>
+					<value>${workspace_loc:/minimal/Debug}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
@@ -82,9 +86,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>system</name>
+			<name>micro-os-plus</name>
 			<type>2</type>
-			<locationURI>uOS_system</locationURI>
+			<locationURI>WORKSPACE_LOC/micro-os-plus</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
