@@ -18,6 +18,20 @@
  * the USB device specification.
  */
 
+// ----- static data ---------------------------------------------------------
+    volatile unsigned short OSUsbDevice::g_usb_event = 0;
+    unsigned char OSUsbDevice::data_to_transfer;
+    PGM_VOID_P OSUsbDevice::pbuffer;
+
+    bool OSUsbDevice::zlp;
+    unsigned char OSUsbDevice::bmRequestType;
+    unsigned char OSUsbDevice::endpoint_status[NB_ENDPOINTS];
+
+    bool OSUsbDevice::usb_connected;
+
+    unsigned char OSUsbDevice::usb_configuration_nb;
+// ---------------------------------------------------------------------------
+
 OSUsbDevice::OSUsbDevice()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -686,21 +700,6 @@ void OSUsbDevice::usb_set_return(unsigned char len, PGM_VOID_P pbuf)
   {
     data_to_transfer = len;
     pbuffer = pbuf;
-  }
-
-namespace OSUsbDevice
-  {
-    unsigned short g_usb_event = 0;
-    unsigned char data_to_transfer;
-    PGM_VOID_P pbuffer;
-
-    bool zlp;
-    unsigned char bmRequestType;
-    unsigned char endpoint_status[NB_ENDPOINTS];
-
-    bool usb_connected;
-
-    unsigned char usb_configuration_nb;
   }
 
 #endif

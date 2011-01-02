@@ -43,22 +43,21 @@ DeviceMemCard::DeviceMemCard()
     m_isOpened = false;
   }
 
-namespace DeviceMemCard
-  {
-    unsigned short m_waitCycles;
-    unsigned short m_bufLen;
-    unsigned short m_capabilities;
+// ----- static data ---------------------------------------------------------
+unsigned short DeviceMemCard::m_waitCycles;
+unsigned short DeviceMemCard::m_bufLen;
+unsigned short DeviceMemCard::m_capabilities;
 
 #if defined(OS_INCLUDE_MEMCARD_MEMBER_OCR)
-    unsigned long m_OCR;
+unsigned long DeviceMemCard::m_OCR;
 #endif
 
 #if defined(OS_INCLUDE_MEMCARD_MEMBER_VHS)
-    unsigned long m_VHS;
+unsigned long DeviceMemCard::m_VHS;
 #endif
 
-    bool m_isOpened;
-  }
+bool DeviceMemCard::m_isOpened;
+// ---------------------------------------------------------------------------
 
 /*
  * IMPORTANT NOTICE: 
