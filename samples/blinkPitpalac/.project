@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>blinkPitpalac</name>
+	<name>sample-blinkPitpalac</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -31,7 +31,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/minimal/Debug-Olimex-STM32-H103}</value>
+					<value>${workspace_loc:/minimal/D}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
@@ -82,9 +82,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>system</name>
+			<name>micro-os-plus</name>
 			<type>2</type>
-			<locationURI>uOS_system</locationURI>
+			<locationURI>WORKSPACE_LOC/micro-os-plus</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
