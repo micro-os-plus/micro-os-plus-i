@@ -7,6 +7,10 @@
 #ifndef UOS_H_
 #define UOS_H_
 
+#if defined OS_CONFIG_BOARD_
+#error "missing BOARD definition in Eclipse"
+#endif
+
 #include "portable/kernel/include/OS.h"
 
 #if 1
