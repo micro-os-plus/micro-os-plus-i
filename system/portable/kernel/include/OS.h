@@ -154,11 +154,18 @@ extern "C" OSStack_t **g_ppCurrentStack;
 #error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
 
+#elif defined(OS_CONFIG_ARCH_AVR32)
+#include "hal/arch/avr32/kernel/include/OS_Arch_Inlines.h"
+#if defined(OS_CONFIG_FAMILY_AVR32UC3)
+#include "hal/arch/avr32/uc3/kernel/include/OS_Family_Inlines.h"
+#else
+#error "Missing OS_CONFIG_FAMILY_* definition"
+#endif
+
 #elif defined(OS_CONFIG_ARCH_TEMPLATE)
 #include "hal/arch/TEMPLATE_ARCH/kernel/include/OS_Arch_Inlines.h"
 #if defined(OS_CONFIG_FAMILY_TEMPLATE)
 #include "hal/arch/TEMPLATE_ARCH/TEMPLATE_FAMILY/kernel/include/OS_Family_Inlines.h"
-
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
 #endif

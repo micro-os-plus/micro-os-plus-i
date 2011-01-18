@@ -9,22 +9,34 @@
 
 #if defined(OS_CONFIG_BOARD_ATMEL_STK525)
 #include "hal/boards/Atmel/stk525/include/DeviceDebugI2C_Defines.h"
+
+#elif defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+#include "hal/boards/Atmel/evk1104/include/DeviceDebugI2C_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_METRILOG_M512)
 #include "hal/boards/Metrilog/m512/include/DeviceDebugI2C_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_METRILOG_M514)
 #include "hal/boards/Metrilog/m514/include/DeviceDebugI2C_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A0739)
 #include "hal/boards/AVI/a0739/include/DeviceDebugI2C_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A07523)
 #include "hal/boards/AVI/a07523/include/DeviceDebugI2C_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A07527)
 #include "hal/boards/AVI/a07527/include/DeviceDebugI2C_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A07524)
 #include "hal/boards/AVI/a07524/include/DeviceDebugI2C_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A07521)
 #include "hal/boards/AVI/a07521/include/DeviceDebugI2C_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 #include "hal/boards/Olimex/stm32_h103/include/DeviceDebugI2C_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_TEMPLATE)
 #include "hal/boards/TEMPLATE_MANUFACTURER/TEMPLATE_BOARD/include/DeviceDebugI2C_Board_Defines.h"
 #else
@@ -66,6 +78,13 @@ static const int I2C_READ = 0x1;
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #if defined(OS_CONFIG_FAMILY_STM32F10X)
 #include "hal/arch/arm_cortex_m3/stm32f10x/devices/debug/include/DeviceDebugI2CEmuMaster_Family_Inlines.h"
+#else
+#error "Missing OS_CONFIG_FAMILY_* definition"
+#endif
+
+#elif defined(OS_CONFIG_ARCH_AVR32)
+#if defined(OS_CONFIG_FAMILY_AVR32UC3)
+#include "hal/arch/avr32/uc3/devices/debug/include/DeviceDebugI2CEmuMaster_Family_Inlines.h"
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
 #endif

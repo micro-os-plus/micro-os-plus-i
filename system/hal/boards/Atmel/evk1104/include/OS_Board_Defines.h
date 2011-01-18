@@ -1,18 +1,17 @@
 /*
- * OS_Board_Defines.h
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
- *  Created on: 18 Jan 2011
- *      Author: Liviu Ionescu
+ *      This file is part of the uOS++ distribution.
  */
 
 #ifndef HAL_OS_BOARD_DEFINES_H_
 #define HAL_OS_BOARD_DEFINES_H_
 
-#define OS_CONFIG_ARCH_TEMPLATE					1
-#define OS_CONFIG_FAMILY_TEMPLATE				1
-#define OS_CONFIG_VARIANT_TEMPLATE				1
-#if !defined(OS_CONFIG_BOARD_TEMPLATE)
-#define OS_CONFIG_BOARD_TEMPLATE				1
+#define OS_CONFIG_ARCH_AVR32					1
+#define OS_CONFIG_FAMILY_AVR32UC3				1
+#define OS_CONFIG_VARIANT_AVR32UC3A3				1
+#if !defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+#define OS_CONFIG_BOARD_ATMEL_EVK1104				1
 #endif
 
 #if !defined(OS_CFGLONG_OSCILLATOR_HZ)

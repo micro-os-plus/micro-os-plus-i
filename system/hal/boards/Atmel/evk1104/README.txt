@@ -1,0 +1,1 @@
+This is the definition of the AVR32 UC3A3 evaluation board EVK1104.

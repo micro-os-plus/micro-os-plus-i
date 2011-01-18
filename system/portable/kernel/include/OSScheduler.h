@@ -311,20 +311,34 @@ inline unsigned char OSReadyList::getCount(void)
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/include/OSScheduler_Arch_Inlines.h"
+
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #include "hal/arch/arm_cortex_m3/kernel/include/OSScheduler_Arch_Inlines.h"
+
 #if defined(OS_CONFIG_FAMILY_STM32F10X)
 #include "hal/arch/arm_cortex_m3/stm32f10x/kernel/include/OSScheduler_Family_Inlines.h"
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
+
+#elif defined(OS_CONFIG_ARCH_AVR32)
+#include "hal/arch/avr32/kernel/include/OSScheduler_Arch_Inlines.h"
+
+#if defined(OS_CONFIG_FAMILY_AVR32UC3)
+#include "hal/arch/avr32/uc3/kernel/include/OSScheduler_Family_Inlines.h"
+#else
+#error "Missing OS_CONFIG_FAMILY_* definition"
+#endif
+
 #elif defined(OS_CONFIG_ARCH_TEMPLATE)
 #include "hal/arch/TEMPLATE_ARCH/kernel/include/OSScheduler_Arch_Inlines.h"
+
 #if defined(OS_CONFIG_FAMILY_TEMPLATE)
 #include "hal/arch/TEMPLATE_ARCH/TEMPLATE_FAMILY/kernel/include/OSScheduler_Family_Inlines.h"
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
+
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif

@@ -30,24 +30,37 @@
 // include board OS definitions
 #if defined(OS_CONFIG_BOARD_ATMEL_STK525)
 #include "hal/boards/Atmel/stk525/include/OS_Board_Defines.h"
+
+#elif defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+#include "hal/boards/Atmel/evk1104/include/OS_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_METRILOG_M512)
 #include "hal/boards/Metrilog/m512/include/OS_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_METRILOG_M514)
 #include "hal/boards/Metrilog/m514/include/OS_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A0739)
 #include "hal/boards/AVI/a0739/include/OS_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A07523)
 #include "hal/boards/AVI/a07523/include/OS_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A07527)
 #include "hal/boards/AVI/a07527/include/OS_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A07524)
 #include "hal/boards/AVI/a07524/include/OS_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_AVI_A07521)
 #include "hal/boards/AVI/a07521/include/OS_Board_Defines.h"
-#elif defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
-#include "hal/boards/Olimex/stm32_h103/include/OS_Board_Defines.h"
+
 #elif defined(OS_CONFIG_BOARD_TEMPLATE)
 #include "hal/boards/TEMPLATE_MANUFACTURER/TEMPLATE_BOARD/include/OS_Board_Defines.h"
+
+#elif defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
+#include "hal/boards/Olimex/stm32_h103/include/OS_Board_Defines.h"
+
 #else
 #error "Missing OS_CONFIG_BOARD_* definition"
 #endif
@@ -55,11 +68,21 @@
 // include architecture OS definitions
 #if defined(OS_CONFIG_ARCH_AVR8)
 #  include "hal/arch/avr8/kernel/include/OS_Arch_Defines.h"
+
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #  include "hal/arch/arm_cortex_m3/kernel/include/OS_Arch_Defines.h"
 
 #if defined(OS_CONFIG_FAMILY_STM32F10X)
 #  include "hal/arch/arm_cortex_m3/stm32f10x/kernel/include/OS_Family_Defines.h"
+#else
+#  error "Missing OS_CONFIG_FAMILY_* definition"
+#endif
+
+#elif defined(OS_CONFIG_ARCH_AVR32)
+#  include "hal/arch/avr32/kernel/include/OS_Arch_Defines.h"
+
+#if defined(OS_CONFIG_FAMILY_AVR32UC3)
+#  include "hal/arch/avr32/uc3/kernel/include/OS_Family_Defines.h"
 #else
 #  error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
