@@ -104,12 +104,14 @@ static const int I2C_READ = 0x1;
 
 inline void OSDeviceDebug::implEarlyInit(void)
   {
+#if false
       {
         unsigned int _i, _j;
         for (_i = 0; _i < OS_CFGINT_DEBUG_I2C_EMU_INIT_DELAY_COUNT; ++_i)
           for (_j = 0; _j < 8000; ++_j)
             implWDReset();
       }
+#endif
 
     masterInit();
 

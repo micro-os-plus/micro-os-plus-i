@@ -14,7 +14,9 @@ void __init_static_constructors(void) __attribute__((noinline));
 
 extern "C" int main(void);
 
-void Reset_Handler(void)
+extern "C" void processor_init(void);
+
+void processor_init(void)
   {
 #if false
     SystemInit();
