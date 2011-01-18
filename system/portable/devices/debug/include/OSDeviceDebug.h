@@ -28,7 +28,9 @@ public:
   static void putChar(unsigned char c);
   static void putNewLine(void);
   static void putString(const char *pc);
+#if defined(OS_CONFIG_ARCH_AVR8)
   static void putString_P(const char * PROGMEM pc);
+#endif
   static void putHex(unsigned char c);
   static void putHex(unsigned short w);
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG)

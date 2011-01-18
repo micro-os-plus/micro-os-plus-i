@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-#if defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
+#if defined(OS_CONFIG_ARCH_TEMPLATE)
 
 OSStack_t * OSScheduler::stackInitialize(OSStack_t * pStackTop, void(*pCode)(
     void *), void *pParams, unsigned char id)
@@ -92,12 +92,7 @@ void OSScheduler::stackSetReturnedValue(OSStack_t * pStack,
 
 void OSScheduler::startImpl(void)
   {
-#ifndef OS_CFGINT_INTERRUPT_PRIORITY_PENDSV
-#define OS_CFGINT_INTERRUPT_PRIORITY_PENDSV 254
-#endif
 
-    /* Make PendSV the same priority as the kernel. */
-    SCB->SHP[14 - 4] = OS_CFGINT_INTERRUPT_PRIORITY_PENDSV;
 
     OS::interruptsClearMask();
     OS::interruptsEnable();
@@ -105,12 +100,8 @@ void OSScheduler::startImpl(void)
     /* System call to start first task. */
     asm volatile
     (
-        " ldr r0, =0xE000ED08   \n" /* Use the NVIC offset register to locate the stack. */
-        " ldr r0, [r0]          \n"
-        " ldr r0, [r0]          \n"
-        " msr msp, r0           \n" /* Set the msp back to the start of the stack. */
-        " svc 1                 \n" /* load first task context and run */
-        :::
+        " 		\n" /* Use the NVIC offset register to locate the stack. */
+        : : :
     );
 
     for (;;)
@@ -120,8 +111,6 @@ void OSScheduler::startImpl(void)
 void OSScheduler::ISRcontextSwitchRequest(void)
   {
 
-    /* Set a PendSV to perform a context switch. */
-    SCB->ICSR |= SCB_ICSR_PENDSVSET;
   }
 
 #if defined(DEBUG)

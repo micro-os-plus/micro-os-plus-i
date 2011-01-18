@@ -8,17 +8,10 @@
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-#if defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
+#if defined(OS_CONFIG_ARCH_TEMPLATE)
 
 #include "portable/kernel/include/OS.h"
 
-#if defined(OS_INCLUDE_SDI12SENSOR)
-#include "portable/devices/sdi12/include/SDI12Sensor.h"
-#endif
-
-#ifndef OS_CFGINT_INTERRUPT_PRIORITY_SYSTICK
-#define OS_CFGINT_INTERRUPT_PRIORITY_SYSTICK 253
-#endif
 
 static int i;
 
@@ -30,13 +23,6 @@ void OSTimerTicks::init(void)
     OSDeviceDebug::putNewLine();
 
 #endif
-    SCB->SHP[15 - 4] = OS_CFGINT_INTERRUPT_PRIORITY_SYSTICK;
-
-    /* Configure SysTick to interrupt at the requested rate. */
-    SysTick->LOAD = (OS_CFGLONG_SYSCLOCK_HZ / OS_CFGINT_TICK_RATE_HZ) - 1UL;
-    // core clock, count down to 0, enable multi-shot
-    SysTick->CTRL = SysTick_CTRL_CLKSOURCE | SysTick_CTRL_TICKINT
-        | SysTick_CTRL_ENABLE;
 
     i = 0;
   }

@@ -145,6 +145,7 @@ extern "C" OSStack_t **g_ppCurrentStack;
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/include/OS_Arch_Inlines.h"
+
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #include "hal/arch/arm_cortex_m3/kernel/include/OS_Arch_Inlines.h"
 #if defined(OS_CONFIG_FAMILY_STM32F10X)
@@ -152,6 +153,16 @@ extern "C" OSStack_t **g_ppCurrentStack;
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
+
+#elif defined(OS_CONFIG_ARCH_TEMPLATE)
+#include "hal/arch/TEMPLATE_ARCH/kernel/include/OS_Arch_Inlines.h"
+#if defined(OS_CONFIG_FAMILY_TEMPLATE)
+#include "hal/arch/TEMPLATE_ARCH/TEMPLATE_FAMILY/kernel/include/OS_Family_Inlines.h"
+
+#else
+#error "Missing OS_CONFIG_FAMILY_* definition"
+#endif
+
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif

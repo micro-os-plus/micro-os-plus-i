@@ -46,6 +46,8 @@
 #include "hal/boards/AVI/a07521/include/OS_Board_Defines.h"
 #elif defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 #include "hal/boards/Olimex/stm32_h103/include/OS_Board_Defines.h"
+#elif defined(OS_CONFIG_BOARD_TEMPLATE)
+#include "hal/boards/TEMPLATE_MANUFACTURER/TEMPLATE_BOARD/include/OS_Board_Defines.h"
 #else
 #error "Missing OS_CONFIG_BOARD_* definition"
 #endif
@@ -58,6 +60,15 @@
 
 #if defined(OS_CONFIG_FAMILY_STM32F10X)
 #  include "hal/arch/arm_cortex_m3/stm32f10x/kernel/include/OS_Family_Defines.h"
+#else
+#  error "Missing OS_CONFIG_FAMILY_* definition"
+#endif
+
+#elif defined(OS_CONFIG_ARCH_TEMPLATE)
+#  include "hal/arch/TEMPLATE_ARCH/kernel/include/OS_Arch_Defines.h"
+
+#if defined(OS_CONFIG_FAMILY_TEMPLATE)
+#  include "hal/arch/TEMPLATE_ARCH/TEMPLATE_FAMILY/kernel/include/OS_Family_Defines.h"
 #else
 #  error "Missing OS_CONFIG_FAMILY_* definition"
 #endif

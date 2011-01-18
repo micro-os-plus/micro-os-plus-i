@@ -318,6 +318,13 @@ inline unsigned char OSReadyList::getCount(void)
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
+#elif defined(OS_CONFIG_ARCH_TEMPLATE)
+#include "hal/arch/TEMPLATE_ARCH/kernel/include/OSScheduler_Arch_Inlines.h"
+#if defined(OS_CONFIG_FAMILY_TEMPLATE)
+#include "hal/arch/TEMPLATE_ARCH/TEMPLATE_FAMILY/kernel/include/OSScheduler_Family_Inlines.h"
+#else
+#error "Missing OS_CONFIG_FAMILY_* definition"
+#endif
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif

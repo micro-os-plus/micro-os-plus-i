@@ -72,7 +72,11 @@ int main()
   {
 #if defined(DEBUG)
     OSDeviceDebug::putNewLine();
+//#if defined(OS_CONFIG_ARCH_AVR8)
     OSDeviceDebug::putString_P(PSTR("main()"));
+//#else
+//    OSDeviceDebug::putString("main()");
+//#endif
     OSDeviceDebug::putNewLine();
 #endif
 #if !defined(OS_EXCLUDE_MULTITASKING)
@@ -108,7 +112,11 @@ delete(void *p __attribute__( ( unused ) ) )
   {
 #if defined(DEBUG)
     ; // dummy, refered by virtual destructors
+//#if defined(OS_CONFIG_ARCH_AVR8)
     OSDeviceDebug::putString_P(PSTR("delete("));
+//#else
+//    OSDeviceDebug::putString("delete(");
+//#endif
 #if (__SIZEOF_POINTER__ == 2)
     OSDeviceDebug::putHex((unsigned short)p);
 #endif

@@ -25,6 +25,8 @@
 #include "hal/boards/AVI/a07521/include/DeviceDebugI2C_Defines.h"
 #elif defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 #include "hal/boards/Olimex/stm32_h103/include/DeviceDebugI2C_Board_Defines.h"
+#elif defined(OS_CONFIG_BOARD_TEMPLATE)
+#include "hal/boards/TEMPLATE_MANUFACTURER/TEMPLATE_BOARD/include/DeviceDebugI2C_Board_Defines.h"
 #else
 #error "Missing OS_CONFIG_BOARD_* definition"
 #endif
@@ -60,12 +62,21 @@ static const int I2C_READ = 0x1;
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/devices/debug/include/DeviceDebugI2CEmuMaster_Inlines.h"
+
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 #if defined(OS_CONFIG_FAMILY_STM32F10X)
 #include "hal/arch/arm_cortex_m3/stm32f10x/devices/debug/include/DeviceDebugI2CEmuMaster_Family_Inlines.h"
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
+
+#elif defined(OS_CONFIG_ARCH_TEMPLATE)
+#if defined(OS_CONFIG_FAMILY_TEMPLATE)
+#include "hal/arch/TEMPLATE_ARCH/TEMPLATE_FAMILY/devices/debug/include/DeviceDebugI2CEmuMaster_Family_Inlines.h"
+#else
+#error "Missing OS_CONFIG_FAMILY_* definition"
+#endif
+
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
