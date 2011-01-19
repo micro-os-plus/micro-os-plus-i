@@ -7,6 +7,9 @@
 #ifndef HAL_FAMILY_OS_INLINES_H_
 #define HAL_FAMILY_OS_INLINES_H_
 
+#include <avr32/io.h>
+#include "hal/arch/avr32/lib/include/compiler.h"
+
 inline void OSImpl::CPUidle(void)
   {
     asm volatile("	":::);
@@ -53,5 +56,14 @@ inline void OSImpl::SOFTreset(void)
     for (;;)
       ; // trigger WD
   }
+
+#if (defined __GNUC__)
+__attribute__((__always_inline__))
+#endif
+extern __inline__ void gpio_local_init(void)
+{
+  Set_system_register(AVR32_CPUCR,
+                      Get_system_register(AVR32_CPUCR) | AVR32_CPUCR_LOCEN_MASK);
+}
 
 #endif /*HAL_FAMILY_OS_INLINES_H_*/
