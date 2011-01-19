@@ -46,6 +46,9 @@
  *
  */
 
+#define OS_BUILD_ASSEMBLY_CODE       (1)
+#include "portable/kernel/include/OS_Defines.h"
+
 #if defined(OS_CONFIG_ARCH_AVR32)
 
 #include <avr32/io.h>
@@ -74,10 +77,9 @@ _start:
   .global _stext
   .type _stext, @function
 _stext:
+#if false
   // Set initial stack pointer.
   lda.w   sp, _estack
-
-  lda.w   pc, processor_init
 
   // Set up EVBA so interrupts can be enabled.
   lda.w   r0, _evba
@@ -117,8 +119,10 @@ udata_clear_loop_end:
   lda.w   lr, exit
 #endif
 
+#endif
   // Start the show.
-  lda.w   pc, main
+//  lda.w   pc, main
+  lda.w   pc, processor_init
 
 
 //! \endverbatim

@@ -47,6 +47,9 @@
  *
  */
 
+#define OS_BUILD_ASSEMBLY_CODE       (1)
+#include "portable/kernel/include/OS_Defines.h"
+
 #if defined(OS_CONFIG_ARCH_AVR32)
 
 #if !__AVR32_UC__ && !__AVR32_AP__
