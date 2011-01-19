@@ -14,10 +14,16 @@ void __init_static_constructors(void) __attribute__((noinline));
 
 extern "C" int main(void);
 
-extern "C" void processor_init(void);
+extern "C" void os_processor_init(void) __attribute__( ( naked ));
 
-void processor_init(void)
+//int xx = 0x12345678;
+
+void os_processor_init(void)
   {
+  asm volatile (
+      " lda.w   sp, _estack\n"
+      :::
+  );
 #if false
     SystemInit();
 #endif
@@ -37,7 +43,7 @@ void processor_init(void)
 #endif
 #endif
 
-    //__init_data_and_bss();
+    __init_data_and_bss();
 
 #if defined(DEBUG)
     OSDeviceDebug::earlyInit();
