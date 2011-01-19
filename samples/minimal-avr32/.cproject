@@ -85,7 +85,7 @@
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
 								</option>
 							</tool>
-							<tool id="avr32.managedbuild.tool.gnu.preprocessor.exe.debug.908914233" name="32-bit AVR/GNU Preprocessing Assembler" superClass="avr32.managedbuild.tool.gnu.preprocessor.exe.debug">
+							<tool command="avr32-gcc -x assembler-with-cpp -c -D&quot;OS_CONFIG_BOARD_ATMEL_EVK1104=1&quot;" id="avr32.managedbuild.tool.gnu.preprocessor.exe.debug.908914233" name="32-bit AVR/GNU Preprocessing Assembler" superClass="avr32.managedbuild.tool.gnu.preprocessor.exe.debug">
 								<option id="avr32.both.preprocessor.option.debugging.level.1460601056" name="Debug Level" superClass="avr32.both.preprocessor.option.debugging.level" value="avr32.both.preprocessor.debugging.level.max" valueType="enumerated"/>
 								<option id="avr32.both.preprocessor.option.mcu.540271056" name="Microcontroller Unit" superClass="avr32.both.preprocessor.option.mcu" value="-mpart=uc3a3256" valueType="string"/>
 								<option id="avr32.both.preprocessor.option.paths.1453833918" name="Include paths (-I)" superClass="avr32.both.preprocessor.option.paths" valueType="includePath">
