@@ -180,6 +180,10 @@ SECTIONS
     KEEP (*(SORT(.ctors.*)))
     KEEP (*(.ctors))
   } >INTRAM AT>FLASH :INTRAM_AT_FLASH
+  
+  __ctors_array_start = LOADADDR (.ctors);
+  __ctors_array_end = (__ctors_array_start + SIZEOF (.ctors));
+  
   .dtors          :
   {
     KEEP (*crtbegin*.o(.dtors))

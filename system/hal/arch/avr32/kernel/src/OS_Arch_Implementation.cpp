@@ -46,10 +46,10 @@ void __init_data_and_bss(void)
   }
 
 /* start address for the constructors section. defined in linker script */
-extern unsigned long __init_array_start;
+extern unsigned long __ctors_array_start;
 
 /* end address for the constructors section. defined in linker script */
-extern unsigned long __init_array_end;
+extern unsigned long __ctors_array_end;
 
 typedef void (*pFunc_t)(void);
 
@@ -58,11 +58,10 @@ void __init_static_constructors(void)
     unsigned long *p;
     void (*pFunc)(void);
 
-    /* run constructors */
-    p = &__init_array_start;
-    for (; p < &__init_array_end; p++)
+    p = &__ctors_array_start;
+    for (; p < &__ctors_array_end; p++)
       {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS) && defined(OS_DEBUG_CONSTRUCTORS_INIT)
         OSDeviceDebug::putString("INIT=");
         OSDeviceDebug::putHex(*p);
         OSDeviceDebug::putNewLine();
@@ -70,7 +69,7 @@ void __init_static_constructors(void)
         pFunc = (pFunc_t) (*p);
         (*pFunc)();
       }
-  }
+}
 
 
 #if false

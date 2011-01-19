@@ -59,7 +59,7 @@ os_processor_init(void)
 
   OS::earlyInit();
 
-  //__init_static_constructors();
+  __init_static_constructors();
 
   main(); // call standard main()
 
