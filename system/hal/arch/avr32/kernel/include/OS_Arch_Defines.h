@@ -7,8 +7,10 @@
 #ifndef HAL_ARCH_OS_DEFS_H_
 #define HAL_ARCH_OS_DEFS_H_
 
+#if !defined (OS_BUILD_ASSEMBLY_CODE)
 typedef unsigned long OSStack_t;
 typedef unsigned long *pfnVector_t;
+#endif
 
 #if !defined(OS_CFGINT_BUSYWAIT_CALIBRATION)
 #if defined(DEBUG)
