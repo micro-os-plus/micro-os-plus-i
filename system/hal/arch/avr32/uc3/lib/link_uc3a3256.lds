@@ -129,6 +129,7 @@ SECTIONS
   PROVIDE (__etext = .);
   PROVIDE (_etext = .);
   PROVIDE (etext = .);
+
   .rodata         : { *(.rodata .rodata.* .gnu.linkonce.r.*) } >FLASH AT>FLASH :FLASH
   .rodata1        : { *(.rodata1) } >FLASH AT>FLASH :FLASH
   .eh_frame_hdr : { *(.eh_frame_hdr) } >FLASH AT>FLASH :FLASH
@@ -137,6 +138,9 @@ SECTIONS
   .lalign	: { . = ALIGN(8); PROVIDE(_data_lma = .); } >FLASH AT>FLASH :FLASH
   . = ORIGIN(INTRAM);
   .dalign	: { . = ALIGN(8); PROVIDE(_data = .); } >INTRAM AT>INTRAM :INTRAM_ALIGN
+
+    PROVIDE (__data_start = .) ;
+
   /* Exception handling  */
   .eh_frame       : ONLY_IF_RW { KEEP (*(.eh_frame)) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   .gcc_except_table   : ONLY_IF_RW { KEEP (*(.gcc_except_table)) *(.gcc_except_table.*) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
@@ -198,9 +202,12 @@ SECTIONS
   .data1          : { *(.data1) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   .balign	: { . = ALIGN(8); PROVIDE(_edata = .); } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   PROVIDE (edata = .);
-  __bss_start = .;
+
+    PROVIDE (__data_end = .) ;
+/* ilg  __bss_start = .; */
   .bss            :
   {
+    PROVIDE (__bss_start = .) ;
     *(.dynbss)
     *(.bss .bss.* .gnu.linkonce.b.*)
     *(COMMON)
@@ -208,10 +215,15 @@ SECTIONS
        _end.  Align after .bss to ensure correct alignment even if the
        .bss section disappears because there are no input sections.  */
     . = ALIGN(8);
+     PROVIDE (__bss_end = .) ;
   } >INTRAM AT>INTRAM :INTRAM
   . = ALIGN(8);
   _end = .;
   PROVIDE (end = .);
+
+   __data_load_start = LOADADDR(.data);
+   __data_load_end = __data_load_start + SIZEOF(.data);
+
   __heap_start__ = ALIGN(8);
   .heap           :
   {
