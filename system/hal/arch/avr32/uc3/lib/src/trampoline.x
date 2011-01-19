@@ -46,6 +46,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define OS_BUILD_ASSEMBLY_CODE       (1)
+#include "portable/kernel/include/OS_Defines.h"
+
 #if defined(OS_CONFIG_ARCH_AVR32)
 
 #include "hal/arch/avr32/uc3/lib/include/conf_isp.h"
@@ -68,8 +71,9 @@ _trampoline:
   .org  PROGRAM_START_OFFSET
 program_start:
   // Jump to the C runtime startup routine.
-  lda.w   pc, _stext
+  //lda.w   pc, _stext
 
+  lda.w   pc, os_processor_init
 
 //! \endverbatim
 //! @}
