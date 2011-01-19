@@ -47,6 +47,8 @@
  *
  */
 
+#if defined(OS_CONFIG_ARCH_AVR32)
+
 #include <avr32/io.h>
 #include "hal/arch/avr32/lib/include/compiler.h"
 #include "hal/arch/avr32/lib/include/preprocessor.h"
@@ -212,3 +214,5 @@ void INTC_register_interrupt(__int_handler handler, unsigned int irq, unsigned i
   // core interrupt system and the user interrupt handler.
   AVR32_INTC.ipr[int_grp] = ipr_val[int_level & (AVR32_INTC_IPR_INTLEVEL_MASK >> AVR32_INTC_IPR_INTLEVEL_OFFSET)];
 }
+
+#endif /* defined(OS_CONFIG_ARCH_AVR32) */

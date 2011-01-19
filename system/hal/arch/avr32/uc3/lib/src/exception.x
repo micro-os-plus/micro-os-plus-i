@@ -47,6 +47,8 @@
  *
  */
 
+#if defined(OS_CONFIG_ARCH_AVR32)
+
 #if !__AVR32_UC__ && !__AVR32_AP__
   #error Implementation of the AVR32 architecture not supported by the INTC driver.
 #endif
@@ -237,3 +239,5 @@ ipr_val:
 
 //! \endverbatim
 //! @}
+
+#endif /* defined(OS_CONFIG_ARCH_AVR32) */

@@ -46,6 +46,8 @@
  *
  */
 
+#if defined(OS_CONFIG_ARCH_AVR32)
+
 #include <avr32/io.h>
 
 
@@ -121,3 +123,5 @@ udata_clear_loop_end:
 
 //! \endverbatim
 //! @}
+
+#endif /* defined(OS_CONFIG_ARCH_AVR32) */

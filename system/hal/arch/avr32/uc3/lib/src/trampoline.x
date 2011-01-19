@@ -46,6 +46,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if defined(OS_CONFIG_ARCH_AVR32)
 
 #include "hal/arch/avr32/uc3/lib/include/conf_isp.h"
 
@@ -72,3 +73,5 @@ program_start:
 
 //! \endverbatim
 //! @}
+
+#endif /* defined(OS_CONFIG_ARCH_AVR32) */
