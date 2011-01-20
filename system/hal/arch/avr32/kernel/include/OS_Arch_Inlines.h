@@ -7,10 +7,12 @@
 #ifndef HAL_ARCH_OS_INLINES_H_
 #define HAL_ARCH_OS_INLINES_H_
 
+#include "hal/arch/avr32/lib/include/compiler.h"
+
 inline void OSImpl::returnFromInterrupt(void)
   {
     asm volatile (
-        "		\n"
+        "rete		\n"
         ::
     );
     for (;;)
@@ -21,7 +23,7 @@ inline void OSImpl::returnFromSubroutine(void)
   {
     asm volatile
     (
-        " 		\n"
+        "mov pc, lr	\n"
         ::
     );
     for (;;)
@@ -35,38 +37,42 @@ inline void OSImpl::NOP(void)
 
 inline void OSImpl::interruptsEnable(void)
   {
-    asm volatile
+  Enable_global_interrupt();
+/*    asm volatile
     (
         " 		\n"
         :::
-    );
+    );*/
   }
 
 inline void OSImpl::interruptsDisable(void)
   {
-    asm volatile
+  Disable_global_interrupt();
+/*    asm volatile
     (
         " 		\n"
         :::
-    );
+    );*/
   }
 
 inline void OSImpl::interruptsClearMask(void)
   {
-    asm volatile
+  Enable_global_interrupt();
+/*    asm volatile
     (
         " 		\n"
         :::
-    );
+    );*/
   }
 
 inline void OSImpl::interruptsSetMask(void)
   {
-    asm volatile
+  Disable_global_interrupt();
+   /* asm volatile
     (
         " 		\n"
         :::
-    );
+    );*/
   }
 
 #endif /*HAL_ARCH_OS_INLINES_H_*/
