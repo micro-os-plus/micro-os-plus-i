@@ -53,6 +53,9 @@
 #include "hal/arch/avr32/lib/include/compiler.h"
 #include "hal/arch/avr32/lib/include/preprocessor.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*! \brief Sets the MCU in the specified sleep mode.
  *
@@ -366,12 +369,8 @@ extern void pm_switch_to_clock(volatile avr32_pm_t *pm, unsigned long clock);
  * \param fosc0 Oscillator 0 crystal frequency (Hz)
  * \param startup Crystal 0 startup time. AVR32_PM_OSCCTRL0_STARTUP_x_RCOSC.
  */
-#ifdef __cplusplus
-extern "C"
-#else
-extern
-#endif
-void pm_switch_to_osc0(volatile avr32_pm_t *pm, unsigned int fosc0, unsigned int startup);
+
+extern void pm_switch_to_osc0(volatile avr32_pm_t *pm, unsigned int fosc0, unsigned int startup);
 
 
 
@@ -508,5 +507,8 @@ extern int pm_configure_clocks(pm_freq_param_t *param);
  */
 extern int pm_configure_usb_clock(pm_freq_param_t *param, unsigned int pll);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // _PM_H_
