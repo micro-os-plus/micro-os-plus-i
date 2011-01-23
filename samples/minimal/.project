@@ -28,7 +28,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/sample-minimal/Debug-Template-Avr32}</value>
+					<value>${workspace_loc:/sample-minimal-avr32/Debug}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.contents</key>
@@ -68,6 +68,7 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>de.innot.avreclipse.core.avrnature</nature>
+		<nature>com.atmel.avr32.core.nature</nature>
 	</natures>
 	<linkedResources>
 		<link>
