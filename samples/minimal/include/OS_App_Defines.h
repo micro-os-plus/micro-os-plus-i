@@ -21,7 +21,14 @@
 //#define OS_CONFIG_DEBUG_DEVICE_I2C                    1
 //#define OS_CONFIG_DEBUG_DEVICE_USART			1
 
+#define OS_DEBUG_OSSCHEDULER_STACKINITIALIZE            (1)
 #define OS_DEBUG_CONSTRUCTORS                           (1)
+#define OS_DEBUG_OSSCHEDULER_START                      (1)
+#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
+#define OS_DEBUG_OSSCHEDULER_TASKREGISTER               (1)
+#define OS_DEBUG_OSREADYLIST_INSERT                     (1)
+#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
+#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
 
 #endif /*DEBUG*/
 
