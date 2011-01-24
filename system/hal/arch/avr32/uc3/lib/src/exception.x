@@ -186,7 +186,7 @@ _handle_DTLB_Miss_Write:
         .org  0x100
         // Supervisor Call.
 _handle_Supervisor_Call:
-        rjmp $
+        rjmp os_scall_handler
 
 
 // Interrupt support.
