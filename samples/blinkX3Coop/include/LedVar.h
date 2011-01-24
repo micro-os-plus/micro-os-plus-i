@@ -32,6 +32,7 @@ inline void LedVar::init(void)
   {
     // init led port as output
     OS_GPIO_PORT_CONFIG_OUTPUT(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
+    OS_GPIO_PORT_HIGH(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
   }
 
 inline void LedVar::toggle(void)
