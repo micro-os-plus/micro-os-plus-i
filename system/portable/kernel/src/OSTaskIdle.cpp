@@ -43,11 +43,11 @@ void OSTaskIdle::taskMain(void)
             OS::CPUidle();
           }
 #else
-            OSScheduler::ledActiveOff(); // turn activity led off
-            OS::CPUidle();
+        OSScheduler::ledActiveOff(); // turn activity led off
+        OS::CPUidle();
 #endif
-
-        // OSScheduler::yield(); //??
+        // required for cooperative and after non-scheduled interrupts
+        OSScheduler::yield();
       }
   }
 
