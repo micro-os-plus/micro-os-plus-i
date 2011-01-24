@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2009 Liviu Ionescu.
+ *      Copyright (C) 2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -14,14 +14,10 @@
  */
 inline void OSScheduler::ledActiveInit(void)
   {
-#if false
-        // enable clock for APB2 where GPIOC is located
-        RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
-#endif
-
 #if defined(OS_CONFIG_ACTIVE_LED_PORT) && defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
-        OS_GPIO_PORT_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
-        OS_GPIO_PORT_CONFIG(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT, 1);
+        OS_GPIO_PORT_CONFIG_ENABLE(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT);
+        OS_GPIO_PORT_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+        OS_GPIO_PORT_CONFIG_OUTPUT(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT);
 #else
 #error "OS_CONFIG_ACTIVE_LED_* missing"
 #endif
