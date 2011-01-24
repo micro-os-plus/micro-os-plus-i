@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -11,7 +11,7 @@
 // ---------------------------------------------------------------------------
 
 /*
- * Perform a series of short busy wait steps of 1 tick separated
+ * Perform a series of short busy wait steps of 1 millisecond separated
  * by yields.
  */
 
@@ -20,7 +20,7 @@ delayWithYield(schedTicks_t n)
 {
   for (; n--;)
     {
-      os.busyWaitMillis(1); // busy wait one tick
+      os.busyWaitMillis(1); // busy wait one millisecond
       os.sched.yield(); // release control to next task
     }
 }
