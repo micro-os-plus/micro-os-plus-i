@@ -16,6 +16,7 @@ public:
   inline static void returnFromSubroutine(void) __attribute__((always_inline,noreturn));
   // ---
 
+  inline static void CPUinit(void) __attribute__((always_inline));
   inline static void CPUidle(void) __attribute__((always_inline));
   inline static void CPUsleep(void) __attribute__((always_inline));
   inline static void CPUdeepSleep(void) __attribute__((always_inline));
@@ -36,6 +37,8 @@ public:
   inline static void interruptsSetMask(void) __attribute__((always_inline));
 
   };
+
+extern "C" OSStack_t **g_ppCurrentStack;
 
 #include "portable/kernel/include/OSScheduler.h"
 
@@ -140,8 +143,6 @@ inline unsigned char OS::getResetBits(void)
   {
     return ms_resetBits;
   }
-
-extern "C" OSStack_t **g_ppCurrentStack;
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/include/OS_Arch_Inlines.h"
