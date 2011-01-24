@@ -41,6 +41,8 @@ typedef PGM_VOID_P OSProgramPtr_t;
 //#define OS_CFV(_MODE,_SPEED)    ((((_MODE) & 0x3) << 2) | ((_SPEED) & 0x03))
 
 #define OS_GPIO_PORT_CONFIG(_PORT_CONFIG, _BIT, _VALUE) ((_PORT_CONFIG) = ((_PORT_CONFIG) & ~(OS_SVB(_BIT, 0x1))) | (OS_SVB(_BIT, _VALUE)))
+#define OS_GPIO_PORT_CONFIG_OUTPUT(_PORT_CONFIG, _BIT) ((_PORT_CONFIG) = ((_PORT_CONFIG) & ~(OS_SVB(_BIT, 0x1))) | (OS_SVB(_BIT, 0x1)))
+#define OS_GPIO_PORT_CONFIG_INPUT(_PORT_CONFIG, _BIT) ((_PORT_CONFIG) = ((_PORT_CONFIG) & ~(OS_SVB(_BIT, 0x1))) | (OS_SVB(_BIT, 0x0)))
 #define OS_GPIO_PORT_HIGH(_PORT, _BIT) ((_PORT) |= OS_S1B(_BIT))
 #define OS_GPIO_PORT_LOW(_PORT, _BIT) ((_PORT) &= ~OS_S1B(_BIT))
 #define OS_GPIO_PORT_TOGGLE(_PORT, _BIT) ((_PORT) ^= OS_S1B(_BIT))
