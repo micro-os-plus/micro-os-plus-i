@@ -7,6 +7,8 @@
 #ifndef HAL_ARCH_OSSCHEDULER_INLINES_H_
 #define HAL_ARCH_OSSCHEDULER_INLINES_H_
 
+#include "hal/arch/avr32/lib/include/compiler.h"
+
 //------------------------------------------------------------------------------------
 
 /*
@@ -45,6 +47,12 @@
 // R7
 
 // (*) automatically done for INT0..INT3, but not for SCALL
+
+void SCALLcontextSave(void) __attribute__( ( always_inline ) );
+void SCALLcontextRestore(void) __attribute__( ( always_inline ) );
+void AppContextRestore(void) __attribute__( ( always_inline ) );
+
+
 
 inline void
 AppContextRestore(void)
