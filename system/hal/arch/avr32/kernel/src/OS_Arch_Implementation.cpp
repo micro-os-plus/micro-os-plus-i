@@ -27,7 +27,7 @@ extern unsigned long __bss_start;
 /* end address for the .bss section. defined in linker script */
 extern unsigned long __bss_end;
 
-void __init_data_and_bss(void)
+void os_init_data_and_bss(void)
   {
     unsigned long *pSrc, *pDest;
 
@@ -53,7 +53,7 @@ extern unsigned long __ctors_array_end;
 
 typedef void (*pFunc_t)(void);
 
-void __init_static_constructors(void)
+void os_init_static_constructors(void)
   {
     unsigned long *p;
     void (*pFunc)(void);
