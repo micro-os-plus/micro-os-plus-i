@@ -18,7 +18,7 @@ extern "C" int
 main(void);
 
 extern "C" void
-os_reset_handler(void) __attribute__( ( naked ));
+os_reset_handler(void) __attribute__( ( naked, noreturn ));
 
 //int xx = 0x12345678;
 
@@ -73,6 +73,7 @@ os_reset_handler(void)
 
   main(); // call standard main()
 
+  // noreturn
   for (;;)
     ;
 }
