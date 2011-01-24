@@ -179,4 +179,10 @@
 #define OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT             (1)
 #endif
 
+#if !defined(OS_INCLUDE_SEPARATE_PROGMEM)
+#define PROGMEM
+#define PSTR(_S_) ((const char *)_S_)
+#define putString_P putString
+#endif
+
 #endif /*OS_DEFINES_H_*/
