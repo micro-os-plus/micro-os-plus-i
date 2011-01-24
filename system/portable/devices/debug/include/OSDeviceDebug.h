@@ -107,9 +107,11 @@ inline void OSDeviceDebug::putString(const char __attribute__( ( unused ) ) * pc
   {
   }
 
+#if defined(OS_INCLUDE_SEPARATE_PROGMEM)
 inline void OSDeviceDebug::putString_P(const char __attribute__( ( unused) ) * PROGMEM pc)
   {
   }
+#endif
 
 inline void OSDeviceDebug::putHex(unsigned char __attribute__( ( unused ) ) c)
   {
