@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2009 Liviu Ionescu.
+ *      Copyright (C) 2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -8,50 +8,60 @@
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
 
-#include "hal/arch/avr32/uc3/lib/include/pm.h"
+void
+os_init_data_and_bss(void) __attribute__((noinline));
 
 void
-__init_data_and_bss(void) __attribute__((noinline));
-void
-__init_static_constructors(void) __attribute__((noinline));
+os_init_static_constructors(void) __attribute__((noinline));
 
 extern "C" int
 main(void);
 
 extern "C" void
-os_processor_init(void) __attribute__( ( naked ));
+os_reset_handler(void) __attribute__( ( naked ));
 
 //int xx = 0x12345678;
 
 void
-os_processor_init(void)
+OSImpl::CPUinit(void)
+{
+  // Switch to external Oscillator 0
+  pm_switch_to_osc0(&AVR32_PM, OS_CFGLONG_OSCILLATOR_HZ,
+      AVR32_PM_OSCCTRL0_STARTUP_2048_RCOSC);
+
+  // initialise local bus; without it GPIO does not work
+  Set_system_register(AVR32_CPUCR,
+      Get_system_register(AVR32_CPUCR) | AVR32_CPUCR_LOCEN_MASK);
+
+  // Set up EVBA so interrupts can be enabled later.
+  Set_system_register(AVR32_EVBA, (int)&_evba);
+}
+
+void
+os_reset_handler(void)
 {
   asm volatile (
       " lda.w   sp, _estack\n"
       :::
   );
-#if true
-  // Switch to external Oscillator 0
-  pm_switch_to_osc0(&AVR32_PM, OS_CFGLONG_OSCILLATOR_HZ, AVR32_PM_OSCCTRL0_STARTUP_2048_RCOSC);
-  gpio_local_init();
-#endif
 
   // be sure we start with interrupts disabled
   OS::interruptsDisable();
 
+  OSImpl::CPUinit();
+
   OSScheduler::ledActiveInit();
   OSScheduler::ISRledActiveOn();
 
+  os_init_data_and_bss();
+
 #if false
-  wdt_enable(WDTO_2S);
-
-#if !defined(OS_EXCLUDE_MULTITASKING)
-  set_sleep_mode(SLEEP_MODE_IDLE);
-  sleep_enable();
+  if (xx != 0x12345678)
+    {
+      OSDeviceDebug::putString("dataInit() failed");
+      OSDeviceDebug::putNewLine();
+    }
 #endif
-#endif
-
-  __init_data_and_bss();
 
 #if defined(DEBUG)
   OSDeviceDebug::earlyInit();
@@ -59,7 +69,7 @@ os_processor_init(void)
 
   OS::earlyInit();
 
-  __init_static_constructors();
+  os_init_static_constructors();
 
   main(); // call standard main()
 
@@ -71,6 +81,17 @@ void
 OS::saveResetBits(void)
 {
   ms_resetBits = -1;
+}
+
+extern "C" void
+os_scall_handler(void) __attribute__( ( naked ));
+
+void
+os_scall_handler(void)
+{
+  SCALLcontextSave();
+  OSScheduler::contextSwitch();
+  SCALLcontextRestore();
 }
 
 #endif /* OS_CONFIG_FAMILY_AVR32UC3 */
