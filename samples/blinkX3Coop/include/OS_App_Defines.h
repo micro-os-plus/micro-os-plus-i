@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -8,7 +8,7 @@
 #define APP_OS_DEFINES_H_
 
 // override the board definitions, if needed
-//#define OS_CFGLONG_OSCILLATOR_HZ                        (8000000UL)
+//#define OS_CFGLONG_OSCILLATOR_HZ                        (16000000UL)
 
 //#define OS_CFGINT_TICK_RATE_HZ                          (1000)
 //#define OS_CFGINT_TIMER_PRESCALLER                      (64)
