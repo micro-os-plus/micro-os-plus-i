@@ -40,17 +40,7 @@ OSTask *OSReadyList::ms_array[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 
 // ----------------------------------------------------------------------------
 
-#if defined(DEBUG)
-OSScheduler::OSScheduler()
-  {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("OSScheduler()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
-  }
-#endif
-
+// runs before all constructors
 void OSScheduler::earlyInit(void)
   {
 #if defined(DEBUG)
@@ -72,11 +62,20 @@ void OSScheduler::earlyInit(void)
     ms_tasksCount = 0;
   }
 
+
+#if defined(DEBUG)
+OSScheduler::OSScheduler()
+  {
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+    OSDeviceDebug::putString_P(PSTR("OSScheduler()="));
+    OSDeviceDebug::putPtr(this);
+    OSDeviceDebug::putNewLine();
+#endif
+  }
+#endif
+
 void OSScheduler::start(void)
   {
-    //ledActiveInit();
-    //ledActiveOn();
-
     // insert all tasks in the ready list; equal priority tasks
     // will have the same order as they were defined
     int i;
@@ -131,6 +130,10 @@ void OSScheduler::start(void)
       }
 
     // never gets here
+#if defined(DEBUG)
+    OSDeviceDebug::putString_P(PSTR("OSScheduler::start() failed"));
+    OSDeviceDebug::putNewLine();
+#endif
     for (;;)
       ;
   }
@@ -230,7 +233,7 @@ int OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
   }
 
 // quick check if a context switch is necessary
-// executed on interrups to save a few cycles by not entering the
+// executed on interrupts to save a few cycles by not entering the
 // context switch routine
 
 bool OSScheduler::requireContextSwitch()
@@ -346,7 +349,7 @@ unsigned char OSScheduler::taskRegister(OSTask *pTask)
       }
     OSScheduler::criticalExit();
 
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_TASKREGISTER)
     if (false)
       {
         OSDeviceDebug::putString_P(PSTR("Register "));
@@ -405,7 +408,7 @@ void OSScheduler::ISRcancelTask(OSTask *pTask)
 
 OSReadyList::OSReadyList()
   {
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("OSReadyList()"));
     OSDeviceDebug::putNewLine();
 #endif
