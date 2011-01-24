@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -39,8 +39,10 @@ extern void delayWithYield(schedTicks_t n);
 #define APP_CONFIG_LED2                 AVR32_PIN_PX54
 #define APP_CONFIG_LED3                 AVR32_PIN_PX51
 
+#define APP_CONFIG_LED_ISACTIVE_LOW     (1)
+
 #else
-#error "Missing board"
+#error "Missing OS_CONFIG_BOARD_* board definition"
 #endif
 
 
