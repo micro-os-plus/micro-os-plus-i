@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2009 Liviu Ionescu.
+ *      Copyright (C) 2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -9,16 +9,14 @@
 
 #include <avr32/io.h>
 
-// _VALUE == 1 output
-// _VALUE == 0 input
-#define OS_GPIO_PORT_CONFIG(_PORT_CONFIG, _BIT, _VALUE) \
-	{ \
-	(AVR32_GPIO.port[(_BIT)>>5].gpers = (1<< ((_BIT) & 0x1F))); \
-	if( _VALUE > 0) \
-	(AVR32_GPIO.port[(_BIT)>>5].oders = (1<< ((_BIT) & 0x1F))); \
-        else \
-	(AVR32_GPIO.port[(_BIT)>>5].oderc = (1<< ((_BIT) & 0x1F))); \
-	}
+/*
+ * Usage:
+ *      _PORT = GPIOX (currently ignored)
+ *      _BIT = AVR32_PIN_PXnn
+ */
+#define OS_GPIO_PORT_CONFIG_ENABLE(_PORT, _BIT) (AVR32_GPIO.port[(_BIT)>>5].gpers = (1<< ((_BIT) & 0x1F)))
+#define OS_GPIO_PORT_CONFIG_OUTPUT(_PORT, _BIT) (AVR32_GPIO.port[(_BIT)>>5].oders = (1<< ((_BIT) & 0x1F)))
+#define OS_GPIO_PORT_CONFIG_INPUT(_PORT, _BIT) (AVR32_GPIO.port[(_BIT)>>5].oderc = (1<< ((_BIT) & 0x1F)))
 
 #define OS_GPIO_PORT_HIGH(_PORT, _BIT) (AVR32_GPIO.port[(_BIT)>>5].ovrs = (1<< ((_BIT) & 0x1F)))
 #define OS_GPIO_PORT_LOW(_PORT, _BIT) (AVR32_GPIO.port[(_BIT)>>5].ovrc = (1<< ((_BIT) & 0x1F)))
