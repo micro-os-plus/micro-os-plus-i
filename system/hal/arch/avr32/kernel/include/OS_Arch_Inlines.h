@@ -9,70 +9,61 @@
 
 #include "hal/arch/avr32/lib/include/compiler.h"
 
-inline void OSImpl::returnFromInterrupt(void)
-  {
-    asm volatile (
-        "rete		\n"
-        ::
-    );
-    for (;;)
-      ; // noreturn
-  }
+inline void
+OSImpl::returnFromInterrupt(void)
+{
+  asm volatile (
+      " rete \n"
+      :::
+  );
+  for (;;)
+    ; // noreturn
+}
 
-inline void OSImpl::returnFromSubroutine(void)
-  {
-    asm volatile
-    (
-        "mov pc, lr	\n"
-        ::
-    );
-    for (;;)
-      ; // noreturn
-  }
+inline void
+OSImpl::returnFromSubroutine(void)
+{
+  asm volatile
+  (
+      " mov pc, lr \n"
+      :::
+  );
+  for (;;)
+    ; // noreturn
+}
 
-inline void OSImpl::NOP(void)
-  {
-    asm volatile( " nop":: );
-  }
+inline void
+OSImpl::NOP(void)
+{
+  asm volatile
+  (
+      " nop \n"
+      :::
+  );
+}
 
-inline void OSImpl::interruptsEnable(void)
-  {
+inline void
+OSImpl::interruptsEnable(void)
+{
   Enable_global_interrupt();
-/*    asm volatile
-    (
-        " 		\n"
-        :::
-    );*/
-  }
+}
 
-inline void OSImpl::interruptsDisable(void)
-  {
+inline void
+OSImpl::interruptsDisable(void)
+{
   Disable_global_interrupt();
-/*    asm volatile
-    (
-        " 		\n"
-        :::
-    );*/
-  }
+}
 
-inline void OSImpl::interruptsClearMask(void)
-  {
+inline void
+OSImpl::interruptsClearMask(void)
+{
   Enable_global_interrupt();
-/*    asm volatile
-    (
-        " 		\n"
-        :::
-    );*/
-  }
+}
 
-inline void OSImpl::interruptsSetMask(void)
-  {
+inline void
+OSImpl::interruptsSetMask(void)
+{
   Disable_global_interrupt();
-   /* asm volatile
-    (
-        " 		\n"
-        :::
-    );*/
-  }
+}
 
 #endif /*HAL_ARCH_OS_INLINES_H_*/
