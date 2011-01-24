@@ -73,7 +73,7 @@ program_start:
   // Jump to the C runtime startup routine.
   //lda.w   pc, _stext
 
-  lda.w   pc, os_processor_init
+  lda.w   pc, os_reset_handler
 
 //! \endverbatim
 //! @}
