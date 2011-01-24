@@ -9,8 +9,8 @@
 
 // do not use parenthesis, will also be stringified
 #define OS_CFGINT_MAJOR                 3
-#define OS_CFGINT_MINOR                 0
-#define OS_CFGINT_REVISION              1162
+#define OS_CFGINT_MINOR                 1
+#define OS_CFGINT_REVISION              1287
 
 #define xstr(x)  str(x)
 #define str(x)  #x
