@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -31,8 +31,14 @@ inline LedVar::LedVar(unsigned char iBit)
 inline void LedVar::init(void)
   {
     // init led port as output
-    OS_GPIO_PORT_CONFIG_OUTPUT(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
-    OS_GPIO_PORT_HIGH(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
+    OS_GPIO_PIN_CONFIG_OUTPUT(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
+
+    // Turn led off, i.e. HIGH if active low.
+#if defined(APP_CONFIG_LED_ISACTIVE_LOW)
+    OS_GPIO_PIN_HIGH(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
+#else
+    OS_GPIO_PIN_LOW(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
+#endif
   }
 
 inline void LedVar::toggle(void)
@@ -40,7 +46,7 @@ inline void LedVar::toggle(void)
     os.sched.criticalEnter();
       {
         // toggle led
-        OS_GPIO_PORT_TOGGLE(APP_CONFIG_LED_PORT, m_iBit);
+        OS_GPIO_PIN_TOGGLE(APP_CONFIG_LED_PORT, m_iBit);
       }
     os.sched.criticalExit();
   }
