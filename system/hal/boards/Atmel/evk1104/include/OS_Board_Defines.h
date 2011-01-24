@@ -26,56 +26,59 @@
 #endif
 
 #if !defined(OS_CONFIG_ACTIVE_LED_PORT)
-#define OS_CONFIG_ACTIVE_LED_PORT						GPIOX
+#define OS_CONFIG_ACTIVE_LED_PORT			        GPIOX
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
-#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG				OS_CONFIG_ACTIVE_LED_PORT
+#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG		        OS_CONFIG_ACTIVE_LED_PORT
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
-#define OS_CONFIG_ACTIVE_LED_BIT						AVR32_PIN_PX16
+#define OS_CONFIG_ACTIVE_LED_BIT			        AVR32_PIN_PX16
+#endif
+#if !defined(OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW)
+#define OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW                       (1)
 #endif
 
 #if false
 #if !defined(OS_CONFIG_USB_LED_PORT_INIT)
-#define OS_CONFIG_USB_LED_PORT_INIT						DDRD
+#define OS_CONFIG_USB_LED_PORT_INIT			        DDRD
 #endif
 #if !defined(OS_CONFIG_USB_LED_PORT)
-#define OS_CONFIG_USB_LED_PORT							PORTD
+#define OS_CONFIG_USB_LED_PORT					PORTD
 #endif
 #if !defined(OS_CONFIG_USB_LED_BIT)
-#define OS_CONFIG_USB_LED_BIT							PORTD7
+#define OS_CONFIG_USB_LED_BIT					PORTD7
 #endif
 
 #if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)
-#define OS_CONFIG_BLINK_LED_PORT_INIT					DDRD
+#define OS_CONFIG_BLINK_LED_PORT_INIT				DDRD
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_PORT)
-#define OS_CONFIG_BLINK_LED_PORT						PORTD
+#define OS_CONFIG_BLINK_LED_PORT				PORTD
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_BIT)
-#define OS_CONFIG_BLINK_LED_BIT							5
+#define OS_CONFIG_BLINK_LED_BIT					5
 #endif
 #endif
 
 #if true
 #if !defined(OS_CONFIG_DEBUG_LED1_PORT)
-#define OS_CONFIG_DEBUG_LED1_PORT                       GPIOX
+#define OS_CONFIG_DEBUG_LED1_PORT                               GPIOX
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                OS_CONFIG_DEBUG_LED1_PORT
+#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                        OS_CONFIG_DEBUG_LED1_PORT
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_BIT)
-#define OS_CONFIG_DEBUG_LED1_BIT                        AVR32_PIN_PX50
+#define OS_CONFIG_DEBUG_LED1_BIT                                AVR32_PIN_PX50
 #endif
 
 #if !defined(OS_CONFIG_DEBUG_LED2_PORT)
-#define OS_CONFIG_DEBUG_LED2_PORT                       GPIOX
+#define OS_CONFIG_DEBUG_LED2_PORT                               GPIOX
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                OS_CONFIG_DEBUG_LED2_PORT
+#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                        OS_CONFIG_DEBUG_LED2_PORT
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_BIT)
-#define OS_CONFIG_DEBUG_LED2_BIT                        AVR32_PIN_PX54
+#define OS_CONFIG_DEBUG_LED2_BIT                                AVR32_PIN_PX54
 #endif
 #endif
 
