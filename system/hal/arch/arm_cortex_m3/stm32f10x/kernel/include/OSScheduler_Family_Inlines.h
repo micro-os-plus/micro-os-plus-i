@@ -18,8 +18,8 @@ inline void OSScheduler::ledActiveInit(void)
         RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
 
 #if defined(OS_CONFIG_ACTIVE_LED_PORT) && defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
-        OS_GPIO_PORT_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
-        OS_GPIO_PORT_CONFIG(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT, OS_CFV(GPIO_Mode_Out_PP, GPIO_Speed_50MHz));
+        OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+        OS_GPIO_PIN_CONFIG(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT, OS_CFV(GPIO_Mode_Out_PP, GPIO_Speed_50MHz));
 #else
 #error "OS_CONFIG_ACTIVE_LED_* missing"
 #endif
@@ -28,7 +28,7 @@ inline void OSScheduler::ledActiveInit(void)
 /* Turn LED on (on interrupts) */
 inline void OSScheduler::ISRledActiveOn(void)
   {
-    OS_GPIO_PORT_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+    OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
   }
 
 inline void OSScheduler::ledActiveOn(void)
@@ -43,7 +43,7 @@ inline void OSScheduler::ledActiveOn(void)
 /* Turn LED off (on interrupts) */
 inline void OSScheduler::ISRledActiveOff(void)
   {
-    OS_GPIO_PORT_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+    OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
   }
 
 /* Turn LED off (at sleep) */

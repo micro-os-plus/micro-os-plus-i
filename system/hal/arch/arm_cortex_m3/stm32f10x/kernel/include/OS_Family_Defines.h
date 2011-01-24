@@ -16,10 +16,10 @@
 #define OS_SVB(_BIT,_VALUE)     (((_VALUE) & 0xF) << ((OS_BIT8(_BIT)) * 4))
 #define OS_CFV(_MODE,_SPEED)    ((((_MODE) & 0x3) << 2) | ((_SPEED) & 0x03))
 
-#define OS_GPIO_PORT_CONFIG(_PORT_CONFIG, _BIT, _VALUE) ((_PORT_CONFIG) = ((_PORT_CONFIG) & ~(OS_SVB(_BIT, OS_CFV(0x3, 0x3)))) | (OS_SVB(_BIT, _VALUE)))
-#define OS_GPIO_PORT_HIGH(_PORT, _BIT) ((_PORT)->BSRR |= OS_S1B(_BIT))
-#define OS_GPIO_PORT_LOW(_PORT, _BIT) ((_PORT)->BRR |= OS_S1B(_BIT))
-#define OS_GPIO_PORT_TOGGLE(_PORT, _BIT) ((_PORT)->ODR ^= OS_S1B(_BIT))
+#define OS_GPIO_PIN_CONFIG(_PORT_CONFIG, _BIT, _VALUE) ((_PORT_CONFIG) = ((_PORT_CONFIG) & ~(OS_SVB(_BIT, OS_CFV(0x3, 0x3)))) | (OS_SVB(_BIT, _VALUE)))
+#define OS_GPIO_PIN_HIGH(_PORT, _BIT) ((_PORT)->BSRR |= OS_S1B(_BIT))
+#define OS_GPIO_PIN_LOW(_PORT, _BIT) ((_PORT)->BRR |= OS_S1B(_BIT))
+#define OS_GPIO_PIN_TOGGLE(_PORT, _BIT) ((_PORT)->ODR ^= OS_S1B(_BIT))
 
 
 /* External Interrupts */
