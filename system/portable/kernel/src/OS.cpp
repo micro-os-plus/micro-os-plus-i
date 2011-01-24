@@ -72,11 +72,7 @@ int main()
   {
 #if defined(DEBUG)
     OSDeviceDebug::putNewLine();
-//#if defined(OS_CONFIG_ARCH_AVR8)
     OSDeviceDebug::putString_P(PSTR("main()"));
-//#else
-//    OSDeviceDebug::putString("main()");
-//#endif
     OSDeviceDebug::putNewLine();
 #endif
 #if !defined(OS_EXCLUDE_MULTITASKING)
