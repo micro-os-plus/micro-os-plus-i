@@ -41,7 +41,7 @@ TaskBlink::taskMain(void)
           debug.putString(getName());
           debug.putString("', led=");
           debug.putDec(m_oLed.bitNumber());
-          debug.putString(", millis=");
+          debug.putString(", ticks=");
           debug.putDec(m_rate);
           debug.putNewLine();
         }
@@ -54,7 +54,7 @@ TaskBlink::taskMain(void)
   // task endless loop
   for (;;)
     {
-      delayWithYield(m_rate); // sequence of short waits
+      os.sched.timerTicks.sleep(m_rate);
 
       // finally toggle led
       m_oLed.toggle();
