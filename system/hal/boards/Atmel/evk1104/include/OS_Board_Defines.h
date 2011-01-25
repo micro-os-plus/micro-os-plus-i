@@ -17,9 +17,33 @@
 #if !defined(OS_CFGLONG_OSCILLATOR_HZ)
 #define OS_CFGLONG_OSCILLATOR_HZ				(16000000UL)
 #endif
-#if !defined(OS_CFGINT_CLOCK_PRESCALER)
-#define OS_CFGINT_CLOCK_PRESCALER				(1)
+
+#if !defined(OS_CFGINT_TIMER_PRESCALLER)
+#define OS_CFGINT_TIMER_PRESCALLER				(4)
 #endif
+
+// TODO: Stringify definitions
+#if !defined(OS_CFGINT_TIMER_ID)
+#define OS_CFGINT_TIMER_ID                                      (0)
+#endif
+#if !defined(OS_CFGVAR_TIMER)
+#define OS_CFGVAR_TIMER                                         (AVR32_TC0)
+#endif
+#if !defined(OS_CFGINT_TIMER_CHANNEL)
+#define OS_CFGINT_TIMER_CHANNEL                                 (0)
+#endif
+#if !defined(OS_CFGINT_TIMER_IRQ_ID)
+#define OS_CFGINT_TIMER_IRQ_ID                                  (AVR32_TC0_IRQ0)
+#endif
+#if !defined(OS_CFGINT_TIMER_IRQ_LEVEL)
+#define OS_CFGINT_TIMER_IRQ_LEVEL                               (0)
+#endif
+
+#if !defined(OS_CFGINT_TIMER_CLOCK_SELECT)
+#define OS_CFGINT_TIMER_CLOCK_SELECT                            (3)
+#endif
+
+
 
 #if !defined(OS_CFGINT_TICK_RATE_HZ)
 #define OS_CFGINT_TICK_RATE_HZ             		        (1000)
