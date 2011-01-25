@@ -52,6 +52,9 @@
 
 #include "hal/arch/avr32/lib/include/compiler.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //! Maximal number of interrupt request lines per group.
 #define AVR32_INTC_MAX_NUM_IRQS_PER_GRP             32
@@ -69,12 +72,11 @@ typedef void (*__int_handler)(void);
 typedef void (__interrupt *__int_handler)(void);
 #endif
 
-
 /*! \brief Initializes the hardware interrupt controller driver.
  *
  * \note Taken and adapted from Newlib.
  */
-extern void INTC_init_interrupts(void);
+extern  void INTC_init_interrupts(void);
 
 /*! \brief Registers an interrupt handler.
  *
@@ -96,5 +98,9 @@ extern void INTC_register_interrupt(__int_handler handler, unsigned int irq, uns
 
 #endif  // __AVR32_ABI_COMPILER__
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // _INTC_H_
+
