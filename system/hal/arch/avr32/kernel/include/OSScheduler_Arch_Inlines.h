@@ -356,7 +356,7 @@ OSScheduler::contextRestore(void)
 /*
  * Critical section management.
  *
- * Push BASEPRI onto the stack and disable interrupts.
+ * Push SR onto the stack and disable interrupts.
  *
  * Notice: The function context is addressed via Rxx, not SP, so using the
  * stack as temporary storage should be safe.
@@ -367,14 +367,20 @@ OSScheduler::criticalEnter(void)
 #if !defined(OS_EXCLUDE_MULTITASKING)
   asm volatile
   (
-      "		\n"
-      : : :
+      "	mfsr r0, %[SR] \n"
+      " st.w --sp, r0 \n"
+      " orh r0, %[MASK] \n"
+      " mtsr %[SR], r0 \n"
+      :
+      : [MASK] "i" (0x001E),
+        [SR] "i" (AVR32_SR)
+      : "r0"
   );
 #endif
 }
 
 /*
- * Pop BASEPRI from the stack, restore interrupts to previous status
+ * Pop SR from the stack, restore interrupts to previous status
  */
 inline void
 OSScheduler::criticalExit(void)
@@ -382,9 +388,11 @@ OSScheduler::criticalExit(void)
 #if !defined(OS_EXCLUDE_MULTITASKING)
   asm volatile
   (
-      "		\n"
-      "		\n"
-      : : :
+      "	ld.w r0, sp++ \n"
+      "	mtsr %[SR], r0 \n"
+      :
+      : [SR] "i" (AVR32_SR)
+      : "r0"
   );
 #endif
 }
