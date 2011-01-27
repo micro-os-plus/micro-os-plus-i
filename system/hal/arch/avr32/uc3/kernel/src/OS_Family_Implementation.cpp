@@ -90,9 +90,9 @@ os_scall_handler(void) __attribute__( ( naked ));
 void
 os_scall_handler(void)
 {
-  SCALLcontextSave();
+  SCALL_contextSave();
   OSScheduler::contextSwitch();
-  SCALLcontextRestore();
+  SCALL_contextRestore();
 }
 
 #endif /* OS_CONFIG_FAMILY_AVR32UC3 */
