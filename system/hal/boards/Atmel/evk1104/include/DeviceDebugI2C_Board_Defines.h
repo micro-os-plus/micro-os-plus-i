@@ -9,14 +9,14 @@
 
 #include <avr32/io.h>
 
-#define OS_CFGINT_DEBUG_I2C_EMU_INIT_DELAY_COUNT        (100)
+#define OS_CFGINT_DEBUG_I2C_EMU_INIT_DELAY_COUNT        (1)
 #define OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT             (2)
 
-#define OS_CONFIG_DEBUG_SCL_PORT                        GPIO
+#define OS_CONFIG_DEBUG_SCL_PORT                        GPIOA
 #define OS_CONFIG_DEBUG_SCL_PORT_CONFIG                 OS_CONFIG_DEBUG_SCL_PORT
 #define OS_CONFIG_DEBUG_SCL_BIT                         AVR32_PIN_PA03
 
-#define OS_CONFIG_DEBUG_SDA_PORT                        GPIO
+#define OS_CONFIG_DEBUG_SDA_PORT                        GPIOA
 #define OS_CONFIG_DEBUG_SDA_PORT_CONFIG                 OS_CONFIG_DEBUG_SDA_PORT
 #define OS_CONFIG_DEBUG_SDA_BIT                         AVR32_PIN_PA04
 
