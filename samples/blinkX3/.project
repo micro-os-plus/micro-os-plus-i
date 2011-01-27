@@ -3,6 +3,7 @@
 	<name>blinkX3</name>
 	<comment></comment>
 	<projects>
+		<project>micro-os-plus</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -27,11 +28,11 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildCommand</key>
-					<value>cs-make</value>
+					<value>make</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/minimal/D}</value>
+					<value>${workspace_loc:/sample-blinkX3/Debug-Atmel-EVK1104}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
