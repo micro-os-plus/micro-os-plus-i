@@ -14,9 +14,9 @@ typedef unsigned long *pfnVector_t;
 
 #if !defined(OS_CFGINT_BUSYWAIT_CALIBRATION)
 #if defined(DEBUG)
-#define OS_CFGINT_BUSYWAIT_CALIBRATION	         (9129)
+#define OS_CFGINT_BUSYWAIT_CALIBRATION	                (9129)
 #else
-#define OS_CFGINT_BUSYWAIT_CALIBRATION           (7074)
+#define OS_CFGINT_BUSYWAIT_CALIBRATION                  (7074)
 #endif
 #endif
 
@@ -24,13 +24,13 @@ typedef unsigned long *pfnVector_t;
 #define PSTR(_S_) ((const char *)_S_)
 #define putString_P putString
 
-#define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG			(1)
-#define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT				(1)
+#define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG            (1)
+#define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT             (1)
 
-#define OS_INLINE_INTERRUPTS_ENABLE_DISABLE				(1)
+#define OS_INLINE_INTERRUPTS_ENABLE_DISABLE             (1)
 
-//#define OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT              (1)
-#define OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING          (1)
+//#define OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT      (1)
+#define OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING   (1)
 
 
 #if !defined(OS_CFGINT_STACK_MINIMAL_SIZE)
