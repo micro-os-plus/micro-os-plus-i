@@ -57,13 +57,13 @@ OSImpl::interruptsDisable(void)
 inline void
 OSImpl::interruptsClearMask(void)
 {
-  Enable_global_interrupt();
+  ;
 }
 
 inline void
 OSImpl::interruptsSetMask(void)
 {
-  Disable_global_interrupt();
+  ;
 }
 
 #endif /*HAL_ARCH_OS_INLINES_H_*/
