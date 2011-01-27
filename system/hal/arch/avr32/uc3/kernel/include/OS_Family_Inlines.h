@@ -46,7 +46,7 @@ OSImpl::CPUdeepSleep(void)
 inline void
 OSImpl::WDTreset(void)
 {
-  ;
+  ; // TODO: fill it in
 }
 
 // as per manual, JMP 0 is not recommended since
