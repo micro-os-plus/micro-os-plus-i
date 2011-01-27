@@ -76,29 +76,13 @@ OSScheduler::stackInitialize(OSStack_t * pStackTop, void
   return pStackTop;
 }
 
-#if false
-void OSScheduler::stackSetReturnedValue(OSStack_t * pStack,
-    OSEventWaitReturn_t ret)
-  {
-#if false && defined(DEBUG)
-    OSDeviceDebug::putString(" rv=");
-    OSDeviceDebug::putHex((unsigned short)ret);
-    OSDeviceDebug::putString(" *");
-    OSDeviceDebug::putHex((unsigned short)pStack);
-    OSDeviceDebug::putNewLine();
-#endif
-
-    pStack[STACK_R0_WORD_OFFSET] = (OSStack_t) ret;
-  }
-#endif
-
 void
 OSScheduler::startImpl(void)
 {
   OS::interruptsClearMask();
   OS::interruptsEnable();
 
-  UserMode_contextRestore();
+  FirstTask_contextRestore();
 
   for (;;)
     ; // noreturn
