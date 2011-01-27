@@ -48,9 +48,9 @@
 
 // (*) automatically done for INT0..INT3, but not for SCALL
 
-#if defined(OS_INCLUDE_OSSCHEDULER_IMPL_CONTEXT_PROCESSING)
+#if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
-inline void OSScheduler::implStackPointerSave(void)
+inline void OSSchedulerImpl::implStackPointerSave(void)
   {
     asm volatile (
 
@@ -64,7 +64,7 @@ inline void OSScheduler::implStackPointerSave(void)
     );
   }
 
-inline void OSScheduler::implStackPointerRestore(void)
+inline void OSSchedulerImpl::implStackPointerRestore(void)
   {
     asm volatile (
 
@@ -79,7 +79,7 @@ inline void OSScheduler::implStackPointerRestore(void)
     );
   }
 
-inline void OSScheduler::implRegistersSave(void)
+inline void OSSchedulerImpl::implRegistersSave(void)
   {
     asm volatile (
         /* Save R0..R7 */
@@ -90,7 +90,7 @@ inline void OSScheduler::implRegistersSave(void)
     );
   }
 
-inline void OSScheduler::implRegistersRestore(void)
+inline void OSSchedulerImpl::implRegistersRestore(void)
   {
     asm volatile (
         /* Restore R0..R7 */
@@ -102,8 +102,19 @@ inline void OSScheduler::implRegistersRestore(void)
     );
   }
 
+/* Check if INT0 or higher were being handled (case where the OS tick interrupted another */
+/* interrupt handler (which was of a higher priority level but decided to lower its priority */
+/* level and allow other lower interrupt level to occur). */
+/* In this case we don't want to do a task switch because we don't know what the stack */
+/* currently looks like (we don't know what the interrupted interrupt handler was doing). */
+
+/* Saving SP in pxCurrentTCB and then later restoring it (thinking restoring the task) */
+/* will just be restoring the interrupt handler, no way!!! */
+/* So, since we won't do a vTaskSwitchContext(), it's of no use to save SP. */
+
+
 #if false
-inline void OSScheduler::implIsAllowedToSwitch(void)
+inline void OSSchedulerImpl::implIsAllowedToSwitch(void)
   {
     asm volatile (
         " ld.w    r0, sp[9*4] \n" /* Read SR in stack */
@@ -116,7 +127,7 @@ inline void OSScheduler::implIsAllowedToSwitch(void)
     );
   }
 #else
-inline bool OSScheduler::implIsAllowedToSwitch(void)
+inline bool OSSchedulerImpl::implIsAllowedToSwitch(void)
   {
     register bool bRet asm ("r8");
 
@@ -141,14 +152,14 @@ inline bool OSScheduler::implIsAllowedToSwitch(void)
 #endif
 
 void
-SCALLcontextSave(void) __attribute__( ( always_inline ) );
+SCALL_contextSave(void) __attribute__( ( always_inline ) );
 void
-SCALLcontextRestore(void) __attribute__( ( always_inline ) );
+SCALL_contextRestore(void) __attribute__( ( always_inline ) );
 void
-AppContextRestore(void) __attribute__( ( always_inline ) );
+UserMode_contextRestore(void) __attribute__( ( always_inline ) );
 
 inline void
-AppContextRestore(void)
+UserMode_contextRestore(void)
 {
   //  implStackPointerRestore();
   //  implRegistersRestore();
@@ -222,7 +233,7 @@ AppContextRestore(void)
 }
 
 inline void
-SCALLcontextSave(void)
+SCALL_contextSave(void)
 {
   // push all registers to stack
   // *g_ppCurrentStack = SP (stack pointer)
@@ -289,7 +300,7 @@ SCALLcontextSave(void)
 }
 
 inline void
-SCALLcontextRestore(void)
+SCALL_contextRestore(void)
 {
   /* Restore all registers */
   asm volatile (
@@ -336,151 +347,13 @@ SCALLcontextRestore(void)
 
 }
 
-inline void
-OSScheduler::contextSave(void)
-{
-#if false
-  // push all registers to stack
-  // *g_ppCurrentStack = SP (stack pointer)
-  // leave interrupts as they were
-
-  /* When we come here */
-  /* Registers R8..R12, LR, PC and SR had already been pushed to system stack */
-
-  implRegistersSave();
-
-  if (implIsAllowedToSwitch())
-    {
-#if false
-      asm volatile (
-          /* Save R0..R7 */
-          //" stm     --sp, r0-r7 \n"
-
-          /* Check if INT0 or higher were being handled (case where the OS tick interrupted another */
-          /* interrupt handler (which was of a higher priority level but decided to lower its priority */
-          /* level and allow other lower interrupt level to occur). */
-          /* In this case we don't want to do a task switch because we don't know what the stack */
-          /* currently looks like (we don't know what the interrupted interrupt handler was doing). */
-
-          /* Saving SP in pxCurrentTCB and then later restoring it (thinking restoring the task) */
-          /* will just be restoring the interrupt handler, no way!!! */
-          /* So, since we won't do a vTaskSwitchContext(), it's of no use to save SP. */
-
-          " ld.w    r0, sp[9*4] \n" /* Read SR in stack */
-          " bfextu  r0, r0, 22, 3 \n" /* Extract the mode bits to R0. */
-          " cp.w    r0, 1 \n" /* Compare the mode bits with supervisor mode(b'001) */
-          " brhi    0f \n"
-
-          /* Store SP in the first member of the structure pointed to by pxCurrentTCB */
-
-          /* NOTE: we don't enter a critical section here because all interrupt handlers */
-          /* MUST perform a SAVE_CONTEXT/RESTORE_CONTEXT in the same way as */
-          /* portSAVE_CONTEXT_OS_INT/port_RESTORE_CONTEXT_OS_INT if they call OS functions. */
-          /* => all interrupt handlers must use portENTER_SWITCHING_ISR/portEXIT_SWITCHING_ISR. */
-#if false
-          " mov     r8, LO(%[pxCurrentTCB]) \n"
-          " orh     r8, HI(%[pxCurrentTCB]) \n"
-          " ld.w    r0, r8[0] \n"
-          " st.w    r0[0], sp \n"
-#endif
-          //"0: \n"
-          :
-          : [pxCurrentTCB] "i" (&g_ppCurrentStack)
-          : "r0", "r8"
-      );
-#endif
-      implStackPointerSave();
-
-      asm volatile (
-          "0: \n"
-          :
-          :
-          :
-      );
-    }
-#endif
-}
-
-/*
- * Opposite to contextSave().
- */
-
-inline void
-OSScheduler::contextRestore(void)
-{
-#if false
-  // SP = *g_ppCurrentStack
-  // pop everything from stack
-
-  /* Check if INT0 or higher were being handled (case where the OS tick interrupted another */
-  /* interrupt handler (which was of a higher priority level but decided to lower its priority */
-  /* level and allow other lower interrupt level to occur). */
-
-  /* In this case we don't want to do a task switch because we don't know what the stack */
-  /* currently looks like (we don't know what the interrupted interrupt handler was doing). */
-
-  /* Saving SP in pxCurrentTCB and then later restoring it (thinking restoring the task) */
-  /* will just be restoring the interrupt handler, no way!!! */
-
-  if (implIsAllowedToSwitch())
-    {
-#if false
-      asm volatile (
-
-          " ld.w    r0, sp[9*4] \n" /* Read SR in stack */
-          " bfextu  r0, r0, 22, 3 \n" /* Extract the mode bits to R0. */
-          " cp.w    r0, 1 \n" /* Compare the mode bits with supervisor mode(b'001) */
-          " brhi    1f \n"
-          :
-          :
-          : "r0"
-      );
-#endif
-      /* because it is here safe, always call vTaskSwitchContext() since an OS tick occurred. */
-
-      /* A critical section has to be used here because vTaskSwitchContext handles FreeRTOS linked lists. */
-
-      //portENTER_CRITICAL();
-
-      if (OSScheduler::requireContextSwitch())
-        {
-          OSScheduler::contextSwitch();
-        }
-
-      //portEXIT_CRITICAL();
-
-      implStackPointerRestore();
-
-      /* Restore all registers */
-      asm volatile (
-#if false
-          /* Set SP to point to new stack */
-          " mov     r8, LO(%[pxCurrentTCB]) \n"
-          " orh     r8, HI(%[pxCurrentTCB]) \n"
-          " ld.w    r0, r8[0] \n"
-          " ld.w    sp, r0[0] \n"
-#endif
-          "1: \n"
-
-          /* Restore R0..R7 */
-          //" ldm     sp++, r0-r7 \n"
-
-          /* Now, the stack should be R8..R12, LR, PC and SR */
-          :
-          : [pxCurrentTCB] "i" (&g_ppCurrentStack)
-          : "r0", "r8"
-      );
-    }
-  implRegistersRestore();
-#endif
-}
 
 /*
  * Critical section management.
  *
- * Push SR onto the stack and disable interrupts.
+ * Push SR onto the stack and disable non Real Time interrupts.
  *
- * Notice: The function context is addressed via Rxx, not SP, so using the
+ * Notice: The function context is addressed via R07, not SP, so using the
  * stack as temporary storage should be safe.
  */
 inline void
@@ -519,7 +392,7 @@ OSScheduler::criticalExit(void)
 #endif
 }
 
-// trigger a soft interrupt
+// trigger a system call interrupt
 inline void
 OSScheduler::yieldImpl(void)
 {
