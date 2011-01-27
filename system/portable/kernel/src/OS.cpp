@@ -10,15 +10,136 @@
 unsigned char OS::ms_resetBits;
 
 #if defined(DEBUG) && !defined(OS_EXCLUDE_MULTITASKING)
+
 OS::OS()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("OS()="));
     OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) */
   }
+
+#endif /* defined(DEBUG) */
+
+extern "C"
+int  main( void ) __attribute__( ( weak ) );
+
+extern "C" void
+os_reset_handler(void) __attribute__( ( naked, noreturn ));
+
+void
+os_init_data_and_bss(void) __attribute__((noinline));
+
+void
+os_init_static_constructors(void) __attribute__((noinline));
+
+
+//int xx = 0x12345678;
+
+void
+os_reset_handler(void)
+{
+  // mandatory in the first position, before any C call
+  OSImpl::CPUstackInit();
+  // from this point on, C calls are available
+
+  // be sure we start with interrupts disabled
+  OS::interruptsDisable();
+
+  OSImpl::CPUinit();
+
+  OSScheduler::ledActiveInit();
+  OSScheduler::ISRledActiveOn();
+
+  os_init_data_and_bss();
+
+#if false
+  if (xx != 0x12345678)
+    {
+      OSDeviceDebug::putString("dataInit() failed");
+      OSDeviceDebug::putNewLine();
+    }
 #endif
+
+#if defined(DEBUG)
+  OSDeviceDebug::earlyInit();
+#endif /* defined(DEBUG) */
+
+  OS::earlyInit();
+
+  os_init_static_constructors();
+
+  main(); // call standard main()
+
+  // noreturn
+  for (;;)
+    ;
+}
+
+/* init value for the stack pointer. defined in linker script */
+extern unsigned long __stack_end;
+
+/* start address for the initialization values of the .data section.
+ defined in linker script */
+extern unsigned long __os_data_load_start;
+
+/* start address for the .data section. defined in linker script */
+extern unsigned long __os_data_start;
+
+/* end address for the .data section. defined in linker script */
+extern unsigned long __os_data_end;
+
+/* start address for the .bss section. defined in linker script */
+extern unsigned long __os_bss_start;
+
+/* end address for the .bss section. defined in linker script */
+extern unsigned long __os_bss_end;
+
+void os_init_data_and_bss(void)
+  {
+    unsigned long *pSrc, *pDest;
+
+    /* Copy the data segment initializers from flash to SRAM */
+    pSrc = &__os_data_load_start;
+    pDest = &__os_data_start;
+    for (; pDest < &__os_data_end;)
+      {
+        *(pDest++) = *(pSrc++);
+      }
+    /* Zero fill the bss segment. */
+    for (pDest = &__os_bss_start; pDest < &__os_bss_end;)
+      {
+        *(pDest++) = 0;
+      }
+  }
+
+/* start address for the constructors section. defined in linker script */
+extern unsigned long __os_ctors_array_start;
+
+/* end address for the constructors section. defined in linker script */
+extern unsigned long __os_ctors_array_end;
+
+typedef void (*pFunc_t)(void);
+
+void os_init_static_constructors(void)
+  {
+    unsigned long *p;
+    void (*pFunc)(void);
+
+    p = &__os_ctors_array_start;
+    for (; p < &__os_ctors_array_end; p++)
+      {
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS) && defined(OS_DEBUG_CONSTRUCTORS_INIT)
+        OSDeviceDebug::putString("INIT=");
+        OSDeviceDebug::putHex(*p);
+        OSDeviceDebug::putNewLine();
+#endif
+        pFunc = (pFunc_t) (*p);
+        (*pFunc)();
+      }
+}
+
 
 #if defined(OS_INCLUDE_NAKED_INIT)
 // ----- init5 ---------------------------------------------------------------
@@ -29,18 +150,22 @@ void OS::nakedEarlyInit(void)
   }
 #endif
 
+// runs before constructors
 void OS::earlyInit(void)
   {
 #if defined(DEBUG)
     OSDeviceDebug::putString_P(PSTR("OS::earlyInit()"));
     OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) */
+
     saveResetBits();
+
 #if defined(DEBUG)
     OSDeviceDebug::putString_P(PSTR("ResetBits="));
     OSDeviceDebug::putHex((unsigned char) OS::getResetBits());
     OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) */
+
 #if !defined(OS_EXCLUDE_MULTITASKING)
     OSScheduler::earlyInit();
 #endif
@@ -64,9 +189,7 @@ void OS::busyWaitMillis(schedTicks_t n)
 #endif /*OS_INCLUDE_OS_BUSYWAITMILLIS*/
 
 // -----------------------------------------------------------------------------
-// default main
-extern "C"
-int  main( void ) __attribute__( ( weak ) );
+// default main. may be redefined by application
 
 int main()
   {
@@ -74,7 +197,8 @@ int main()
     OSDeviceDebug::putNewLine();
     OSDeviceDebug::putString_P(PSTR("main()"));
     OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) */
+
 #if !defined(OS_EXCLUDE_MULTITASKING)
     // tasks were created and registered by class constructors
     OSScheduler::start();
@@ -118,7 +242,7 @@ delete(void *p __attribute__( ( unused ) ) )
 #endif
     OSDeviceDebug::putChar(')');
     OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) */
   }
 
 #endif /*OS_INCLUDE_NEW_DELETE*/
