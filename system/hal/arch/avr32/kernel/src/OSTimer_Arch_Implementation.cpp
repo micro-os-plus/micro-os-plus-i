@@ -24,8 +24,12 @@ static int i;
 __attribute__((__interrupt__)) void
 TikTestIsr(void);
 
-__attribute__((__interrupt__)) void
-SysTick_Handler(void);
+#if defined(OS_EXCLUDE_PREEMPTION)
+__attribute__((interrupt)) void
+#else
+__attribute__((naked)) void
+#endif
+SysTick_contextHandler(void);
 
 void
 OSTimerTicks::init(void)
@@ -37,10 +41,11 @@ OSTimerTicks::init(void)
 
 #endif
 
+  if (false)
+    return;
+
   volatile avr32_pm_t* pm = &AVR32_PM;
   volatile avr32_tc_t* tc_reg = &OS_CFGVAR_TIMER;
-
-#if true
 
   //initialise  exception vector base address
   INTC_init_interrupts();
@@ -74,7 +79,7 @@ OSTimerTicks::init(void)
   tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].idr = 0xFFFFFFFF;
 
   //register the interrupt
-  INTC_register_interrupt(SysTick_Handler, OS_CFGINT_TIMER_IRQ_ID,
+  INTC_register_interrupt(SysTick_contextHandler, OS_CFGINT_TIMER_IRQ_ID,
       OS_CFGINT_TIMER_IRQ_LEVEL);
 
   //clock source
@@ -116,24 +121,62 @@ OSTimerTicks::init(void)
   // set interrupt source RC Compare
   tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].IER.cpcs = 1;
 
-#endif
-
 #if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
   i = 0;
 #endif
 }
 
-__attribute__((__interrupt__)) void
-SysTick_Handler(void)
+__attribute__((noinline)) void
+SysTick_interruptServiceRoutine();
+
+#if defined(OS_EXCLUDE_PREEMPTION)
+__attribute__((interrupt)) void
+#else
+__attribute__((naked)) void
+#endif
+SysTick_contextHandler(void)
 {
-  // Clear TC interrupt
-  // TODO: check if we do it first or last?
-  volatile avr32_tc_t* tc_reg = &OS_CFGVAR_TIMER;
-  tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].sr;
+#define HACK true
+#if !HACK
+  OSScheduler::interruptEnter();
+#else
+#if !defined(OS_EXCLUDE_PREEMPTION)
+  OSScheduler::implRegistersSave();
 
-  /* This is an interrupt function. */
-  OSScheduler::ISRledActiveOn();
+  if (OSScheduler::implIsAllowedToSwitch())
+    {
+    OSScheduler::implStackPointerSave();
+    }
+  asm volatile ( "0:");
+#endif
+  OSScheduler::ledActiveOn();
+#endif
+    {
+      SysTick_interruptServiceRoutine();
+    }
+#if !HACK
+  OSScheduler::interruptEnter();
+#else
+#if !defined(OS_EXCLUDE_PREEMPTION)
+    if (OSScheduler::implIsAllowedToSwitch())
+    {
+      if (OSScheduler::requireContextSwitch())
+        {
+          OSScheduler::contextSwitch();
+        }
+      OSScheduler::implStackPointerRestore();
+    }
+  asm volatile ( "0:");
+  OSScheduler::implRegistersRestore();
 
+#endif
+#endif
+  OSImpl::returnFromInterrupt();
+}
+
+void
+SysTick_interruptServiceRoutine()
+{
   OSScheduler::timerTicks.interruptServiceRoutine();
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT)
@@ -152,8 +195,10 @@ SysTick_Handler(void)
 
 #endif
 
-  //if (OSScheduler::requireContextSwitch())
-  //  OSScheduler::ISRcontextSwitchRequest();
+  // Clear TC interrupt
+  // Notice: Should be done at the end, not at the beginning!
+  OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
+
 }
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
@@ -191,19 +236,19 @@ TIMER2_OVF_vect(void)
 #if false
 __attribute__((__interrupt__)) void
 TikTestIsr(void)
-{
-  // Clear TC interrupt
-  // TODO: should we do it first or last?
-  volatile avr32_tc_t* tc_reg = &OS_CFGVAR_TIMER;
-  tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].sr;
+  {
+    // Clear TC interrupt
+    // TODO: should we do it first or last?
+    volatile avr32_tc_t* tc_reg = &OS_CFGVAR_TIMER;
+    tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].sr;
 
 #if defined(DEBUG)
 
-  if ((i++ % OS_CFGINT_TICK_RATE_HZ) == 0)
+    if ((i++ % OS_CFGINT_TICK_RATE_HZ) == 0)
     OSDeviceDebug::putChar('!');
 
 #endif
-}
+  }
 #endif
 
 #endif /* defined(OS_CONFIG_ARCH_AVR32) */
