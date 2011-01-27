@@ -27,6 +27,18 @@
 #define APP_CONFIG_LED2                 6
 #define APP_CONFIG_LED3                 5
 
+#elif defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+
+#define APP_CONFIG_LED_PORT             GPIOX
+#define APP_CONFIG_LED_PORT_CONFIG      GPIOX
+#define APP_CONFIG_LED_PORT_TOGGLE      GPIOX
+
+#define APP_CONFIG_LED1                 AVR32_PIN_PX50
+#define APP_CONFIG_LED2                 AVR32_PIN_PX54
+#define APP_CONFIG_LED3                 AVR32_PIN_PX51
+
+#define APP_CONFIG_LED_ISACTIVE_LOW     (1)
+
 #else
 #error "Missing board"
 #endif
