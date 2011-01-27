@@ -155,7 +155,7 @@ public:
   ISRcontextSwitchRequest(void);
 #endif
 
-#if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT) || defined(OS_INCLUDE_OSSCHEDULER_IMPL_CONTEXT_PROCESSING)
+#if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT) || defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
   inline static void
   interruptEnter(void) __attribute__( ( always_inline ) );
@@ -169,27 +169,6 @@ public:
   contextSave(void) __attribute__( ( always_inline ) );
   inline static void
   contextRestore(void) __attribute__( ( always_inline ) );
-#endif
-
-#if defined(OS_INCLUDE_OSSCHEDULER_IMPL_CONTEXT_PROCESSING)
-
-  inline static void
-  implStackPointerSave(void) __attribute__( ( always_inline ) );
-  inline static void
-  implStackPointerRestore(void) __attribute__( ( always_inline ) );
-
-  inline static void
-  implRegistersSave(void) __attribute__( ( always_inline ) );
-  inline static void
-  implRegistersRestore(void) __attribute__( ( always_inline ) );
-
-#if true
-  inline static bool
-  implIsAllowedToSwitch(void) __attribute__( ( always_inline ) );
-#else
-  inline static void
-  implIsAllowedToSwitch(void) __attribute__( ( always_inline ) );
-#endif
 #endif
 
   static OSTimerTicks timerTicks;
@@ -235,6 +214,31 @@ private:
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
   static bool ms_allowDeepSleep;
+#endif
+
+};
+
+// ----------------------------------------------------------------------------
+
+class OSSchedulerImpl
+{
+public:
+
+#if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
+
+  inline static void
+  implStackPointerSave(void) __attribute__( ( always_inline ) );
+  inline static void
+  implStackPointerRestore(void) __attribute__( ( always_inline ) );
+
+  inline static void
+  implRegistersSave(void) __attribute__( ( always_inline ) );
+  inline static void
+  implRegistersRestore(void) __attribute__( ( always_inline ) );
+
+  inline static bool
+  implIsAllowedToSwitch(void) __attribute__( ( always_inline ) );
+
 #endif
 
 };
@@ -379,42 +383,42 @@ inline void OSScheduler::interruptExit(void)
 
 #endif
 
-#if defined(OS_INCLUDE_OSSCHEDULER_IMPL_CONTEXT_PROCESSING)
+#if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
 inline void
 OSScheduler::interruptEnter(void)
-{
+  {
 #if !defined(OS_EXCLUDE_PREEMPTION)
-  implRegistersSave();
+  OSSchedulerImpl::implRegistersSave();
 
-  implIsAllowedToSwitch();
-    {
-      implStackPointerSave();
-    }
-  asm volatile ( "0:");
+    if (OSSchedulerImpl::implIsAllowedToSwitch())
+      {
+        OSSchedulerImpl::implStackPointerSave();
+      }
 #endif
-  OSScheduler::ledActiveOn();
-}
+    OSScheduler::ledActiveOn();
+  }
 
 inline void
 OSScheduler::interruptExit(void)
-{
+  {
 #if !defined(OS_EXCLUDE_PREEMPTION)
-  implIsAllowedToSwitch();
-    {
-      if (OSScheduler::requireContextSwitch())
-        {
-          OSScheduler::contextSwitch();
-        }
-      implStackPointerRestore();
-    }
-  asm volatile ( "0:");
-  implRegistersRestore();
+
+    if (OSSchedulerImpl::implIsAllowedToSwitch())
+      {
+        if (OSScheduler::requireContextSwitch())
+          {
+            OSScheduler::contextSwitch();
+          }
+        OSSchedulerImpl::implStackPointerRestore();
+      }
+    OSSchedulerImpl::implRegistersRestore();
+
+    OSImpl::returnFromInterrupt();
 
 #endif
-  OSImpl::returnFromInterrupt();
-  // interrupts enabled after this point
-}
+    // interrupts re-enabled after this point
+  }
 
 #endif
 
