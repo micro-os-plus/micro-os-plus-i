@@ -81,57 +81,57 @@ _evba:
         .org  0x000
         // Unrecoverable Exception.
 _handle_Unrecoverable_Exception:
-        rjmp $
+        rjmp os_ex_unrecover
 
         .org  0x004
         // TLB Multiple Hit.
 _handle_TLB_Multiple_Hit:
-        rjmp $
+        rjmp os_ex_tbl_mult_hit
 
         .org  0x008
         // Bus Error Data Fetch.
 _handle_Bus_Error_Data_Fetch:
-        rjmp $
+        rjmp os_ex_bus_err_data_fetch
 
         .org  0x00C
          // Bus Error Instruction Fetch.
 _handle_Bus_Error_Instruction_Fetch:
-        rjmp $
+        rjmp os_ex_bus_err_inst_fetch
 
         .org  0x010
         // NMI.
 _handle_NMI:
-        rjmp $
+        rjmp os_ex_nmi
 
         .org  0x014
         // Instruction Address.
 _handle_Instruction_Address:
-        rjmp $
+        rjmp os_ex_inst_add
 
         .org  0x018
         // ITLB Protection.
 _handle_ITLB_Protection:
-        rjmp $
+        rjmp os_ex_itlb_prot
 
         .org  0x01C
         // Breakpoint.
 _handle_Breakpoint:
-        rjmp $
+        rjmp os_ex_brk_point
 
         .org  0x020
         // Illegal Opcode.
 _handle_Illegal_Opcode:
-        rjmp $
+        rjmp os_ex_illegal_opcode
 
         .org  0x024
         // Unimplemented Instruction.
 _handle_Unimplemented_Instruction:
-        rjmp $
+        rjmp os_ex_unimpl_inst
 
         .org  0x028
         // Privilege Violation.
 _handle_Privilege_Violation:
-        rjmp $
+        rjmp os_ex_privilege_violaton
 
         .org  0x02C
         // Floating-Point: UNUSED IN AVR32UC and AVR32AP.
@@ -146,22 +146,22 @@ _handle_Coprocessor_Absent:
         .org  0x034
         // Data Address (Read).
 _handle_Data_Address_Read:
-        rjmp $
+        rjmp os_ex_data_rd
 
         .org  0x038
         // Data Address (Write).
 _handle_Data_Address_Write:
-        rjmp $
+        rjmp os_ex_data_wr
 
         .org  0x03C
         // DTLB Protection (Read).
 _handle_DTLB_Protection_Read:
-        rjmp $
+        rjmp os_ex_dtlb_protect_rd
 
         .org  0x040
         // DTLB Protection (Write).
 _handle_DTLB_Protection_Write:
-        rjmp $
+        rjmp os_ex_dtlb_protect_wr
 
         .org  0x044
         // DTLB Modified: UNUSED IN AVR32UC.
@@ -171,17 +171,17 @@ _handle_DTLB_Modified:
         .org  0x050
         // ITLB Miss.
 _handle_ITLB_Miss:
-        rjmp $
+        rjmp os_ex_itlb_miss
 
         .org  0x060
         // DTLB Miss (Read).
 _handle_DTLB_Miss_Read:
-        rjmp $
+        rjmp os_ex_dtlb_miss_rd
 
         .org  0x070
         // DTLB Miss (Write).
 _handle_DTLB_Miss_Write:
-        rjmp $
+        rjmp os_ex_dtlb_miss_wr
 
         .org  0x100
         // Supervisor Call.
