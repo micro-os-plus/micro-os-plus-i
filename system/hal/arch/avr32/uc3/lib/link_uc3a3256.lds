@@ -181,9 +181,6 @@ SECTIONS
     KEEP (*(.ctors))
   } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   
-  __ctors_array_start = LOADADDR (.ctors);
-  __ctors_array_end = (__ctors_array_start + SIZEOF (.ctors));
-  
   .dtors          :
   {
     KEEP (*crtbegin*.o(.dtors))
@@ -224,9 +221,6 @@ SECTIONS
   . = ALIGN(8);
   _end = .;
   PROVIDE (end = .);
-
-   __data_load_start = LOADADDR(.data);
-   __data_load_end = __data_load_start + SIZEOF(.data);
 
   __heap_start__ = ALIGN(8);
   .heap           :
@@ -279,4 +273,16 @@ SECTIONS
   } >INTRAM AT>INTRAM :INTRAM
   .userpage       : { *(.userpage .userpage.*) } >USERPAGE AT>USERPAGE :USERPAGE
   /DISCARD/ : { *(.note.GNU-stack) }
+  
+   __os_data_start = __data_start;
+   __os_data_end = __data_end;
+   __os_data_load_start = LOADADDR(.data);
+   __os_data_load_end = __os_data_load_start + SIZEOF(.data);
+
+   __os_bss_start = __bss_start;
+   __os_bss_end = __bss_end;
+
+   __os_ctors_array_start = LOADADDR (.ctors);
+   __os_ctors_array_end = (__os_ctors_array_start + SIZEOF (.ctors));
+    
 }
