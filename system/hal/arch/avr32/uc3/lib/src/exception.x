@@ -207,7 +207,15 @@ _int\priority:
   // PC and SR are automatically saved in respectively RAR_INTx and RSR_INTx by
   // the CPU upon interrupt entry. No other register is saved by hardware.
   pushm   r8-r12, lr
+  
 #endif
+
+#if false
+  mov r9,-61440
+  mov r8,8
+  st.w r9[600],r8
+#endif
+
   mov     r12, \priority  // Pass the int_level parameter to the _get_interrupt_handler function.
   call    _get_interrupt_handler
   cp.w    r12, 0          // Get the pointer to the interrupt handler returned by the function.
