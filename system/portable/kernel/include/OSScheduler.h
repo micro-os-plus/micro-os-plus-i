@@ -24,13 +24,13 @@ class OSTask;
 typedef unsigned int OSEvent_t;
 
 class OSEvent
-  {
+{
 public:
   static const OSEvent_t OS_NONE = -1;
   static const OSEvent_t OS_ALL = 0;
   static const OSEvent_t OS_TIMEOUT = 1;
   static const OSEvent_t OS_CUSTOM_TIMER = 2;
-  };
+};
 
 // ----------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ public:
 typedef unsigned int OSEventWaitReturn_t;
 
 class OSEventWaitReturn
-  {
+{
 public:
   static const OSEventWaitReturn_t OS_NONE = -1;
   static const OSEventWaitReturn_t OS_VOID = 0;
@@ -50,86 +50,146 @@ public:
 
   // user values should be relative to this one
   static const OSEventWaitReturn_t OS_CUSTOM = 10;
-  };
+};
 
 // ----------------------------------------------------------------------------
 
 class OSScheduler
-  {
+{
 public:
 #if defined(DEBUG)
   OSScheduler();
 #endif
 
-  static void earlyInit(void);
+  static void
+  earlyInit(void);
 
   // publicly available methods
-  static void start(void) __attribute__( ( noreturn ) );
-  static void startImpl(void) __attribute__( ( noreturn ) );
+  static void
+  start(void) __attribute__( ( noreturn ) );
+  static void
+  startImpl(void) __attribute__( ( noreturn ) );
 
-  static bool isRunning(void);
-
-  static void lock(void);
-  static void unlock(void);
-
-  static bool isLocked(void);
-  static void setLock(bool flag);
-
-  inline static bool isPreemptive(void);
-  static void setPreemptive(bool flag);
-
-  static OSTask *getTaskCurrent(void);
-  static OSTask *getTaskIdle(void);
-
-  static int getTasksCount(void);
-  static OSTask *getTask(int i);
-
-  static bool isAllowDeepSleep(void);
-  static void setAllowDeepSleep(bool flag);
-
-  inline static void criticalEnter(void) __attribute__( ( always_inline ) );
-  inline static void criticalExit(void) __attribute__( ( always_inline ) );
-
-  // event/synchronization methods
-  static OSEventWaitReturn_t eventWait(OSEvent_t event);
-
-  static int eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
-      OSEventWaitReturn::OS_VOID);
-
-  static void yield(void);
-  inline static void yieldImpl(void) __attribute__( ( always_inline ) );
-
-  static OSStack_t *stackInitialize(OSStack_t * pStackTop, void(*entryPoint)(
-      void *), void *pParams, unsigned char id);
+  static bool
+  isRunning(void);
 
   static void
-      stackSetReturnedValue(OSStack_t * pStack, OSEventWaitReturn_t ret);
+  lock(void);
+  static void
+  unlock(void);
 
-  inline static void ledActiveInit(void) __attribute__( ( always_inline ) );
-  inline static void ISRledActiveOn(void) __attribute__( ( always_inline ) );
-  inline static void ledActiveOn(void) __attribute__( ( always_inline ) );
-  inline static void ISRledActiveOff(void) __attribute__( ( always_inline ) );
-  inline static void ledActiveOff(void) __attribute__( ( always_inline ) );
+  static bool
+  isLocked(void);
+  static void
+  setLock(bool flag);
 
-  static unsigned char taskRegister(OSTask * pTask);
+  inline static bool
+  isPreemptive(void);
+  static void
+  setPreemptive(bool flag);
 
-  static void interruptTick(void);
+  static OSTask *
+  getTaskCurrent(void);
+  static OSTask *
+  getTaskIdle(void);
 
-  static bool requireContextSwitch(void);
-  static void contextSwitch(void);
+  static int
+  getTasksCount(void);
+  static OSTask *
+  getTask(int i);
+
+  static bool
+  isAllowDeepSleep(void);
+  static void
+  setAllowDeepSleep(bool flag);
+
+  inline static void
+  criticalEnter(void) __attribute__( ( always_inline ) );
+  inline static void
+  criticalExit(void) __attribute__( ( always_inline ) );
+
+  // event/synchronization methods
+  static OSEventWaitReturn_t
+  eventWait(OSEvent_t event);
+
+  static int
+  eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
+      OSEventWaitReturn::OS_VOID);
+
+  static void
+  yield(void);
+  inline static void
+  yieldImpl(void) __attribute__( ( always_inline ) );
+
+  static OSStack_t *
+  stackInitialize(OSStack_t * pStackTop, void
+  (*entryPoint)(void *), void *pParams, unsigned char id);
+
+  static void
+  stackSetReturnedValue(OSStack_t * pStack, OSEventWaitReturn_t ret);
+
+  inline static void
+  ledActiveInit(void) __attribute__( ( always_inline ) );
+  inline static void
+  ISRledActiveOn(void) __attribute__( ( always_inline ) );
+  inline static void
+  ledActiveOn(void) __attribute__( ( always_inline ) );
+  inline static void
+  ISRledActiveOff(void) __attribute__( ( always_inline ) );
+  inline static void
+  ledActiveOff(void) __attribute__( ( always_inline ) );
+
+  static unsigned char
+  taskRegister(OSTask * pTask);
+
+  static void
+  interruptTick(void);
+
+  static bool
+  requireContextSwitch(void);
+  static void
+  contextSwitch(void);
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSWITCHREQUEST)
-  static void ISRcontextSwitchRequest(void);
+  static void
+  ISRcontextSwitchRequest(void);
 #endif
 
-#if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT)
-  inline static void interruptEnter(void) __attribute__( ( always_inline ) );
-  inline static void interruptExit(void) __attribute__( ( always_inline ) );
+#if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT) || defined(OS_INCLUDE_OSSCHEDULER_IMPL_CONTEXT_PROCESSING)
+
+  inline static void
+  interruptEnter(void) __attribute__( ( always_inline ) );
+  inline static void
+  interruptExit(void) __attribute__( ( always_inline ) );
+
 #endif
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE)
-  inline static void contextSave(void) __attribute__( ( always_inline ) );
-  inline static void contextRestore(void) __attribute__( ( always_inline ) );
+  inline static void
+  contextSave(void) __attribute__( ( always_inline ) );
+  inline static void
+  contextRestore(void) __attribute__( ( always_inline ) );
+#endif
+
+#if defined(OS_INCLUDE_OSSCHEDULER_IMPL_CONTEXT_PROCESSING)
+
+  inline static void
+  implStackPointerSave(void) __attribute__( ( always_inline ) );
+  inline static void
+  implStackPointerRestore(void) __attribute__( ( always_inline ) );
+
+  inline static void
+  implRegistersSave(void) __attribute__( ( always_inline ) );
+  inline static void
+  implRegistersRestore(void) __attribute__( ( always_inline ) );
+
+#if true
+  inline static bool
+  implIsAllowedToSwitch(void) __attribute__( ( always_inline ) );
+#else
+  inline static void
+  implIsAllowedToSwitch(void) __attribute__( ( always_inline ) );
+#endif
 #endif
 
   static OSTimerTicks timerTicks;
@@ -145,15 +205,19 @@ public:
   static OSTask *ms_pTaskRunning;
 
 private:
-  static void timerSetup(void);
+  static void
+  timerSetup(void);
 
-  static void setTaskIdle(OSTask *);
+  static void
+  setTaskIdle(OSTask *);
 
   //static void timerISR(void) __attribute__( ( naked ) );
-  static void timerISR(void);
+  static void
+  timerISR(void);
 
   //static void dumpContextInfo(void *pContext);
-  static void dumpContextInfo(OSTask *);
+  static void
+  dumpContextInfo(OSTask *);
 
   // members
   static bool ms_isPreemptive;
@@ -173,90 +237,107 @@ private:
   static bool ms_allowDeepSleep;
 #endif
 
-  };
+};
 
 //-----------------------------------------------------------------------------
 
 class OSReadyList
-  {
+{
 public:
   OSReadyList();
 
-  static void insert(OSTask * pTask);
-  static void remove(OSTask * pTask);
+  static void
+  insert(OSTask * pTask);
+  static void
+  remove(OSTask * pTask);
 
-  inline static OSTask *getTop(void);
-  inline static unsigned char getCount(void);
+  inline static OSTask *
+  getTop(void);
+  inline static unsigned char
+  getCount(void);
 
 #if defined(DEBUG)
 
-  static void dump(void);
+  static void
+  dump(void);
 #endif
 
 private:
-  static int find(OSTask * pTask);
+  static int
+  find(OSTask * pTask);
 
   // members
   static OSTask *ms_array[];
   static unsigned char ms_count;
-  };
+};
 
 //-----------------------------------------------------------------------------
 
-inline bool OSScheduler::isRunning(void)
-  {
-    return ms_isRunning;
-  }
+inline bool
+OSScheduler::isRunning(void)
+{
+  return ms_isRunning;
+}
 
-inline void OSScheduler::lock(void)
-  {
-    ms_isLocked = true;
-  }
+inline void
+OSScheduler::lock(void)
+{
+  ms_isLocked = true;
+}
 
-inline void OSScheduler::unlock(void)
-  {
-    ms_isLocked = false;
-  }
+inline void
+OSScheduler::unlock(void)
+{
+  ms_isLocked = false;
+}
 
-inline bool OSScheduler::isLocked(void)
-  {
-    return ms_isLocked;
-  }
+inline bool
+OSScheduler::isLocked(void)
+{
+  return ms_isLocked;
+}
 
-inline void OSScheduler::setLock(bool flag)
-  {
-    ms_isLocked = flag;
-  }
+inline void
+OSScheduler::setLock(bool flag)
+{
+  ms_isLocked = flag;
+}
 
-inline void OSScheduler::setPreemptive(bool flag)
-  {
-    ms_isPreemptive = flag;
-  }
+inline void
+OSScheduler::setPreemptive(bool flag)
+{
+  ms_isPreemptive = flag;
+}
 
-inline bool OSScheduler::isPreemptive(void)
-  {
-    return ms_isPreemptive;
-  }
+inline bool
+OSScheduler::isPreemptive(void)
+{
+  return ms_isPreemptive;
+}
 
-inline OSTask * OSScheduler::getTaskCurrent(void)
-  {
-    return ms_pTaskRunning;
-  }
+inline OSTask *
+OSScheduler::getTaskCurrent(void)
+{
+  return ms_pTaskRunning;
+}
 
-inline OSTask * OSScheduler::getTaskIdle(void)
-  {
-    return ms_pTaskIdle;
-  }
+inline OSTask *
+OSScheduler::getTaskIdle(void)
+{
+  return ms_pTaskIdle;
+}
 
-inline void OSScheduler::setTaskIdle(OSTask * pt)
-  {
-    ms_pTaskIdle = pt;
-  }
+inline void
+OSScheduler::setTaskIdle(OSTask * pt)
+{
+  ms_pTaskIdle = pt;
+}
 
-inline int OSScheduler::getTasksCount(void)
-  {
-    return ms_tasksCount;
-  }
+inline int
+OSScheduler::getTasksCount(void)
+{
+  return ms_tasksCount;
+}
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
 
@@ -276,8 +357,9 @@ inline void OSScheduler::setAllowDeepSleep(bool flag)
 
 inline void OSScheduler::interruptEnter(void)
   {
+#if !defined(OS_EXCLUDE_PREEMPTION)
     OSScheduler::contextSave(); // interrupts disabled in here
-
+#endif
     OSScheduler::ledActiveOn();
   }
 
@@ -288,24 +370,67 @@ inline void OSScheduler::interruptExit(void)
         OSScheduler::contextSwitch();
       }
 
+#if !defined(OS_EXCLUDE_PREEMPTION)
     OSScheduler::contextRestore();
     OSImpl::returnFromInterrupt();
+#endif
     // interrupts enabled after this point
   }
 
 #endif
 
+#if defined(OS_INCLUDE_OSSCHEDULER_IMPL_CONTEXT_PROCESSING)
+
+inline void
+OSScheduler::interruptEnter(void)
+{
+#if !defined(OS_EXCLUDE_PREEMPTION)
+  implRegistersSave();
+
+  implIsAllowedToSwitch();
+    {
+      implStackPointerSave();
+    }
+  asm volatile ( "0:");
+#endif
+  OSScheduler::ledActiveOn();
+}
+
+inline void
+OSScheduler::interruptExit(void)
+{
+#if !defined(OS_EXCLUDE_PREEMPTION)
+  implIsAllowedToSwitch();
+    {
+      if (OSScheduler::requireContextSwitch())
+        {
+          OSScheduler::contextSwitch();
+        }
+      implStackPointerRestore();
+    }
+  asm volatile ( "0:");
+  implRegistersRestore();
+
+#endif
+  OSImpl::returnFromInterrupt();
+  // interrupts enabled after this point
+}
+
+#endif
+
 //-----------------------------------------------------------------------------
 
-inline OSTask * OSReadyList::getTop(void)
-  {
-    return ms_array[0];
-  }
+inline OSTask *
+OSReadyList::getTop(void)
+{
+  return ms_array[0];
+}
 
-inline unsigned char OSReadyList::getCount(void)
-  {
-    return ms_count;
-  }
+inline unsigned char
+OSReadyList::getCount(void)
+{
+  return ms_count;
+}
 
 //-----------------------------------------------------------------------------
 
