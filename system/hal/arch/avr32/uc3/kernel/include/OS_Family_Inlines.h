@@ -11,7 +11,89 @@
 #include "hal/arch/avr32/lib/include/compiler.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 
+inline void
+OSImpl::CPUstackInit(void)
+{
+  asm volatile (
+      " lda.w   sp, _estack \n"
+      :::
+  );
+}
+
 extern unsigned long _evba;
+
+inline void
+OSImpl::CPUinit(void)
+{
+  // Switch to external Oscillator 0
+  pm_switch_to_osc0(&AVR32_PM, OS_CFGLONG_OSCILLATOR_HZ,
+      AVR32_PM_OSCCTRL0_STARTUP_2048_RCOSC);
+
+  // initialise local bus; without it GPIO does not work
+  Set_system_register(AVR32_CPUCR,
+      Get_system_register(AVR32_CPUCR) | AVR32_CPUCR_LOCEN_MASK);
+
+  // Set up EVBA so interrupts can be enabled later.
+  Set_system_register(AVR32_EVBA, (int)&_evba);
+}
+
+
+inline void
+OSImpl::returnFromInterrupt(void)
+{
+  asm volatile (
+      " rete \n"
+      :::
+  );
+  for (;;)
+    ; // noreturn
+}
+
+inline void
+OSImpl::returnFromSubroutine(void)
+{
+  asm volatile
+  (
+      " mov pc, lr \n"
+      :::
+  );
+  for (;;)
+    ; // noreturn
+}
+
+inline void
+OSImpl::NOP(void)
+{
+  asm volatile
+  (
+      " nop \n"
+      :::
+  );
+}
+
+inline void
+OSImpl::interruptsEnable(void)
+{
+  Enable_global_interrupt();
+}
+
+inline void
+OSImpl::interruptsDisable(void)
+{
+  Disable_global_interrupt();
+}
+
+inline void
+OSImpl::interruptsClearMask(void)
+{
+  ; // TODO: implement it
+}
+
+inline void
+OSImpl::interruptsSetMask(void)
+{
+  ; // TODO: implement it
+}
 
 inline void
 OSImpl::CPUidle(void)
