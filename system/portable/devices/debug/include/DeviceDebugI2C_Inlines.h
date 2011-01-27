@@ -100,15 +100,23 @@ static const int I2C_READ = 0x1;
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
+#if defined(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT)
+#if OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT < 2
+#error "Illegal OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT value"
+#endif
+#else
+#define OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT (2)
+#endif
+
 // ----- public methods ------------------------------------------------------
 
 inline void OSDeviceDebug::implEarlyInit(void)
   {
-#if false
+#if true
       {
         unsigned int _i, _j;
         for (_i = 0; _i < OS_CFGINT_DEBUG_I2C_EMU_INIT_DELAY_COUNT; ++_i)
-          for (_j = 0; _j < 8000; ++_j)
+          for (_j = 0; _j < OS_CFGINT_BUSYWAIT_CALIBRATION; ++_j)
             implWDReset();
       }
 #endif
