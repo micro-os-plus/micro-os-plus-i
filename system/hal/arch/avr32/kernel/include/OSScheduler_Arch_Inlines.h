@@ -48,18 +48,114 @@
 
 // (*) automatically done for INT0..INT3, but not for SCALL
 
-void SCALLcontextSave(void) __attribute__( ( always_inline ) );
-void SCALLcontextRestore(void) __attribute__( ( always_inline ) );
-void AppContextRestore(void) __attribute__( ( always_inline ) );
+#if defined(OS_INCLUDE_OSSCHEDULER_IMPL_CONTEXT_PROCESSING)
 
+inline void OSScheduler::implStackPointerSave(void)
+  {
+    asm volatile (
 
+        " mov     r8, LO(%[pxCurrentTCB]) \n"
+        " orh     r8, HI(%[pxCurrentTCB]) \n"
+        " ld.w    r0, r8[0] \n"
+        " st.w    r0[0], sp \n"
+        :
+        : [pxCurrentTCB] "i" (&g_ppCurrentStack)
+        :
+    );
+  }
+
+inline void OSScheduler::implStackPointerRestore(void)
+  {
+    asm volatile (
+
+        /* Set SP to point to new stack */
+        " mov     r8, LO(%[pxCurrentTCB]) \n"
+        " orh     r8, HI(%[pxCurrentTCB]) \n"
+        " ld.w    r0, r8[0] \n"
+        " ld.w    sp, r0[0] \n"
+        :
+        : [pxCurrentTCB] "i" (&g_ppCurrentStack)
+        :
+    );
+  }
+
+inline void OSScheduler::implRegistersSave(void)
+  {
+    asm volatile (
+        /* Save R0..R7 */
+        " stm     --sp, r0-r7 \n"
+        :
+        :
+        :
+    );
+  }
+
+inline void OSScheduler::implRegistersRestore(void)
+  {
+    asm volatile (
+        /* Restore R0..R7 */
+        " ldm     sp++, r0-r7 \n"
+        /* R0-R7 should not be used below this line */
+        :
+        :
+        :
+    );
+  }
+
+#if false
+inline void OSScheduler::implIsAllowedToSwitch(void)
+  {
+    asm volatile (
+        " ld.w    r0, sp[9*4] \n" /* Read SR in stack */
+        " bfextu  r0, r0, 22, 3 \n" /* Extract the mode bits to R0. */
+        " cp.w    r0, 1 \n" /* Compare the mode bits with supervisor mode(b'001) */
+        " brhi    0f \n"
+        :
+        :
+        : "r0"
+    );
+  }
+#else
+inline bool OSScheduler::implIsAllowedToSwitch(void)
+  {
+    register bool bRet asm ("r8");
+
+    asm volatile (
+        " ld.w    r0, sp[9*4] \n" /* Read SR in stack */
+        " bfextu  r0, r0, 22, 3 \n" /* Extract the mode bits to R0. */
+        " cp.w    r0, 1 \n" /* Compare the mode bits with supervisor mode(b'001) */
+        " brhi    9f \n"
+        " mov     r8, 1 \n"
+        " bral    8f \n"
+        "9: "
+        " mov     r8, 0 \n"
+        "8:"
+        : "=r" (bRet)
+        :
+        : "r0"
+    );
+    return bRet;
+  }
+
+#endif
+#endif
+
+void
+SCALLcontextSave(void) __attribute__( ( always_inline ) );
+void
+SCALLcontextRestore(void) __attribute__( ( always_inline ) );
+void
+AppContextRestore(void) __attribute__( ( always_inline ) );
 
 inline void
 AppContextRestore(void)
 {
+  //  implStackPointerRestore();
+  //  implRegistersRestore();
+
   /* Restore Context for cases other than INTi. */
   asm volatile (
-
+#if true
       " mov     r8, LO(%[pxCurrentTCB]) \n"
       " orh     r8, HI(%[pxCurrentTCB]) \n"
       " ld.w    r0, r8[0] \n"
@@ -68,6 +164,7 @@ AppContextRestore(void)
       /* Restore R0..R7 */
       " ldm     sp++, r0-r7 \n"
       /* R0-R7 should not be used below this line */
+#endif
 
       /* Skip PC and SR (will do it at the end) */
       " sub     sp, -2*4 \n"
@@ -76,24 +173,24 @@ AppContextRestore(void)
       " ldm     sp++, r8-r12, lr \n"
 
       /* Restore SR */
-      " ld.w r0, sp[-8*4]\n\t" /* R0 is modified, is restored later. */
+      " ld.w    r0, sp[-8*4]\n\t" /* R0 is modified, is restored later. */
       " mtsr    %[SR], r0 \n"
 
       /* Restore r0 */
-      " ld.w    r0, sp[-9*4] \n\t"
+      " ld.w    r0, sp[-9*4] \n"
 
-      /* Restore PC */
-      " ld.w    pc, sp[-7*4]" /* Get PC from stack - PC is the 7th register saved */
+      /* Restore PC from stack - PC is the 7th register saved */
+      " ld.w    pc, sp[-7*4] \n"
 
       :
       : [pxCurrentTCB] "i" (&g_ppCurrentStack),
-        [SR] "i" (AVR32_SR)
+      [SR] "i" (AVR32_SR)
       :
   );
 
   /* Leave pxCurrentTCB variable access critical section */
 
-  //portEXIT_CRITICAL();
+  //OSScheduler::criticalExit();
 
   asm volatile (
 
@@ -143,24 +240,24 @@ SCALLcontextSave(void)
   asm volatile (
 
       /* in order to save R0-R7 */
-      " sub sp, 6*4 \n"
+      " sub     sp, 6*4 \n"
 
       /* Save R0..R7 */
-      " stm --sp, r0-r7 \n"
+      " stm     --sp, r0-r7 \n"
 
       /* in order to save R8-R12 and LR */
       /* do not use SP if interrupts occurs, SP must be left at bottom of stack */
-      " sub r7, sp,-16*4 \n"
+      " sub     r7, sp,-16*4 \n"
 
       /* Copy PC and SR in other places in the stack. */
-      " ld.w r0, r7[-2*4] \n" /* Read SR */
-      " st.w r7[-8*4], r0 \n" /* Copy SR */
+      " ld.w    r0, r7[-2*4] \n" /* Read SR */
+      " st.w    r7[-8*4], r0 \n" /* Copy SR */
 
-      "ld.w r0, r7[-1*4] \n" /* Read PC */
-      "st.w r7[-7*4], r0 \n" /* Copy PC */
+      " ld.w    r0, r7[-1*4] \n" /* Read PC */
+      " st.w    r7[-7*4], r0 \n" /* Copy PC */
 
       /* Save R8..R12 and LR on the stack. */
-      "stm --r7, r8-r12, lr \n"
+      " stm     --r7, r8-r12, lr \n"
 
       /* Arriving here we have the following stack organizations: */
       /* R8..R12, LR, PC, SR, R0..R7. */
@@ -176,15 +273,15 @@ SCALLcontextSave(void)
   /* Basically, all accesses to the pxCurrentTCB structure should be put in a */
   /* critical section because it is a global structure. */
 
-  //portENTER_CRITICAL();
+  //OSScheduler::criticalEnter();
 
   /* Store SP in the first member of the structure pointed to by pxCurrentTCB */
   asm volatile (
 
-      " mov r8, LO(%[pxCurrentTCB]) \n"
-      " orh r8, HI(%[pxCurrentTCB]) \n"
-      " ld.w r0, r8[0] \n"
-      " st.w r0[0], sp \n"
+      " mov     r8, LO(%[pxCurrentTCB]) \n"
+      " orh     r8, HI(%[pxCurrentTCB]) \n"
+      " ld.w    r0, r8[0] \n"
+      " st.w    r0[0], sp \n"
       :
       : [pxCurrentTCB] "i" (&g_ppCurrentStack)
       :
@@ -197,10 +294,10 @@ SCALLcontextRestore(void)
   /* Restore all registers */
   asm volatile (
 
-      "mov     r8, LO(%[pxCurrentTCB]) \n"
-      "orh     r8, HI(%[pxCurrentTCB]) \n"
-      "ld.w    r0, r8[0] \n"
-      "ld.w    sp, r0[0] \n"
+      " mov     r8, LO(%[pxCurrentTCB]) \n"
+      " orh     r8, HI(%[pxCurrentTCB]) \n"
+      " ld.w    r0, r8[0] \n"
+      " ld.w    sp, r0[0] \n"
       :
       : [pxCurrentTCB] "i" (&g_ppCurrentStack)
       :
@@ -216,21 +313,21 @@ SCALLcontextRestore(void)
 
       /* do not use SP if interrupts occurs, SP must be left at bottom of stack */
       " sub     r7, sp, -10*4 \n"
-      " \n"
+
       /* Restore r8-r12 and LR */
       " ldm     r7++, r8-r12, lr \n"
-      " \n"
+
       /* RETS will take care of the extra PC and SR restore. */
       /* So, we have to prepare the stack for this. */
       " ld.w    r0, r7[-8*4] \n" /* Read SR */
       " st.w    r7[-2*4], r0 \n" /* Copy SR */
       " ld.w    r0, r7[-7*4] \n" /* Read PC */
       " st.w    r7[-1*4], r0 \n" /* Copy PC */
-      " \n"
+
       /* Restore R0..R7 */
       " ldm     sp++, r0-r7 \n"
       " sub     sp, -6*4 \n"
-      " \n"
+
       " rets \n"
       :
       :
@@ -242,6 +339,7 @@ SCALLcontextRestore(void)
 inline void
 OSScheduler::contextSave(void)
 {
+#if false
   // push all registers to stack
   // *g_ppCurrentStack = SP (stack pointer)
   // leave interrupts as they were
@@ -249,42 +347,58 @@ OSScheduler::contextSave(void)
   /* When we come here */
   /* Registers R8..R12, LR, PC and SR had already been pushed to system stack */
 
-  asm volatile (
-      /* Save R0..R7 */
-      " stm     --sp, r0-r7 \n"
+  implRegistersSave();
 
-      /* Check if INT0 or higher were being handled (case where the OS tick interrupted another */
-      /* interrupt handler (which was of a higher priority level but decided to lower its priority */
-      /* level and allow other lower interrupt level to occur). */
-      /* In this case we don't want to do a task switch because we don't know what the stack */
-      /* currently looks like (we don't know what the interrupted interrupt handler was doing). */
+  if (implIsAllowedToSwitch())
+    {
+#if false
+      asm volatile (
+          /* Save R0..R7 */
+          //" stm     --sp, r0-r7 \n"
 
-      /* Saving SP in pxCurrentTCB and then later restoring it (thinking restoring the task) */
-      /* will just be restoring the interrupt handler, no way!!! */
-      /* So, since we won't do a vTaskSwitchContext(), it's of no use to save SP. */
+          /* Check if INT0 or higher were being handled (case where the OS tick interrupted another */
+          /* interrupt handler (which was of a higher priority level but decided to lower its priority */
+          /* level and allow other lower interrupt level to occur). */
+          /* In this case we don't want to do a task switch because we don't know what the stack */
+          /* currently looks like (we don't know what the interrupted interrupt handler was doing). */
 
-      " ld.w    r0, sp[9*4] \n" /* Read SR in stack */
-      " bfextu  r0, r0, 22, 3 \n" /* Extract the mode bits to R0. */
-      " cp.w    r0, 1 \n" /* Compare the mode bits with supervisor mode(b'001) */
-      " brhi    LABEL_INT_SKIP_SAVE_CONTEXT_%[LINE] \n"
+          /* Saving SP in pxCurrentTCB and then later restoring it (thinking restoring the task) */
+          /* will just be restoring the interrupt handler, no way!!! */
+          /* So, since we won't do a vTaskSwitchContext(), it's of no use to save SP. */
 
-      /* Store SP in the first member of the structure pointed to by pxCurrentTCB */
-      /* NOTE: we don't enter a critical section here because all interrupt handlers */
-      /* MUST perform a SAVE_CONTEXT/RESTORE_CONTEXT in the same way as */
-      /* portSAVE_CONTEXT_OS_INT/port_RESTORE_CONTEXT_OS_INT if they call OS functions. */
-      /* => all interrupt handlers must use portENTER_SWITCHING_ISR/portEXIT_SWITCHING_ISR. */
+          " ld.w    r0, sp[9*4] \n" /* Read SR in stack */
+          " bfextu  r0, r0, 22, 3 \n" /* Extract the mode bits to R0. */
+          " cp.w    r0, 1 \n" /* Compare the mode bits with supervisor mode(b'001) */
+          " brhi    0f \n"
 
-      " mov     r8, LO(%[pxCurrentTCB]) \n"
-      " orh     r8, HI(%[pxCurrentTCB]) \n"
-      " ld.w    r0, r8[0] \n"
-      " st.w    r0[0], sp \n"
+          /* Store SP in the first member of the structure pointed to by pxCurrentTCB */
 
-      "LABEL_INT_SKIP_SAVE_CONTEXT_%[LINE]: \n"
-      :
-      : [pxCurrentTCB] "i" (&g_ppCurrentStack),
-      [LINE] "i" (__LINE__)
-      :
-  );
+          /* NOTE: we don't enter a critical section here because all interrupt handlers */
+          /* MUST perform a SAVE_CONTEXT/RESTORE_CONTEXT in the same way as */
+          /* portSAVE_CONTEXT_OS_INT/port_RESTORE_CONTEXT_OS_INT if they call OS functions. */
+          /* => all interrupt handlers must use portENTER_SWITCHING_ISR/portEXIT_SWITCHING_ISR. */
+#if false
+          " mov     r8, LO(%[pxCurrentTCB]) \n"
+          " orh     r8, HI(%[pxCurrentTCB]) \n"
+          " ld.w    r0, r8[0] \n"
+          " st.w    r0[0], sp \n"
+#endif
+          //"0: \n"
+          :
+          : [pxCurrentTCB] "i" (&g_ppCurrentStack)
+          : "r0", "r8"
+      );
+#endif
+      implStackPointerSave();
+
+      asm volatile (
+          "0: \n"
+          :
+          :
+          :
+      );
+    }
+#endif
 }
 
 /*
@@ -294,10 +408,10 @@ OSScheduler::contextSave(void)
 inline void
 OSScheduler::contextRestore(void)
 {
+#if false
   // SP = *g_ppCurrentStack
   // pop everything from stack
 
-#if false
   /* Check if INT0 or higher were being handled (case where the OS tick interrupted another */
   /* interrupt handler (which was of a higher priority level but decided to lower its priority */
   /* level and allow other lower interrupt level to occur). */
@@ -308,49 +422,57 @@ OSScheduler::contextRestore(void)
   /* Saving SP in pxCurrentTCB and then later restoring it (thinking restoring the task) */
   /* will just be restoring the interrupt handler, no way!!! */
 
-  asm volatile (
+  if (implIsAllowedToSwitch())
+    {
+#if false
+      asm volatile (
 
-      " ld.w r0, sp[9*4] \n" /* Read SR in stack */
-      " bfextu r0, r0, 22, 3 \n" /* Extract the mode bits to R0. */
-      " cp.w r0, 1 \n" /* Compare the mode bits with supervisor mode(b'001) */
-      " brhi LABEL_INT_SKIP_RESTORE_CONTEXT_%[LINE] \n"
-      :
-      : [LINE] "i" (__LINE__)
-      :
-  );
-
-  /* because it is here safe, always call vTaskSwitchContext() since an OS tick occurred. */
-
-  /* A critical section has to be used here because vTaskSwitchContext handles FreeRTOS linked lists. */
-
-  //portENTER_CRITICAL();
-
-  //vTaskSwitchContext();
-
-  //portEXIT_CRITICAL();
+          " ld.w    r0, sp[9*4] \n" /* Read SR in stack */
+          " bfextu  r0, r0, 22, 3 \n" /* Extract the mode bits to R0. */
+          " cp.w    r0, 1 \n" /* Compare the mode bits with supervisor mode(b'001) */
+          " brhi    1f \n"
+          :
+          :
+          : "r0"
+      );
 #endif
+      /* because it is here safe, always call vTaskSwitchContext() since an OS tick occurred. */
 
-  /* Restore all registers */
-  asm volatile (
+      /* A critical section has to be used here because vTaskSwitchContext handles FreeRTOS linked lists. */
 
-      /* Set SP to point to new stack */
-      " mov r8, LO(%[pxCurrentTCB]) \n"
-      " orh r8, HI(%[pxCurrentTCB]) \n"
-      " ld.w r0, r8[0] \n"
-      " ld.w sp, r0[0] \n"
-      "LABEL_INT_SKIP_RESTORE_CONTEXT_%[LINE]: \n"
+      //portENTER_CRITICAL();
 
-      /* Restore R0..R7 */
-      " ldm sp++, r0-r7 \n"
+      if (OSScheduler::requireContextSwitch())
+        {
+          OSScheduler::contextSwitch();
+        }
 
-      /* Now, the stack should be R8..R12, LR, PC and SR */
-      " rete \n"
-      :
-      : [pxCurrentTCB] "i" (&g_ppCurrentStack),
-      [LINE] "i" (__LINE__)
-      :
-  );
+      //portEXIT_CRITICAL();
 
+      implStackPointerRestore();
+
+      /* Restore all registers */
+      asm volatile (
+#if false
+          /* Set SP to point to new stack */
+          " mov     r8, LO(%[pxCurrentTCB]) \n"
+          " orh     r8, HI(%[pxCurrentTCB]) \n"
+          " ld.w    r0, r8[0] \n"
+          " ld.w    sp, r0[0] \n"
+#endif
+          "1: \n"
+
+          /* Restore R0..R7 */
+          //" ldm     sp++, r0-r7 \n"
+
+          /* Now, the stack should be R8..R12, LR, PC and SR */
+          :
+          : [pxCurrentTCB] "i" (&g_ppCurrentStack)
+          : "r0", "r8"
+      );
+    }
+  implRegistersRestore();
+#endif
 }
 
 /*
@@ -367,14 +489,14 @@ OSScheduler::criticalEnter(void)
 #if !defined(OS_EXCLUDE_MULTITASKING)
   asm volatile
   (
-      "	mfsr r0, %[SR] \n"
-      " st.w --sp, r0 \n"
-      " orh r0, %[MASK] \n"
-      " mtsr %[SR], r0 \n"
+      "	mfsr    r8, %[SR] \n"
+      " st.w    --sp, r8 \n"
+      " orh     r8, %[MASK] \n" // disable interrupts in MASK
+      " mtsr    %[SR], r8 \n"
       :
       : [MASK] "i" (0x001E),
-        [SR] "i" (AVR32_SR)
-      : "r0"
+      [SR] "i" (AVR32_SR)
+      : "r8"
   );
 #endif
 }
@@ -388,11 +510,11 @@ OSScheduler::criticalExit(void)
 #if !defined(OS_EXCLUDE_MULTITASKING)
   asm volatile
   (
-      "	ld.w r0, sp++ \n"
-      "	mtsr %[SR], r0 \n"
+      "	ld.w    r8, sp++ \n"
+      "	mtsr    %[SR], r8 \n"
       :
       : [SR] "i" (AVR32_SR)
-      : "r0"
+      : "r8", "cc"
   );
 #endif
 }
