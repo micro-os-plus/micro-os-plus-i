@@ -98,16 +98,10 @@ OSScheduler::startImpl(void)
   OS::interruptsClearMask();
   OS::interruptsEnable();
 
-  AppContextRestore();
+  UserMode_contextRestore();
 
   for (;;)
     ; // noreturn
-}
-
-void
-OSScheduler::ISRcontextSwitchRequest(void)
-{
-
 }
 
 #if defined(DEBUG)
