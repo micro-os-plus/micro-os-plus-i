@@ -16,6 +16,7 @@ public:
   inline static void returnFromSubroutine(void) __attribute__((always_inline,noreturn));
   // ---
 
+  inline static void CPUstackInit(void) __attribute__((always_inline));
   inline static void CPUinit(void) __attribute__((always_inline));
   inline static void CPUidle(void) __attribute__((always_inline));
   inline static void CPUsleep(void) __attribute__((always_inline));
