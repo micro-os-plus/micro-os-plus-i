@@ -27,6 +27,9 @@ protected:
   friend class OSScheduler;
   static void init(void);
 
+  static void implInit(void);
+  static void implAcknowledgeInterrupt(void);
+
 private:
   static OSTimerStruct_t m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
   };
