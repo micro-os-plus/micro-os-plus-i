@@ -12,19 +12,20 @@
 class OSImpl
   {
 public:
-  inline static void returnFromInterrupt(void) __attribute__((always_inline,noreturn));
-  inline static void returnFromSubroutine(void) __attribute__((always_inline,noreturn));
-  // ---
-
   inline static void CPUstackInit(void) __attribute__((always_inline));
   inline static void CPUinit(void) __attribute__((always_inline));
   inline static void CPUidle(void) __attribute__((always_inline));
   inline static void CPUsleep(void) __attribute__((always_inline));
   inline static void CPUdeepSleep(void) __attribute__((always_inline));
 
+  inline static OSResetBits_t CPUfetchResetBits(void) __attribute__((always_inline));
+
   inline static void WDTreset(void) __attribute__((always_inline));
   inline static void NOP(void) __attribute__((always_inline));
   inline static void SOFTreset(void) __attribute__((always_inline));
+
+  inline static void returnFromInterrupt(void) __attribute__((always_inline,noreturn));
+  inline static void returnFromSubroutine(void) __attribute__((always_inline,noreturn));
 
 #if defined(OS_INLINE_INTERRUPTS_ENABLE_DISABLE)
   inline static void interruptsEnable(void) __attribute__((always_inline));
@@ -133,14 +134,14 @@ public:
   static void busyWaitMillis(schedTicks_t n);
 #endif
 
-  static unsigned char getResetBits(void);
+  static OSResetBits_t getResetBits(void);
 
 private:
   static void saveResetBits(void);
-  static unsigned char ms_resetBits;
+  static OSResetBits_t ms_resetBits;
   };
 
-inline unsigned char OS::getResetBits(void)
+inline OSResetBits_t OS::getResetBits(void)
   {
     return ms_resetBits;
   }
