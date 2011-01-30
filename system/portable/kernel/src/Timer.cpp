@@ -6,6 +6,8 @@
 
 #include "portable/kernel/include/Timer.h"
 
+#if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
+
 #if defined(OS_INCLUDE_TIMER)
 
 Timer::Timer(OSTimer *pTimer)
@@ -74,3 +76,5 @@ OSEventWaitReturn_t Timer::eventWait()
   }
 
 #endif /*OS_INCLUDE_TIMER*/
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
