@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if !defined(OS_EXCLUDE_MULTITASKING)
+#if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
 
@@ -17,10 +17,6 @@
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 
-#if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
-static int i;
-#endif
-
 
 #if defined(OS_EXCLUDE_PREEMPTION)
 __attribute__((interrupt)) void
@@ -30,15 +26,8 @@ __attribute__((naked)) void
 SysTick_contextHandler(void);
 
 void
-OSTimerTicks::init(void)
+OSTimerTicks::implInit(void)
 {
-#if defined(DEBUG)
-
-  OSDeviceDebug::putString("OSTimerTicks::init()");
-  OSDeviceDebug::putNewLine();
-
-#endif
-
   volatile avr32_pm_t* pm = &AVR32_PM;
   volatile avr32_tc_t* tc_reg = &OS_CFGVAR_TIMER;
 
@@ -116,9 +105,6 @@ OSTimerTicks::init(void)
   // set interrupt source RC Compare
   tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].IER.cpcs = 1;
 
-#if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
-  i = 0;
-#endif
 }
 
 __attribute__((noinline)) void
@@ -133,32 +119,14 @@ SysTick_contextHandler(void)
 {
   OSScheduler::interruptEnter();
     {
-      SysTick_interruptServiceRoutine();
+      OSScheduler::timerTicks.interruptServiceRoutine();
     }
   OSScheduler::interruptExit();
 }
 
-void
-SysTick_interruptServiceRoutine()
+
+void OSTimerTicks::implAcknowledgeInterrupt(void)
 {
-  OSScheduler::timerTicks.interruptServiceRoutine();
-
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT)
-  if (++OSTimerSeconds::ms_schedulerTicks == OS_CFGINT_TICK_RATE_HZ)
-    {
-      OSTimerSeconds::ms_schedulerTicks = 0;
-
-      OSScheduler::timerSeconds.interruptServiceRoutine();
-    }
-#endif
-
-#if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
-
-  if ((i++ % OS_CFGINT_TICK_RATE_HZ) == 0)
-    OSDeviceDebug::putChar('!');
-
-#endif
-
   // Clear TC interrupt
   // Notice: Should be done at the end, not at the beginning!
   OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
@@ -199,4 +167,4 @@ TIMER2_OVF_vect(void)
 
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
 
-#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
