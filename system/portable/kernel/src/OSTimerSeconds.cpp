@@ -6,6 +6,8 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
+#if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
+
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
 
 #include "portable/kernel/include/OSTimerSeconds.h"
@@ -46,3 +48,4 @@ void OSTimerSeconds::checkVirtualWatchdogs(void)
 
 #endif /* OS_INCLUDE_OSSCHEDULER_TIMERSECONDS */
 
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
