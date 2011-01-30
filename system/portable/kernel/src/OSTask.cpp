@@ -99,7 +99,7 @@ void OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint,
     memset((void *) pStack, STACK_FILL_BYTE, stackSize);
 
     // initialize stack so that a context restore will be performed
-    m_pStack = OSScheduler::stackInitialize((OSStack_t*) (&pStack[stackSize
+    m_pStack = OSSchedulerImpl::stackInitialize((OSStack_t*) (&pStack[stackSize
         / sizeof(OSStack_t) - 1]), entryPoint, pParameters, m_id);
 
     // pStack points to first register on arm and
