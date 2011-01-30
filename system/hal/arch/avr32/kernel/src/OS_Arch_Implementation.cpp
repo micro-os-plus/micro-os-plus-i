@@ -8,14 +8,7 @@
 
 #if defined(OS_CONFIG_ARCH_AVR32)
 
-
-#if false
-extern "C" void __dso_handle(void);
-void __dso_handle(void)
-  {
-    ;
-  }
-#endif
+// placeholder for common architecture files
 
 #endif /* OS_CONFIG_ARCH_AVR32 */
 
