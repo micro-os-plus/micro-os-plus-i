@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if !defined(OS_EXCLUDE_MULTITASKING)
+#if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
 
 #include "portable/kernel/include/OS.h"
 //#include "portable/kernel/include/OSTimer.h"
@@ -281,4 +281,4 @@ void OSTimer::interruptTick(void)
 #endif
   }
 
-#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
