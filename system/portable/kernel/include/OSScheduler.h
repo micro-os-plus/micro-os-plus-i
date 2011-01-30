@@ -67,8 +67,6 @@ public:
   // publicly available methods
   static void
   start(void) __attribute__( ( noreturn ) );
-  static void
-  startImpl(void) __attribute__( ( noreturn ) );
 
   static bool
   isRunning(void);
@@ -108,7 +106,7 @@ public:
   inline static void
   criticalExit(void) __attribute__( ( always_inline ) );
 
-  // event/synchronization methods
+  // event/synchronisation methods
   static OSEventWaitReturn_t
   eventWait(OSEvent_t event);
 
@@ -118,24 +116,15 @@ public:
 
   static void
   yield(void);
-  inline static void
-  yieldImpl(void) __attribute__( ( always_inline ) );
-
-  static OSStack_t *
-  stackInitialize(OSStack_t * pStackTop, void
-  (*entryPoint)(void *), void *pParams, unsigned char id);
-
-  static void
-  stackSetReturnedValue(OSStack_t * pStack, OSEventWaitReturn_t ret);
 
   inline static void
   ledActiveInit(void) __attribute__( ( always_inline ) );
   inline static void
-  ISRledActiveOn(void) __attribute__( ( always_inline ) );
+  ISR_ledActiveOn(void) __attribute__( ( always_inline ) );
   inline static void
   ledActiveOn(void) __attribute__( ( always_inline ) );
   inline static void
-  ISRledActiveOff(void) __attribute__( ( always_inline ) );
+  ISR_ledActiveOff(void) __attribute__( ( always_inline ) );
   inline static void
   ledActiveOff(void) __attribute__( ( always_inline ) );
 
@@ -147,13 +136,9 @@ public:
 
   static bool
   requireContextSwitch(void);
+
   static void
   contextSwitch(void);
-
-#if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSWITCHREQUEST)
-  static void
-  ISRcontextSwitchRequest(void);
-#endif
 
 #if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT) || defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
@@ -165,10 +150,12 @@ public:
 #endif
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE)
+
   inline static void
   contextSave(void) __attribute__( ( always_inline ) );
   inline static void
   contextRestore(void) __attribute__( ( always_inline ) );
+
 #endif
 
   static OSTimerTicks timerTicks;
@@ -193,10 +180,6 @@ private:
   //static void timerISR(void) __attribute__( ( naked ) );
   static void
   timerISR(void);
-
-  //static void dumpContextInfo(void *pContext);
-  static void
-  dumpContextInfo(OSTask *);
 
   // members
   static bool ms_isPreemptive;
@@ -223,21 +206,45 @@ private:
 class OSSchedulerImpl
 {
 public:
+  static void
+  start(void) __attribute__( ( noreturn ) );
+
+  inline static void
+  yield(void) __attribute__( ( always_inline ) );
+
+  static OSStack_t *
+  stackInitialize(OSStack_t * pStackTop, void
+  (*entryPoint)(void *), void *pParams, unsigned char id);
+
+  static void
+  stackSetReturnedValue(OSStack_t * pStack, OSEventWaitReturn_t ret);
+
+#if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSWITCHREQUEST)
+  static void
+  ISRcontextSwitchRequest(void);
+#endif
+
+  //static void dumpContextInfo(void *pContext);
+  static void
+  dumpContextInfo(OSTask *);
+
+  inline static void
+  FirstTask_contextRestore(void) __attribute__( ( always_inline ) );
 
 #if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
   inline static void
-  implStackPointerSave(void) __attribute__( ( always_inline ) );
+  stackPointerSave(void) __attribute__( ( always_inline ) );
   inline static void
-  implStackPointerRestore(void) __attribute__( ( always_inline ) );
+  stackPointerRestore(void) __attribute__( ( always_inline ) );
 
   inline static void
-  implRegistersSave(void) __attribute__( ( always_inline ) );
+  registersSave(void) __attribute__( ( always_inline ) );
   inline static void
-  implRegistersRestore(void) __attribute__( ( always_inline ) );
+  registersRestore(void) __attribute__( ( always_inline ) );
 
   inline static bool
-  implIsAllowedToSwitch(void) __attribute__( ( always_inline ) );
+  isContextSwitchAllowed(void) __attribute__( ( always_inline ) );
 
 #endif
 
@@ -310,13 +317,21 @@ OSScheduler::setLock(bool flag)
 inline void
 OSScheduler::setPreemptive(bool flag)
 {
+#if !defined(OS_EXCLUDE_PREEMPTION)
   ms_isPreemptive = flag;
+#else
+  flag = flag;
+#endif
 }
 
 inline bool
 OSScheduler::isPreemptive(void)
 {
+#if !defined(OS_EXCLUDE_PREEMPTION)
   return ms_isPreemptive;
+#else
+  return false;
+#endif
 }
 
 inline OSTask *
@@ -355,7 +370,7 @@ inline void OSScheduler::setAllowDeepSleep(bool flag)
     ms_allowDeepSleep = flag;
   }
 
-#endif
+#endif /* OS_INCLUDE_OSTASK_SLEEP */
 
 #if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT)
 
@@ -381,46 +396,108 @@ inline void OSScheduler::interruptExit(void)
     // interrupts enabled after this point
   }
 
-#endif
+#endif /* OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT */
 
 #if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
 inline void
 OSScheduler::interruptEnter(void)
-  {
+{
 #if !defined(OS_EXCLUDE_PREEMPTION)
-  OSSchedulerImpl::implRegistersSave();
+  OSSchedulerImpl::registersSave();
 
-    if (OSSchedulerImpl::implIsAllowedToSwitch())
-      {
-        OSSchedulerImpl::implStackPointerSave();
-      }
+  if (OSSchedulerImpl::isContextSwitchAllowed())
+    {
+      OSSchedulerImpl::stackPointerSave();
+    }
 #endif
-    OSScheduler::ledActiveOn();
-  }
+  OSScheduler::ledActiveOn();
+}
 
 inline void
 OSScheduler::interruptExit(void)
-  {
+{
 #if !defined(OS_EXCLUDE_PREEMPTION)
 
-    if (OSSchedulerImpl::implIsAllowedToSwitch())
-      {
-        if (OSScheduler::requireContextSwitch())
-          {
-            OSScheduler::contextSwitch();
-          }
-        OSSchedulerImpl::implStackPointerRestore();
-      }
-    OSSchedulerImpl::implRegistersRestore();
+  if (OSSchedulerImpl::isContextSwitchAllowed())
+    {
+      if (OSScheduler::requireContextSwitch())
+        {
+          OSScheduler::contextSwitch();
+        }
+      OSSchedulerImpl::stackPointerRestore();
+    }
+  OSSchedulerImpl::registersRestore();
 
-    OSImpl::returnFromInterrupt();
+  OSImpl::returnFromInterrupt();
 
 #endif
-    // interrupts re-enabled after this point
+  // interrupts re-enabled after this point
+}
+
+#endif /* OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING */
+
+#if !defined(OS_EXCLUDE_OSSCHEDULER_LED_ACTIVE)
+/*
+ * Manage the activity LED
+ */
+inline void OSScheduler::ledActiveInit(void)
+  {
+#if defined(OS_CONFIG_ACTIVE_LED_PORT) && defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
+        OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT);
+        // Turn off led, i.e. HIGH if active low
+#if defined(OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW)
+        OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+#else
+        OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+#endif
+        OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT);
+#else
+#error "OS_CONFIG_ACTIVE_LED_* missing"
+#endif
   }
 
+/* Turn LED on (on interrupts) */
+inline void OSScheduler::ISR_ledActiveOn(void)
+  {
+#if defined(OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW)
+    OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+#else
+    OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
 #endif
+   }
+
+// TODO: if GPIO actions are atomic, we need no critical sections
+inline void OSScheduler::ledActiveOn(void)
+  {
+    OSScheduler::criticalEnter();
+      {
+        ISR_ledActiveOn();
+      }
+    OSScheduler::criticalExit();
+  }
+
+/* Turn LED off (on interrupts) */
+inline void OSScheduler::ISR_ledActiveOff(void)
+  {
+#if defined(OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW)
+    OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+#else
+    OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+#endif
+  }
+
+/* Turn LED off (at sleep) */
+inline void OSScheduler::ledActiveOff(void)
+  {
+    OSScheduler::criticalEnter();
+      {
+        ISR_ledActiveOff();
+      }
+    OSScheduler::criticalExit();
+    }
+
+#endif /* ! OS_EXCLUDE_OSSCHEDULER_LED_ACTIVE */
 
 //-----------------------------------------------------------------------------
 
