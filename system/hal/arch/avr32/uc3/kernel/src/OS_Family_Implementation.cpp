@@ -8,18 +8,12 @@
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
 
-
-void
-OS::saveResetBits(void)
-{
-  ms_resetBits = -1;
-}
-
+// common point for all exceptions
 extern "C" void
-os_ex_handle(unsigned short n);
+os_exception_handler(unsigned short n);
 
 void
-os_ex_handle(unsigned short n)
+os_exception_handler(unsigned short n)
 {
 #if defined(DEBUG)
   OSDeviceDebug::putNewLine();
@@ -29,6 +23,8 @@ os_ex_handle(unsigned short n)
 #endif
   for (;;)
     ;
+
+  // TODO: on release, perform a soft reset
 }
 
 extern "C" void
@@ -49,7 +45,7 @@ os_ex_unrecover(void) __attribute__( ( naked ));
 void
 os_ex_unrecover(void)
 {
-  os_ex_handle(3);
+  os_exception_handler(3);
 }
 
 // TLB Multiple Hit.
@@ -59,7 +55,7 @@ os_ex_tbl_mult_hit(void) __attribute__( ( naked ));
 void
 os_ex_tbl_mult_hit(void)
 {
-  os_ex_handle(4);
+  os_exception_handler(4);
 }
 
 // Bus Error Data Fetch.
@@ -69,7 +65,7 @@ os_ex_bus_err_data_fetch(void) __attribute__( ( naked ));
 void
 os_ex_bus_err_data_fetch(void)
 {
-  os_ex_handle(5);
+  os_exception_handler(5);
 }
 
 // Bus Error Instruction Fetch.
@@ -79,7 +75,7 @@ os_ex_bus_err_inst_fetch(void) __attribute__( ( naked ));
 void
 os_ex_bus_err_inst_fetch(void)
 {
-  os_ex_handle(6);
+  os_exception_handler(6);
 }
 
 // NMI.
@@ -89,7 +85,7 @@ os_ex_nmi(void) __attribute__( ( naked ));
 void
 os_ex_nmi(void)
 {
-  os_ex_handle(7);
+  os_exception_handler(7);
 }
 
 // Instruction Address.
@@ -99,7 +95,7 @@ os_ex_inst_add(void) __attribute__( ( naked ));
 void
 os_ex_inst_add(void)
 {
-  os_ex_handle(12);
+  os_exception_handler(12);
 }
 
 // ITLB Protection.
@@ -109,7 +105,7 @@ os_ex_itlb_prot(void) __attribute__( ( naked ));
 void
 os_ex_itlb_prot(void)
 {
-  os_ex_handle(14);
+  os_exception_handler(14);
 }
 
 // Breakpoint.
@@ -119,7 +115,7 @@ os_ex_brk_point(void) __attribute__( ( naked ));
 void
 os_ex_brk_point(void)
 {
-  os_ex_handle(15);
+  os_exception_handler(15);
 }
 
 // Illegal Opcode.
@@ -129,7 +125,7 @@ os_ex_illegal_opcode(void) __attribute__( ( naked ));
 void
 os_ex_illegal_opcode(void)
 {
-  os_ex_handle(16);
+  os_exception_handler(16);
 }
 
 // Unimplemented Instruction.
@@ -139,7 +135,7 @@ os_ex_unimpl_inst(void) __attribute__( ( naked ));
 void
 os_ex_unimpl_inst(void)
 {
-  os_ex_handle(17);
+  os_exception_handler(17);
 }
 
 // Privilege Violation.
@@ -149,7 +145,7 @@ os_ex_privilege_violaton(void) __attribute__( ( naked ));
 void
 os_ex_privilege_violaton(void)
 {
-  os_ex_handle(18);
+  os_exception_handler(18);
 }
 
 // Data Address (Read).
@@ -159,7 +155,7 @@ os_ex_data_rd(void) __attribute__( ( naked ));
 void
 os_ex_data_rd(void)
 {
-  os_ex_handle(22);
+  os_exception_handler(22);
 }
 
 // Data Address (Write).
@@ -169,7 +165,7 @@ os_ex_data_wr(void) __attribute__( ( naked ));
 void
 os_ex_data_wr(void)
 {
-  os_ex_handle(23);
+  os_exception_handler(23);
 }
 
 // DTLB Protection (Read).
@@ -179,7 +175,7 @@ os_ex_dtlb_protect_rd(void) __attribute__( ( naked ));
 void
 os_ex_dtlb_protect_rd(void)
 {
-  os_ex_handle(26);
+  os_exception_handler(26);
 }
 
 // DTLB Protection (Write).
@@ -189,7 +185,7 @@ os_ex_dtlb_protect_wr(void) __attribute__( ( naked ));
 void
 os_ex_dtlb_protect_wr(void)
 {
-  os_ex_handle(27);
+  os_exception_handler(27);
 }
 
 // ITLB Miss.
@@ -199,7 +195,7 @@ os_ex_itlb_miss(void) __attribute__( ( naked ));
 void
 os_ex_itlb_miss(void)
 {
-  os_ex_handle(13);
+  os_exception_handler(13);
 }
 
 // DTLB Miss (Read).
@@ -209,7 +205,7 @@ os_ex_dtlb_miss_rd(void) __attribute__( ( naked ));
 void
 os_ex_dtlb_miss_rd(void)
 {
-  os_ex_handle(24);
+  os_exception_handler(24);
 }
 
 // DTLB Miss (Write).
@@ -219,7 +215,7 @@ os_ex_dtlb_miss_wr(void) __attribute__( ( naked ));
 void
 os_ex_dtlb_miss_wr(void)
 {
-  os_ex_handle(25);
+  os_exception_handler(25);
 }
 
 #endif /* OS_CONFIG_FAMILY_AVR32UC3 */
