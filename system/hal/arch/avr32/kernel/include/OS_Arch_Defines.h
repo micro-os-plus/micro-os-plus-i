@@ -10,6 +10,8 @@
 #if !defined (OS_BUILD_ASSEMBLY_CODE)
 typedef unsigned long OSStack_t;
 typedef unsigned long *pfnVector_t;
+
+typedef unsigned long OSResetBits_t;
 #endif
 
 #if !defined(OS_CFGINT_BUSYWAIT_CALIBRATION)
