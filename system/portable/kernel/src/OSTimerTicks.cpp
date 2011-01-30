@@ -7,7 +7,7 @@
 //#include "portable/kernel/include/OS_Defines.h"
 #include "portable/kernel/include/OS_Defines.h"
 
-#if !defined(OS_EXCLUDE_MULTITASKING)
+#if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
 
 #include "portable/kernel/include/OSTimerTicks.h"
 
@@ -30,6 +30,28 @@ OSTimerTicks::OSTimerTicks() :
 #include "portable/devices/sdi12/include/SDI12Sensor.h"
 #endif
 
+#if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
+static int i;
+#endif
+
+void
+OSTimerTicks::init(void)
+{
+#if defined(DEBUG)
+
+  OSDeviceDebug::putString("OSTimerTicks::init()");
+  OSDeviceDebug::putNewLine();
+
+#endif
+
+#if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
+  i = 0;
+#endif
+
+  implInit();
+}
+
+
 void OSTimerTicks::interruptServiceRoutine(void)
   {
     OSScheduler::criticalEnter();
@@ -45,6 +67,25 @@ void OSTimerTicks::interruptServiceRoutine(void)
       }
     OSScheduler::criticalExit();
 
+#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT)
+
+  if (++OSTimerSeconds::ms_schedulerTicks == OS_CFGINT_TICK_RATE_HZ)
+    {
+      OSTimerSeconds::ms_schedulerTicks = 0;
+
+      OSScheduler::timerSeconds.interruptServiceRoutine();
+    }
+
+#endif
+
+#if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
+
+  if ((i++ % OS_CFGINT_TICK_RATE_HZ) == 0)
+    OSDeviceDebug::putChar('!');
+
+#endif
+
+  implAcknowledgeInterrupt();
   }
 
-#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
