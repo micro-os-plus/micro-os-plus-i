@@ -7,7 +7,7 @@
 #include "portable/kernel/include/OS.h"
 
 // static members
-unsigned char OS::ms_resetBits;
+OSResetBits_t OS::ms_resetBits;
 
 #if defined(DEBUG) && !defined(OS_EXCLUDE_MULTITASKING)
 
@@ -22,8 +22,16 @@ OS::OS()
 
 #endif /* defined(DEBUG) */
 
+void
+OS::saveResetBits(void)
+{
+  ms_resetBits = OSImpl::CPUfetchResetBits();
+}
+
 extern "C"
 int  main( void ) __attribute__( ( weak ) );
+
+#if !defined(OS_EXCLUDE_RESET_HANDLER)
 
 extern "C" void
 os_reset_handler(void) __attribute__( ( naked, noreturn ));
@@ -47,10 +55,11 @@ os_reset_handler(void)
   // be sure we start with interrupts disabled
   OS::interruptsDisable();
 
+  // should also init GPIO, so that leds will be available
   OSImpl::CPUinit();
 
   OSScheduler::ledActiveInit();
-  OSScheduler::ISRledActiveOn();
+  OSScheduler::ISR_ledActiveOn();
 
   os_init_data_and_bss();
 
@@ -140,6 +149,7 @@ void os_init_static_constructors(void)
       }
 }
 
+#endif /* OS_EXCLUDE_RESET_HANDLER */
 
 #if defined(OS_INCLUDE_NAKED_INIT)
 // ----- init5 ---------------------------------------------------------------
