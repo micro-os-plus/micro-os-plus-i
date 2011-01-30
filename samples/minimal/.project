@@ -32,7 +32,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/sample-minimal/Release-Atmel-EVK1104}</value>
+					<value>${workspace_loc:/sample-minimal/Debug-Atmel-EVK1104}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
