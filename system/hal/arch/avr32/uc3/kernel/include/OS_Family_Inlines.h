@@ -38,6 +38,13 @@ OSImpl::CPUinit(void)
 }
 
 
+inline OSResetBits_t
+OSImpl::CPUfetchResetBits(void)
+{
+  return -1;    // TODO: fetch bits telling reset reason.
+}
+
+
 inline void
 OSImpl::returnFromInterrupt(void)
 {
