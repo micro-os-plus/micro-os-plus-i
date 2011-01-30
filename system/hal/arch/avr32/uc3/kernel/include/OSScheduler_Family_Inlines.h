@@ -50,7 +50,7 @@
 
 // Save the current SP to the current task, via the global pointer.
 inline void
-OSSchedulerImpl::implStackPointerSave(void)
+OSSchedulerImpl::stackPointerSave(void)
   {
     asm volatile (
         " mov     r8, LO(%[pxCurrentTCB]) \n"
@@ -65,7 +65,7 @@ OSSchedulerImpl::implStackPointerSave(void)
 
 // Restore the current SP from the current task, via the global pointer
 inline void
-OSSchedulerImpl::implStackPointerRestore(void)
+OSSchedulerImpl::stackPointerRestore(void)
   {
     asm volatile (
         " mov     r8, LO(%[pxCurrentTCB]) \n"
@@ -81,7 +81,7 @@ OSSchedulerImpl::implStackPointerRestore(void)
 // Save the remaining r0-r7 registers on stack;
 // the others were saved by the interrupt
 inline void
-OSSchedulerImpl::implRegistersSave(void)
+OSSchedulerImpl::registersSave(void)
   {
     asm volatile (
         " stm     --sp, r0-r7 \n"
@@ -94,7 +94,7 @@ OSSchedulerImpl::implRegistersSave(void)
 // Restore r0-r7 registers from stack;
 // the others will be restored when exiting the interrupt.
 inline void
-OSSchedulerImpl::implRegistersRestore(void)
+OSSchedulerImpl::registersRestore(void)
   {
     asm volatile (
         " ldm     sp++, r0-r7 \n"
@@ -117,7 +117,7 @@ OSSchedulerImpl::implRegistersRestore(void)
 
 #if false
 inline void
-OSSchedulerImpl::implIsAllowedToSwitch(void)
+OSSchedulerImpl::isContextSwitchAllowed(void)
   {
     asm volatile (
         " ld.w    r0, sp[9*4] \n" // Read SR in stack
@@ -131,7 +131,7 @@ OSSchedulerImpl::implIsAllowedToSwitch(void)
   }
 #else
 inline bool
-OSSchedulerImpl::implIsAllowedToSwitch(void)
+OSSchedulerImpl::isContextSwitchAllowed(void)
   {
     register bool bRet asm ("r8");
 
@@ -166,7 +166,7 @@ FirstTask_contextRestore(void) __attribute__( ( always_inline ) );
 
 // Restore artificial context for first task startup
 inline void
-FirstTask_contextRestore(void)
+OSSchedulerImpl::FirstTask_contextRestore(void)
 {
 #if true
 
@@ -186,8 +186,8 @@ FirstTask_contextRestore(void)
 
 #else
 
-  OSSchedulerImpl::implStackPointerRestore();
-  OSSchedulerImpl::implRegistersRestore();
+  OSSchedulerImpl::stackPointerRestore();
+  OSSchedulerImpl::registersRestore();
 
 #endif
 
@@ -303,7 +303,7 @@ SCALL_contextSave(void)
 
 #if false
 
-  OSSchedulerImpl::implStackPointerSave();
+  OSSchedulerImpl::stackPointerSave();
 
 #else
   // Store SP in the first member of the structure pointed to by pxCurrentTCB *
@@ -420,7 +420,7 @@ OSScheduler::criticalExit(void)
 
 // perform a context switch by triggering a system call exception
 inline void
-OSScheduler::yieldImpl(void)
+OSSchedulerImpl::yield(void)
 {
   asm volatile
   (
