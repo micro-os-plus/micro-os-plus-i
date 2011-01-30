@@ -25,7 +25,9 @@ bool OSScheduler::ms_isPreemptive;
 unsigned char OSScheduler::ms_tasksCount;
 OSTask *OSScheduler::ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 
+#if !defined(OS_EXCLUDE_OSTIMER)
 OSTimerTicks OSScheduler::timerTicks;
+#endif
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
 bool OSScheduler::ms_allowDeepSleep;
@@ -49,7 +51,11 @@ void OSScheduler::earlyInit(void)
 #endif
     ms_isRunning = false;
     ms_isLocked = false;
+#if !defined(OS_EXCLUDE_PREEMPTION)
     ms_isPreemptive = true;
+#else
+    ms_isPreemptive = false;
+#endif
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
     ms_allowDeepSleep = true;
@@ -109,13 +115,15 @@ void OSScheduler::start(void)
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_START)
           {
             OSDeviceDebug::putString_P(PSTR("Start "));
-            dumpContextInfo(ms_pTaskRunning);
+            OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
 
             OSDeviceDebug::putNewLine();
           }
 #endif
 
+#if !defined(OS_EXCLUDE_OSTIMER)
         timerTicks.init();
+#endif
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
         timerSeconds.init();
@@ -124,7 +132,7 @@ void OSScheduler::start(void)
         ms_isRunning = true;
 
         // interrupts enabled when pop-ing flags
-        OSScheduler::startImpl();
+        OSSchedulerImpl::start();
         // return to the top-most task (guaranteed to exist,
         // since the idle task was already checked to be there)
       }
@@ -142,7 +150,7 @@ void OSScheduler::start(void)
 void OSScheduler::yield(void)
   {
     //ms_pTaskRunning->m_hasReturnValue = false;
-    yieldImpl();
+  OSSchedulerImpl::yield();
   }
 
 // sleep until event occurs
@@ -173,7 +181,7 @@ OSEventWaitReturn_t OSScheduler::eventWait(OSEvent_t event)
       }
 
     //ms_pTaskRunning->m_hasReturnValue = true;
-    yieldImpl();
+    OSSchedulerImpl::yield();
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_EVENTWAIT)
     OSDeviceDebug::putString(" wk ");
 #endif
@@ -246,7 +254,7 @@ bool OSScheduler::requireContextSwitch()
         && (OSReadyList::getCount() > 1);
     if (!bRequire)
       {
-        OSScheduler::ISRledActiveOff();
+        OSScheduler::ISR_ledActiveOff();
       }
 
     return bRequire;
