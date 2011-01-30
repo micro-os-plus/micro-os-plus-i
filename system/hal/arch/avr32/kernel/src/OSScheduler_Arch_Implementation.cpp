@@ -9,7 +9,7 @@
 #if defined(OS_CONFIG_ARCH_AVR32)
 
 OSStack_t *
-OSScheduler::stackInitialize(OSStack_t * pStackTop, void
+OSSchedulerImpl::stackInitialize(OSStack_t * pStackTop, void
 (*pCode)(void *), void *pParams, unsigned char id)
 {
   /* The value on the right is the offset from the task stack pointer */
@@ -77,12 +77,12 @@ OSScheduler::stackInitialize(OSStack_t * pStackTop, void
 }
 
 void
-OSScheduler::startImpl(void)
+OSSchedulerImpl::start(void)
 {
   OS::interruptsClearMask();
   OS::interruptsEnable();
 
-  FirstTask_contextRestore();
+  OSSchedulerImpl::FirstTask_contextRestore();
 
   for (;;)
     ; // noreturn
@@ -91,7 +91,7 @@ OSScheduler::startImpl(void)
 #if defined(DEBUG)
 
 void
-OSScheduler::dumpContextInfo(OSTask * pTask)
+OSSchedulerImpl::dumpContextInfo(OSTask * pTask)
 {
   OSDeviceDebug::putChar('\'');
   OSDeviceDebug::putString(pTask->getName());
