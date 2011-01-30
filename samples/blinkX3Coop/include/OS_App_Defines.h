@@ -16,7 +16,8 @@
 
 #define OS_CFGINT_TASKS_TABLE_SIZE                      (3)
 
-#define OS_INCLUDE_OS_BUSYWAITMILLIS                    1
+#define OS_EXCLUDE_PREEMPTION                           (1)
+#define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 
 #if defined(DEBUG)
 // One of the following must be defined in Eclipse project or Makefile
