@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if !defined(OS_EXCLUDE_MULTITASKING)
+#if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
 
 #if defined(OS_CONFIG_ARCH_AVR32)
 
@@ -16,4 +16,4 @@
 
 #endif /* defined(OS_CONFIG_ARCH_AVR32) */
 
-#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
