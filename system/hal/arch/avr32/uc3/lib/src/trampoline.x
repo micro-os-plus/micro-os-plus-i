@@ -70,9 +70,7 @@ _trampoline:
 
   .org  PROGRAM_START_OFFSET
 program_start:
-  // Jump to the C runtime startup routine.
-  //lda.w   pc, _stext
-
+  // Jump to the uOS++ startup routine.
   lda.w   pc, os_reset_handler
 
 //! \endverbatim
