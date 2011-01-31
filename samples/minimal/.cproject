@@ -53485,7 +53485,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.822581117" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections -finline-functions -Wa,-adhlns=&quot;$@.lst&quot; " valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.822581117" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections -finline-small-functions -Wa,-adhlns=&quot;$@.lst&quot; " valueType="string"/>
 								<option id="avr32.cpp.compiler.option.gc-sections.1399497307" name="Prepare functions for garbage collection" superClass="avr32.cpp.compiler.option.gc-sections" value="true" valueType="boolean"/>
 								<inputType id="avr32.managedbuild.tool.gnu.cpp.compiler.input.1927311103" superClass="avr32.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -53503,7 +53503,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.misc.other.856628185" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wextra -std=gnu99 -ffunction-sections -fdata-sections -Wa,-adhlns=&quot;$@.lst&quot; -finline-functions" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.other.856628185" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wextra -std=gnu99 -ffunction-sections -fdata-sections -Wa,-adhlns=&quot;$@.lst&quot; -finline-small-functions" valueType="string"/>
 								<inputType id="avr32.managedbuild.tool.gnu.c.compiler.input.1339390958" superClass="avr32.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="avr32.managedbuild.tool.gnu.c.linker.exe.debug.1847292687" name="32-bit AVR/GNU C Linker" superClass="avr32.managedbuild.tool.gnu.c.linker.exe.debug">
@@ -53551,7 +53551,9 @@
 					</sourceEntries>
 				</configuration>
 			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="micro-os-plus;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
+			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 			<storageModule moduleId="scannerConfiguration">
@@ -62355,7 +62357,6 @@
 		<cconfiguration id="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480" moduleId="org.eclipse.cdt.core.settings" name="Release-Atmel-EVK1104">
 				<macros>
-					<stringMacro name="DBGDEV" type="VALUE_TEXT" value="I2C"/>
 					<stringMacro name="BOARD" type="VALUE_TEXT" value="ATMEL_EVK1104"/>
 				</macros>
 				<externalSettings/>
@@ -62453,7 +62454,9 @@
 					</sourceEntries>
 				</configuration>
 			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="micro-os-plus;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
+			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 			<storageModule moduleId="scannerConfiguration">
