@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdtprojectproperties>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.IncludePaths">
+<language name="s,S,asm">
+<includepath>${ProjDirPath}/include</includepath>
+<includepath>${WorkspaceDirPath}/micro-os-plus</includepath>
+
+</language>
+<language name="C Source File">
+<includepath>${ProjDirPath}/include</includepath>
+<includepath>${WorkspaceDirPath}/micro-os-plus</includepath>
+
+</language>
+<language name="C++ Source File">
+<includepath>${ProjDirPath}/include</includepath>
+<includepath>${WorkspaceDirPath}/micro-os-plus</includepath>
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.Macros">
+<language name="s,S,asm">
+
+</language>
+<language name="C Source File">
+<macro>
+<name>OS_CONFIG_BOARD_${BOARD}</name><value>1</value>
+</macro>
+
+</language>
+<language name="C++ Source File">
+<macro>
+<name>OS_CONFIG_BOARD_${BOARD}</name><value>1</value>
+</macro>
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+</cdtprojectproperties>
