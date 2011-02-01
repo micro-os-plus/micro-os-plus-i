@@ -88,13 +88,79 @@ TaskBlinkNested::taskMain(void)
 void
 nestedInterruptInit(void)
 {
-  ; // TODO: initialise the second timer on a nested interrupt
+  volatile avr32_tc_t* tc_reg = &TSKBLKNEST_TIMER;
+
+  // the clock for TCO is already enabled
+
+  // initialise registers for the Channel
+
+  // disable channel
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CCR.clkdis = 1;
+
+  // clear interrupt flags, by reading SR
+  tc_reg->channel[TSKBLKNEST_CHANNEL].sr;
+
+  // reset register
+  tc_reg->channel[TSKBLKNEST_CHANNEL].cmr = 0;
+
+  // set waveform mode as default
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.wave = 1;
+
+  // for waveform mode the TIOB must not be input
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.eevt = 2;
+  //disable all interrupt sources
+  tc_reg->channel[TSKBLKNEST_CHANNEL].idr = 0xFFFFFFFF;
+
+  //register the interrupt
+  INTC_register_interrupt(NestedInterrupt_contextHandler,
+      TSKBLKNEST_CFGINT_TIMER_IRQ_ID, TSKBLKNEST_CFGINT_TIMER_IRQ_LEVEL);
+
+  //clock source
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.tcclks
+      = TSKBLKNEST_CFGINT_TIMER_CLOCK_SELECT;
+
+  // counter UP mode with automatic trigger on RC Compare
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.wavsel = 2;
+  // no event on TIOA when RC compare
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.acpc = 0;
+  // no event on TIOB when RC compare
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.bcpc = 0;
+  // enable channel, as it might be disabled
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CCR.clken = 1;
+
+  // start channel using software trigger
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CCR.swtrg = 1;
+
+#define T_DIVIDER (1 << ((TSKBLKNEST_CFGINT_TIMER_CLOCK_SELECT-2)*2+1))
+#define T_COUNTER (OS_CFGLONG_OSCILLATOR_HZ/TSKBLKNEST_CFGINT_TIMER_PRESCALLER/T_DIVIDER/TSKBLKNEST_CFGINT_TICK_RATE_HZ)
+
+#if defined(DEBUG)
+
+  OSDeviceDebug::putDec(TSKBLKNEST_CFGINT_TIMER_PRESCALLER);
+  OSDeviceDebug::putChar(',');
+  OSDeviceDebug::putDec(T_DIVIDER);
+  OSDeviceDebug::putChar(',');
+  OSDeviceDebug::putDec(T_COUNTER);
+  OSDeviceDebug::putNewLine();
+
+#endif
+
+  // set RC value
+  tc_reg->channel[TSKBLKNEST_CHANNEL].RC.rc = T_COUNTER;
+
+  // counter UP mode with automatic trigger on RC Compare
+  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.wavsel = 2;
+
+  // set interrupt source RC Compare
+  tc_reg->channel[TSKBLKNEST_CHANNEL].IER.cpcs = 1;
 }
 
 void
 nestedInterruptAck(void)
 {
-  ; // TODO: add code
+  // Clear TC interrupt
+  // Notice: Should be done at the end, not at the beginning!
+  TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
 }
 
 #if defined(OS_EXCLUDE_PREEMPTION)
