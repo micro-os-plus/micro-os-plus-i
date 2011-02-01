@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2009 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -380,7 +380,7 @@ void OSScheduler::interruptTick(void)
         OSTask *pt;
         pt = ms_tasks[ i ];
 #if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK)
-        pt->schedulerTicks();
+        pt->schedulerTick();
 #endif
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
         if (pt->isInterrupted())
