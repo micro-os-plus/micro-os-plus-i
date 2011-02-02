@@ -189,8 +189,11 @@ void SDI12Sensor::disableMarking(void)
     ms_cntMarking = 0;
   }
 
+// critical section moved here from OSTimerTicks::interruptServiceRoutine
 void SDI12Sensor::interruptTick(void)
   {
+  OSScheduler::criticalEnter();
+    {
     //OSDeviceDebug::putString(".");
     if (ms_timerTimeout != 0)
       {
@@ -236,6 +239,8 @@ void SDI12Sensor::interruptTick(void)
                 OSEventWaitReturn::OS_CANCELED);
           }
       }
+    }
+  OSScheduler::criticalExit();
   }
 
 // ---------------------------------------------------------------------------
