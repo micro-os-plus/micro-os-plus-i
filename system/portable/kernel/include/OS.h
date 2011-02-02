@@ -131,7 +131,11 @@ public:
 #endif
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMILLIS)
-  static void busyWaitMillis(schedTicks_t n);
+  static void busyWaitMillis(unsigned int n);
+#endif
+
+#if defined(OS_INCLUDE_OS_BUSYWAITMICROS)
+  static void busyWaitMicros(unsigned int n);
 #endif
 
   static OSResetBits_t getResetBits(void);
