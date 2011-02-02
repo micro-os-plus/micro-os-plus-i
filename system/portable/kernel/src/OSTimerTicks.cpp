@@ -54,18 +54,20 @@ OSTimerTicks::init(void)
 
 void OSTimerTicks::interruptServiceRoutine(void)
   {
+  OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, AVR32_PIN_PX50);
+
     OSScheduler::criticalEnter();
       {
         interruptTick();
         incrementTicks();
-
-        OSScheduler::interruptTick();
-
-#if defined(OS_INCLUDE_SDI12SENSOR)
-        SDI12Sensor::interruptTick();
-#endif
       }
     OSScheduler::criticalExit();
+
+    OSScheduler::interruptTick();
+
+#if defined(OS_INCLUDE_SDI12SENSOR)
+    SDI12Sensor::interruptTick();
+#endif
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT)
 
@@ -85,6 +87,7 @@ void OSTimerTicks::interruptServiceRoutine(void)
 
 #endif
 
+  OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, AVR32_PIN_PX50);
   implAcknowledgeInterrupt();
   }
 
