@@ -20,9 +20,6 @@ public:
   // actual task main code
   virtual void taskMain(void);
 
-  // extension to scheduler tick; runs in interrupt context
-  virtual void schedulerTick(void);
-
 private:
   // members
   OSStack_t m_stack[ (OSTask::STACK_MINIMAL_SIZE + 200) / sizeof(OSStack_t) ];
