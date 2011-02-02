@@ -57,35 +57,7 @@ TaskBlink::taskMain(void)
       os.sched.timerTicks.sleep(m_rate);
 
       // finally toggle led
-      m_oLed.toggle();
+      //m_oLed.toggle();
     }
 }
 
-void
-busyWaitMicros(unsigned int n)
-{
-  int i;
-  // calibrate from OSC
-  for (i = (OS_CFGLONG_SYSCLOCK_HZ / 1000 * n / OS_CFGINT_BUSYWAIT_CALIBRATION); i--;)
-    {
-      OSImpl::NOP();
-    }
-}
-
-// artificially make the system timer interrupt longer, so that we
-// increase the chance of having nested interrupts.
-
-#define APP_INCLUDE_BUSY_WAIT           1
-#define APP_BUSY_PROCENTAGE             30
-#define APP_EVENT_DUMMY                 0x1111
-#define APP_CFGINT_NOTIFIES             100
-void
-TaskBlink::schedulerTick(void)
-{
-#if defined(APP_INCLUDE_BUSY_WAIT)
-  busyWaitMicros(1000000/OS_CFGINT_TICK_RATE_HZ*APP_BUSY_PROCENTAGE/100);
-#else
-  for (int i = APP_CFGINT_NOTIFIES; --i;)
-    os.sched.eventNotify(APP_EVENT_DUMMY);
-#endif
-}
