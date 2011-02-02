@@ -183,7 +183,7 @@ void OS::earlyInit(void)
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMILLIS)
 
-void OS::busyWaitMillis(schedTicks_t n)
+void OS::busyWaitMillis(unsigned int n)
   {
     for (; n--;)
       {
@@ -196,7 +196,22 @@ void OS::busyWaitMillis(schedTicks_t n)
       }
   }
 
-#endif /*OS_INCLUDE_OS_BUSYWAITMILLIS*/
+#endif /* OS_INCLUDE_OS_BUSYWAITMILLIS */
+
+#if defined(OS_INCLUDE_OS_BUSYWAITMICROS)
+
+void
+OS::busyWaitMicros(unsigned int n)
+{
+  int i;
+  // calibrate from OSC
+  for (i = (OS_CFGLONG_SYSCLOCK_HZ / 1000 * n / OS_CFGINT_BUSYWAIT_CALIBRATION); i--;)
+    {
+      OSImpl::NOP();
+    }
+}
+
+#endif /* OS_INCLUDE_OS_BUSYWAITMICROS */
 
 // -----------------------------------------------------------------------------
 // default main. may be redefined by application
