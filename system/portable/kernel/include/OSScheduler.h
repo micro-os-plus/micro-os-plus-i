@@ -231,6 +231,10 @@ public:
   inline static void
   FirstTask_contextRestore(void) __attribute__( ( always_inline ) );
 
+#if defined(OS_INCLUDE_APPLICATION_INTERRUPT_TICK)
+  static void applicationInterruptTick(void);
+#endif /* OS_INCLUDE_APPLICATION_INTERRUPT_TICK */
+
 #if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
   inline static void
