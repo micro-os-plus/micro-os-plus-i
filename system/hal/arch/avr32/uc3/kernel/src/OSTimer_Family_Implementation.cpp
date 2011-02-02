@@ -17,7 +17,6 @@
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 
-
 #if defined(OS_EXCLUDE_PREEMPTION)
 __attribute__((interrupt)) void
 #else
@@ -28,6 +27,7 @@ SysTick_contextHandler(void);
 void
 OSTimerTicks::implInit(void)
 {
+
   volatile avr32_pm_t* pm = &AVR32_PM;
   volatile avr32_tc_t* tc_reg = &OS_CFGVAR_TIMER;
 
@@ -119,17 +119,17 @@ SysTick_contextHandler(void)
 {
   OSScheduler::interruptEnter();
     {
+      OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
+
       OSScheduler::timerTicks.interruptServiceRoutine();
     }
   OSScheduler::interruptExit();
 }
 
-
-void OSTimerTicks::implAcknowledgeInterrupt(void)
+void
+OSTimerTicks::implAcknowledgeInterrupt(void)
 {
-  // Clear TC interrupt
-  // Notice: Should be done at the end, not at the beginning!
-  OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
+  ;
 }
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
@@ -163,7 +163,6 @@ TIMER2_OVF_vect(void)
 #endif
 
 #endif
-
 
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
 
