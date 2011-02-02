@@ -21,7 +21,11 @@
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 
 //#define OS_INCLUDE_OSTASK_SCHEDULERTICK                 (1)
-#define OS_INCLUDE_APPLICATION_INTERRUPT_TICK           (1)
+#define OS_INCLUDE_OSSCHEDULER_APPLICATIONINTERRUPTTICK (1)
+
+#define OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED           (1)
+
+#define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
 
 #if defined(DEBUG)
 // One of the following must be defined in Eclipse project or Makefile
