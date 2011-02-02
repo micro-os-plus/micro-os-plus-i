@@ -4,7 +4,6 @@
  *	This file is part of the uOS++ distribution.
  */
 
-//#include "portable/kernel/include/OS_Defines.h"
 #include "portable/kernel/include/OS_Defines.h"
 
 #if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
@@ -48,13 +47,21 @@ OSTimerTicks::init(void)
   i = 0;
 #endif
 
+#if defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED)
+  OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_OSTIMERTICKS_LED_PORT_CONFIG, OS_CONFIG_OSTIMERTICKS_LED_BIT);
+  OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_OSTIMERTICKS_LED_PORT_CONFIG, OS_CONFIG_OSTIMERTICKS_LED_BIT);
+#endif /* OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED */
+
   implInit();
 }
 
 
 void OSTimerTicks::interruptServiceRoutine(void)
   {
-  OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, AVR32_PIN_PX50);
+
+#if defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED)
+  OS_GPIO_PIN_HIGH(OS_CONFIG_OSTIMERTICKS_LED_PORT_CONFIG, OS_CONFIG_OSTIMERTICKS_LED_BIT);
+#endif /* OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED */
 
     OSScheduler::criticalEnter();
       {
@@ -87,8 +94,10 @@ void OSTimerTicks::interruptServiceRoutine(void)
 
 #endif
 
-  OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, AVR32_PIN_PX50);
-  implAcknowledgeInterrupt();
+#if defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED)
+  OS_GPIO_PIN_LOW(OS_CONFIG_OSTIMERTICKS_LED_PORT_CONFIG, OS_CONFIG_OSTIMERTICKS_LED_BIT);
+#endif /* OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED */
+
   }
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
