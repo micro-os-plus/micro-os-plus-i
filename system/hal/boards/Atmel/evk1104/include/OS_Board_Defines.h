@@ -62,6 +62,18 @@
 #define OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW                       (1)
 #endif
 
+#if defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED)
+#if !defined(OS_CONFIG_OSTIMERTICKS_LED_PORT)
+#define OS_CONFIG_OSTIMERTICKS_LED_PORT                         GPIOX
+#endif
+#if !defined(OS_CONFIG_OSTIMERTICKS_LED_PORT_CONFIG)
+#define OS_CONFIG_OSTIMERTICKS_LED_PORT_CONFIG                  OS_CONFIG_ACTIVE_LED_PORT
+#endif
+#if !defined(OS_CONFIG_OSTIMERTICKS_LED_BIT)
+#define OS_CONFIG_OSTIMERTICKS_LED_BIT                          AVR32_PIN_PX50
+#endif
+#endif /* OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED */
+
 #if false
 #if !defined(OS_CONFIG_USB_LED_PORT_INIT)
 #define OS_CONFIG_USB_LED_PORT_INIT			        DDRD
