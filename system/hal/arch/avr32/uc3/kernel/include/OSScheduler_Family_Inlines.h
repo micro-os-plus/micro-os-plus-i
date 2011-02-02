@@ -390,11 +390,16 @@ OSScheduler::criticalEnter(void)
   (
       " mfsr    r8, %[SR] \n"
       " st.w    --sp, r8 \n" // push value to stack
+#if false
       " orh     r8, %[MASK] \n" // selectively disable interrupts in MASK
       " mtsr    %[SR], r8 \n"
+#else
+      " ssrf    %[GM]"
+#endif
       :
       : [MASK] "i" (0x001E),    // TODO: define a configuration macro
-      [SR] "i" (AVR32_SR)
+      [SR] "i" (AVR32_SR),
+      [GM] "i" (AVR32_SR_GM_OFFSET)
       : "r8"
   );
 #endif
