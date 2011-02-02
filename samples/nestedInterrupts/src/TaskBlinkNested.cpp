@@ -78,7 +78,7 @@ TaskBlinkNested::taskMain(void)
           debug.putChar('.');
 
           // finally toggle led
-          m_oLed.toggle();
+          //m_oLed.toggle();
 
           i = m_rate;
         }
@@ -163,8 +163,8 @@ void
 nestedInterruptAck(void)
 {
   // Clear TC interrupt
-  // Notice: Should be done at the end, not at the beginning!
-  TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
+  // Reading the Status Register will also clear the interrupt bit for the corresponding interrupts
+  // TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
 }
 
 #if defined(OS_EXCLUDE_PREEMPTION)
@@ -177,6 +177,10 @@ NestedInterrupt_contextHandler(void)
 {
   OSScheduler::interruptEnter();
     {
+      // Reading the Status Register will also clear the interrupt bit for
+      // the corresponding interrupts
+      TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
+
       NestedInterrupt_interruptServiceRoutine();
     }
   OSScheduler::interruptExit();
@@ -185,11 +189,13 @@ NestedInterrupt_contextHandler(void)
 __attribute__ ((noinline)) void
 NestedInterrupt_interruptServiceRoutine(void)
 {
+  //nestedInterruptAck();
+
   OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
 
   OSScheduler::eventNotify(EVENT_NESTEED);
 
   OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
 
-  nestedInterruptAck();
+  //nestedInterruptAck();
 }
