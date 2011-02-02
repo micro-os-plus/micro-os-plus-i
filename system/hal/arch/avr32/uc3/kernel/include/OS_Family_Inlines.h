@@ -81,13 +81,25 @@ OSImpl::NOP(void)
 inline void
 OSImpl::interruptsEnable(void)
 {
-  Enable_global_interrupt();
+  asm volatile
+  (
+      " csrf    %[GM] \n"
+      :
+      : [GM] "i" (AVR32_SR_GM_OFFSET)
+      :
+  );
 }
 
 inline void
 OSImpl::interruptsDisable(void)
 {
-  Disable_global_interrupt();
+  asm volatile
+  (
+      " ssrf    %[GM] \n"
+      :
+      : [GM] "i" (AVR32_SR_GM_OFFSET)
+      :
+  );
 }
 
 inline void
