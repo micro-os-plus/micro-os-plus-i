@@ -404,9 +404,9 @@ OSScheduler::interruptTick(void)
 
 #endif /* defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) || defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
 
-#if defined(OS_INCLUDE_APPLICATION_INTERRUPT_TICK)
-    OSSchedulerImpl::applicationInterruptTick();
-#endif /* OS_INCLUDE_APPLICATION_INTERRUPT_TICK */
+#if defined(OS_INCLUDE_OSSCHEDULER_APPLICATIONINTERRUPTTICK)
+    applicationInterruptTick();
+#endif /* OS_INCLUDE_APPLICATION_INTERRUPTTICK */
 }
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
