@@ -153,6 +153,10 @@ nestedInterruptInit(void)
 
   // set interrupt source RC Compare
   tc_reg->channel[TSKBLKNEST_CHANNEL].IER.cpcs = 1;
+
+  OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
+  OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
+
 }
 
 void
@@ -181,7 +185,11 @@ NestedInterrupt_contextHandler(void)
 __attribute__ ((noinline)) void
 NestedInterrupt_interruptServiceRoutine(void)
 {
+  OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
+
   OSScheduler::eventNotify(EVENT_NESTEED);
+
+  OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
 
   nestedInterruptAck();
 }
