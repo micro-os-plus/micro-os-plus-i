@@ -108,6 +108,7 @@ private:
   static void staticMain(OSTask * pt);
 
 #if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK)
+  // Warning: no longer run in critical section
   virtual void schedulerTick( void );
 #endif
 
