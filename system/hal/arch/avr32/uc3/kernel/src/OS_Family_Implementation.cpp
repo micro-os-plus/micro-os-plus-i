@@ -16,15 +16,31 @@ void
 os_exception_handler(unsigned short n)
 {
 #if defined(DEBUG)
+
   OSDeviceDebug::putNewLine();
   OSDeviceDebug::putString("Exception = ");
   OSDeviceDebug::putDec(n);
   OSDeviceDebug::putNewLine();
-#endif
-  for (;;)
-    ;
 
-  // TODO: on release, perform a soft reset
+  for (;;)
+  ;
+
+#else
+
+#if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_LOGEXCEPTIONDETAILS)
+
+  // Allow the application to log the exception type
+  OSApplicationImpl::logExceptionDetails(n);
+
+#else
+
+  n = n; // avoid 'unused parameter' warning
+
+#endif
+
+  OSImpl::SOFTreset();
+
+#endif
 }
 
 extern "C" void
@@ -34,7 +50,7 @@ void
 os_scall_handler(void)
 {
   SCALL_contextSave();
-  OSScheduler::contextSwitch();
+  OSScheduler::performContextSwitch();
   SCALL_contextRestore();
 }
 
