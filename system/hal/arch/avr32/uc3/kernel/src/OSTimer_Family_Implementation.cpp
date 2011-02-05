@@ -17,12 +17,18 @@
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 
+#define MYTEST
+
 #if defined(OS_EXCLUDE_PREEMPTION)
-__attribute__((interrupt)) void
+__attribute__((interrupt))
 #else
-__attribute__((naked)) void
+__attribute__((naked))
 #endif
+void
 SysTick_contextHandler(void);
+
+__attribute__((noinline)) void
+SysTick_interruptServiceRoutine();
 
 void
 OSTimerTicks::implInit(void)
@@ -107,24 +113,58 @@ OSTimerTicks::implInit(void)
 
 }
 
-__attribute__((noinline)) void
-SysTick_interruptServiceRoutine();
+#if defined(OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION)
 
-#if defined(OS_EXCLUDE_PREEMPTION)
-__attribute__((interrupt)) void
-#else
-__attribute__((naked)) void
-#endif
+void
 SysTick_contextHandler(void)
 {
-  OSScheduler::interruptEnter();
+#if true
+  OSSchedulerImpl::registersSave();
+  if (OSSchedulerImpl::isContextSwitchAllowed())
     {
-      OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
-
-      OSScheduler::timerTicks.interruptServiceRoutine();
+      OSSchedulerImpl::stackPointerSave();
     }
-  OSScheduler::interruptExit();
+  else
+    OSImpl::NOP();
+#endif
+  OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
+
+  OSScheduler::timerTicks.interruptServiceRoutine();
+#if true
+  if (OSSchedulerImpl::isContextSwitchAllowed())
+    {
+#if true
+      if (OSScheduler::isContextSwitchRequired())
+        {
+          OSScheduler::performContextSwitch();
+        }
+#endif
+      OSSchedulerImpl::stackPointerRestore();
+    }
+  else
+    OSImpl::NOP();
+  OSSchedulerImpl::registersRestore();
+
+  OSImpl::returnFromInterrupt();
+#endif
+
 }
+
+#else
+
+void
+SysTick_contextHandler(void)
+  {
+    OSScheduler::interruptEnter();
+      {
+        OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
+
+        OSScheduler::timerTicks.interruptServiceRoutine();
+      }
+    OSScheduler::interruptExit();
+  }
+
+#endif
 
 void
 OSTimerTicks::implAcknowledgeInterrupt(void)
