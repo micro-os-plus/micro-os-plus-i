@@ -79,8 +79,9 @@ OSSchedulerImpl::stackInitialize(OSStack_t * pStackTop, void
 void
 OSSchedulerImpl::start(void)
 {
-  OS::interruptsClearMask();
-  OS::interruptsEnable();
+  // be sure interrupts remain disabled before restoring first context
+  //OS::interruptsClearMask();
+  //OS::interruptsEnable();
 
   OSSchedulerImpl::FirstTask_contextRestore();
 
