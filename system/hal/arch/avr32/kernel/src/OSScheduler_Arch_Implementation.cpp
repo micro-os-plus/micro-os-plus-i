@@ -35,7 +35,7 @@ OSSchedulerImpl::stackInitialize(OSStack_t * pStackTop, void
   *pStackTop-- = (OSStack_t) pCode;
   /* SR          +8*4=32 */
   *pStackTop-- = 0x00400000;
-  /* Task starts with interrupts enabled ??? */
+  /* Task starts in system mode, with all interrupts enabled */
 
 #define STACK_R0_WORD_OFFSET    (7)
   /* R0          +7*4=28 */
