@@ -11,7 +11,7 @@
  * Initialise system task object and store parameters in private members.
  */
 
-TaskBlinkBusyWait::TaskBlinkBusyWait(const char *pName, unsigned char iLed, schedTicks_t rate) :
+TaskBlinkBusyWait::TaskBlinkBusyWait(const char *pName, unsigned int iLed, unsigned int rate) :
   OSTask(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)

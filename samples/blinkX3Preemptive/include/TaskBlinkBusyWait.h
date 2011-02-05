@@ -15,7 +15,7 @@ class TaskBlinkBusyWait : public OSTask
   {
 public:
   // task constructor
-  TaskBlinkBusyWait(const char *pName, unsigned char iLed, schedTicks_t rate);
+  TaskBlinkBusyWait(const char *pName, unsigned int iLed, unsigned int rate);
 
   // actual task main code
   virtual void taskMain(void);
@@ -25,7 +25,7 @@ private:
   OSStack_t m_stack[ (OSTask::STACK_MINIMAL_SIZE + 200) / sizeof(OSStack_t) ];
 
   LedVar m_oLed;
-  schedTicks_t m_rate;
+  unsigned int m_rate;
   };
 
 #endif /*TASKBLINKBUSYWAIT_H_*/
