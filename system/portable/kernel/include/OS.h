@@ -40,6 +40,21 @@ public:
 
   };
 
+
+class OSApplicationImpl
+{
+public:
+
+#if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_LOGEXCEPTIONDETAILS)
+  static void logExceptionDetails(unsigned int n);
+#endif /* OS_INCLUDE_OSSAPPLICATIONIMPL_LOGEXCEPTIONDETAILS */
+
+#if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
+  static void interruptTick(void);
+#endif /* OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK */
+
+};
+
 extern "C" OSStack_t **g_ppCurrentStack;
 
 #include "portable/kernel/include/OSScheduler.h"
@@ -139,6 +154,8 @@ public:
 #endif
 
   static OSResetBits_t getResetBits(void);
+
+  static void applicationExceptionDetailsLog(unsigned int n);
 
 private:
   static void saveResetBits(void);
