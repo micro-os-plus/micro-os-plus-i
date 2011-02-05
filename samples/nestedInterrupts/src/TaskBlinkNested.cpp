@@ -7,17 +7,16 @@
 #include "TaskBlinkNested.h"
 
 #define EVENT_NESTEED 0x1234
-void
-nestedInterruptInit(void);
 
-void
-nestedInterruptAck(void);
-
+#if defined(OS_EXCLUDE_PREEMPTION)
+__attribute__((interrupt))
+#else
+__attribute__((naked))
+#endif
 void
 NestedInterrupt_contextHandler(void);
 
-void
-NestedInterrupt_interruptServiceRoutine();
+static TaskBlinkNested *pTaskBlinkNested;
 
 /*
  * Task constructor.
@@ -35,6 +34,9 @@ TaskBlinkNested::TaskBlinkNested(const char *pName, unsigned char iLed,
 #endif
 
   m_rate = rate;
+  m_count = 0;
+
+  pTaskBlinkNested = this;
 }
 
 /*
@@ -65,28 +67,42 @@ TaskBlinkNested::taskMain(void)
   // initialise led port as output
   m_oLed.init();
 
-  nestedInterruptInit();
+  interruptInit();
 
-  int i;
-  i = m_rate;
+  bool bSecond;
+  bSecond = false;
   // task endless loop
   for (;;)
     {
+#if true
       os.sched.eventWait(EVENT_NESTEED);
-      if (--i == 0)
+#else
+      os.sched.yield();
+#endif
+
+      os.sched.criticalEnter();
         {
+          if (m_count >= m_rate)
+            {
+              m_count -= m_rate;
+              bSecond = true;
+            }
+        }
+      os.sched.criticalExit();
+
+      if (bSecond)
+        {
+          bSecond = false;
+
           debug.putChar('.');
-
           // finally toggle led
-          //m_oLed.toggle();
-
-          i = m_rate;
+          m_oLed.toggle();
         }
     }
 }
 
 void
-nestedInterruptInit(void)
+TaskBlinkNested::interruptInit(void)
 {
   volatile avr32_tc_t* tc_reg = &TSKBLKNEST_TIMER;
 
@@ -134,19 +150,23 @@ nestedInterruptInit(void)
 #define T_DIVIDER (1 << ((TSKBLKNEST_CFGINT_TIMER_CLOCK_SELECT-2)*2+1))
 #define T_COUNTER (OS_CFGLONG_OSCILLATOR_HZ/TSKBLKNEST_CFGINT_TIMER_PRESCALLER/T_DIVIDER/TSKBLKNEST_CFGINT_TICK_RATE_HZ)
 
+  unsigned int nCounter;
+  nCounter = (OS_CFGLONG_OSCILLATOR_HZ / TSKBLKNEST_CFGINT_TIMER_PRESCALLER
+      /T_DIVIDER / m_rate);
+
 #if defined(DEBUG)
 
   OSDeviceDebug::putDec(TSKBLKNEST_CFGINT_TIMER_PRESCALLER);
   OSDeviceDebug::putChar(',');
   OSDeviceDebug::putDec(T_DIVIDER);
   OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putDec(T_COUNTER);
+  OSDeviceDebug::putDec(nCounter);
   OSDeviceDebug::putNewLine();
 
 #endif
 
   // set RC value
-  tc_reg->channel[TSKBLKNEST_CHANNEL].RC.rc = T_COUNTER;
+  tc_reg->channel[TSKBLKNEST_CHANNEL].RC.rc = nCounter;
 
   // counter UP mode with automatic trigger on RC Compare
   tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.wavsel = 2;
@@ -160,42 +180,43 @@ nestedInterruptInit(void)
 }
 
 void
-nestedInterruptAck(void)
+TaskBlinkNested::interruptAck(void)
 {
-  // Clear TC interrupt
-  // Reading the Status Register will also clear the interrupt bit for the corresponding interrupts
-  // TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
+  TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
 }
 
-#if defined(OS_EXCLUDE_PREEMPTION)
-__attribute__((interrupt))
+
+void
+TaskBlinkNested::interruptServiceRoutine(void)
+{
+  OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
+
+  m_count++;    // count ticks
+
+#if OS_TEST_PHASE == 1
+  OS::busyWaitMicros(10);
 #else
-__attribute__((naked))
+
+  // Notify task; some of these will be lost, but the total count
+  // will accumulate, and when awaken, will be considered
+  OSScheduler::eventNotify(EVENT_NESTEED);
+
 #endif
+
+  OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
+
+  interruptAck();
+}
+
+
+
 void
 NestedInterrupt_contextHandler(void)
 {
   OSScheduler::interruptEnter();
     {
-      // Reading the Status Register will also clear the interrupt bit for
-      // the corresponding interrupts
-      TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
-
-      NestedInterrupt_interruptServiceRoutine();
+      pTaskBlinkNested->interruptServiceRoutine();
     }
   OSScheduler::interruptExit();
 }
 
-__attribute__ ((noinline)) void
-NestedInterrupt_interruptServiceRoutine(void)
-{
-  //nestedInterruptAck();
-
-  OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
-
-  OSScheduler::eventNotify(EVENT_NESTEED);
-
-  OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
-
-  //nestedInterruptAck();
-}
