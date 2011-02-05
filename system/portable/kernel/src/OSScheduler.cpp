@@ -170,6 +170,8 @@ OSScheduler::eventWait(OSEvent_t event)
 
   if (!ms_isLocked)
     {
+      OSScheduler::criticalEnter();
+        {
       if (event != OSEvent::OS_NONE)
         {
           // mark the entering task is waiting on the given event
@@ -181,6 +183,8 @@ OSScheduler::eventWait(OSEvent_t event)
           // if no event, return NONE
           ms_pTaskRunning->m_eventWaitReturn = OSEventWaitReturn::OS_NONE;
         }
+        }
+      OSScheduler::criticalExit();
     }
 
   //ms_pTaskRunning->m_hasReturnValue = true;
@@ -230,7 +234,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
                       pt->m_event = OSEvent::OS_NONE; // no longer wait for it
                       pt->m_eventWaitReturn = ret;
 #if defined(DEBUG)
-                      if (ret == 0xFFFF)
+                      if (ret == OSEventWaitReturn::OS_NONE)
                         OSDeviceDebug::putChar('^');
 #endif
                       OSReadyList::insert(pt);
@@ -252,7 +256,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 // context switch routine
 
 bool
-OSScheduler::requireContextSwitch()
+OSScheduler::isContextSwitchRequired()
 {
   // should be used only here, in scheduler core routines!!!
   OS::WDTreset();
@@ -273,7 +277,7 @@ OSScheduler::requireContextSwitch()
 // tasks context to be restored.
 
 void
-OSScheduler::contextSwitch()
+OSScheduler::performContextSwitch()
 {
   // be sure it runs with interrupts disabled!
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH)
@@ -404,9 +408,9 @@ OSScheduler::interruptTick(void)
 
 #endif /* defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) || defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
 
-#if defined(OS_INCLUDE_OSSCHEDULER_APPLICATIONINTERRUPTTICK)
-    applicationInterruptTick();
-#endif /* OS_INCLUDE_APPLICATION_INTERRUPTTICK */
+#if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
+    OSApplicationImpl::interruptTick();
+#endif /* OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK */
 }
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
