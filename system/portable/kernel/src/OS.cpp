@@ -28,6 +28,7 @@ OS::saveResetBits(void)
   ms_resetBits = OSImpl::CPUfetchResetBits();
 }
 
+
 extern "C"
 int  main( void ) __attribute__( ( weak ) );
 
