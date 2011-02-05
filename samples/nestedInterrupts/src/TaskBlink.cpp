@@ -56,8 +56,13 @@ TaskBlink::taskMain(void)
     {
       os.sched.timerTicks.sleep(m_rate);
 
+#if OS_TEST_PHASE == 1
+      ;
+#else
       // finally toggle led
-      //m_oLed.toggle();
+      m_oLed.toggle();
+#endif
+
     }
 }
 
