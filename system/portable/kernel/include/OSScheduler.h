@@ -135,10 +135,10 @@ public:
   interruptTick(void);
 
   static bool
-  requireContextSwitch(void);
+  isContextSwitchRequired(void);
 
   static void
-  contextSwitch(void);
+  performContextSwitch(void);
 
 #if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT) || defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
@@ -159,10 +159,6 @@ public:
 #endif
 
   static OSTimerTicks timerTicks;
-
-#if defined(OS_INCLUDE_OSSCHEDULER_APPLICATIONINTERRUPTTICK)
-  static void applicationInterruptTick(void);
-#endif /* OS_INCLUDE_APPLICATION_INTERRUPT_TICK */
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
   static OSTimerSeconds timerSeconds;
@@ -275,6 +271,7 @@ public:
 
   static void
   dump(void);
+
 #endif
 
 private:
@@ -388,9 +385,9 @@ inline void OSScheduler::interruptEnter(void)
 
 inline void OSScheduler::interruptExit(void)
   {
-    if (OSScheduler::requireContextSwitch() )
+    if (OSScheduler::isContextSwitchRequired() )
       {
-        OSScheduler::contextSwitch();
+        OSScheduler::performContextSwitch();
       }
 
 #if !defined(OS_EXCLUDE_PREEMPTION)
@@ -408,14 +405,20 @@ inline void
 OSScheduler::interruptEnter(void)
 {
 #if !defined(OS_EXCLUDE_PREEMPTION)
+
   OSSchedulerImpl::registersSave();
+  OSScheduler::ISR_ledActiveOn();
 
   if (OSSchedulerImpl::isContextSwitchAllowed())
     {
       OSSchedulerImpl::stackPointerSave();
     }
+
+#else
+
+  OSScheduler::ISR_ledActiveOn();
+
 #endif
-  OSScheduler::ledActiveOn();
 }
 
 inline void
@@ -425,9 +428,9 @@ OSScheduler::interruptExit(void)
 
   if (OSSchedulerImpl::isContextSwitchAllowed())
     {
-      if (OSScheduler::requireContextSwitch())
+      if (OSScheduler::isContextSwitchRequired())
         {
-          OSScheduler::contextSwitch();
+          OSScheduler::performContextSwitch();
         }
       OSSchedulerImpl::stackPointerRestore();
     }
