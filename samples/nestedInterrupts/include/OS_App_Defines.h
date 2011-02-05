@@ -16,17 +16,28 @@
 
 #define OS_CFGINT_TASKS_TABLE_SIZE                      (3)
 
-#define OS_EXCLUDE_PREEMPTION                           (1)
+//#define OS_EXCLUDE_PREEMPTION                           (1)
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
+#define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
 
 //#define OS_INCLUDE_OSTASK_SCHEDULERTICK                 (1)
-#define OS_INCLUDE_OSSCHEDULER_APPLICATIONINTERRUPTTICK (1)
+#define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
+
+#define OS_TEST_PHASE 2
+
+#if OS_TEST_PHASE == 1
 
 #define OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED            (1)
-#define OS_CONFIG_OSTIMERTICKS_LED_BIT                       AVR32_PIN_PX50
+#define OS_CONFIG_OSTIMERTICKS_LED_BIT                  AVR32_PIN_PX50
 
-#define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
+#else
+
+#endif
+
+
+//#define OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION  (1)
+//#define OS_INCLUDE_OSSCHEDULER_YIELD_UNDER_CONSTRUCTION (1)
 
 #if defined(DEBUG)
 // One of the following must be defined in Eclipse project or Makefile
