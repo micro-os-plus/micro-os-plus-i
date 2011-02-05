@@ -15,10 +15,12 @@
 
 // tasks allocated on static storage
 TaskBlink task1("A", APP_CONFIG_LED1, TICKS * 1);
-TaskBlinkNested task2("B", APP_CONFIG_LED2, TICKS * 1);
+TaskBlinkNested task2("B", APP_CONFIG_LED2, TICKS * 9);
 
 
 // ---------------------------------------------------------------------------
+
+#if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
 
 // artificially make the system timer interrupt longer, so that we
 // increase the chance of having nested interrupts.
@@ -30,7 +32,7 @@ TaskBlinkNested task2("B", APP_CONFIG_LED2, TICKS * 1);
 #define APP_CFGINT_NOTIFIES             100
 
 void
-OSScheduler::applicationInterruptTick(void)
+OSApplicationImpl::interruptTick(void)
 {
 #if defined(APP_INCLUDE_LENGTHEN_SYSTICK)
 #if defined(APP_INCLUDE_BUSY_WAIT)
@@ -41,6 +43,8 @@ OSScheduler::applicationInterruptTick(void)
 #endif
 #endif
 }
+
+#endif /* defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK) */
 
 // ---------------------------------------------------------------------------
 
