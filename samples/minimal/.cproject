@@ -62383,7 +62383,6 @@
 								<option id="avr32.cpp.compiler.option.flashvault.1324849712" name="Enable FlashVault support" superClass="avr32.cpp.compiler.option.flashvault" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.951624868" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_DEBUG_DEVICE_${DBGDEV}=1&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1643263167" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
@@ -62400,7 +62399,6 @@
 								<option id="avr32.c.compiler.option.flashvault.1889451688" name="Enable FlashVault support" superClass="avr32.c.compiler.option.flashvault" value="false" valueType="boolean"/>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.882547678" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_DEBUG_DEVICE_${DBGDEV}=1&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.486166567" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
