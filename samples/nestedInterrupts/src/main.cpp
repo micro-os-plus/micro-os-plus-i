@@ -14,8 +14,8 @@
 #define TICKS  (OS_CFGINT_TICK_RATE_HZ)
 
 // tasks allocated on static storage
-TaskBlink task1("A", APP_CONFIG_LED1, TICKS * 1);
-TaskBlinkNested task2("B", APP_CONFIG_LED2, TICKS * 9);
+TaskBlink task1("A", APP_CONFIG_LED1, APP_CFGINT_BLINK_TICKS);
+TaskBlinkNested task2("B", APP_CONFIG_LED2, APP_CFGINT_NESTED_TICKS);
 
 
 // ---------------------------------------------------------------------------
@@ -24,12 +24,6 @@ TaskBlinkNested task2("B", APP_CONFIG_LED2, TICKS * 9);
 
 // artificially make the system timer interrupt longer, so that we
 // increase the chance of having nested interrupts.
-
-#define APP_INCLUDE_LENGTHEN_SYSTICK    1
-#define APP_INCLUDE_BUSY_WAIT           1
-#define APP_BUSY_PROCENTAGE             40
-#define APP_EVENT_DUMMY                 0x1111
-#define APP_CFGINT_NOTIFIES             100
 
 void
 OSApplicationImpl::interruptTick(void)
@@ -50,5 +44,6 @@ OSApplicationImpl::interruptTick(void)
 
 // message to be displayed on the debugging device at startup
 #if defined(DEBUG)
-const char greeting[] = "AVI nestedInterrupts v1.1";
+const char greeting[] = "AVI nestedInterrupts v1.2";
+const char buildDateTime[] = __DATE__ " " __TIME__;
 #endif
