@@ -216,7 +216,7 @@ TaskBlinkNested::interruptServiceRoutine(void)
 void
 NestedInterrupt_contextHandler(void)
 {
-#if !defined(APP_EXCLUDE_PREEMPTION) || defined(OS_EXCLUDE_PREEMPTION)
+#if !defined(APP_EXCLUDE_PREEMPTION) && !defined(OS_EXCLUDE_PREEMPTION)
   OSScheduler::interruptEnter();
 #endif
     {
@@ -226,7 +226,7 @@ NestedInterrupt_contextHandler(void)
       TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
 #endif
     }
-#if !defined(APP_EXCLUDE_PREEMPTION) || defined(OS_EXCLUDE_PREEMPTION)
+#if !defined(APP_EXCLUDE_PREEMPTION) && !defined(OS_EXCLUDE_PREEMPTION)
   OSScheduler::interruptExit();
 #endif
 }
