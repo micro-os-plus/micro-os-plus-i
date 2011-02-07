@@ -7,6 +7,8 @@
 #ifndef APP_DEFINES_H_
 #define APP_DEFINES_H_
 
+#include "portable/kernel/include/uOS.h"
+
 extern void delayWithYield(schedTicks_t n);
 
 #if defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
@@ -41,9 +43,23 @@ extern void delayWithYield(schedTicks_t n);
 
 #define APP_CONFIG_LED_ISACTIVE_LOW     (1)
 
+
 #else
 #error "Missing OS_CONFIG_BOARD_* board definition"
 #endif
+
+#define APP_CFGINT_BLINK_TICKS          (OS_CFGINT_TICK_RATE_HZ)
+#define APP_CFGINT_NESTED_TICKS         (APP_CFGINT_BLINK_TICKS * 7)
+
+//#define APP_EXCLUDE_PREEMPTION
+//#define APP_ISR_ACTION_BUSYWAIT
+//#define APP_EXCLUDE_ISR_ACTION
+#define APP_INCLUDE_LENGTHEN_SYSTICK    1
+//#define APP_INCLUDE_BUSY_WAIT           1
+#define APP_BUSY_PROCENTAGE             40
+#define APP_EVENT_DUMMY                 0x1111
+#define APP_CFGINT_NOTIFIES             25
+
 
 
 #endif /*APP_DEFINES_H_ */
