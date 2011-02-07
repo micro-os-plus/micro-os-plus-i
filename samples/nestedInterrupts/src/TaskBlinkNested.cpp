@@ -8,7 +8,7 @@
 
 #define EVENT_NESTEED 0x1234
 
-#if defined(OS_EXCLUDE_PREEMPTION)
+#if defined(APP_EXCLUDE_PREEMPTION) || defined(OS_EXCLUDE_PREEMPTION)
 __attribute__((interrupt))
 #else
 __attribute__((naked))
@@ -171,8 +171,10 @@ TaskBlinkNested::interruptInit(void)
   // counter UP mode with automatic trigger on RC Compare
   tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.wavsel = 2;
 
+#if true
   // set interrupt source RC Compare
   tc_reg->channel[TSKBLKNEST_CHANNEL].IER.cpcs = 1;
+#endif
 
   OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
   OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
@@ -180,20 +182,21 @@ TaskBlinkNested::interruptInit(void)
 }
 
 void
-TaskBlinkNested::interruptAck(void)
+TaskBlinkNested::interruptAcknowledge(void)
 {
   TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
 }
 
-
 void
 TaskBlinkNested::interruptServiceRoutine(void)
 {
+#if !defined(APP_EXCLUDE_ISR_ACTION)
+
   OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
 
-  m_count++;    // count ticks
+  m_count++; // count ticks
 
-#if OS_TEST_PHASE == 1
+#if defined(APP_ISR_ACTION_BUSYWAIT)
   OS::busyWaitMicros(10);
 #else
 
@@ -205,18 +208,26 @@ TaskBlinkNested::interruptServiceRoutine(void)
 
   OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
 
-  interruptAck();
+#endif
+
+  interruptAcknowledge();
 }
-
-
 
 void
 NestedInterrupt_contextHandler(void)
 {
+#if !defined(APP_EXCLUDE_PREEMPTION) || defined(OS_EXCLUDE_PREEMPTION)
   OSScheduler::interruptEnter();
+#endif
     {
+#if !defined(APP_EXCLUDE_ISR_ACTION)
       pTaskBlinkNested->interruptServiceRoutine();
+#else
+      TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
+#endif
     }
+#if !defined(APP_EXCLUDE_PREEMPTION) || defined(OS_EXCLUDE_PREEMPTION)
   OSScheduler::interruptExit();
+#endif
 }
 
