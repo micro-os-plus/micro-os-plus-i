@@ -45,5 +45,5 @@ OSApplicationImpl::interruptTick(void)
 // message to be displayed on the debugging device at startup
 #if defined(DEBUG)
 const char greeting[] = "AVI nestedInterrupts v1.2";
-const char buildDateTime[] = __DATE__ " " __TIME__;
+const char buildDateTime[] = "(" __DATE__ " " __TIME__ ")";
 #endif
