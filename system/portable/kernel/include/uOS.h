@@ -138,6 +138,7 @@ extern ostream clog;
 #endif
 
 extern const char greeting[];
+extern const char buildDateTime[];
 
 // leave it last
 #include "App_Defines.h"
