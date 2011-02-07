@@ -19,7 +19,7 @@
 
 #define MYTEST
 
-#if defined(OS_EXCLUDE_PREEMPTION)
+#if defined(OS_EXCLUDE_OSTIMERTICKS_PREEMPTION) || defined(OS_EXCLUDE_PREEMPTION)
 __attribute__((interrupt))
 #else
 __attribute__((naked))
@@ -117,59 +117,61 @@ OSTimerTicks::implInit(void)
 
 void
 SysTick_contextHandler(void)
-{
+  {
 #if true
-  OSSchedulerImpl::registersSave();
-  if (OSSchedulerImpl::isContextSwitchAllowed())
-    {
-      OSSchedulerImpl::stackPointerSave();
-    }
-  else
+    OSSchedulerImpl::registersSave();
+    if (OSSchedulerImpl::isContextSwitchAllowed())
+      {
+        OSSchedulerImpl::stackPointerSave();
+      }
+    else
     OSImpl::NOP();
 #endif
-  OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
+    OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
 
-  OSScheduler::timerTicks.interruptServiceRoutine();
+    OSScheduler::timerTicks.interruptServiceRoutine();
 #if true
-  if (OSSchedulerImpl::isContextSwitchAllowed())
-    {
+    if (OSSchedulerImpl::isContextSwitchAllowed())
+      {
 #if true
-      if (OSScheduler::isContextSwitchRequired())
-        {
-          OSScheduler::performContextSwitch();
-        }
+        if (OSScheduler::isContextSwitchRequired())
+          {
+            OSScheduler::performContextSwitch();
+          }
 #endif
-      OSSchedulerImpl::stackPointerRestore();
-    }
-  else
+        OSSchedulerImpl::stackPointerRestore();
+      }
+    else
     OSImpl::NOP();
-  OSSchedulerImpl::registersRestore();
+    OSSchedulerImpl::registersRestore();
 
-  OSImpl::returnFromInterrupt();
+    OSImpl::returnFromInterrupt();
 #endif
 
-}
+  }
 
 #else
 
 void
 SysTick_contextHandler(void)
-  {
-    OSScheduler::interruptEnter();
-      {
-        OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
-
-        OSScheduler::timerTicks.interruptServiceRoutine();
-      }
-    OSScheduler::interruptExit();
-  }
+{
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_PREEMPTION) && !defined(OS_EXCLUDE_PREEMPTION)
+  OSScheduler::interruptEnter();
+#endif
+    {
+      OSScheduler::timerTicks.interruptServiceRoutine();
+    }
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_PREEMPTION) && !defined(OS_EXCLUDE_PREEMPTION)
+  OSScheduler::interruptExit();
+#endif
+}
 
 #endif
 
 void
 OSTimerTicks::implAcknowledgeInterrupt(void)
 {
-  ;
+  OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
 }
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
