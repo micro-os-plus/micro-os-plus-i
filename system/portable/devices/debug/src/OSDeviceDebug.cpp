@@ -1,12 +1,10 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
 
 #include "portable/kernel/include/OS.h"
-//#include "portable/devices/debug/include/OSDeviceDebug.h"
-//#include "portable/kernel/include/OSScheduler.h"
 
 #include <string.h>
 
@@ -24,10 +22,6 @@ OSDeviceDebug::OSDeviceDebug()
 
 #if defined(DEBUG)
 
-extern const char greeting[] __attribute__( ( weak ) );
-
-const char greeting[] = "uOS++"; // default debug greeting
-
 #if defined(OS_INCLUDE_NAKED_INIT)
 
 // ----- init5 ---------------------------------------------------------------
@@ -39,6 +33,12 @@ void OSDeviceDebug::nakedEarlyInit(void)
 
 #endif
 
+extern const char greeting[] __attribute__( ( weak ) );
+extern const char buildDateTime[] __attribute__( ( weak ) );
+
+const char greeting[] = "uOS++"; // default debug greeting
+const char buildDateTime[] = "(" __DATE__ " " __TIME__ ")";
+
 void
 OSDeviceDebug::earlyInit(void)
 {
@@ -46,6 +46,8 @@ OSDeviceDebug::earlyInit(void)
 
   commonPutBytes("\r\n\r\n", 4);
   commonPutBytes(greeting, strlen(greeting));
+  commonPutByte(' ');
+  commonPutBytes(buildDateTime, strlen(buildDateTime));
   commonPutBytes("\r\n", 2);
   commonPutBytes(OS_STRING_OSGREETING, sizeof(OS_STRING_OSGREETING));
   commonPutBytes("\r\n\r\n", 4);
