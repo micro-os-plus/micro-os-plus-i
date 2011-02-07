@@ -170,8 +170,8 @@ OSScheduler::eventWait(OSEvent_t event)
 
   if (!ms_isLocked)
     {
-      OSScheduler::criticalEnter();
-        {
+      //OSScheduler::criticalEnter();
+      //  {
       if (event != OSEvent::OS_NONE)
         {
           // mark the entering task is waiting on the given event
@@ -183,8 +183,8 @@ OSScheduler::eventWait(OSEvent_t event)
           // if no event, return NONE
           ms_pTaskRunning->m_eventWaitReturn = OSEventWaitReturn::OS_NONE;
         }
-        }
-      OSScheduler::criticalExit();
+      //  }
+      //OSScheduler::criticalExit();
     }
 
   //ms_pTaskRunning->m_hasReturnValue = true;
