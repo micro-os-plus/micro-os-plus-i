@@ -17,12 +17,15 @@
 #define OS_CFGINT_TASKS_TABLE_SIZE                      (3)
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
+//#define OS_EXCLUDE_OSTIMERTICKS_PREEMPTION              (1)
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 #define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
 
 //#define OS_INCLUDE_OSTASK_SCHEDULERTICK                 (1)
 #define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
+
+#define OS_CFGINT_IDLE_TASK_STACK_SIZE                  (400)
 
 #define OS_TEST_PHASE 2
 
@@ -34,7 +37,6 @@
 #else
 
 #endif
-
 
 //#define OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION  (1)
 //#define OS_INCLUDE_OSSCHEDULER_YIELD_UNDER_CONSTRUCTION (1)
