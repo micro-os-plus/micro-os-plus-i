@@ -7,7 +7,6 @@
 #ifndef APP_DEFINES_H_
 #define APP_DEFINES_H_
 
-#include "portable/kernel/include/uOS.h"
 
 extern void delayWithYield(schedTicks_t n);
 
@@ -51,7 +50,7 @@ extern void delayWithYield(schedTicks_t n);
 #define APP_CFGINT_BLINK_TICKS          (OS_CFGINT_TICK_RATE_HZ)
 #define APP_CFGINT_NESTED_TICKS         (APP_CFGINT_BLINK_TICKS * 7)
 
-//#define APP_EXCLUDE_PREEMPTION
+#define APP_EXCLUDE_NAKED_ISR
 //#define APP_ISR_ACTION_BUSYWAIT
 //#define APP_EXCLUDE_ISR_ACTION
 #define APP_INCLUDE_LENGTHEN_SYSTICK    1
