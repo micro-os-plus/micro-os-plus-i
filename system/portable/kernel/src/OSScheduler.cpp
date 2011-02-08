@@ -290,7 +290,7 @@ OSScheduler::performContextSwitch()
       //  OSDeviceDebug::putChar('*');
 
       OSDeviceDebug::putChar('<');
-      dumpContextInfo(ms_pTaskRunning);
+      OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
     }
 #endif
 
@@ -330,7 +330,7 @@ OSScheduler::performContextSwitch()
     {
       //OSReadyList::dump();
       OSDeviceDebug::putChar('>');
-      dumpContextInfo(ms_pTaskRunning);
+      OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
       OSDeviceDebug::putNewLine();
     }
 #endif
