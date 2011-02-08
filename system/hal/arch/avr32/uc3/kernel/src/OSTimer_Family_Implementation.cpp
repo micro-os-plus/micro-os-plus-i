@@ -17,12 +17,10 @@
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 
-#define MYTEST
-
-#if defined(OS_EXCLUDE_OSTIMERTICKS_PREEMPTION) || defined(OS_EXCLUDE_PREEMPTION)
-__attribute__((interrupt))
-#else
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
 __attribute__((naked))
+#else
+__attribute__((interrupt))
 #endif
 void
 SysTick_contextHandler(void);
@@ -155,13 +153,13 @@ SysTick_contextHandler(void)
 void
 SysTick_contextHandler(void)
 {
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_PREEMPTION) && !defined(OS_EXCLUDE_PREEMPTION)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
   OSScheduler::interruptEnter();
 #endif
     {
       OSScheduler::timerTicks.interruptServiceRoutine();
     }
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_PREEMPTION) && !defined(OS_EXCLUDE_PREEMPTION)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
   OSScheduler::interruptExit();
 #endif
 }
