@@ -8,10 +8,10 @@
 
 #define EVENT_NESTEED 0x1234
 
-#if defined(APP_EXCLUDE_PREEMPTION) || defined(OS_EXCLUDE_PREEMPTION)
-__attribute__((interrupt))
-#else
+#if !defined(APP_EXCLUDE_NAKED_ISR)
 __attribute__((naked))
+#else
+__attribute__((interrupt))
 #endif
 void
 NestedInterrupt_contextHandler(void);
@@ -194,6 +194,8 @@ TaskBlinkNested::interruptServiceRoutine(void)
 
   OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
 
+  interruptAcknowledge();
+
   m_count++; // count ticks
 
 #if defined(APP_ISR_ACTION_BUSYWAIT)
@@ -209,14 +211,12 @@ TaskBlinkNested::interruptServiceRoutine(void)
   OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
 
 #endif
-
-  interruptAcknowledge();
 }
 
 void
 NestedInterrupt_contextHandler(void)
 {
-#if !defined(APP_EXCLUDE_PREEMPTION) && !defined(OS_EXCLUDE_PREEMPTION)
+#if !defined(APP_EXCLUDE_NAKED_ISR)
   OSScheduler::interruptEnter();
 #endif
     {
@@ -226,7 +226,7 @@ NestedInterrupt_contextHandler(void)
       TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
 #endif
     }
-#if !defined(APP_EXCLUDE_PREEMPTION) && !defined(OS_EXCLUDE_PREEMPTION)
+#if !defined(APP_EXCLUDE_NAKED_ISR)
   OSScheduler::interruptExit();
 #endif
 }
