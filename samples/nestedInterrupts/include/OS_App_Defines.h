@@ -16,8 +16,8 @@
 
 #define OS_CFGINT_TASKS_TABLE_SIZE                      (3)
 
-//#define OS_EXCLUDE_PREEMPTION                           (1)
-//#define OS_EXCLUDE_OSTIMERTICKS_PREEMPTION              (1)
+#define OS_EXCLUDE_PREEMPTION                           (1)
+#define OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR               (1)
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 #define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
