@@ -404,19 +404,16 @@ inline void OSScheduler::interruptExit(void)
 inline void
 OSScheduler::interruptEnter(void)
 {
-#if !defined(OS_EXCLUDE_PREEMPTION)
 
   OSSchedulerImpl::registersSave();
   OSScheduler::ISR_ledActiveOn();
+
+#if !defined(OS_EXCLUDE_PREEMPTION)
 
   if (OSSchedulerImpl::isContextSwitchAllowed())
     {
       OSSchedulerImpl::stackPointerSave();
     }
-
-#else
-
-  OSScheduler::ISR_ledActiveOn();
 
 #endif
 }
@@ -434,11 +431,12 @@ OSScheduler::interruptExit(void)
         }
       OSSchedulerImpl::stackPointerRestore();
     }
-  OSSchedulerImpl::registersRestore();
-
-  OSImpl::returnFromInterrupt();
 
 #endif
+
+  OSSchedulerImpl::registersRestore();
+  OSImpl::returnFromInterrupt();
+
   // interrupts re-enabled after this point
 }
 
