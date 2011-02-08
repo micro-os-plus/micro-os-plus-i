@@ -66,11 +66,12 @@
 #endif
 
 // include architecture OS definitions
+// please note the inclusion order: first family and then architecture
+
 #if defined(OS_CONFIG_ARCH_AVR8)
 #  include "hal/arch/avr8/kernel/include/OS_Arch_Defines.h"
 
 #elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
-#  include "hal/arch/arm_cortex_m3/kernel/include/OS_Arch_Defines.h"
 
 #if defined(OS_CONFIG_FAMILY_STM32F10X)
 #  include "hal/arch/arm_cortex_m3/stm32f10x/kernel/include/OS_Family_Defines.h"
@@ -78,8 +79,9 @@
 #  error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
 
+#  include "hal/arch/arm_cortex_m3/kernel/include/OS_Arch_Defines.h"
+
 #elif defined(OS_CONFIG_ARCH_AVR32)
-#  include "hal/arch/avr32/kernel/include/OS_Arch_Defines.h"
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
 #  include "hal/arch/avr32/uc3/kernel/include/OS_Family_Defines.h"
@@ -87,14 +89,17 @@
 #  error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
 
+#  include "hal/arch/avr32/kernel/include/OS_Arch_Defines.h"
+
 #elif defined(OS_CONFIG_ARCH_TEMPLATE)
-#  include "hal/arch/TEMPLATE_ARCH/kernel/include/OS_Arch_Defines.h"
 
 #if defined(OS_CONFIG_FAMILY_TEMPLATE)
 #  include "hal/arch/TEMPLATE_ARCH/TEMPLATE_FAMILY/kernel/include/OS_Family_Defines.h"
 #else
 #  error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
+
+#  include "hal/arch/TEMPLATE_ARCH/kernel/include/OS_Arch_Defines.h"
 
 #else
 #  error "Missing OS_CONFIG_ARCH_* definition"
@@ -107,6 +112,8 @@
 #    define assert(e) ((e) ? (void)0 : OSDeviceDebug::__assert(__func__, __FILE__, __LINE__, #e))
 #  endif
 #endif
+
+// ----- Default definitions for various variables ----------------------------
 
 #if !defined(OS_CFGINT_CLOCK_PRESCALER)
 #define OS_CFGINT_CLOCK_PRESCALER (1)
@@ -121,7 +128,7 @@
 #endif
 
 
-//  Interdependencies between various definitions
+// ----- Interdependencies between various definitions ------------------------
 
 #if !defined(OS_INCLUDE_OSEVENTFLAGS) && defined(OS_INCLUDE_SDI12SENSOR)
 #define OS_INCLUDE_OSEVENTFLAGS                         (1)
