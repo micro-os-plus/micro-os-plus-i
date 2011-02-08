@@ -170,8 +170,8 @@ OSScheduler::eventWait(OSEvent_t event)
 
   if (!ms_isLocked)
     {
-      //OSScheduler::criticalEnter();
-      //  {
+      OSScheduler::criticalEnter();
+        {
       if (event != OSEvent::OS_NONE)
         {
           // mark the entering task is waiting on the given event
@@ -183,8 +183,8 @@ OSScheduler::eventWait(OSEvent_t event)
           // if no event, return NONE
           ms_pTaskRunning->m_eventWaitReturn = OSEventWaitReturn::OS_NONE;
         }
-      //  }
-      //OSScheduler::criticalExit();
+        }
+      OSScheduler::criticalExit();
     }
 
   //ms_pTaskRunning->m_hasReturnValue = true;
@@ -264,10 +264,14 @@ OSScheduler::isContextSwitchRequired()
   bool bRequire;
   bRequire = (ms_isPreemptive || (ms_pTaskRunning == ms_pTaskIdle))
       && (OSReadyList::getCount() > 1);
+
+#if false
+  // done in TaskIdle, no longer needed here
   if (!bRequire)
     {
       OSScheduler::ISR_ledActiveOff();
     }
+#endif
 
   return bRequire;
 }
