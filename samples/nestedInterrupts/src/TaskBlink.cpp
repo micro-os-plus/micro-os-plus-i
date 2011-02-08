@@ -56,6 +56,8 @@ TaskBlink::taskMain(void)
     {
       os.sched.timerTicks.sleep(m_rate);
 
+      debug.putChar(',');
+
 #if OS_TEST_PHASE == 1
       ;
 #else
