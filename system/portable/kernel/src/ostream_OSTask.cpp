@@ -13,15 +13,15 @@
 ostream & operator <<(ostream & out, OSTask& pt)
   {
     out << dec << pt.getID();
-    out << ' '<< showbase << hex << ( unsigned short ) &pt;
+    out << ' '<< showbase << hex << ( unsigned int ) &pt;
     out << ' '<< pt.getName();
     out << ", pri="<< dec << ( unsigned short ) pt.getPriority();
 #if defined(OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER)
     out << ", PC="<< pt.getProgramCounter();
 #endif
-    out << ", stk="<< hex << ( unsigned short ) pt.getStackBottom();
+    out << ", stk="<< hex << ( unsigned int ) pt.getStackBottom();
     out << "["<< dec << pt.getStackSize() << "] ";
-    out << hex << ( unsigned short ) pt.getStack();
+    out << hex << ( unsigned int) pt.getStack();
     out << "["<< dec << pt.getStackUsed() << "]";
 
     if (pt.isSuspended() )
