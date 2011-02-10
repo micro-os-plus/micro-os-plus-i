@@ -12,6 +12,7 @@ typedef unsigned long OSStack_t;
 typedef unsigned long *pfnVector_t;
 
 typedef unsigned long OSResetBits_t;
+typedef void *OSProgramPtr_t;
 #endif
 
 #if !defined(OS_CFGINT_BUSYWAIT_CALIBRATION)
@@ -25,6 +26,7 @@ typedef unsigned long OSResetBits_t;
 #define PROGMEM
 #define PSTR(_S_) ((const char *)_S_)
 #define putString_P putString
+
 
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG            (1)
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT             (1)
