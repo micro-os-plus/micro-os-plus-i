@@ -51,6 +51,8 @@ TaskBlink::taskMain(void)
   // initialise led port as output
   m_oLed.init();
 
+  int k;
+  k = 0;
   // task endless loop
   for (;;)
     {
@@ -64,7 +66,23 @@ TaskBlink::taskMain(void)
       // finally toggle led
       m_oLed.toggle();
 #endif
-
+      if (++k > 10)
+        {
+          k = 0;
+          int cnt;
+          cnt = os.sched.getTasksCount();
+          for (int i = 0; i < cnt; ++i)
+            {
+              OSTask *pt;
+              pt = os.sched.getTask(i);
+              clog << endl;
+              if (pt == this)
+                clog << '*';
+              else
+                clog << *pt; // print task info
+            }
+          clog << endl;
+        }
     }
 }
 
