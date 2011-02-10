@@ -78,8 +78,8 @@ TaskBlink::taskMain(void)
               clog << endl;
               if (pt == this)
                 clog << '*';
-              else
-                clog << *pt; // print task info
+
+              clog << *pt; // print task info
             }
           clog << endl;
         }
