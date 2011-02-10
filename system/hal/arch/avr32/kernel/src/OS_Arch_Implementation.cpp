@@ -10,5 +10,13 @@
 
 // placeholder for common architecture files
 
+#if true
+extern "C" void __dso_handle(void);
+void __dso_handle(void)
+  {
+    ;
+  }
+#endif
+
 #endif /* OS_CONFIG_ARCH_AVR32 */
 
