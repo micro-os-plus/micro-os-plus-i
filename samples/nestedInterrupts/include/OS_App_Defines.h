@@ -62,7 +62,10 @@
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
 //#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
 //#define OS_DEBUG_OSSCHEDULER_TASKREGISTER               (1)
+//#define OS_DEBUG_OSSCHEDULER_EVENTWAIT                  (1)
+//#define OS_DEBUG_OSSCHEDULER_EVENTNOTIFY                (1)
 //#define OS_DEBUG_OSREADYLIST_INSERT                     (1)
+//#define OS_DEBUG_OSREADYLIST_REMOVE                     (1)
 //#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
 //#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
 
