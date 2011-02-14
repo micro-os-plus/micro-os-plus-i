@@ -207,12 +207,14 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
   OSDeviceDebug::putString( ")" );
   OSDeviceDebug::putNewLine();
 #endif
-
+#if false
   if (event == OSEvent::OS_NONE)
     return 0;
+#endif
 
   int cnt;
   cnt = 0;
+#if false
   OSScheduler::criticalEnter();
     {
       int i;
@@ -246,7 +248,18 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
         }
     }
   OSScheduler::criticalExit();
-
+#else
+  int i;
+  for (i = 0; i < ms_tasksCount; ++i)
+    {
+      OSTask *pt;
+      pt = ms_tasks[i];
+      if (pt != 0)
+        {
+         cnt += pt->eventNotify(event,ret);
+        }
+    }
+#endif
   // return the number of notified tasks
   return cnt;
 }
