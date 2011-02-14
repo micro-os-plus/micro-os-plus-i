@@ -17,6 +17,8 @@
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 
+#define COUNT_IRQ_NUM               0
+
 #if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
 __attribute__((naked))
 #else
@@ -32,11 +34,13 @@ void
 OSTimerTicks::implInit(void)
 {
 
-  volatile avr32_pm_t* pm = &AVR32_PM;
-  volatile avr32_tc_t* tc_reg = &OS_CFGVAR_TIMER;
-
   //initialise  exception vector base address
   INTC_init_interrupts();
+
+#if defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER)
+
+  volatile avr32_pm_t* pm = &AVR32_PM;
+  volatile avr32_tc_t* tc_reg = &OS_CFGVAR_TIMER;
 
   // enable clock for TC0
 #if OS_CFGINT_TIMER_ID == 0
@@ -109,6 +113,13 @@ OSTimerTicks::implInit(void)
   // set interrupt source RC Compare
   tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].IER.cpcs = 1;
 
+#else
+  Set_system_register(AVR32_COUNT, 0);
+  Set_system_register(AVR32_COMPARE, OS_CFGLONG_OSCILLATOR_HZ/OS_CFGINT_TICK_RATE_HZ);
+  //register the interrupt
+   INTC_register_interrupt(SysTick_contextHandler, COUNT_IRQ_NUM,
+       OS_CFGINT_TIMER_IRQ_LEVEL);
+#endif
 }
 
 #if defined(OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION)
@@ -169,7 +180,11 @@ SysTick_contextHandler(void)
 void
 OSTimerTicks::implAcknowledgeInterrupt(void)
 {
+#if defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER)
   OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
+#else
+  Set_system_register(AVR32_COMPARE, OS_CFGLONG_OSCILLATOR_HZ/OS_CFGINT_TICK_RATE_HZ);
+#endif
 }
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
