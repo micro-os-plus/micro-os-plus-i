@@ -61,38 +61,63 @@ public:
   OSScheduler();
 #endif
 
+  // publicly available methods
+
+  // early initialisations
+  // must be called before all constructors
   static void
   earlyInit(void);
 
-  // publicly available methods
+  // start the scheduler.
+  // the scheduler cannot be stopped if it was started.
   static void
   start(void) __attribute__( ( noreturn ) );
 
+  // return true if the the scheduler was started
   static bool
   isRunning(void);
 
+  // disable preemption.
+  // yield() will immediately return to the same task,
+  // and eventWait() will immediately return with OS_EVENT_WAIT_RETURN_LOCKED.
   static void
   lock(void);
+
+  // enable preemption
   static void
   unlock(void);
 
+  // check if the scheduler was locked
   static bool
   isLocked(void);
+
+  // Lock the scheduler if the flag is true, unlock otherwise.
   static void
   setLock(bool flag);
 
+  // Return true if the scheduler runs in preemptive mode.
   inline static bool
   isPreemptive(void);
+
+  // Set the scheduler to run in cooperative mode if flag is false,
+  // set to preemptive mode if flag is true (default).
   static void
   setPreemptive(bool flag);
 
+  // Return a pointer to the task currently running on the CPU.
   static OSTask *
   getTaskCurrent(void);
+
+  // returns the idle task
   static OSTask *
   getTaskIdle(void);
 
+  // Return the number of tasks registered to the scheduler.
   static int
   getTasksCount(void);
+
+  // Return the i-th task registered to the scheduler,
+  // or OS_TASK_NONE for illegal index.
   static OSTask *
   getTask(int i);
 
@@ -101,19 +126,23 @@ public:
   static void
   setAllowDeepSleep(bool flag);
 
+  // enter a critical section, i.e. a section where interrupts are disabled.
   inline static void
   criticalEnter(void) __attribute__( ( always_inline ) );
+  // exit from critical section.
   inline static void
   criticalExit(void) __attribute__( ( always_inline ) );
 
-  // event/synchronisation methods
+  // sleep until event occurs
   static OSEventWaitReturn_t
   eventWait(OSEvent_t event);
 
+  // wakeup all tasks waiting for event
   static int
   eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
       OSEventWaitReturn::OS_VOID);
 
+  // Suspend the current task and reschedule the CPU to the next task.
   static void
   yield(void);
 
@@ -128,22 +157,31 @@ public:
   inline static void
   ledActiveOff(void) __attribute__( ( always_inline ) );
 
+  // register a task to the scheduler
   static unsigned char
   taskRegister(OSTask * pTask);
 
+  // TODO: do we need this?
   static void
   interruptTick(void);
 
+  // quick check if a context switch is necessary
   static bool
   isContextSwitchRequired(void);
 
+  // make the context switch to the first task
+  // from the ReadyList
   static void
   performContextSwitch(void);
 
 #if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT) || defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
+  // called in order to save the context of the current task
+  // must be called in conjunction with interruptExit
   inline static void
   interruptEnter(void) __attribute__( ( always_inline ) );
+  // called in order to perform the context switch
+  // must be called in conjunction with interruptEnter
   inline static void
   interruptExit(void) __attribute__( ( always_inline ) );
 
@@ -158,6 +196,7 @@ public:
 
 #endif
 
+  // timer used by scheduler to chedule the next task
   static OSTimerTicks timerTicks;
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
@@ -168,31 +207,46 @@ public:
   static void ISRcancelTask(OSTask *pTask);
 #endif
 
+  // pointer to the active task (running task)
   static OSTask *ms_pTaskRunning;
 
-private:
-  static void
-  timerSetup(void);
+  friend class OSTimerTicks;
 
+private:
+
+  // TODO: remove if no longer needed
+//  static void
+//  timerSetup(void);
+
+  // set the idle task
   static void
   setTaskIdle(OSTask *);
 
+  // TODO: remove if no longer needed
   //static void timerISR(void) __attribute__( ( naked ) );
-  static void
-  timerISR(void);
+//  static void
+//  timerISR(void);
 
   // members
+
+  // true if the scheduler is preemptive
   static bool ms_isPreemptive;
 
+  // true if the scheduler was started
   static bool ms_isRunning;
+  // true if the scheduler is locked, i.e. preemption is disabled
   static bool ms_isLocked;
 
+  // list of tasks registered to the scheduler
   static OSTask *ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
+  // the number of tasks registered to the scheduler
   static unsigned char ms_tasksCount;
   //static unsigned char tasksIdx;
 
+  // the Idle task
   static OSTask *ms_pTaskIdle;
 
+  // the ready list used for managing the runnable tasks
   static OSReadyList ms_readyTasksList;
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
@@ -206,43 +260,64 @@ private:
 class OSSchedulerImpl
 {
 public:
+
+  // starts the first task from the ready list
   static void
   start(void) __attribute__( ( noreturn ) );
 
+  // yield function
   inline static void
   yield(void) __attribute__( ( always_inline ) );
 
+  // used to initialize the stack for a task
   static OSStack_t *
   stackInitialize(OSStack_t * pStackTop, void
   (*entryPoint)(void *), void *pParams, unsigned char id);
 
-  static void
-  stackSetReturnedValue(OSStack_t * pStack, OSEventWaitReturn_t ret);
+  // TODO: remove if no longer needed
+//  static void
+//  stackSetReturnedValue(OSStack_t * pStack, OSEventWaitReturn_t ret);
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSWITCHREQUEST)
   static void
   ISRcontextSwitchRequest(void);
 #endif
 
+  // TODO: remove if no longer needed
   //static void dumpContextInfo(void *pContext);
+
+  // dump context info to the device debug
   static void
   dumpContextInfo(OSTask *);
 
+  // restore the context for the next task to be scheduled
   inline static void
   FirstTask_contextRestore(void) __attribute__( ( always_inline ) );
 
 #if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
+  // save the SP for the active task
   inline static void
   stackPointerSave(void) __attribute__( ( always_inline ) );
+
+  // restore the SP for the active task
   inline static void
   stackPointerRestore(void) __attribute__( ( always_inline ) );
 
+  // save the registers for the active task
   inline static void
   registersSave(void) __attribute__( ( always_inline ) );
+
+  // restore the registers for the active task
   inline static void
   registersRestore(void) __attribute__( ( always_inline ) );
 
+  // check if the context switch can be done. The context
+  // switch cannot be done if the current context is a nested interrupt.
+  // In order to check this, the SR register saved on stack is verified
+  // (to see what the previous context was).
+  // See the OSScheduler::interruptEnter or OSScheduler::interruptExit
+  // in order to see how this is used.
   inline static bool
   isContextSwitchAllowed(void) __attribute__( ( always_inline ) );
 
@@ -257,13 +332,17 @@ class OSReadyList
 public:
   OSReadyList();
 
+  // insert task in ready list
   static void
   insert(OSTask * pTask);
+  // delete task from ready list
   static void
   remove(OSTask * pTask);
 
+  // returns the first task from ready list (task with higher priority)
   inline static OSTask *
   getTop(void);
+  // returns the number of the tasks from ready list
   inline static unsigned char
   getCount(void);
 
@@ -275,11 +354,15 @@ public:
 #endif
 
 private:
+  // find if pTask is in the ready tasks array
   static int
   find(OSTask * pTask);
 
   // members
+
+  // array of ready tasks
   static OSTask *ms_array[];
+  // number of ready tasks (ready to run) in ms_array
   static unsigned char ms_count;
 };
 
