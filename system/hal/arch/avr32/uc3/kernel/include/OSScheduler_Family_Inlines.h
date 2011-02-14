@@ -474,6 +474,7 @@ SCALL_contextSave(void)
   // when the new context is executed
 #if defined(OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK)
 
+  register unsigned int tmp; // asm("r8");
   asm volatile
   (
       " mfsr    %[R], %[SR] \n"
