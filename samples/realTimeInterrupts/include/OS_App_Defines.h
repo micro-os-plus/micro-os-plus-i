@@ -27,6 +27,10 @@
 //#define OS_INCLUDE_OSTASK_SCHEDULERTICK                 (1)
 #define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
 
+//#define OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL  (1)
+
+//#define OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER   (1)
+
 #define OS_CFGINT_IDLE_TASK_STACK_SIZE                  (800)
 
 #define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
@@ -37,6 +41,9 @@
 #define OS_INCLUDE_OSTREAM_OSTASK                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
 
+//#define OSTASK_NOTIFY_MEASURE                           1
+
+#define OS_APP_CONFIG_LED3                 AVR32_PIN_PX51
 
 #define OS_TEST_PHASE 2
 
