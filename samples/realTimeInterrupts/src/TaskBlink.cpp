@@ -91,7 +91,7 @@ TaskBlink::taskMain(void)
                       OSTask *pt;
                       pt = os.sched.getTask(j);
                       clog << endl;
-                      clog << (pt == this) ? '*' : ' ';
+                      clog << ((pt == this) ? '*' : ' ');
 
                       clog << *pt; // print task info
                     }
