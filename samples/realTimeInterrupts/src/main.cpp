@@ -17,7 +17,7 @@
 TaskBlink task1("A", APP_CONFIG_LED1, APP_CFGINT_BLINK_TICKS);
 TaskBlinkNested task2("B", APP_CONFIG_LED2, APP_CFGINT_NESTED_TICKS);
 
-
+bool g_flagNotify;
 // ---------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
@@ -36,6 +36,11 @@ OSApplicationImpl::interruptTick(void)
     os.sched.eventNotify(APP_EVENT_DUMMY);
 #endif
 #endif
+  if(g_flagNotify)
+    {
+      g_flagNotify = false;
+      os.sched.eventNotify(EVENT_NESTEED);
+    }
 }
 
 #endif /* defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK) */
