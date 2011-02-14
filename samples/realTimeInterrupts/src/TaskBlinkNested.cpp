@@ -6,7 +6,7 @@
 
 #include "TaskBlinkNested.h"
 
-#define EVENT_NESTEED 0x1234
+//#define EVENT_NESTEED 0x1234
 
 #if !defined(APP_EXCLUDE_NAKED_ISR)
 __attribute__((naked))
@@ -69,6 +69,8 @@ TaskBlinkNested::taskMain(void)
 
   interruptInit();
 
+  g_flagNotify = false;
+
   bool bSecond;
   bSecond = false;
   // task endless loop
@@ -80,7 +82,7 @@ TaskBlinkNested::taskMain(void)
       os.sched.yield();
 #endif
 
-      os.sched.criticalEnter();
+      os.sched.realTimeCriticalEnter();
         {
           if (m_count >= m_rate)
             {
@@ -191,9 +193,9 @@ void
 TaskBlinkNested::interruptServiceRoutine(void)
 {
 #if !defined(APP_EXCLUDE_ISR_ACTION)
-
+#if true
   OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
-
+#endif
   interruptAcknowledge();
 
   m_count++; // count ticks
@@ -201,15 +203,18 @@ TaskBlinkNested::interruptServiceRoutine(void)
 #if defined(APP_ISR_ACTION_BUSYWAIT)
   OS::busyWaitMicros(10);
 #else
-
+#if defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL)
   // Notify task; some of these will be lost, but the total count
   // will accumulate, and when awaken, will be considered
-  OSScheduler::eventNotify(EVENT_NESTEED);
-
+  eventNotify(EVENT_NESTEED);
+#else
+  OS::busyWaitMicros(100);
+  g_flagNotify = true;
 #endif
-
+#endif
+#if true
   OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
-
+#endif
 #endif
 }
 
