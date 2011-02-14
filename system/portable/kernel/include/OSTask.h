@@ -97,6 +97,9 @@ public:
   // public members
   OSStack_t *m_pStack; // saved SP during context switches
 
+  int
+  eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
+      OSEventWaitReturn::OS_VOID);
 private:
   friend class OSScheduler;
   friend class OSReadyList;
