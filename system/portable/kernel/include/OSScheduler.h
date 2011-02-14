@@ -129,6 +129,10 @@ public:
   // enter a critical section, i.e. a section where interrupts are disabled.
   inline static void
   criticalEnter(void) __attribute__( ( always_inline ) );
+  // enter a real time critical section, i.e. a section where
+  // all interrupts are disabled.
+   inline static void
+   realTimeCriticalEnter(void) __attribute__( ( always_inline ) );
   // exit from critical section.
   inline static void
   criticalExit(void) __attribute__( ( always_inline ) );
