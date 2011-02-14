@@ -616,6 +616,27 @@ OSScheduler::criticalEnter(void)
 #endif
 }
 
+
+inline void
+OSScheduler::realTimeCriticalEnter(void)
+{
+#if !defined(OS_EXCLUDE_MULTITASKING)
+  register unsigned int tmp; //asm("r8");
+
+  asm volatile
+  (
+      " mfsr    %[R], %[SR] \n"
+      " st.w    --sp, %[R] \n" // push value onto stack
+
+      " ssrf    %[GM] \n" // disable all interrupts
+
+      : [R] "=r" (tmp)
+      : [SR] "i" (AVR32_SR), [GM] "i" (AVR32_SR_GM_OFFSET)
+      :
+  );
+#endif
+}
+
 /*
  * Pop SR from the stack; this will also restore interrupts to
  * their previous state.
