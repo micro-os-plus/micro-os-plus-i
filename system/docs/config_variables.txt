@@ -96,6 +96,7 @@ type_t myvariable;
 #define OS_CFGINT16_xxx		(1)
 #define OS_CFGLONG_xxx		(1)
 
+#define OS_CFGREG_xxx		(memory mapped register)
 #define OS_CFGVAR_xxx		(variable)
 #define OS_CFGPTR_xxx		(&variable)
 
