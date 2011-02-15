@@ -117,7 +117,7 @@ public:
   getTasksCount(void);
 
   // Return the i-th task registered to the scheduler,
-  // or OS_TASK_NONE for illegal index.
+  // or NULL for illegal index or missing task.
   static OSTask *
   getTask(int i);
 
