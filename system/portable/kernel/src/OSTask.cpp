@@ -28,7 +28,7 @@ OSTask::OSTask(const char *pName, OSTaskMainPtr_t entryPoint,
   OSTask::init(pName, entryPoint, pParameters, pStack, stackSize, priority);
 }
 
-/* stack size is in multiples of OSStack_t */
+/* The stack size is in multiples of OSStack_t */
 void
 OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
     const OSStack_t *pStack, unsigned short stackSize,
@@ -38,7 +38,7 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
   if (pStack == 0 || stackSize == 0)
     return;
 
-  // no entry, sorry...
+  // no entry point, sorry...
   if (entryPoint == 0)
     return;
 
@@ -77,9 +77,9 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
   m_eventWaitReturn = OSEventWaitReturn::OS_NONE;
   m_isSuspended = false;
   m_isWaiting = false;
-  //m_hasReturnValue = false;
 
-  //m_isPreempted = false;
+  //m_hasReturnValue = false;   // TODO: remove if no longer needed
+  //m_isPreempted = false;      // TODO: remove if no longer needed
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
   // by default, tasks will enter deep sleep
@@ -93,13 +93,15 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
   m_isInterrupted = false;
 #endif
-  // register this task to scheduler
+
+  // Register this task to the scheduler.
+  // The scheduler constructor should run first for this to work.
   m_id = OSScheduler::taskRegister(this);
 
-  // fill stack with constant pattern(0x5A)
+  // Fill the stack with constant pattern (0x5A)
   memset((void *) pStack, STACK_FILL_BYTE, stackSize);
 
-  // initialize stack so that a context restore will be performed
+  // Initialise the stack so that a context restore will be performed
   m_pStack = OSSchedulerImpl::stackInitialize((OSStack_t*) (&pStack[stackSize
       / sizeof(OSStack_t) - 1]), entryPoint, pParameters, m_id);
 
@@ -115,6 +117,9 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
 }
 
 #if false
+
+// The task should run forever, termination is not supported,
+// so the destructor is not needed.
 OSTask::~OSTask()
   {
 #if defined(DEBUG)
@@ -126,7 +131,7 @@ OSTask::~OSTask()
   }
 #endif
 
-// redirect to virtual function
+// Redirect to virtual function
 void
 OSTask::staticMain(OSTask * pt)
 {
@@ -141,7 +146,7 @@ OSTask::staticMain(OSTask * pt)
   OS::SOFTreset();
 }
 
-// overriden by actual implementation
+// Should be overridden by actual implementation
 void
 OSTask::taskMain(void)
 {
@@ -150,7 +155,7 @@ OSTask::taskMain(void)
     ;
 }
 
-// Suspend and remove from ready list
+// Suspend the task and remove from ready list.
 void
 OSTask::suspend(void)
 {
@@ -162,7 +167,7 @@ OSTask::suspend(void)
   OSScheduler::criticalExit();
 }
 
-// Resume and insert into ready list
+// Resume the task and insert into ready list.
 void
 OSTask::resume(void)
 {
@@ -248,6 +253,7 @@ OSTask::getID(void)
 
 #if defined(OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER)
 
+#error "implement it in a portable way, this is avr8 only"
 OSProgramPtr_t OSTask::getProgramCounter(void)
   {
     unsigned char * p;
@@ -286,7 +292,7 @@ OSTask::isWaiting(void)
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
 
-bool OSTask::isAllowDeepSleep(void)
+bool OSTask::isDeepSleepAllowed(void)
   {
     return m_allowSleep;
   }
