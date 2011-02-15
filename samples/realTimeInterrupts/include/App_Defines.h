@@ -56,7 +56,8 @@ extern void delayWithYield(schedTicks_t n);
 #define APP_CFGINT_DUMP_MAX_INTERVAL_SECONDS (300)
 
 //#define APP_EXCLUDE_NAKED_ISR
-//#define APP_ISR_ACTION_BUSYWAIT         1
+//#define APP_INCLUDE_TASKBLINKREALTIME_ISR_ACTION_BUSYWAIT         1
+
 //#define APP_EXCLUDE_ISR_ACTION
 #define APP_INCLUDE_LENGTHEN_SYSTICK    1
 //#define APP_INCLUDE_BUSY_WAIT           1
