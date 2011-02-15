@@ -12,7 +12,9 @@
 
 // ----- Static Data ----------------------------------------------------------
 
-// global pointer, used in contextSave/Restore
+// Global pointer, used in contextSave/Restore.
+// It points to the address of the m_pStack field of the current running task.
+// This approach is used in order to make code faster.
 OSStack_t **g_ppCurrentStack;
 
 OSTask *OSScheduler::ms_pTaskIdle;
@@ -356,7 +358,7 @@ OSScheduler::getTask(int id)
   if (id < ms_tasksCount)
     return ms_tasks[id];
   else
-    return (OSTask *) OSTask::NONE;
+    return NULL;
 }
 
 // internal methods
