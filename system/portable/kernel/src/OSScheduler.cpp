@@ -25,6 +25,7 @@ bool OSScheduler::ms_isLocked;
 bool OSScheduler::ms_isPreemptive;
 
 unsigned char OSScheduler::ms_tasksCount;
+// The +1 is here to reserve space for the idle task.
 OSTask *OSScheduler::ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 
 #if !defined(OS_EXCLUDE_OSTIMER)
@@ -35,7 +36,7 @@ OSTimerTicks OSScheduler::timerTicks;
 bool OSScheduler::ms_allowDeepSleep;
 #endif
 
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
+#if defined(OS_INCLUDE_TIMERSECONDS)
 OSTimerSeconds OSScheduler::timerSeconds;
 #endif
 
@@ -52,8 +53,10 @@ OSScheduler::earlyInit(void)
   OSDeviceDebug::putString_P(PSTR("OSScheduler::earlyInit()"));
   OSDeviceDebug::putNewLine();
 #endif
+
   ms_isRunning = false;
   ms_isLocked = false;
+
 #if !defined(OS_EXCLUDE_PREEMPTION)
   ms_isPreemptive = true;
 #else
@@ -85,7 +88,7 @@ OSScheduler::OSScheduler()
 void
 OSScheduler::start(void)
 {
-  // insert all tasks in the ready list; equal priority tasks
+  // Insert all tasks in the ready list; equal priority tasks
   // will have the same order as they were defined
   int i;
   for (i = 0; i < ms_tasksCount; ++i)
@@ -112,7 +115,9 @@ OSScheduler::start(void)
     }
   else
     {
+      // Get the task with the highest priority.
       ms_pTaskRunning = OSReadyList::getTop();
+      // Prepare the global value with the pointer to the m_pStack.
       g_ppCurrentStack = &ms_pTaskRunning->m_pStack;
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_START)
@@ -134,13 +139,14 @@ OSScheduler::start(void)
 
       ms_isRunning = true;
 
-      // interrupts enabled when pop-ing flags
+      // Interrupts will be enabled during context restore,
+      // after popping the flags/status register,
       OSSchedulerImpl::start();
-      // return to the top-most task (guaranteed to exist,
-      // since the idle task was already checked to be there)
+      // Execution will continue with the top-most task (guaranteed to exist,
+      // since the idle task was already checked to be there).
     }
 
-  // never gets here
+  // Should never get here.
 #if defined(DEBUG)
   OSDeviceDebug::putString_P(PSTR("OSScheduler::start() failed"));
   OSDeviceDebug::putNewLine();
@@ -149,7 +155,7 @@ OSScheduler::start(void)
     ;
 }
 
-// release processor to next ready task
+// Release the processor to the next ready task.
 void
 OSScheduler::yield(void)
 {
@@ -157,7 +163,7 @@ OSScheduler::yield(void)
   OSSchedulerImpl::yield();
 }
 
-// sleep until event occurs
+// Sleep until the event occurs.
 OSEventWaitReturn_t
 OSScheduler::eventWait(OSEvent_t event)
 {
@@ -197,7 +203,7 @@ OSScheduler::eventWait(OSEvent_t event)
   return ms_pTaskRunning->m_eventWaitReturn;
 }
 
-// wakeup all tasks waiting for event
+// Wake all tasks waiting for the given event.
 int
 OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 {
@@ -280,25 +286,17 @@ OSScheduler::isContextSwitchRequired()
   bRequire = (ms_isPreemptive || (ms_pTaskRunning == ms_pTaskIdle))
       && (OSReadyList::getCount() > 1);
 
-#if false
-  // done in TaskIdle, no longer needed here
-  if (!bRequire)
-    {
-      OSScheduler::ISR_ledActiveOff();
-    }
-#endif
-
   return bRequire;
 }
 
-// at exit the static variable ms_pTaskRunning points to the new
+// Perform the context switch operations.
+// At exit the static variable ms_pTaskRunning points to the new
 // running task and the global variable g_ppCurrentStack to the
 // tasks context to be restored.
 
 void
 OSScheduler::performContextSwitch()
 {
-  // be sure it runs with interrupts disabled!
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH)
     {
       //if (ms_pTaskRunning->m_isPreempted)
@@ -326,6 +324,7 @@ OSScheduler::performContextSwitch()
 
           // select the running task from the top of the list
           ms_pTaskRunning = OSReadyList::getTop();
+          // Prepare the global value with the pointer to the m_pStack.
           g_ppCurrentStack = &ms_pTaskRunning->m_pStack;
         }
       OSScheduler::criticalExit();
@@ -337,7 +336,7 @@ OSScheduler::performContextSwitch()
           OSDeviceDebug::putChar('L');
         }
 #endif
-      // if scheduler is locked, return LOCKED
+      // if scheduler is locked, return OS_LOCKED
       ms_pTaskRunning->m_eventWaitReturn = OSEventWaitReturn::OS_LOCKED;
     }
 
@@ -351,7 +350,8 @@ OSScheduler::performContextSwitch()
 #endif
 }
 
-// get task 'id' from task array
+// Get the address of the task registered under 'id' in tasks array,
+// or NULL if 'id' is too high.
 OSTask *
 OSScheduler::getTask(int id)
 {
@@ -434,7 +434,7 @@ OSScheduler::interruptTick(void)
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
 
-// warning: not synchronized
+// warning: not synchronised
 void OSScheduler::ISRcancelTask(OSTask *pTask)
   {
     if (pTask->isWaiting())
@@ -485,13 +485,13 @@ OSReadyList::insert(OSTask *pTask)
   prio = pTask->m_staticPriority;
   for (i = 0; i < ms_count; ++i)
     {
-      // for identical priority insert at end
+      // for identical priority, insert at the end
       if (prio > ms_array[i] ->m_staticPriority)
         break;
     }
 
-  // i is the place where to insert, or count
   if (i < ms_count)
+    // i is the place where to insert
     {
       int j;
       // shift right to make space
@@ -500,6 +500,7 @@ OSReadyList::insert(OSTask *pTask)
           ms_array[j] = ms_array[j - 1];
         }
     }
+  // i might also be == ms_count
 
   ms_array[i] = pTask;
   ms_count++;
@@ -517,16 +518,16 @@ void
 OSReadyList::remove(OSTask * pTask)
 {
   if (pTask == OSScheduler::getTaskIdle())
-    return; // do not remove idle task
+    return; // do not remove the idle task
 
   int i;
   i = find(pTask);
   if (i == -1)
     {
-      return; // not found
+      return; // task not found, nothing to remove
     }
 
-  // move list one step to the left
+  // move the list one step to the left
   for (; i < ms_count - 1; ++i)
     {
       ms_array[i] = ms_array[i + 1];
@@ -552,7 +553,7 @@ OSReadyList::find(OSTask *pTask)
         return i;
     }
 
-  return -1; // not found
+  return -1; // task not found
 }
 
 #if defined(DEBUG)
