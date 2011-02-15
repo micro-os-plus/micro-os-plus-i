@@ -23,16 +23,10 @@ public:
   static const OSTaskPriority_t MAX_PRIORITY = 0xFF;
   static const OSTaskPriority_t DEFAULT_PRIORITY = (MAX_PRIORITY/2+1);
 
-  // TODO: remove it if no longer used
-//  Static const int NONE = -1;
-
   // Value for the minimal size for a task.
   static const unsigned short STACK_MINIMAL_SIZE = OS_CFGINT_STACK_MINIMAL_SIZE;
-  // Pattern for initializing the stack.
+  // Pattern for initialising the stack.
   static const OSStack_t STACK_FILL_BYTE = 0x5A;
-
-
-  //#define OS_TASK_NONE                    ((OSTask *)-1)
 
   // Constructors.
   OSTask(const char *pName, const OSStack_t *pStack,
@@ -49,63 +43,71 @@ public:
 #endif
 
   // Main function task,
-  // overriden by actual implementation.
+  // Overridden by actual implementation.
   virtual void taskMain(void);
 
   // Suspend the task and remove it from the ready list.
   void suspend(void);
-  // Resume a task, previously suspended and insert into the ready list
+  // Resume the task, previously suspended by inserting it into the ready list.
   void resume(void);
-  // Check if a task is suspended.
+  // Check if the task is suspended.
   bool isSuspended(void);
-  // Check if a task is waiting on a specific event.
+  // Check if the task is waiting on an event.
   bool isWaiting(void);
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
   // Return TRUE if the task can go to sleep,
   // FALSE otherwise.
-  bool isAllowDeepSleep();
+  bool isDeepSleepAllowed();
 #endif
 
 #if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
-  // TODO: if these function are no longer used, should be removed.
   void virtualWatchdogSet(unsigned short seconds);
   void virtualWatchdogCheck(void);
 #endif
 
   // Return the task name.
   char const *getName(void);
+  
   // Return the address of the stack bottom.
   // Stack grows from high address to low address,
   // so this is the maximum address the stack can grow.
   unsigned char *getStackBottom(void);
+  
   // Return the current stack pointer of the task.
   // This value is stored only during context switch,
   // so the running task will not get the actual value.
   OSStack_t *getStack(void);
+  
   // Return the stack size given at task creation.
   unsigned short getStackSize(void);    /* bytes */
+
 #if defined(OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER)
-  // TODO: Remove it if is no longer necessary.
   OSProgramPtr_t getProgramCounter(void);
 #endif
+
   // Return the task ID.
   int getID(void);
-  // Returns the task's context.
+  
+  // Return the task's context.
   void *getContext(void);
 
   // Return task priority.
   // Higher means better priority.
   OSTaskPriority_t getPriority(void);
+  
+  // Set task priority.
   void setPriority(OSTaskPriority_t priority);
 
   // Return the event the task is waiting for.
   // Cancelling a waiting task can be done by notifying
   // this event with a return value of OS_EVENT_WAIT_RETURN_CANCELED.
   OSEvent_t getEvent(void);
+
   // Set the event the task is waiting for.
   void setEvent(OSEvent_t event);
-  // Returns the maximum usage of the stack.
+
+  // Return the maximum usage of the stack, in bytes.
   unsigned short getStackUsed(void);
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
@@ -114,32 +116,31 @@ public:
 #endif
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
-  // TODO: Remove the next 4 functions if are no longer used.
-//  bool isInterrupted(void);
-//  void setInterruption(bool flag);
-//  void requestInterruption(void);
-//  void ackInterruption(void);
+  bool isInterrupted(void);
+  void setInterruption(bool flag);
+  void requestInterruption(void);
+  void ackInterruption(void);
 #endif
 
 #if defined(DEBUG)
-  // TODO: this is the only place where
-  // this function appears, should be removed?
-//  void dumpPC(void);
+  void dumpPC(void);
 #endif
 
-  // public members
-  // Saved SP during context switches.
+public:
+  // The SP is saved in this variable at contextSave 
+  // and restored from here at contextRestore.
   OSStack_t *m_pStack;
 
   // Wake up this task if it waits for the event received as parameter.
   int
   eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
       OSEventWaitReturn::OS_VOID);
+
 private:
-  friend class OSScheduler;
+  friend class OSScheduler;     // TODO: explain why they are here
   friend class OSReadyList;
 
-  // Initialize task's environment.
+  // Initialise task's environment.
   void init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
       const OSStack_t *pStackBottom, unsigned short stackSize,
       OSTaskPriority_t priority);
@@ -148,51 +149,59 @@ private:
   static void staticMain(OSTask * pt);
 
 #if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK)
-  // Warning: no longer run in critical section
-  // TODO: remove if no longer needed.
-//  virtual void schedulerTick( void );
+  // Warning: no longer run in critical section!
+  virtual void schedulerTick( void );
 #endif
 
   // members
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
-  // TODO: remove if no longer needed.
-  //bool m_isInterrupted;
+  // True if the task is interrupted.
+  bool m_isInterrupted;
 #endif
 
-  //bool m_isPreempted;
-  bool m_isSuspended;
-  bool m_isWaiting;
-  //bool m_hasReturnValue;
+  //bool m_isPreempted; // TODO: remove it fi no longer needed
 
-  // Events which the task is waiting for.
+  // True if the task is suspended.
+  bool m_isSuspended;
+
+  // True if task is waiting for an event. The event value is in m_event.
+  bool m_isWaiting;
+
+  //bool m_hasReturnValue;  // TODO: remove it fi no longer needed
+
+  // The event which the task is waiting for, or OSEvent::OS_NONE
   OSEvent_t m_event;
+
+  // The value to be returned by eventWait(), or OSEventReturn::OS_NONE
   OSEventWaitReturn_t m_eventWaitReturn;
 
   // Task's priority.
   OSTaskPriority_t m_staticPriority;
 
-  // Task's ID.
+  // Task's numerical ID, the index in the scheduler array.
   unsigned char m_id;
+
   // Task's name.
   const char *m_pName;
 
   // Task's entry point (i.e. the function executed by this task).
   OSTaskMainPtr_t m_entryPoint;
+
   // Data passed to this task.
   void *m_pParameters;
 
-  // The bottom of the task's stack.
+  // The bottom of the task's stack (lowest address).
   unsigned char *m_pStackBottom;
-  // The size of the task's stack.
-  unsigned short m_stackSize;   /* bytes */
+
+  // The size of the task's stack, in bytes.
+  unsigned short m_stackSize;
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
-  // True if the task can pe put to sleep.
+  // True if the task can be put to sleep.
   bool m_allowSleep;
 #endif
 
 #if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
-  // TODO: Remove it if is no longer necessary.
   unsigned short m_WDseconds;
 #endif
   };
