@@ -7,7 +7,7 @@
 #include "portable/kernel/include/uOS.h"
 
 #include "TaskBlink.h"
-#include "TaskBlinkNested.h"
+#include "TaskBlinkRealTime.h"
 
 // ---------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@
 
 // tasks allocated on static storage
 TaskBlink task1("A", APP_CONFIG_LED1, APP_CFGINT_BLINK_TICKS);
-TaskBlinkNested task2("B", APP_CONFIG_LED2, APP_CFGINT_NESTED_TICKS);
+TaskBlinkRealTime task2("B", APP_CONFIG_LED2, APP_CFGINT_NESTED_TICKS);
 
 bool g_flagNotify;
 // ---------------------------------------------------------------------------
@@ -39,7 +39,7 @@ OSApplicationImpl::interruptTick(void)
   if(g_flagNotify)
     {
       g_flagNotify = false;
-      os.sched.eventNotify(EVENT_NESTEED);
+      os.sched.eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
     }
 }
 
