@@ -103,14 +103,14 @@ typedef struct
  * \return The MCU reset cause which can be masked with the
  *         \c AVR32_PM_RCAUSE_x_MASK bit-masks to isolate specific causes.
  */
-#if (defined __GNUC__)
+/*#if (defined __GNUC__)
 __attribute__((__always_inline__))
 #endif
 extern __inline__ unsigned int pm_get_reset_cause(volatile avr32_pm_t *pm)
 {
   return pm->rcause;
 }
-
+*/
 
 /*!
  * \brief This function will enable the external clock mode of the oscillator 0.
