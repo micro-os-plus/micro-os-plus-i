@@ -16,6 +16,7 @@
 #include "hal/arch/avr32/lib/include/compiler.h"
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
+#include "hal/arch/avr32/uc3/lib/include/tc.h"
 #include "hal/arch/avr32/uc3/lib/include/rtc.h"
 
 #define COUNT_IRQ_NUM               0
@@ -205,7 +206,7 @@ OSTimerSeconds::init(void)
 {
 #if defined(OS_INCLUDE_32KHZ_TIMER)
 
-  volatile avr32_rtc_t* rtc_reg = &OS_CFGAVR_RTC;
+  volatile avr32_rtc_t* rtc_reg = &AVR32_RTC;
 
   rtc_init(rtc_reg, RTC_OSC_32KHZ, 0);
   rtc_set_top_value(rtc_reg, (OS_CFG_RTC_TOP / 2) - 1);
@@ -228,7 +229,7 @@ void
 OSTimerSeconds::implAcknowledgeInterrupt(void)
 {
 #if defined(OS_INCLUDE_32KHZ_TIMER)
-  volatile avr32_rtc_t* rtc_reg = &OS_CFGAVR_RTC;
+  volatile avr32_rtc_t* rtc_reg = &AVR32_RTC;
   rtc_clear_interrupt(rtc_reg);
 #endif
 }
