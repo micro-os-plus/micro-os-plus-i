@@ -16,14 +16,6 @@
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 
-#define TSKBLKNEST_TIMER                        (AVR32_TC1)
-#define TSKBLKNEST_CHANNEL                      (0)
-#define TSKBLKNEST_CFGINT_TIMER_IRQ_ID          (AVR32_TC1_IRQ0)
-#define TSKBLKNEST_CFGINT_TIMER_IRQ_LEVEL       (1)
-#define TSKBLKNEST_CFGINT_TIMER_CLOCK_SELECT    (3)
-#define TSKBLKNEST_CFGINT_TIMER_PRESCALLER      (4)
-//#define TSKBLKNEST_CFGINT_TICK_RATE_HZ          (9000)
-
 class TaskBlinkNested : public OSTask
 {
 public:
@@ -53,4 +45,4 @@ private:
   volatile schedTicks_t m_count;
 };
 
-#endif /*TASKBLINKBUSYWAIT_H_*/
+#endif /* TASKBLINKBUSYWAIT_H_ */
