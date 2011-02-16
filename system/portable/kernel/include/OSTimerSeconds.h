@@ -41,6 +41,7 @@ public:
 protected:
   friend class OSScheduler;
   static void init(void);
+  static void implAcknowledgeInterrupt(void);
 
 private:
   static OSTimerStruct_t m_array[OS_CFGINT_OSTIMERSECONDS_SIZE];
@@ -71,6 +72,7 @@ inline OSTime_t OSTimerSeconds::getUptime(void)
 
 inline void OSTimerSeconds::interruptServiceRoutine(void)
   {
+    implAcknowledgeInterrupt();
     interruptTick();
     incrementTicks();
 
