@@ -208,8 +208,14 @@ OSTimerSeconds::init(void)
 
   volatile avr32_rtc_t* rtc_reg = &AVR32_RTC;
 
+#if !defined(OS_INCLUDE_OSTIMERSECONDS_INIT_RTCOSCRC)
   rtc_init(rtc_reg, RTC_OSC_32KHZ, 0);
   rtc_set_top_value(rtc_reg, (OS_CFG_RTC_TOP / 2) - 1);
+#else
+  rtc_init(rtc_reg, RTC_OSC_RC, 0);
+  rtc_set_top_value(rtc_reg, ((115000) / 2) - 1);
+#endif
+
   rtc_enable_wake_up(rtc_reg);
   rtc_enable(rtc_reg);
   //register the interrupt
