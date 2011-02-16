@@ -16,6 +16,7 @@
 #include "hal/arch/avr32/lib/include/compiler.h"
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
+#include "hal/arch/avr32/uc3/lib/include/rtc.h"
 
 #define COUNT_IRQ_NUM               0
 
@@ -29,6 +30,14 @@ SysTick_contextHandler(void);
 
 __attribute__((noinline)) void
 SysTick_interruptServiceRoutine();
+
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+__attribute__((naked))
+#else
+__attribute__((interrupt))
+#endif
+void
+SysSeconds_contextHandler(void);
 
 void
 OSTimerTicks::implInit(void)
@@ -76,7 +85,7 @@ OSTimerTicks::implInit(void)
 
   //clock source
   tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].CMR.waveform.tcclks
-      = OS_CFGINT_TIMER_CLOCK_SELECT;
+  = OS_CFGINT_TIMER_CLOCK_SELECT;
 
   // counter UP mode with automatic trigger on RC Compare
   tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].CMR.waveform.wavsel = 2;
@@ -115,10 +124,11 @@ OSTimerTicks::implInit(void)
 
 #else
   Set_system_register(AVR32_COUNT, 0);
-  Set_system_register(AVR32_COMPARE, OS_CFGLONG_OSCILLATOR_HZ/OS_CFGINT_TICK_RATE_HZ);
+  Set_system_register(AVR32_COMPARE, OS_CFGLONG_OSCILLATOR_HZ
+      /OS_CFGINT_TICK_RATE_HZ);
   //register the interrupt
-   INTC_register_interrupt(SysTick_contextHandler, COUNT_IRQ_NUM,
-       OS_CFGINT_TIMER_IRQ_LEVEL);
+  INTC_register_interrupt(SysTick_contextHandler, COUNT_IRQ_NUM,
+      OS_CFGINT_TIMER_IRQ_LEVEL);
 #endif
 }
 
@@ -183,37 +193,58 @@ OSTimerTicks::implAcknowledgeInterrupt(void)
 #if defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER)
   OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
 #else
-  Set_system_register(AVR32_COMPARE, OS_CFGLONG_OSCILLATOR_HZ/OS_CFGINT_TICK_RATE_HZ);
+  Set_system_register(AVR32_COMPARE, OS_CFGLONG_OSCILLATOR_HZ
+      /OS_CFGINT_TICK_RATE_HZ);
 #endif
 }
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
 
-void OSTimerSeconds::init(void)
-  {
+void
+OSTimerSeconds::init(void)
+{
 #if defined(OS_INCLUDE_32KHZ_TIMER)
-    TCCR2A = 0; // Normal (counter) mode
-    TCCR2B = 5; // clk/128
-    ASSR = _BV( AS2 ); // Timer2 clocked from crystal
-    TIMSK2 = _BV( TOIE2 );
+
+  volatile avr32_rtc_t* rtc_reg = &OS_CFGAVR_RTC;
+
+  rtc_init(rtc_reg, RTC_OSC_32KHZ, 0);
+  rtc_set_top_value(rtc_reg, (OS_CFG_RTC_TOP / 2) - 1);
+  rtc_enable_wake_up(rtc_reg);
+  rtc_enable(rtc_reg);
+  //register the interrupt
+  INTC_register_interrupt(SysSeconds_contextHandler, AVR32_RTC_IRQ,
+      OS_CFGINT_TIMER_IRQ_LEVEL);
+  rtc_enable_interrupt(rtc_reg);
+
+#if false
+  TCCR2A = 0; // Normal (counter) mode
+  TCCR2B = 5; // clk/128
+  ASSR = _BV( AS2 ); // Timer2 clocked from crystal
+  TIMSK2 = _BV( TOIE2 );
 #endif
-  }
-
+#endif
+}
+void
+OSTimerSeconds::implAcknowledgeInterrupt(void)
+{
 #if defined(OS_INCLUDE_32KHZ_TIMER)
-
-extern "C" void TIMER2_OVF_vect(void) __attribute__((signal, naked));
+  volatile avr32_rtc_t* rtc_reg = &OS_CFGAVR_RTC;
+  rtc_clear_interrupt(rtc_reg);
+#endif
+}
+#if defined(OS_INCLUDE_32KHZ_TIMER)
 
 void
-TIMER2_OVF_vect(void)
-  {
-    // interrupts disabled in here
-    OSScheduler::interruptEnter();
-      {
-        OSScheduler::timerSeconds.interruptServiceRoutine();
-      }
-    OSScheduler::interruptExit();
-    // interrupts enabled after this point
-  }
+SysSeconds_contextHandler(void)
+{
+  // interrupts disabled in here
+  OSScheduler::interruptEnter();
+    {
+      OSScheduler::timerSeconds.interruptServiceRoutine();
+    }
+  OSScheduler::interruptExit();
+  // interrupts enabled after this point
+}
 
 #endif
 
