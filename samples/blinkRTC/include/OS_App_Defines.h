@@ -25,6 +25,8 @@
 
 //#define OS_INCLUDE_OS_BUSYWAITMILLIS                    1
 
+#define OS_INCLUDE_OSTIMERSECONDS_INIT_RTCOSCRC         (1)
+
 #if defined(DEBUG)
 // One of the following must be defined in Eclipse project or Makefile
 //#define OS_CONFIG_DEBUG_DEVICE_I2C                    1
