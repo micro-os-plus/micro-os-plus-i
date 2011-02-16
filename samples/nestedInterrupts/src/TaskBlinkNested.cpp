@@ -6,9 +6,8 @@
 
 #include "TaskBlinkNested.h"
 
-#define EVENT_NESTEED 0x1234
 
-#if !defined(APP_EXCLUDE_NAKED_ISR)
+#if !defined(APP_EXCLUDE_NESTEDINTERRUPT_NAKEDISR)
 __attribute__((naked))
 #else
 __attribute__((interrupt))
@@ -64,8 +63,10 @@ TaskBlinkNested::taskMain(void)
       os.sched.unlock();
     }
 
+#if !defined(APP_EXCLUDE_TASKBLINKNESTED_TASKMAIN_LED)
   // initialise led port as output
   m_oLed.init();
+#endif
 
   interruptInit();
 
@@ -75,7 +76,7 @@ TaskBlinkNested::taskMain(void)
   for (;;)
     {
 #if true
-      os.sched.eventWait(EVENT_NESTEED);
+      os.sched.eventWait(APP_CFGINT_TASKBLINKNESTED_EVENT);
 #else
       os.sched.yield();
 #endif
@@ -95,8 +96,11 @@ TaskBlinkNested::taskMain(void)
           bSecond = false;
 
           debug.putChar('.');
+
+#if !defined(APP_EXCLUDE_TASKBLINKNESTED_TASKMAIN_LED)
           // finally toggle led
           m_oLed.toggle();
+#endif
         }
     }
 }
@@ -104,59 +108,59 @@ TaskBlinkNested::taskMain(void)
 void
 TaskBlinkNested::interruptInit(void)
 {
-  volatile avr32_tc_t* tc_reg = &TSKBLKNEST_TIMER;
+  volatile avr32_tc_t* tc_reg = &APP_CFGREG_TASKBLINKNESTED_TIMER;
 
   // the clock for TCO is already enabled
 
   // initialise registers for the Channel
 
   // disable channel
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CCR.clkdis = 1;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CCR.clkdis = 1;
 
   // clear interrupt flags, by reading SR
-  tc_reg->channel[TSKBLKNEST_CHANNEL].sr;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].sr;
 
   // reset register
-  tc_reg->channel[TSKBLKNEST_CHANNEL].cmr = 0;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].cmr = 0;
 
   // set waveform mode as default
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.wave = 1;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CMR.waveform.wave = 1;
 
   // for waveform mode the TIOB must not be input
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.eevt = 2;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CMR.waveform.eevt = 2;
   //disable all interrupt sources
-  tc_reg->channel[TSKBLKNEST_CHANNEL].idr = 0xFFFFFFFF;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].idr = 0xFFFFFFFF;
 
   //register the interrupt
   INTC_register_interrupt(NestedInterrupt_contextHandler,
-      TSKBLKNEST_CFGINT_TIMER_IRQ_ID, TSKBLKNEST_CFGINT_TIMER_IRQ_LEVEL);
+      APP_CFGINT_TASKBLINKNESTED_TIMERIRQID, APP_CFGINT_TASKBLINKNESTED_TIMERIRQLEVEL);
 
   //clock source
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.tcclks
-      = TSKBLKNEST_CFGINT_TIMER_CLOCK_SELECT;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CMR.waveform.tcclks
+      = APP_CFGINT_TASKBLINKNESTED_TIMERCLOCKSELECT;
 
   // counter UP mode with automatic trigger on RC Compare
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.wavsel = 2;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CMR.waveform.wavsel = 2;
   // no event on TIOA when RC compare
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.acpc = 0;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CMR.waveform.acpc = 0;
   // no event on TIOB when RC compare
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.bcpc = 0;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CMR.waveform.bcpc = 0;
   // enable channel, as it might be disabled
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CCR.clken = 1;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CCR.clken = 1;
 
   // start channel using software trigger
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CCR.swtrg = 1;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CCR.swtrg = 1;
 
-#define T_DIVIDER (1 << ((TSKBLKNEST_CFGINT_TIMER_CLOCK_SELECT-2)*2+1))
-#define T_COUNTER (OS_CFGLONG_OSCILLATOR_HZ/TSKBLKNEST_CFGINT_TIMER_PRESCALLER/T_DIVIDER/TSKBLKNEST_CFGINT_TICK_RATE_HZ)
+#define T_DIVIDER (1 << ((APP_CFGINT_TASKBLINKNESTED_TIMERCLOCKSELECT-2)*2+1))
+#define T_COUNTER (OS_CFGLONG_OSCILLATOR_HZ/APP_CFGINT_TASKBLINKNESTED_TIMERPRESCALLER/T_DIVIDER/TSKBLKNEST_CFGINT_TICK_RATE_HZ)
 
   unsigned int nCounter;
-  nCounter = (OS_CFGLONG_OSCILLATOR_HZ / TSKBLKNEST_CFGINT_TIMER_PRESCALLER
+  nCounter = (OS_CFGLONG_OSCILLATOR_HZ / APP_CFGINT_TASKBLINKNESTED_TIMERPRESCALLER
       /T_DIVIDER / m_rate);
 
 #if defined(DEBUG)
 
-  OSDeviceDebug::putDec(TSKBLKNEST_CFGINT_TIMER_PRESCALLER);
+  OSDeviceDebug::putDec(APP_CFGINT_TASKBLINKNESTED_TIMERPRESCALLER);
   OSDeviceDebug::putChar(',');
   OSDeviceDebug::putDec(T_DIVIDER);
   OSDeviceDebug::putChar(',');
@@ -166,33 +170,36 @@ TaskBlinkNested::interruptInit(void)
 #endif
 
   // set RC value
-  tc_reg->channel[TSKBLKNEST_CHANNEL].RC.rc = nCounter;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].RC.rc = nCounter;
 
   // counter UP mode with automatic trigger on RC Compare
-  tc_reg->channel[TSKBLKNEST_CHANNEL].CMR.waveform.wavsel = 2;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].CMR.waveform.wavsel = 2;
 
 #if true
   // set interrupt source RC Compare
-  tc_reg->channel[TSKBLKNEST_CHANNEL].IER.cpcs = 1;
+  tc_reg->channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].IER.cpcs = 1;
 #endif
 
-  OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
-  OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
-
+#if defined(APP_CFGINT_TASKBLINKNESTED_ISRLEDBIT)
+  OS_GPIO_PIN_CONFIG_ENABLE(APP_CFGREG_TASKBLINKNESTED_ISRLEDPORTCONFIG, APP_CFGINT_TASKBLINKNESTED_ISRLEDBIT);
+  OS_GPIO_PIN_CONFIG_OUTPUT(APP_CFGREG_TASKBLINKNESTED_ISRLEDPORTCONFIG, APP_CFGINT_TASKBLINKNESTED_ISRLEDBIT);
+#endif
 }
 
 void
 TaskBlinkNested::interruptAcknowledge(void)
 {
-  TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
+  APP_CFGREG_TASKBLINKNESTED_TIMER.channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].sr;
 }
 
 void
 TaskBlinkNested::interruptServiceRoutine(void)
 {
-#if !defined(APP_EXCLUDE_ISR_ACTION)
+#if !defined(APP_EXCLUDE_TASKBLINKNESTED_ISRACTION)
 
-  OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
+#if defined(APP_CFGINT_TASKBLINKNESTED_ISRLEDBIT)
+  OS_GPIO_PIN_HIGH(APP_CFGREG_TASKBLINKNESTED_ISRLEDPORTCONFIG, APP_CFGINT_TASKBLINKNESTED_ISRLEDBIT);
+#endif
 
   interruptAcknowledge();
 
@@ -204,11 +211,13 @@ TaskBlinkNested::interruptServiceRoutine(void)
 
   // Notify task; some of these will be lost, but the total count
   // will accumulate, and when awaken, will be considered
-  OSScheduler::eventNotify(EVENT_NESTEED);
+  OSScheduler::eventNotify(APP_CFGINT_TASKBLINKNESTED_EVENT);
 
 #endif
 
-  OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, APP_CONFIG_LED3);
+#if defined(APP_CFGINT_TASKBLINKNESTED_ISRLEDBIT)
+  OS_GPIO_PIN_LOW(APP_CFGREG_TASKBLINKNESTED_ISRLEDPORTCONFIG, APP_CFGINT_TASKBLINKNESTED_ISRLEDBIT);
+#endif
 
 #endif
 }
@@ -216,17 +225,17 @@ TaskBlinkNested::interruptServiceRoutine(void)
 void
 NestedInterrupt_contextHandler(void)
 {
-#if !defined(APP_EXCLUDE_NAKED_ISR)
+#if !defined(APP_EXCLUDE_NESTEDINTERRUPT_NAKEDISR)
   OSScheduler::interruptEnter();
 #endif
     {
-#if !defined(APP_EXCLUDE_ISR_ACTION)
+#if !defined(APP_EXCLUDE_TASKBLINKNESTED_ISRACTION)
       pTaskBlinkNested->interruptServiceRoutine();
 #else
-      TSKBLKNEST_TIMER.channel[TSKBLKNEST_CHANNEL].sr;
+      APP_CFGREG_TASKBLINKNESTED_TIMER.channel[APP_CFGINT_TASKBLINKNESTED_TIMERCHANNEL].sr;
 #endif
     }
-#if !defined(APP_EXCLUDE_NAKED_ISR)
+#if !defined(APP_EXCLUDE_NESTEDINTERRUPT_NAKEDISR)
   OSScheduler::interruptExit();
 #endif
 }

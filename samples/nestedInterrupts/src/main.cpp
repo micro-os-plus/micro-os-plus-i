@@ -11,12 +11,9 @@
 
 // ---------------------------------------------------------------------------
 
-#define TICKS  (OS_CFGINT_TICK_RATE_HZ)
-
 // tasks allocated on static storage
-TaskBlink task1("A", APP_CONFIG_LED1, APP_CFGINT_BLINK_TICKS);
-TaskBlinkNested task2("B", APP_CONFIG_LED2, APP_CFGINT_NESTED_TICKS);
-
+TaskBlink task1("A", APP_CFGINT_TASKBLINK_LEDBIT, APP_CFGINT_TASKBLINK_TICKS);
+TaskBlinkNested task2("B", APP_CFGINT_TASKBLINKNESTED_LEDBIT, APP_CFGINT_TASKBLINKNESTED_TICKS);
 
 // ---------------------------------------------------------------------------
 
