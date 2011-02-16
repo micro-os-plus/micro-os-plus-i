@@ -43,8 +43,6 @@
 #define OS_CFGINT_TIMER_CLOCK_SELECT                            (3)
 #endif
 
-#define OS_CFGAVR_RTC                                           (AVR32_RTC)
-
 #define OS_CFG_RTC_TOP                                          (32768)
 
 #if !defined(OS_CFGINT_TICK_RATE_HZ)
