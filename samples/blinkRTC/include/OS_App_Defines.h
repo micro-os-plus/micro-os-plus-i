@@ -16,10 +16,11 @@
 
 #define OS_CFGINT_TASKS_TABLE_SIZE                      (3)
 
+#define OS_INCLUDE_TIMERSECONDS                         (1)
 #define OS_INCLUDE_OSTIMERSECONDS                       (1)
 #define OS_INCLUDE_OSSCHEDULER_TIMERSECONDS             (1)
-#define OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT        (1)
-
+//#define OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT        (1)
+#define OS_INCLUDE_32KHZ_TIMER                          (1)
 //#define OS_EXCLUDE_PREEMPTION                           (1)
 
 //#define OS_INCLUDE_OS_BUSYWAITMILLIS                    1
