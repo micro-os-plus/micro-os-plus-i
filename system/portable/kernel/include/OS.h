@@ -12,29 +12,43 @@
 class OSImpl
   {
 public:
+  // Initialize the SP register in order to point to the stack section.
   inline static void CPUstackInit(void) __attribute__((always_inline));
+  // Some CPU initializations.
   inline static void CPUinit(void) __attribute__((always_inline));
+  // Put MCU to the idle sleep mode.
   inline static void CPUidle(void) __attribute__((always_inline));
+  // Put MCU to sleep.
   inline static void CPUsleep(void) __attribute__((always_inline));
+  // Put MCU to deep sleep.
   inline static void CPUdeepSleep(void) __attribute__((always_inline));
-
+  // Returns the reset bits used to know the reset reason.
   inline static OSResetBits_t CPUfetchResetBits(void) __attribute__((always_inline));
-
+  // Reset the WDT.
   inline static void WDTreset(void) __attribute__((always_inline));
+  // No operation performed. Embeds the nop assembly command.
   inline static void NOP(void) __attribute__((always_inline));
+  // Generate a soft reset.
   inline static void SOFTreset(void) __attribute__((always_inline));
-
+  // Wrapper for the rete instruction.
   inline static void returnFromInterrupt(void) __attribute__((always_inline,noreturn));
+  // Copy link register's (LR) value into the PC. This will restart execution
+  // of the previously executed routine.
   inline static void returnFromSubroutine(void) __attribute__((always_inline,noreturn));
 
 #if defined(OS_INLINE_INTERRUPTS_ENABLE_DISABLE)
+  // Enable interrupts (global interrupt mask bit - GM from SR).
   inline static void interruptsEnable(void) __attribute__((always_inline));
+  // Disable all interrupts (global interrupt mask bit - GM from SR).
   inline static void interruptsDisable(void) __attribute__((always_inline));
 #else
+  // Enable interrupts (global interrupt mask bit - GM from SR).
   inline static void interruptsEnable(void);
+  // Disable all interrupts (global interrupt mask bit - GM from SR).
   inline static void interruptsDisable(void);
 #endif
 
+  // Used for ARM architecture.
   inline static void interruptsClearMask(void) __attribute__((always_inline));
   inline static void interruptsSetMask(void) __attribute__((always_inline));
 
@@ -110,23 +124,30 @@ class OS: public OSImpl
 public:
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
+  // Scheduler object used by this class.
   OSScheduler sched;
 #endif
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 #if defined(DEBUG)
+  // Constructor.
   OS();
 #endif
 #else
+  // TODO: if is no longer used please remove it.
   static void main(void) __attribute__( ( noreturn ) );
 #endif
 
 #if defined(OS_INCLUDE_NAKED_INIT)
+  // Naked version for the earlyInit function.
   static void nakedEarlyInit(void) __attribute__( ( naked, section( ".init6" ) ) );
 #endif
 
+  // Performs early initialisations.
+  // Must be called before all constructors.
   static void earlyInit(void);
 
+  // isDebug function return true if debug is active, false otherwise.
 #if defined(DEBUG)
 
   //const static bool isDebug = true;
@@ -146,15 +167,18 @@ public:
 #endif
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMILLIS)
+  // Busy waiting for n milliseconds.
   static void busyWaitMillis(unsigned int n);
 #endif
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMICROS)
+  // Busy waiting for n microseconds.
   static void busyWaitMicros(unsigned int n);
 #endif
-
+  // Returns the reset bits used to know the reset reason.
   static OSResetBits_t getResetBits(void);
 
+  // TODO: please remove it if is no longer necessarily.
   static void applicationExceptionDetailsLog(unsigned int n);
 
 private:
