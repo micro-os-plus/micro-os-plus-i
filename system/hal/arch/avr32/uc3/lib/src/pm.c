@@ -328,6 +328,17 @@ void pm_wait_for_clk32_ready(volatile avr32_pm_t *pm)
   while (!(pm->poscsr & AVR32_PM_POSCSR_OSC32RDY_MASK));
 }
 
+int pm_is_clk32_ready(volatile avr32_pm_t *pm)
+{
+  int i;
+  i = 0;
+
+  while(!(pm->poscsr & AVR32_PM_POSCSR_OSC32RDY_MASK))
+    {
+      if(i++ >2000000) return 0;
+    }
+  return 1;
+}
 
 void pm_cksel(volatile avr32_pm_t *pm,
               unsigned int pbadiv,
