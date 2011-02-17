@@ -50,9 +50,8 @@
 #ifndef _RTC_H_
 #define _RTC_H_
 
-//#include "compiler.h"
 #include <avr32/io.h>
-#include "hal/arch/avr32/lib/include/compiler.h"
+
 
 #ifdef __cplusplus
 extern "C" {
