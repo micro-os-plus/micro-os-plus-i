@@ -25,18 +25,18 @@
 __attribute__((naked))
 #else
 __attribute__((interrupt))
-#endif
+#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)*/
 void
 SysTick_contextHandler(void);
 
 __attribute__((noinline)) void
 SysTick_interruptServiceRoutine();
 
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)
 __attribute__((naked))
 #else
 __attribute__((interrupt))
-#endif
+#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)*/
 void
 SysSeconds_contextHandler(void);
 
@@ -112,7 +112,7 @@ OSTimerTicks::implInit(void)
   OSDeviceDebug::putDec(COUNTER);
   OSDeviceDebug::putNewLine();
 
-#endif
+#endif /*defined(DEBUG)*/
 
   // set RC value
   tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].RC.rc = COUNTER;
@@ -130,7 +130,7 @@ OSTimerTicks::implInit(void)
   //register the interrupt
   INTC_register_interrupt(SysTick_contextHandler, COUNT_IRQ_NUM,
       OS_CFGINT_TIMER_IRQ_LEVEL);
-#endif
+#endif /*defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER)*/
 }
 
 #if defined(OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION)
@@ -177,16 +177,16 @@ SysTick_contextHandler(void)
 {
 #if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
   OSScheduler::interruptEnter();
-#endif
+#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)*/
     {
       OSScheduler::timerTicks.interruptServiceRoutine();
     }
 #if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
   OSScheduler::interruptExit();
-#endif
+#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)*/
 }
 
-#endif
+#endif /*defined(OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION)*/
 
 void
 OSTimerTicks::implAcknowledgeInterrupt(void)
@@ -196,7 +196,7 @@ OSTimerTicks::implAcknowledgeInterrupt(void)
 #else
   Set_system_register(AVR32_COMPARE, OS_CFGLONG_OSCILLATOR_HZ
       /OS_CFGINT_TICK_RATE_HZ);
-#endif
+#endif /*defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER)*/
 }
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
@@ -208,13 +208,23 @@ OSTimerSeconds::init(void)
 
   volatile avr32_rtc_t* rtc_reg = &AVR32_RTC;
 
-#if !defined(OS_INCLUDE_OSTIMERSECONDS_INIT_RTCOSCRC)
-  rtc_init(rtc_reg, RTC_OSC_32KHZ, 0);
-  rtc_set_top_value(rtc_reg, (OS_CFG_RTC_TOP / 2) - 1);
-#else
-  rtc_init(rtc_reg, RTC_OSC_RC, 0);
-  rtc_set_top_value(rtc_reg, ((115000) / 2) - 1);
-#endif
+  if(rtc_init(rtc_reg, RTC_OSC_32KHZ, 0))
+    {
+      rtc_set_top_value(rtc_reg, (OS_CFG_RTC_TOP / 2) - 1);
+#if defined(DEBUG)
+      OSDeviceDebug::putChar('Q');
+      OSDeviceDebug::putNewLine();
+#endif /*defined(DEBUG)*/
+    }
+  else
+    {
+      rtc_init(rtc_reg, RTC_OSC_RC, 0);
+      rtc_set_top_value(rtc_reg, ((115000) / 2) - 1);
+#if defined(DEBUG)
+      OSDeviceDebug::putChar('R');
+      OSDeviceDebug::putNewLine();
+#endif /*defined(DEBUG)*/
+    }
 
   rtc_enable_wake_up(rtc_reg);
   rtc_enable(rtc_reg);
@@ -222,40 +232,34 @@ OSTimerSeconds::init(void)
   INTC_register_interrupt(SysSeconds_contextHandler, AVR32_RTC_IRQ,
       OS_CFGINT_TIMER_IRQ_LEVEL);
   rtc_enable_interrupt(rtc_reg);
-
-#if false
-  TCCR2A = 0; // Normal (counter) mode
-  TCCR2B = 5; // clk/128
-  ASSR = _BV( AS2 ); // Timer2 clocked from crystal
-  TIMSK2 = _BV( TOIE2 );
-#endif
-#endif
+#endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
 }
+
 void
 OSTimerSeconds::implAcknowledgeInterrupt(void)
 {
 #if defined(OS_INCLUDE_32KHZ_TIMER)
-  volatile avr32_rtc_t* rtc_reg = &AVR32_RTC;
-  rtc_clear_interrupt(rtc_reg);
-#endif
+  rtc_clear_interrupt(&AVR32_RTC);
+#endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
 }
-#if defined(OS_INCLUDE_32KHZ_TIMER)
 
+#if defined(OS_INCLUDE_32KHZ_TIMER)
 void
 SysSeconds_contextHandler(void)
 {
-  // interrupts disabled in here
+#if !defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)
   OSScheduler::interruptEnter();
+#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR) */
     {
       OSScheduler::timerSeconds.interruptServiceRoutine();
     }
+#if !defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)
   OSScheduler::interruptExit();
-  // interrupts enabled after this point
+#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR) */
 }
+#endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
 
-#endif
-
-#endif
+#endif /*defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)*/
 
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
 
