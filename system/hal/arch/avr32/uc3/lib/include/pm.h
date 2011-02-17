@@ -248,6 +248,13 @@ extern void pm_wait_for_clk32_ready(volatile avr32_pm_t *pm);
 
 
 /*!
+ * \brief This function will return 1 if the Osc32 clock is ready.
+ * \param pm Base address of the Power Manager (i.e. &AVR32_PM)
+ */
+extern int pm_is_clk32_ready(volatile avr32_pm_t *pm);
+
+
+/*!
  * \brief This function will select all the power manager clocks.
  * \param pm Base address of the Power Manager (i.e. &AVR32_PM)
  * \param pbadiv Peripheral Bus A clock divisor enable
