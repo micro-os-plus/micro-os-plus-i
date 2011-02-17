@@ -80,9 +80,10 @@ int rtc_init(volatile avr32_rtc_t *rtc, unsigned char osc_type, unsigned char ps
     // Enable the 32-kHz clock
     pm_enable_clk32_no_wait(&AVR32_PM, AVR32_PM_OSCCTRL32_STARTUP_0_RCOSC);
   }
-
+  if( !pm_is_clk32_ready(&AVR32_PM))
+    return 0;
   // Wait until the rtc CTRL register is up-to-date
- // while (rtc_is_busy(rtc));
+ //while (rtc_is_busy(rtc));
 
   // Set the new RTC configuration
   rtc->ctrl = osc_type << AVR32_RTC_CTRL_CLK32_OFFSET |
