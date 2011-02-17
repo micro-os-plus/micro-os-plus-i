@@ -7,16 +7,26 @@
 #include "portable/kernel/include/uOS.h"
 
 #include "TaskBlink.h"
-//#include "TaskBlinkNested.h"
+#include "TaskStress.h"
 
 // ---------------------------------------------------------------------------
 
 #define TICKS  (OS_CFGINT_TICK_RATE_HZ)
 
 // tasks allocated on static storage
-TaskBlink task1("A", APP_CONFIG_LED1, APP_CFGINT_BLINK_TICKS);
-//TaskBlinkNested task2("B", APP_CONFIG_LED2, APP_CFGINT_NESTED_TICKS);
-
+TaskBlink taskA("A", APP_CONFIG_LED1, APP_CFGINT_BLINK_TICKS);
+TaskStress task0("0", 0, 50, 1,50);
+TaskStress task1("1", 0, 50, 1,50);
+TaskStress task2("2", 0, 50, 1,50);
+TaskStress task3("3", 30, 70, 1, 100);
+#if true
+TaskStress task4("4", 30, 70, 1, 100);
+TaskStress task5("5", 30, 70, 1, 100);
+TaskStress task6("6", 10, 90, 10, 200);
+TaskStress task7("7", 10, 90, 10, 200);
+TaskStress task8("8", 10, 90, 10, 200);
+TaskStress task9("9", 10, 90, 10, 200);
+#endif
 
 // ---------------------------------------------------------------------------
 
@@ -44,6 +54,6 @@ OSApplicationImpl::interruptTick(void)
 
 // message to be displayed on the debugging device at startup
 #if defined(DEBUG)
-const char greeting[] = "AVI realTimeInterrupts v1.1";
+const char greeting[] = "AVI stress v1.1";
 const char buildDateTime[] = "(" __DATE__ " " __TIME__ ")";
 #endif
