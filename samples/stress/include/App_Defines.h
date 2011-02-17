@@ -62,7 +62,7 @@ extern void delayWithYield(schedTicks_t n);
 //#define APP_INCLUDE_BUSY_WAIT           1
 #define APP_BUSY_PROCENTAGE             40
 #define APP_EVENT_DUMMY                 0x1111
-#define APP_CFGINT_NOTIFIES             25
+#define APP_CFGINT_NOTIFIES             5
 
 
 
