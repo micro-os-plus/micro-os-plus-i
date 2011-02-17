@@ -51,7 +51,7 @@
 #define _TC_H_
 
 #include <avr32/io.h>
-#include "hal/arch/avr32/lib/include/compiler.h"
+
 
 #ifdef __cplusplus
 extern "C" {
