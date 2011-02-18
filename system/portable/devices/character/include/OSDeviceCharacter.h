@@ -19,6 +19,7 @@ typedef enum
 deviceCharacterType_t;
 #endif
 
+// TODO: methods for buffered read/write operations must be added.
 class OSDeviceCharacter
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
 : public streambuf
@@ -34,16 +35,18 @@ public:
   // close device
   OSReturn_t close(void);
 
-  // test if device in opened
+  // test if device is opened
   bool isOpened(void) const;
 
-  // test if device in connected state
+  // test if device is in connected state
   bool isConnected(void) const;
 
   // blocking read.
   // return byte or negative (OSReturn::OS_DISCONNECTED, OSReturn::OS_TIMEOUT)
   OSReturn_t readByte(void);
 
+  // Check if there is available data to be read
+  // and if it is return the size of the data.
   OSReturn_t availableRead(void);
 
   // blocking write. does not flush, unless buffer full.
@@ -86,12 +89,24 @@ public:
   void setWriteTimeout(OSTimerTicks_t t);
   OSTimerTicks_t getWriteTimeout(void);
 
+  // Set timer to be used by the open function.
+  // If the operation doesn't succeed after the open-timeout
+  // (set with setOpenTimeout), this timer is used to
+  // wake-up the task and return with an error code.
   void setOpenTimer(OSTimer *pTimer);
   OSTimer *getOpenTimer(void);
 
+  // Set timer to be used by the read functions.
+  // If the operation doesn't succeed after the read-timeout
+  // (set with setReadTimeout), this timer is used to
+  // wake-up the task and return with an error code.
   void setReadTimer(OSTimer *pTimer);
   OSTimer *getReadTimer(void);
 
+  // Set timer to be used by the write functions.
+  // If the operation doesn't succeed after the write-timeout
+  // (set with setWriteTimeout), this timer is used to
+  // wake-up the task and return with an error code.
   void setWriteTimer(OSTimer *pTimer);
   OSTimer *getWriteTimer(void);
 
@@ -106,6 +121,9 @@ protected:
   bool m_isOpened;
 
 private:
+
+  // Implementation for different methods.
+
   virtual OSEvent_t implGetOpenEvent(void);
   virtual OSEvent_t implGetReadEvent(void);
   virtual OSEvent_t implGetWriteEvent(void);
@@ -135,6 +153,7 @@ private:
 
 #endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
 
+  // Events for open/read/write methods.
   OSEvent_t m_openEvent;
   OSEvent_t m_readEvent;
   OSEvent_t m_writeEvent;
