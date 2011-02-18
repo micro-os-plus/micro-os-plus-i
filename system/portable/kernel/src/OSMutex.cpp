@@ -14,7 +14,7 @@ OSMutex::OSMutex()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("OSMutex()=");
-    OSDeviceDebug::putHex( ( unsigned short ) this );
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
     m_isAcquired = false;

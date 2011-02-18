@@ -14,7 +14,7 @@ OSEventFlags::OSEventFlags()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("OSEventFlags()=");
-    OSDeviceDebug::putHex( ( unsigned short ) this );
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
     m_flags = 0;
@@ -61,7 +61,7 @@ OSEventFlagsBits_t OSEventFlags::clear(OSEventFlagsBits_t bits)
  * the timer event.
  */
 
-OSEventFlagsBits_t OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
+OSReturn_t OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
   {
     OSEventFlagsBits_t flags;
     OSScheduler::criticalEnter();
@@ -72,7 +72,7 @@ OSEventFlagsBits_t OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
 
     // if requested bits are already set, return immediately
     if (((flags & bits) != 0))
-      return OSEventWaitReturn::OS_IMMEDIATELY;
+      return OSReturn::OS_IMMEDIATELY;
 
     OSEventWaitReturn_t ret;
     do
@@ -85,12 +85,14 @@ OSEventFlagsBits_t OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
           }
         OSScheduler::criticalExit();
 
+        // Event could be notified by task interruption
+        // in this case the event return is OS_CANCELED
         if (!isStrict && (ret != (OSEventWaitReturn_t)this))
           break;
 
       } while ((flags & bits) == 0);
 
-    return flags;
+    return OSReturn::OS_OK;
   }
 
 #endif

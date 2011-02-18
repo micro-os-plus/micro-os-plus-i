@@ -14,6 +14,7 @@ typedef unsigned long OSTime_t;
 
 class Timer;
 
+// structure of an alarm slot
 typedef struct timerStruct
   {
   OSTimerTicks_t ticks;
@@ -31,6 +32,7 @@ typedef struct timerStruct
 class OSTimer
   {
 public:
+  // constructor
   OSTimer(OSTimerStruct_t *pArray, int size);
 
   // sleep for the number of timer ticks
@@ -56,14 +58,22 @@ public:
   void incrementTicks(void);
 
 protected:
+  // insert a new timeout into the array
   void insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret);
+
+  // remove the timeout from the given slot
   void remove(int i);
 
+  // the array of timeouts
   OSTimerStruct_t *m_pArray;
+
+  // the size of m_pArray
   int m_size;
+  // the number of slots used from m_pArray
   int m_count;
 
 private:
+  // the current number of ticks
   OSTimerTicks_t ms_ticks;
   };
 

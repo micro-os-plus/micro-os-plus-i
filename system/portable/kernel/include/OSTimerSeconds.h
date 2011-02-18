@@ -17,36 +17,48 @@
 #define OS_CFGINT_OSTIMERSECONDS_SIZE 	(OS_CFGINT_TASKS_TABLE_SIZE)
 #endif
 
+// the second system timer functionality, intended to measure longer intervals
 class OSTimerSeconds : public OSTimer
   {
 public:
+  // initialise internal structures
   OSTimerSeconds();
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
+  // increment the current seconds number
   static void incrementUptime(void);
+  // return the current seconds number
   static unsigned long getUptime(void);
 #endif
 
 #if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
+  // check for every task if the software watchdog (counter) expired
   static void checkVirtualWatchdogs(void);
 #endif
 
-  //void interruptSchedulerTick(void);
+  // return the current number of ticks within the current second
   static OSTimerTicks_t getSchedulerTicks(void);
 
+  // interrupt service routine called each second
   void interruptServiceRoutine(void);
 
+  // the number of OS ticks within current second
   static OSTimerTicks_t ms_schedulerTicks;
 
 protected:
+  // OSScheduler calls OSTimerSeconds::init() from OSScheduler::start()
   friend class OSScheduler;
+
+  // initialise and it is called from OSScheduler::start()
   static void init(void);
   static void implAcknowledgeInterrupt(void);
 
 private:
+  // contain the timeouts( expressed in ticks) for every alarm
   static OSTimerStruct_t m_array[OS_CFGINT_OSTIMERSECONDS_SIZE];
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
+  // current seconds number
   static OSTime_t ms_uptime;
 #endif
   };

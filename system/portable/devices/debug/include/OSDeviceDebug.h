@@ -13,6 +13,7 @@
 #include "portable/stdlib/include/streambuf"
 #endif
 
+// The parent class of all debug classes used for displaying trace messages.
 class OSDeviceDebug
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
 : public streambuf
@@ -22,61 +23,91 @@ class OSDeviceDebug
 public:
 
 #if defined(DEBUG) && !defined(OS_EXCLUDE_MULTITASKING)
+  // Initialise the internal variables.
   OSDeviceDebug();
 #endif
-
+  // Output, on debug interface,  one character.
   static void putChar(unsigned char c);
+  // Output, on debug interface, CR+LF.
   static void putNewLine(void);
+  // Output, on debug interface, a string.
   static void putString(const char *pc);
 #if defined(OS_CONFIG_ARCH_AVR8)
+  // Output, on debug interface, the bytes at pc address,
+  // until the first zero byte.
   static void putString_P(const char * PROGMEM pc);
 #endif
+  // Output, on debug interface, the hex value of a byte;
+  // i.e. 2 hexadecimal characters.
   static void putHex(unsigned char c);
+  // Output, on debug interface, the hex value of a 2-byte word;
+  // i.e. 4 hexadecimal characters.
   static void putHex(unsigned short w);
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG)
+  // Output, on debug interface, the hex value of a long;
+  // i.e. 8 hexadecimal characters.
   static void putHex(unsigned long l);
 #endif
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT)
+  // Output, on debug interface, the hex value of an integer;
+  // i.e. 8 hexadecimal characters.
   static void putHex(unsigned int l);
 #endif
+  // Output, on debug interface, the decimal value of a 2-byte word,
+  // <n> last digits will not be output, max 5 decimal digits.
   static void putDec(unsigned short w, unsigned short n = 0);
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
+  // Output, on debug interface, the decimal value of a short
+  // <n> last digits will not be output, max 10 decimal digits.
   static void putDec(unsigned long l, unsigned short n = 0);
 #endif
-
+  // Output, on debug interface, the address p, in hexadecimal.
   static void putPtr(const void *p);
+  // Output, on debug interface, the address p from program memory, in hexadecimal.
   static void putPC(const char * PROGMEM pc);
-
+  // Output, on debug interface, function name, file name,
+  // line number and expression string.
+  // It is used to in case of a failed assertion.
   static void __assert(const char *func, const char *file, int lineno,
       const char *sexp);
 
 #if defined(DEBUG)
+  // Watchdog reset; implementation specific.
   static void implWDReset(void);
 #endif
-
+  // Initialise debug interface and print greeting and build strings.
   static void earlyInit();
 
 private:
 
 #if defined(DEBUG)
 #if defined(OS_INCLUDE_NAKED_INIT)
+  // Initialise the debug interface.
   static void nakedEarlyInit() __attribute__( ( naked, section( ".init5" ) ) );
 #endif
-
+  // Send one byte to debug interface.
   static int commonPutByte(unsigned char c);
+  // Send the given buffer to debug interface.
   static int commonPutBytes(const char *pc, unsigned int n);
 
   // implementation code, defined in separated files
+  // Initialise debug interface.
   static void implEarlyInit(void);
+  // Ouput one byte on the debug interface.
   static void implPutByte(unsigned char c);
+  // Ouput the given buffer on the debug interface.
   static int implPutBytes(const char *s, unsigned int n);
+  // Return true if the debug interface can output now.
   static bool implCanTransmit(void);
+  // Return true if the debug interface is connected with the MCU.
   static bool implDevicePresent(void);
 #endif
 
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
   // streambuf definitions
+  // Output, on debug interface, one character.
   virtual int overflow(int c = traits::eof());
+  // Output, on debug interface, a buffer.
   virtual streamsize xsputn(const char* s, streamsize n);
 #endif
 

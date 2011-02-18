@@ -12,7 +12,9 @@
 
 // static members
 OSTimerStruct_t OSTimerTicks::m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
-OSTimerTicks_t OSTimerTicks::ms_secondTicks;
+
+// TODO: delete if not needed
+// OSTimerTicks_t OSTimerTicks::ms_secondTicks;
 
 OSTimerTicks::OSTimerTicks() :
   OSTimer(&m_array[0], sizeof(m_array) / sizeof(m_array[0]))
@@ -22,7 +24,8 @@ OSTimerTicks::OSTimerTicks() :
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
-  ms_secondTicks = 0;
+  // TODO: delete if not needed
+  // ms_secondTicks = 0;
 }
 
 #if defined(OS_INCLUDE_SDI12SENSOR)

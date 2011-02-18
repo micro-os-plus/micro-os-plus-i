@@ -108,6 +108,7 @@ public:
   static const OSReturn_t OS_NOT_INITIALIZED = -11;
   static const OSReturn_t OS_BAD_PARAMETER = -12;
   static const OSReturn_t OS_BUFFER_FULL = -13;
+  static const OSReturn_t OS_IMMEDIATELY = -14;
 
   };
 
