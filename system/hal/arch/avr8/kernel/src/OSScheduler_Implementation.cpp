@@ -105,6 +105,7 @@ OSStack_t * OSSchedulerImpl::stackInitialize(OSStack_t * pStackTop, void(*pCode)
     return pStackTop;
   }
 
+#if false
 void OSSchedulerImpl::stackSetReturnedValue(OSStack_t * pStack,
     OSEventWaitReturn_t ret)
   {
@@ -119,6 +120,7 @@ void OSSchedulerImpl::stackSetReturnedValue(OSStack_t * pStack,
     *(pStack + 8) = (((unsigned short) ret) & 0xFF);
     *(pStack + 7) = ((((unsigned short) ret) >> 8) & 0xFF);
   }
+#endif
 
 void OSSchedulerImpl::start(void)
   {
