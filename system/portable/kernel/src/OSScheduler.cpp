@@ -148,7 +148,7 @@ OSScheduler::start(void)
 
   // Should never get here.
 #if defined(DEBUG)
-  OSDeviceDebug::putString_P(PSTR("OSScheduler::start() failed"));
+  OSDeviceDebug::putString_P(PSTR("OSScheduler::start() failed, loop"));
   OSDeviceDebug::putNewLine();
 #endif
   for (;;)
@@ -458,7 +458,8 @@ void OSScheduler::ISRcancelTask(OSTask *pTask)
 OSReadyList::OSReadyList()
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSReadyList()"));
+  OSDeviceDebug::putString_P(PSTR("OSReadyList()="));
+  OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
 
