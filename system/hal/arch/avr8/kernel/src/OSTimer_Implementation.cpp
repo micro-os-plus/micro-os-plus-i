@@ -16,14 +16,13 @@
 #include "portable/devices/sdi12/include/SDI12Sensor.h"
 #endif
 
-void OSTimerTicks::init(void)
+void OSTimerTicks::implInit(void)
   {
-    /* Using 8bit timer0/16bit timer 1 to generate the tick.
-     * Correct fuses must be selected for the configCPU_CLOCK_HZ clock.
-     */
+    // Using 8bit timer0/16bit timer 1 to generate the tick.
+    // The correct fuses must be selected for the main oscillator frequency.
 
-    /* We only have 8/16 bits so have to scale to get our required tick rate. */
-    /* and adjust for correct value. */
+    // We only have 8/16 bits so have to scale to get our required tick rate.
+    // and adjust for correct value.
 
 #define TIMER_CLOCK_HZ	(OS_CFGLONG_OSCILLATOR_HZ / OS_CFGINT_CLOCK_PRESCALER / OS_CFGINT_TIMER_PRESCALLER)
 #define TIMER_CONSTANT	((TIMER_CLOCK_HZ / OS_CFGINT_TICK_RATE_HZ)- 1UL)
@@ -39,6 +38,7 @@ void OSTimerTicks::init(void)
 #if !defined(OS_INCLUDE_OSSCHEDULER_16BIT_TIMER)
 
     timer_constant &= 0xFF;
+
 #endif
 
     timer_freq = TIMER_CLOCK_HZ / ( timer_constant + 1 );
@@ -105,6 +105,11 @@ void OSTimerTicks::init(void)
 
   }
 
+void OSTimerTicks::implAcknowledgeInterrupt()
+{
+  // nothing to do
+}
+
 #if defined(OS_INCLUDE_OSSCHEDULER_16BIT_TIMER)
 
 extern "C" void TIMER1_COMPA_vect(void) __attribute__((signal, naked));
@@ -116,15 +121,6 @@ TIMER1_COMPA_vect(void)
     OSScheduler::interruptEnter();
       {
         OSScheduler::timerTicks.interruptServiceRoutine();
-
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT)
-        if (++OSTimerSeconds::ms_schedulerTicks == OS_CFGINT_TICK_RATE_HZ)
-          {
-            OSTimerSeconds::ms_schedulerTicks = 0;
-
-            OSScheduler::timerSeconds.interruptServiceRoutine();
-          }
-#endif
       }
     OSScheduler::interruptExit();
     // interrupts enabled after this point
@@ -143,15 +139,6 @@ void TIMER0_COMP_vect(void)
     OSScheduler::interruptEnter();
       {
         OSScheduler::timerTicks.interruptServiceRoutine();
-
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT)
-        if ( ++OSTimerSeconds::ms_schedulerTicks == OS_CFGINT_TICK_RATE_HZ)
-          {
-            OSTimerSeconds::ms_schedulerTicks = 0;
-
-            OSScheduler::timerSeconds.interruptServiceRoutine();
-          }
-#endif
       }
     OSScheduler::interruptExit();
     // interrupts enabled after this point
@@ -168,15 +155,6 @@ void TIMER0_COMPA_vect(void)
     OSScheduler::interruptEnter();
       {
         OSScheduler::timerTicks.interruptServiceRoutine();
-
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT)
-        if ( ++OSTimerSeconds::ms_schedulerTicks == OS_CFGINT_TICK_RATE_HZ)
-          {
-            OSTimerSeconds::ms_schedulerTicks = 0;
-
-            OSScheduler::timerSeconds.interruptServiceRoutine();
-          }
-#endif
       }
     OSScheduler::interruptExit();
     // interrupts enabled after this point
