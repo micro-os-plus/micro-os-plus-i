@@ -108,7 +108,12 @@ masterInit(void)
 inline void
 masterSclInit(void)
 {
-  OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_SCL_PORT, OS_CONFIG_DEBUG_SCL_BIT);
+  // Set the pin value to 0; when the pin direction will be configured
+  // to output, this will set the level to low.
+  OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_SCL_PORT_WRITE, OS_CONFIG_DEBUG_SCL_BIT);
+
+  // Set the pin direction to input, i.e. allow the
+  // pull-ups to raise the level to high.
   OS_GPIO_PIN_CONFIG_INPUT(OS_CONFIG_DEBUG_SCL_PORT_CONFIG,
       OS_CONFIG_DEBUG_SCL_BIT);
 }
@@ -116,7 +121,7 @@ masterSclInit(void)
 inline void
 masterSclHigh(void)
 {
-  // The pull-up will do the job
+  // The pull-up will do the job.
   OS_GPIO_PIN_CONFIG_INPUT(OS_CONFIG_DEBUG_SCL_PORT_CONFIG,
       OS_CONFIG_DEBUG_SCL_BIT);
 }
@@ -124,6 +129,7 @@ masterSclHigh(void)
 inline void
 masterSclLow(void)
 {
+  // Configure direction to output, the value was already set to 0.
   OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_DEBUG_SCL_PORT_CONFIG,
       OS_CONFIG_DEBUG_SCL_BIT);
 }
@@ -131,14 +137,18 @@ masterSclLow(void)
 inline bool
 masterSclIsLow(void)
 {
-  return OS_GPIO_PIN_ISLOW(OS_CONFIG_DEBUG_SCL_PORT, OS_CONFIG_DEBUG_SCL_BIT) ? true
-      : false;
+  return OS_GPIO_PIN_ISLOW(OS_CONFIG_DEBUG_SCL_PORT_READ, OS_CONFIG_DEBUG_SCL_BIT);
 }
 
 inline void
 masterSdaInit(void)
 {
-  OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_SDA_PORT, OS_CONFIG_DEBUG_SDA_BIT);
+  // Set the pin value to 0; when the pin direction will be configured
+  // to output, this will set the level to low.
+  OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_SDA_PORT_WRITE, OS_CONFIG_DEBUG_SDA_BIT);
+
+  // Set the pin direction to input, i.e. allow the
+  // pull-ups to raise the level to high.
   OS_GPIO_PIN_CONFIG_INPUT(OS_CONFIG_DEBUG_SDA_PORT_CONFIG,
       OS_CONFIG_DEBUG_SDA_BIT);
 }
@@ -146,7 +156,7 @@ masterSdaInit(void)
 inline void
 masterSdaHigh(void)
 {
-  // The pull-up will do the job
+  // The pull-up will do the job.
   OS_GPIO_PIN_CONFIG_INPUT(OS_CONFIG_DEBUG_SDA_PORT_CONFIG,
       OS_CONFIG_DEBUG_SDA_BIT);
 }
@@ -154,6 +164,7 @@ masterSdaHigh(void)
 inline void
 masterSdaLow(void)
 {
+  // Configure direction to output, the value was already set to 0.
   OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_DEBUG_SDA_PORT_CONFIG,
       OS_CONFIG_DEBUG_SDA_BIT);
 }
@@ -161,8 +172,7 @@ masterSdaLow(void)
 inline bool
 masterSdaIsLow(void)
 {
-  return OS_GPIO_PIN_ISLOW(OS_CONFIG_DEBUG_SDA_PORT, OS_CONFIG_DEBUG_SDA_BIT) ? true
-      : false;
+  return OS_GPIO_PIN_ISLOW(OS_CONFIG_DEBUG_SDA_PORT_READ, OS_CONFIG_DEBUG_SDA_BIT);
 }
 
 inline void
@@ -218,12 +228,8 @@ masterSdaSynchronize(void)
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#if defined(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT)
-#if OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT < 2
-#error "Illegal OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT value"
-#endif
-#else
-#define OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT (2)
+#if !defined(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT)
+#define OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT (0)
 #endif
 
 // ----- public methods ------------------------------------------------------
