@@ -168,6 +168,7 @@ inline void OSScheduler::criticalExit(void)
 #endif
   }
 
+#if false
 /*
  * Manage the activity LED
  */
@@ -207,5 +208,6 @@ inline void OSScheduler::ledActiveOff(void)
       }
     OSScheduler::criticalExit();
   }
+#endif
 
 #endif /*HAL_OSSCHEDULER_ARCH_INLINES_H_*/
