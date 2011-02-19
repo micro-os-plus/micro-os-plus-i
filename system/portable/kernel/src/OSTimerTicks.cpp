@@ -41,7 +41,7 @@ OSTimerTicks::init(void)
 {
 #if defined(DEBUG)
 
-  OSDeviceDebug::putString("OSTimerTicks::init()");
+  OSDeviceDebug::putString_P(PSTR("OSTimerTicks::init()"));
   OSDeviceDebug::putNewLine();
 
 #endif
