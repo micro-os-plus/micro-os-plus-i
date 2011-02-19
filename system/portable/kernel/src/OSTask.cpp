@@ -139,7 +139,7 @@ OSTask::staticMain(OSTask * pt)
 
   // normally should not reach here
 #if defined(DEBUG)
-  OSDeviceDebug::putString_P(PSTR("taskMain loop exit"));
+  OSDeviceDebug::putString_P(PSTR("taskMain returned, reset"));
   OSDeviceDebug::putNewLine();
 #endif
 
