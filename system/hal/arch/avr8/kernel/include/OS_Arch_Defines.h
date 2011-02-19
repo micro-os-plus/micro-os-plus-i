@@ -11,6 +11,7 @@ typedef unsigned char OSStack_t;
 
 #include "avr/pgmspace.h"
 
+typedef unsigned char OSResetBits_t;
 typedef PGM_VOID_P OSProgramPtr_t;
 
 #include "avr/io.h"
@@ -40,12 +41,16 @@ typedef PGM_VOID_P OSProgramPtr_t;
 #define OS_SVB(_BIT,_VALUE)     (((_VALUE) & 0x1) << (_BIT))
 //#define OS_CFV(_MODE,_SPEED)    ((((_MODE) & 0x3) << 2) | ((_SPEED) & 0x03))
 
-#define OS_GPIO_PIN_CONFIG(_PORT_CONFIG, _BIT, _VALUE) ((_PORT_CONFIG) = ((_PORT_CONFIG) & ~(OS_SVB(_BIT, 0x1))) | (OS_SVB(_BIT, _VALUE)))
+#define OS_GPIO_PIN_CONFIG_ENABLE(_PORT, _BIT)
 #define OS_GPIO_PIN_CONFIG_OUTPUT(_PORT_CONFIG, _BIT) ((_PORT_CONFIG) = ((_PORT_CONFIG) & ~(OS_SVB(_BIT, 0x1))) | (OS_SVB(_BIT, 0x1)))
 #define OS_GPIO_PIN_CONFIG_INPUT(_PORT_CONFIG, _BIT) ((_PORT_CONFIG) = ((_PORT_CONFIG) & ~(OS_SVB(_BIT, 0x1))) | (OS_SVB(_BIT, 0x0)))
-#define OS_GPIO_PIN_HIGH(_PORT, _BIT) ((_PORT) |= OS_S1B(_BIT))
-#define OS_GPIO_PIN_LOW(_PORT, _BIT) ((_PORT) &= ~OS_S1B(_BIT))
-#define OS_GPIO_PIN_TOGGLE(_PORT, _BIT) ((_PORT) ^= OS_S1B(_BIT))
+
+#define OS_GPIO_PIN_HIGH(_PORT_WRITE, _BIT) ((_PORT_WRITE) |= OS_S1B(_BIT))
+#define OS_GPIO_PIN_LOW(_PORT_WRITE, _BIT) ((_PORT_WRITE) &= ~OS_S1B(_BIT))
+#define OS_GPIO_PIN_TOGGLE(_PORT_WRITE, _BIT) ((_PORT_WRITE) ^= OS_S1B(_BIT))
+
+#define OS_GPIO_PIN_ISHIGH(_PORT_READ, _BIT) (((_PORT_READ) & OS_S1B(_BIT)) != 0 ? true : false)
+#define OS_GPIO_PIN_ISLOW(_PORT_READ, _BIT) (((_PORT_READ) & OS_S1B(_BIT)) == 0 ? true : false)
 
 #define OS_INCLUDE_NAKED_INIT                           (1)
 
