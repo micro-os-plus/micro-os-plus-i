@@ -8,7 +8,7 @@
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 
-OSStack_t * OSScheduler::stackInitialize(OSStack_t * pStackTop, void(*pCode)(
+OSStack_t * OSSchedulerImpl::stackInitialize(OSStack_t * pStackTop, void(*pCode)(
     void *), void *pParams, unsigned char id)
   {
     /* The value on the right is the offset from the task stack pointer */
@@ -105,7 +105,7 @@ OSStack_t * OSScheduler::stackInitialize(OSStack_t * pStackTop, void(*pCode)(
     return pStackTop;
   }
 
-void OSScheduler::stackSetReturnedValue(OSStack_t * pStack,
+void OSSchedulerImpl::stackSetReturnedValue(OSStack_t * pStack,
     OSEventWaitReturn_t ret)
   {
 #if false && defined(DEBUG)
@@ -120,7 +120,7 @@ void OSScheduler::stackSetReturnedValue(OSStack_t * pStack,
     *(pStack + 7) = ((((unsigned short) ret) >> 8) & 0xFF);
   }
 
-void OSScheduler::startImpl(void)
+void OSSchedulerImpl::start(void)
   {
     // interrupts enabled when pop-ing flags
     OSScheduler::contextRestore();
@@ -144,7 +144,7 @@ void OSScheduler::dumpContextInfo(void *pCurrentContext __attribute__( ( unused 
   }
 #endif
 
-void OSScheduler::dumpContextInfo(OSTask * pTask)
+void OSSchedulerImpl::dumpContextInfo(OSTask * pTask)
   {
     OSDeviceDebug::putChar('\'');
     OSDeviceDebug::putString(pTask->getName());
