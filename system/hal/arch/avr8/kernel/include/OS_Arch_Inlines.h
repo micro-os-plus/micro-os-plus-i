@@ -69,17 +69,26 @@ inline void OSImpl::interruptsDisable(void)
     cli();
   }
 
+inline OSResetBits_t OSImpl::CPUfetchResetBits(void)
+  {
+    OSResetBits_t ret;
+    ret = MCUSR;
+    MCUSR = 0;
+    return ret;
+  }
+
+#if true
 // release processor to next ready task
-inline void OSScheduler::yieldImpl(void)
+inline void OSSchedulerImpl::yield(void)
   {
     OSScheduler::contextSave();
       {
-        contextSwitch(); // same as from ISRs, no return
+      OSScheduler::performContextSwitch(); // same as from ISRs, no return
       }
     OSScheduler::contextRestore();
     OS::interruptsEnable(); // be sure interrupts remain enabled
     OS::returnFromSubroutine(); // necessary because it is 'naked'
   }
-
+#endif
 
 #endif /*HAL_OS_ARCH_INLINES_H_*/
