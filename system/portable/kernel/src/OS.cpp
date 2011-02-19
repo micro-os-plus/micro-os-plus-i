@@ -258,13 +258,9 @@ delete(void *p __attribute__( ( unused ) ) )
   {
 #if defined(DEBUG)
     ; // dummy, refered by virtual destructors
-//#if defined(OS_CONFIG_ARCH_AVR8)
     OSDeviceDebug::putString_P(PSTR("delete("));
-//#else
-//    OSDeviceDebug::putString("delete(");
-//#endif
 #if (__SIZEOF_POINTER__ == 2)
-    OSDeviceDebug::putHex((unsigned short)p);
+    OSDeviceDebug::putPtr(p);
 #endif
     OSDeviceDebug::putChar(')');
     OSDeviceDebug::putNewLine();
