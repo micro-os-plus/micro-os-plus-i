@@ -47,7 +47,7 @@ void processor_init(void)
     wdt_enable(WDTO_2S);
 
     OSScheduler::ledActiveInit();
-    OSScheduler::ISRledActiveOn();
+    OSScheduler::ISR_ledActiveOn();
 
     // prescaller should be configured early
     clock_prescale_set(OS_CONFIG_CLOCK_DIV_ENUM);
@@ -56,12 +56,6 @@ void processor_init(void)
     set_sleep_mode(SLEEP_MODE_IDLE);
     sleep_enable();
 #endif
-  }
-
-void OS::saveResetBits(void)
-  {
-    ms_resetBits = MCUSR;
-    MCUSR = 0;
   }
 
 // nothing smart to do, normally should never be called, just a reference.
