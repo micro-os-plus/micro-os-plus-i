@@ -7,7 +7,7 @@
 #ifndef HAL_BOARD_OS_DEFINES_H_
 #define HAL_BOARD_OS_DEFINES_H_
 
-#define OS_CONFIG_ARCH_AVR8                              1
+#define OS_CONFIG_ARCH_AVR8                             1
 #define OS_CONFIG_FAMILY_AT90USB			1
 #define OS_CONFIG_VARIANT_AT90USB1287                   1
 #if !defined(OS_CONFIG_BOARD_ATMEL_STK525)
@@ -32,8 +32,8 @@
 #define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
 #endif
 
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT_INIT)
-#define OS_CONFIG_ACTIVE_LED_PORT_INIT                  DDRD
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
+#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG                DDRD
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_PORT)
 #define OS_CONFIG_ACTIVE_LED_PORT			PORTD
@@ -82,4 +82,4 @@
 #define OS_CONFIG_DEBUG_LED2_BIT			PORTD6
 #endif
 
-#endif /*HAL_BOARD_OS_DEFINES_H_*/
+#endif /* HAL_BOARD_OS_DEFINES_H_ */
