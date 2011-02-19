@@ -64,7 +64,7 @@
 								<option id="de.innot.avreclipse.compiler.option.optimize.shortenums.154093758" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.compiler.option.optimize.shortenums" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.compiler.option.optimize.packstruct.1022046618" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.compiler.option.optimize.packstruct" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.compiler.option.debug.type.180629241" name="Debug Info Format" superClass="de.innot.avreclipse.compiler.option.debug.type" value="de.innot.avreclipse.compiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.otherflags.605826477" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra  -Wa,-adhlns=&quot;$@.lst&quot; -fmessage-length=0 -Wa,-adhlns=&quot;$@.lst&quot; -ffunction-sections -fdata-sections  -finline-functions" valueType="string"/>
+								<option id="de.innot.avreclipse.compiler.option.otherflags.605826477" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra -fmessage-length=0  -Wa,-adhlns=&quot;$@.lst&quot; -ffunction-sections -fdata-sections  -finline-small-functions" valueType="string"/>
 								<inputType id="de.innot.avreclipse.compiler.winavr.input.15786046" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
 							</tool>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="de.innot.avreclipse.tool.cppcompiler.app.debug.1333751368" name="AVR C++ Compiler" superClass="de.innot.avreclipse.tool.cppcompiler.app.debug">
@@ -84,8 +84,9 @@
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.shortenums.147161334" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.shortenums" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.language.uchar.1988637472" name="char is unsigned (-funsigned-char)" superClass="de.innot.avreclipse.cppcompiler.option.language.uchar" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.language.ubitfields.1977714687" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.cppcompiler.option.language.ubitfields" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.otherflags.1276668927" name="Other flags" superClass="de.innot.avreclipse.cppcompiler.option.otherflags" value="-Wextra -fno-rtti -Wabi -fmessage-length=0 -finline-functions  -Wa,-adhlns=&quot;$@.lst&quot;  -ffunction-sections -fdata-sections" valueType="string"/>
+								<option id="de.innot.avreclipse.cppcompiler.option.otherflags.1276668927" name="Other flags" superClass="de.innot.avreclipse.cppcompiler.option.otherflags" value="-Wextra -fmessage-length=0  -Wa,-adhlns=&quot;$@.lst&quot;  -ffunction-sections -fdata-sections  -fno-rtti  -Wabi  -finline-small-functions" valueType="string"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.std.1419840748" name="Language Standard" superClass="de.innot.avreclipse.cppcompiler.option.std" value="de.innot.avreclipse.cppcompiler.option.std.gnucpp98" valueType="enumerated"/>
+								<option id="de.innot.avreclipse.cppcompiler.option.language.noexceptions.1975790607" name="Do not use Exceptions (-fno-exceptions)" superClass="de.innot.avreclipse.cppcompiler.option.language.noexceptions" value="true" valueType="boolean"/>
 								<inputType id="de.innot.avreclipse.cppcompiler.input.1369062331" superClass="de.innot.avreclipse.cppcompiler.input"/>
 							</tool>
 							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.697425756" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug"/>
@@ -106,7 +107,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/avr32|hal/arch/arm_cortex_m3|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -8977,7 +8978,7 @@
 								<option id="de.innot.avreclipse.compiler.option.optimize.shortenums.290557695" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.compiler.option.optimize.shortenums" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.compiler.option.optimize.packstruct.1892873824" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.compiler.option.optimize.packstruct" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.compiler.option.debug.type.670086615" name="Debug Info Format" superClass="de.innot.avreclipse.compiler.option.debug.type" value="de.innot.avreclipse.compiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.otherflags.1217209482" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra  -Wa,-adhlns=&quot;$@.lst&quot; -fmessage-length=0 -Wa,-adhlns=&quot;$@.lst&quot; -ffunction-sections -fdata-sections  -finline-functions -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize" valueType="string"/>
+								<option id="de.innot.avreclipse.compiler.option.otherflags.1217209482" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra -fmessage-length=0 -Wa,-adhlns=&quot;$@.lst&quot; -ffunction-sections -fdata-sections  -finline-functions -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize" valueType="string"/>
 								<inputType id="de.innot.avreclipse.compiler.winavr.input.1877799179" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
 							</tool>
 							<tool id="de.innot.avreclipse.tool.cppcompiler.app.debug.995777575" name="AVR C++ Compiler" superClass="de.innot.avreclipse.tool.cppcompiler.app.debug">
@@ -8995,7 +8996,7 @@
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.shortenums.134119615" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.shortenums" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.language.uchar.1206438904" name="char is unsigned (-funsigned-char)" superClass="de.innot.avreclipse.cppcompiler.option.language.uchar" value="false" valueType="boolean"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.language.ubitfields.1398412028" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.cppcompiler.option.language.ubitfields" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.otherflags.1657985715" name="Other flags" superClass="de.innot.avreclipse.cppcompiler.option.otherflags" value="-Wextra -fno-rtti -Wabi -fmessage-length=0 -finline-functions  -Wa,-adhlns=&quot;$@.lst&quot;  -ffunction-sections -fdata-sections -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize" valueType="string"/>
+								<option id="de.innot.avreclipse.cppcompiler.option.otherflags.1657985715" name="Other flags" superClass="de.innot.avreclipse.cppcompiler.option.otherflags" value="-Wextra -fmessage-length=0 -Wa,-adhlns=&quot;$@.lst&quot; -ffunction-sections -fdata-sections  -fno-rtti -Wabi -finline-functions  -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize" valueType="string"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.std.1801889035" name="Language Standard" superClass="de.innot.avreclipse.cppcompiler.option.std" value="de.innot.avreclipse.cppcompiler.option.std.gnucpp98" valueType="enumerated"/>
 								<inputType id="de.innot.avreclipse.cppcompiler.input.426330401" superClass="de.innot.avreclipse.cppcompiler.input"/>
 							</tool>
@@ -9017,7 +9018,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/avr32|hal/arch/arm_cortex_m3|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -17931,7 +17932,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/avr32|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -26827,7 +26828,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/avr32|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -35735,7 +35736,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/avr32|hal/arch/arm_cortex_m3|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -44629,7 +44630,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/arm_cortex_m3|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
