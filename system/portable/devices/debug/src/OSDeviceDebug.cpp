@@ -53,7 +53,7 @@ OSDeviceDebug::earlyInit(void)
   commonPutBytes("\r\n\r\n", 4);
 }
 
-// ----- ------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 int
 OSDeviceDebug::commonPutByte(unsigned char c)
