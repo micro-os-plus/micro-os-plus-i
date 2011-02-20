@@ -11,7 +11,7 @@
 // ---------------------------------------------------------------------------
 
 /*
- * Perform a series of short busy wait steps of 1 millisecond separated
+ * Perform a series of short (1 millisecond) busy waits  separated
  * by yields.
  */
 
@@ -27,16 +27,14 @@ delayWithYield(schedTicks_t n)
 
 // ---------------------------------------------------------------------------
 
-#define MILLIS  (1000/3)
+// Since all tasks share the processor, to compute the individual
+// rate, divide the tick rate by the number of tasks
+#define NTASKS  (3)
+#define MILLIS  (OS_CFGINT_TICK_RATE_HZ/NTASKS)
 
-// tasks allocated on static storage
+// Tasks allocated on static storage
 TaskBlink task1("A", APP_CONFIG_LED1, MILLIS * 1);
 TaskBlink task2("B", APP_CONFIG_LED2, MILLIS * 2);
 TaskBlink task3("C", APP_CONFIG_LED3, MILLIS * 4);
 
 // ---------------------------------------------------------------------------
-
-// message to be displayed on the debugging device at startup
-#if defined(DEBUG)
-const char greeting[] = "AVI blinkX3BusyWait v1.1";
-#endif
