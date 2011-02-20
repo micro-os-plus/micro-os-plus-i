@@ -143,15 +143,55 @@ extern const char buildDateTime[];
 // leave it last
 #include "App_Defines.h"
 
+// ----------------------------------------------------------------------------
+
+// Application versioning and greeting definitions
+
+// Stringify numeric definitions and concatenate more strings
+
+#if defined(APP_CFGINT_VERSION_MAJOR) && defined(APP_CFGINT_VERSION_MINOR) && defined(APP_CFGINT_VERSION_REVISION)
+
+// Strings
+#define APP_CFGSTR_VERSION_MAJOR        OS_CFGSTR_STRINGIFY(APP_CFGINT_VERSION_MAJOR)
+#define APP_CFGSTR_VERSION_MINOR        OS_CFGSTR_STRINGIFY(APP_CFGINT_VERSION_MINOR)
+#define APP_CFGSTR_VERSION_REVISION     OS_CFGSTR_STRINGIFY(APP_CFGINT_VERSION_REVISION)
+
+#define APP_CFGSTR_VERSION      APP_CFGSTR_VERSION_MAJOR "." APP_CFGSTR_VERSION_MINOR "." APP_CFGSTR_VERSION_REVISION
+
+#if defined(APP_CFGSTR_APPLICATION_NAME) && defined(APP_CFGSTR_APPLICATION_MANUFACTURER)
+
+#define APP_CFGSTR_GREETING     APP_CFGSTR_APPLICATION_MANUFACTURER \
+  " " APP_CFGSTR_APPLICATION_NAME " v" APP_CFGSTR_VERSION ", " __DATE__ " " __TIME__
+
+#endif /* defined(APP_CFGSTR_APPLICATION_NAME) && .. */
+
+#endif /* defined(APP_CFGINT_VERSION_MAJOR) && .. */
+
+#if !defined(APP_CFGSTR_GREETING)
+
+// Default greeting message, will be used in OSDeviceDebug.cpp
+#define APP_CFGSTR_GREETING "uOS++ app"
+
+#endif /* !defined(APP_CFGSTR_GREETING) */
+
+// ----------------------------------------------------------------------------
+
+#if false
+
+// Deprecated, replace with above definitions
 #if defined(APP_CFGINT_MAJOR) && defined(APP_CFGINT_MINOR) && defined(APP_CFGINT_REVISION)
 
 // Strings
-#define APP_CONFIG_MAJOR                                xstr(APP_CFGINT_MAJOR)
-#define APP_CONFIG_MINOR                                xstr(APP_CFGINT_MINOR)
-#define APP_CONFIG_REVISION                             xstr(APP_CFGINT_REVISION)
+#define APP_CONFIG_MAJOR                xstr(APP_CFGINT_MAJOR)
+#define APP_CONFIG_MINOR                xstr(APP_CFGINT_MINOR)
+#define APP_CONFIG_REVISION             xstr(APP_CFGINT_REVISION)
 
 #define APP_CONFIG_VERSION      APP_CONFIG_MAJOR "." APP_CONFIG_MINOR "." APP_CONFIG_REVISION
 
+#endif /* defined(APP_CFGINT_MAJOR) && .. */
+
 #endif
 
-#endif /*UOS_H_*/
+// ----------------------------------------------------------------------------
+
+#endif /* UOS_H_ */
