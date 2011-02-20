@@ -4,8 +4,8 @@
  *	This file is part of the uOS++ distribution.
  */
 
-#ifndef APP_OS_DEFINES_H_
-#define APP_OS_DEFINES_H_
+#ifndef OS_APP_DEFINES_H_
+#define OS_APP_DEFINES_H_
 
 // place holder to override the board definitions, if needed
 
@@ -42,4 +42,4 @@
 
 #endif
 
-#endif /*APP_OS_DEFINES_H_ */
+#endif /*OS_APP_DEFINES_H_ */
