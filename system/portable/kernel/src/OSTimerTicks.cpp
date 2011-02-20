@@ -32,7 +32,7 @@ OSTimerTicks::OSTimerTicks() :
 #include "portable/devices/sdi12/include/SDI12Sensor.h"
 #endif
 
-#if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
+#if defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
 static int i;
 #endif
 
@@ -46,7 +46,7 @@ OSTimerTicks::init(void)
 
 #endif
 
-#if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
+#if defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
   i = 0;
 #endif
 
@@ -92,7 +92,7 @@ OSTimerTicks::interruptServiceRoutine(void)
 
 #endif
 
-#if defined(DEBUG) && defined(OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS)
+#if defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
 
   if ((i++ % OS_CFGINT_TICK_RATE_HZ) == 0)
     OSDeviceDebug::putChar('!');
