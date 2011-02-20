@@ -30,6 +30,8 @@ public:
   // increment the current ticks number, and call the OSTimer::interruptTick.
   void interruptServiceRoutine(void);
 
+  inline static void interruptContextHandler(void) __attribute__( ( always_inline ) );
+
   // TODO: delete if not needed
   // static OSTimerTicks_t ms_secondTicks;
 
@@ -56,5 +58,22 @@ inline OSTimerTicks_t OSTimerTicks::microsToTicks(unsigned short micros)
   {
     return (((micros)+(OS_CFGINT_TICK_RATE_HZ-1))/OS_CFGINT_TICK_RATE_HZ);
   }
+
+inline  void OSTimerTicks::interruptContextHandler(void)
+{
+  // the current interrupt level disabled in here
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+  OSScheduler::interruptEnter();
+#else
+  OSScheduler::ISR_ledActiveOn();
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+    {
+      OSScheduler::timerTicks.interruptServiceRoutine();
+    }
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+  OSScheduler::interruptExit();
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+  // the current interrupt level enabled after this point
+}
 
 #endif /*OSTIMERTICKS_H_*/
