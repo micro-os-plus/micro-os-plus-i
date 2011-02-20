@@ -4,8 +4,8 @@
  *	This file is part of the uOS++ distribution.
  */
 
-#ifndef APP_OS_DEFINES_H_
-#define APP_OS_DEFINES_H_
+#ifndef OS_APP_DEFINES_H_
+#define OS_APP_DEFINES_H_
 
 // override the board definitions, if needed
 #define OS_CFGLONG_OSCILLATOR_HZ                        (16000000UL)
@@ -32,7 +32,7 @@
 //#define OS_CONFIG_DEBUG_DEVICE_I2C                    1
 //#define OS_CONFIG_DEBUG_DEVICE_USART			1
 
-#define OS_INCLUDE_OSSCHEDULER_TIMER_MARK_SECONDS       (1)
+#define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS       (1)
 
 //#define OS_DEBUG_OSSCHEDULER_STACKINITIALIZE            (1)
 #define OS_DEBUG_CONSTRUCTORS                           (1)
@@ -45,4 +45,4 @@
 
 #endif /*DEBUG*/
 
-#endif /*APP_OS_DEFINES_H_ */
+#endif /*OS_APP_DEFINES_H_ */
