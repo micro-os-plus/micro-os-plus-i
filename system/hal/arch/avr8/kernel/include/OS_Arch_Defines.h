@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -55,9 +55,10 @@ typedef PGM_VOID_P OSProgramPtr_t;
 #define OS_INCLUDE_NAKED_INIT                           (1)
 
 #define OS_EXCLUDE_RESET_HANDLER                        (1)
+
+#define OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING   (1)
 #define OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE      (1)
-#define OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT      (1)
 
 #define OS_INCLUDE_SEPARATE_PROGMEM                     (1)
 
-#endif /*HAL_OS_ARCH_DEFS_H_*/
+#endif /* HAL_OS_ARCH_DEFS_H_ */
