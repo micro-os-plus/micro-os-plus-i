@@ -28,4 +28,4 @@ private:
   unsigned int m_rate;
   };
 
-#endif /*TASKBLINKBUSYWAIT_H_*/
+#endif /* TASKBLINKBUSYWAIT_H_ */
