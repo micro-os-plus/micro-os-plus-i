@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2009 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -33,109 +33,149 @@
  * switch in OSScheduler::contextSwitch().
  */
 
-inline void OSScheduler::contextSave(void)
+/*
+ * Save all registers onto the stack.
+ */
+
+inline void
+OSSchedulerImpl::registersSave(void)
   {
-    // push all registers to stack
-    // *g_pCurrentContext = SP (stack pointer)
-    // leave interrupts disabled
-    asm volatile(
-        "push	r0			\n\t"
-        "in	r0, __SREG__		\n\t"
-        "cli				\n\t"
-        "push	r0			\n\t"
-        "push	r1			\n\t"
-        "clr	r1			\n\t"
-        "push	r2			\n\t"
-        "push	r3			\n\t"
-        "push	r4			\n\t"
-        "push	r5			\n\t"
-        "push	r6			\n\t"
-        "push	r7			\n\t"
-        "push	r8			\n\t"
-        "push	r9			\n\t"
-        "push	r10			\n\t"
-        "push	r11			\n\t"
-        "push	r12			\n\t"
-        "push	r13			\n\t"
-        "push	r14			\n\t"
-        "push	r15			\n\t"
-        "push	r16			\n\t"
-        "push	r17			\n\t"
-        "push	r18			\n\t"
-        "push	r19			\n\t"
-        "push	r20			\n\t"
-        "push	r21			\n\t"
-        "push	r22			\n\t"
-        "push	r23			\n\t"
-        "push	r24			\n\t"
-        "push	r25			\n\t"
-        "push	r26			\n\t"
-        "push	r27			\n\t"
-        "push	r28			\n\t"
-        "push	r29			\n\t"
-        "push	r30			\n\t"
-        "push	r31			\n\t"
-        "lds	r26, g_ppCurrentStack	\n\t"
-        "lds	r27, g_ppCurrentStack+1 \n\t"
-        "in	r0, __SP_L__		\n\t"
-        "st	x+, r0			\n\t"
-        "in	r0, __SP_H__		\n\t"
-        "st	x+, r0			\n\t":: );
+    asm volatile
+    (
+        " push  r0 \n"
+        " in    r0, __SREG__ \n"
+        " cli      \n"
+        " push  r0 \n"
+        " push  r1 \n"
+        " clr   r1 \n"
+        " push  r2 \n"
+        " push  r3 \n"
+        " push  r4 \n"
+        " push  r5 \n"
+        " push  r6 \n"
+        " push  r7 \n"
+        " push  r8 \n"
+        " push  r9 \n"
+        " push  r10 \n"
+        " push  r11 \n"
+        " push  r12 \n"
+        " push  r13 \n"
+        " push  r14 \n"
+        " push  r15 \n"
+        " push  r16 \n"
+        " push  r17 \n"
+        " push  r18 \n"
+        " push  r19 \n"
+        " push  r20 \n"
+        " push  r21 \n"
+        " push  r22 \n"
+        " push  r23 \n"
+        " push  r24 \n"
+        " push  r25 \n"
+        " push  r26 \n"
+        " push  r27 \n"
+        " push  r28 \n"
+        " push  r29 \n"
+        " push  r30 \n"
+        " push  r31 \n"
+
+        :
+        :
+        :
+    );
   }
 
 /*
- * Opposite to contextSave().
- *
- * Interrupts have been disabled during the context save so we
- * can write to the stack pointer without problems.
+ * Restore all registers from the stack.
  */
 
-inline void OSScheduler::contextRestore(void)
+inline void
+OSSchedulerImpl::registersRestore(void)
   {
-    // SP = *g_pCurrentContext
-    // pop everything from stack
-    // restore SREG according to new context
-    asm volatile(
-        "lds	r26, g_ppCurrentStack	\n\t"
-        "lds	r27, g_ppCurrentStack+1 \n\t"
-        "ld	r28, x+			\n\t"
-        "out	__SP_L__, r28		\n\t"
-        "ld	r29, x+			\n\t"
-        "out	__SP_H__, r29		\n\t"
-        "pop	r31			\n\t"
-        "pop	r30			\n\t"
-        "pop	r29			\n\t"
-        "pop	r28			\n\t"
-        "pop	r27			\n\t"
-        "pop	r26			\n\t"
-        "pop	r25			\n\t"
-        "pop	r24			\n\t"
-        "pop	r23			\n\t"
-        "pop	r22			\n\t"
-        "pop	r21			\n\t"
-        "pop	r20			\n\t"
-        "pop	r19			\n\t"
-        "pop	r18			\n\t"
-        "pop	r17			\n\t"
-        "pop	r16			\n\t"
-        "pop	r15			\n\t"
-        "pop	r14			\n\t"
-        "pop	r13			\n\t"
-        "pop	r12			\n\t"
-        "pop	r11			\n\t"
-        "pop	r10			\n\t"
-        "pop	r9			\n\t"
-        "pop	r8			\n\t"
-        "pop	r7			\n\t"
-        "pop	r6			\n\t"
-        "pop	r5			\n\t"
-        "pop	r4			\n\t"
-        "pop	r3			\n\t"
-        "pop	r2			\n\t"
-        "pop	r1			\n\t"
-        "pop	r0			\n\t"
-        "out	__SREG__, r0		\n\t"
-        "pop	r0			\n\t":: );
+    asm volatile
+    (
+        " pop   r31 \n"
+        " pop   r30 \n"
+        " pop   r29 \n"
+        " pop   r28 \n"
+        " pop   r27 \n"
+        " pop   r26 \n"
+        " pop   r25 \n"
+        " pop   r24 \n"
+        " pop   r23 \n"
+        " pop   r22 \n"
+        " pop   r21 \n"
+        " pop   r20 \n"
+        " pop   r19 \n"
+        " pop   r18 \n"
+        " pop   r17 \n"
+        " pop   r16 \n"
+        " pop   r15 \n"
+        " pop   r14 \n"
+        " pop   r13 \n"
+        " pop   r12 \n"
+        " pop   r11 \n"
+        " pop   r10 \n"
+        " pop   r9 \n"
+        " pop   r8 \n"
+        " pop   r7 \n"
+        " pop   r6 \n"
+        " pop   r5 \n"
+        " pop   r4 \n"
+        " pop   r3 \n"
+        " pop   r2 \n"
+        " pop   r1 \n"
+        " pop   r0 \n"
+        " out   __SREG__, r0 \n"
+        " pop   r0 \n"
+
+        :
+        :
+        :
+    );
+  }
+
+inline bool
+OSSchedulerImpl::isContextSwitchAllowed(void)
+  {
+    // The AVR8 architecture does not implement nested interrupts
+    return true;
+  }
+
+inline void
+OSSchedulerImpl::stackPointerSave(void)
+  {
+    asm volatile
+    (
+        " lds   r26, g_ppCurrentStack \n"
+        " lds   r27, g_ppCurrentStack+1 \n"
+        " in    r0, __SP_L__ \n"
+        " st    x+, r0 \n"
+        " in    r0, __SP_H__ \n"
+        " st    x+, r0 \n"
+
+        :
+        :
+        :
+    );
+  }
+
+inline void
+OSSchedulerImpl::stackPointerRestore(void)
+  {
+    asm volatile
+    (
+        " lds   r26, g_ppCurrentStack \n"
+        " lds   r27, g_ppCurrentStack+1 \n"
+        " ld    r28, x+ \n"
+        " out   __SP_L__, r28 \n"
+        " ld    r29, x+ \n"
+        " out   __SP_H__, r29 \n"
+
+        :
+        :
+        :
+    );
   }
 
 /*
@@ -146,68 +186,44 @@ inline void OSScheduler::contextRestore(void)
  * Notice: The function context is addressed via Y, not SP, so using the
  * stack as temporary storage should be safe.
  */
-inline void OSScheduler::criticalEnter(void)
+inline void
+OSScheduler::criticalEnter(void)
   {
 #if !defined(OS_EXCLUDE_MULTITASKING)
-    asm volatile(
-        "in	__tmp_reg__, __SREG__       \n\t"
-        "cli                                \n\t"
-        "push   __tmp_reg__                 \n\t"::);
-#endif
+
+    asm volatile
+    (
+        " in    __tmp_reg__, __SREG__ \n"
+        " cli           \n"
+        " push  __tmp_reg__ \n"
+
+        :
+        :
+        :
+    );
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
 
 /*
  * Pop SREG from the stack, restore interrupts to previous status
  */
-inline void OSScheduler::criticalExit(void)
+inline void
+OSScheduler::criticalExit(void)
   {
 #if !defined(OS_EXCLUDE_MULTITASKING)
-    asm volatile(
-        "pop	__tmp_reg__                \n\t"
-        "out     __SREG__, __tmp_reg__     \n\t":: );
-#endif
+
+    asm volatile
+    (
+        " pop   __tmp_reg__ \n"
+        " out   __SREG__, __tmp_reg__ \n"
+
+        :
+        :
+        :
+    );
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
 
-#if false
-/*
- * Manage the activity LED
- */
-inline void OSScheduler::ledActiveInit(void)
-  {
-	/* Output */
-	OS_CONFIG_ACTIVE_LED_PORT_INIT |= _BV(OS_CONFIG_ACTIVE_LED_BIT);
-  }
-
-/* Turn LED on (on interrupts) */
-inline void OSScheduler::ISRledActiveOn(void)
-  {
-    OS_CONFIG_ACTIVE_LED_PORT |= _BV(OS_CONFIG_ACTIVE_LED_BIT);
-  }
-
-inline void OSScheduler::ledActiveOn(void)
-  {
-    OSScheduler::criticalEnter();
-      {
-        ISRledActiveOn();
-      }
-    OSScheduler::criticalExit();
-  }
-
-/* Turn LED off (on interrupts) */
-inline void OSScheduler::ISRledActiveOff(void)
-  {
-    OS_CONFIG_ACTIVE_LED_PORT &= ~_BV(OS_CONFIG_ACTIVE_LED_BIT);
-  }
-
-/* Turn LED off (at sleep) */
-inline void OSScheduler::ledActiveOff(void)
-  {
-    OSScheduler::criticalEnter();
-      {
-        ISRledActiveOff();
-      }
-    OSScheduler::criticalExit();
-  }
-#endif
-
-#endif /*HAL_OSSCHEDULER_ARCH_INLINES_H_*/
+#endif /* HAL_OSSCHEDULER_ARCH_INLINES_H_ */
