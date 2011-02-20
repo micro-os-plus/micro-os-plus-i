@@ -7,7 +7,34 @@
 #ifndef OS_DEFINES_H_
 #define OS_DEFINES_H_
 
-// do not use parenthesis, will also be stringified
+// ----------------------------------------------------------------------------
+
+// Operating System versioning and greeting definitions
+
+// Notice: do not use parenthesis! (the values will be stringified)
+#define OS_CFGINT_VERSION_MAJOR         3
+#define OS_CFGINT_VERSION_MINOR         1
+#define OS_CFGINT_VERSION_REVISION      1287
+
+#define OS_CFGSTR_STRINGIFY(x)          OS_CFGSTR_SHARP(x)
+#define OS_CFGSTR_SHARP(x)              #x
+
+// stringify above integers
+#define OS_CFGSTR_VERSION_MAJOR         OS_CFGSTR_STRINGIFY(OS_CFGINT_VERSION_MAJOR)
+#define OS_CFGSTR_VERSION_MINOR         OS_CFGSTR_STRINGIFY(OS_CFGINT_VERSION_MINOR)
+#define OS_CFGSTR_VERSION_REVISION      OS_CFGSTR_STRINGIFY(OS_CFGINT_VERSION_REVISION)
+
+#define OS_CFGSTR_VERSION       OS_CFGSTR_VERSION_MAJOR "." OS_CFGSTR_VERSION_MINOR "." OS_CFGSTR_VERSION_REVISION
+
+#define OS_CFGSTR_GREETING      "uOS++ v" OS_CFGSTR_VERSION ", GCC " __VERSION__
+
+// ----------------------------------------------------------------------------
+
+#if false
+
+// Deprecated, replace with above definitions
+
+// Notice: do not use parenthesis! (the values will be stringified)
 #define OS_CFGINT_MAJOR                 3
 #define OS_CFGINT_MINOR                 1
 #define OS_CFGINT_REVISION              1287
@@ -23,6 +50,10 @@
 #define OS_STRING_OSVERSION             OS_STRING_OSMAJOR "." OS_STRING_OSMINOR "." OS_STRING_OSREVISION
 
 #define OS_STRING_OSGREETING            "uOS++ v" OS_STRING_OSVERSION ", GCC " __VERSION__
+
+#endif
+
+// ----------------------------------------------------------------------------
 
 // include additional OS definitions from the application space
 #include "OS_App_Defines.h"
