@@ -164,6 +164,31 @@ void OS::nakedEarlyInit(void)
 // runs before constructors
 void OS::earlyInit(void)
   {
+#if defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING)
+    OSDeviceDebug::putString_P(PSTR("Multitasking: disabled"));
+    OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING) */
+
+#if defined(DEBUG) && defined(OS_EXCLUDE_PREEMPTION)
+    OSDeviceDebug::putString_P(PSTR("Preemption: disabled"));
+    OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) && defined(OS_EXCLUDE_PREEMPTION) */
+
+#if defined(DEBUG) && defined(OS_EXCLUDE_OSTIMER)
+    OSDeviceDebug::putString_P(PSTR("SysTick: disabled"));
+    OSDeviceDebug::putNewLine();
+#else
+#if defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+    OSDeviceDebug::putString_P(PSTR("SysTick: not naked"));
+    OSDeviceDebug::putNewLine();
+#endif /* defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+
+    OSDeviceDebug::putString_P(PSTR("SysTick: "));
+    OSDeviceDebug::putDec(OS_CFGINT_TICK_RATE_HZ);
+    OSDeviceDebug::putString_P(PSTR(" ticks/sec"));
+    OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) && defined(OS_EXCLUDE_OSTIMER) */
+
 #if defined(DEBUG)
     OSDeviceDebug::putString_P(PSTR("OS::earlyInit()"));
     OSDeviceDebug::putNewLine();
@@ -179,7 +204,7 @@ void OS::earlyInit(void)
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
     OSScheduler::earlyInit();
-#endif
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMILLIS)
