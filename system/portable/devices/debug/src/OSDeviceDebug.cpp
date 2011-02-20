@@ -4,7 +4,8 @@
  *	This file is part of the uOS++ distribution.
  */
 
-#include "portable/kernel/include/OS.h"
+// uOS.h used instead of OS.h to get APP_CFGSTR_GREETING
+#include "portable/kernel/include/uOS.h"
 
 #include <string.h>
 
@@ -34,10 +35,9 @@ void OSDeviceDebug::nakedEarlyInit(void)
 #endif
 
 extern const char greeting[] __attribute__( ( weak ) );
-extern const char buildDateTime[] __attribute__( ( weak ) );
 
-const char greeting[] = "uOS++"; // default debug greeting
-const char buildDateTime[] = "(" __DATE__ " " __TIME__ ")";
+// Default greeeting message
+const char greeting[] = APP_CFGSTR_GREETING;
 
 void
 OSDeviceDebug::earlyInit(void)
@@ -46,10 +46,8 @@ OSDeviceDebug::earlyInit(void)
 
   commonPutBytes("\r\n\r\n", 4);
   commonPutBytes(greeting, strlen(greeting));
-  commonPutByte(' ');
-  commonPutBytes(buildDateTime, strlen(buildDateTime));
   commonPutBytes("\r\n", 2);
-  commonPutBytes(OS_STRING_OSGREETING, sizeof(OS_STRING_OSGREETING));
+  commonPutBytes(OS_CFGSTR_GREETING, sizeof(OS_CFGSTR_GREETING));
   commonPutBytes("\r\n\r\n", 4);
 }
 
