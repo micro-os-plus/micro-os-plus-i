@@ -131,8 +131,8 @@ public:
   criticalEnter(void) __attribute__( ( always_inline ) );
   // enter a real time critical section, i.e. a section where
   // all interrupts are disabled.
-   inline static void
-   realTimeCriticalEnter(void) __attribute__( ( always_inline ) );
+  inline static void
+  realTimeCriticalEnter(void) __attribute__( ( always_inline ) );
   // exit from critical section.
   inline static void
   criticalExit(void) __attribute__( ( always_inline ) );
@@ -178,7 +178,7 @@ public:
   static void
   performContextSwitch(void);
 
-#if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT) || defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
+#if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
   // called in order to save the context of the current task
   // must be called in conjunction with interruptExit
@@ -219,8 +219,8 @@ public:
 private:
 
   // TODO: remove if no longer needed
-//  static void
-//  timerSetup(void);
+  //  static void
+  //  timerSetup(void);
 
   // set the idle task
   static void
@@ -228,8 +228,8 @@ private:
 
   // TODO: remove if no longer needed
   //static void timerISR(void) __attribute__( ( naked ) );
-//  static void
-//  timerISR(void);
+  //  static void
+  //  timerISR(void);
 
   // members
 
@@ -279,8 +279,8 @@ public:
   (*entryPoint)(void *), void *pParams, unsigned char id);
 
   // TODO: remove if no longer needed
-//  static void
-//  stackSetReturnedValue(OSStack_t * pStack, OSEventWaitReturn_t ret);
+  //  static void
+  //  stackSetReturnedValue(OSStack_t * pStack, OSEventWaitReturn_t ret);
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSWITCHREQUEST)
   static void
@@ -460,38 +460,29 @@ inline void OSScheduler::setAllowDeepSleep(bool flag)
 
 #endif /* OS_INCLUDE_OSTASK_SLEEP */
 
-#if defined(OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT)
+#if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE)
 
-inline void OSScheduler::interruptEnter(void)
-  {
-#if !defined(OS_EXCLUDE_PREEMPTION)
-    OSScheduler::contextSave(); // interrupts disabled in here
+inline void
+OSScheduler::contextSave(void)
+{
+  OSSchedulerImpl::registersSave();
+  OSSchedulerImpl::stackPointerSave();
+}
+
+inline void
+OSScheduler::contextRestore(void)
+{
+  OSSchedulerImpl::stackPointerRestore();
+  OSSchedulerImpl::registersRestore();
+}
+
 #endif
-    OSScheduler::ledActiveOn();
-  }
-
-inline void OSScheduler::interruptExit(void)
-  {
-    if (OSScheduler::isContextSwitchRequired() )
-      {
-        OSScheduler::performContextSwitch();
-      }
-
-#if !defined(OS_EXCLUDE_PREEMPTION)
-    OSScheduler::contextRestore();
-    OSImpl::returnFromInterrupt();
-#endif
-    // interrupts enabled after this point
-  }
-
-#endif /* OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT */
 
 #if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
 inline void
 OSScheduler::interruptEnter(void)
 {
-
   OSSchedulerImpl::registersSave();
   OSScheduler::ISR_ledActiveOn();
 
@@ -533,61 +524,66 @@ OSScheduler::interruptExit(void)
 /*
  * Manage the activity LED
  */
-inline void OSScheduler::ledActiveInit(void)
-  {
+inline void
+OSScheduler::ledActiveInit(void)
+{
 #if defined(OS_CONFIG_ACTIVE_LED_PORT) && defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
-        OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT);
-        // Turn off led, i.e. HIGH if active low
+  OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT);
+  // Turn off led, i.e. HIGH if active low
 #if defined(OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW)
-        OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+  OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
 #else
-        OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+  OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
 #endif
-        OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT);
+  OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_CONFIG_ACTIVE_LED_BIT);
 #else
 #error "OS_CONFIG_ACTIVE_LED_* missing"
 #endif
-  }
+}
 
 /* Turn LED on (on interrupts) */
-inline void OSScheduler::ISR_ledActiveOn(void)
-  {
+inline void
+OSScheduler::ISR_ledActiveOn(void)
+{
 #if defined(OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW)
-    OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+  OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
 #else
-    OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+  OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
 #endif
-   }
+}
 
 // TODO: if GPIO actions are atomic, we need no critical sections
-inline void OSScheduler::ledActiveOn(void)
-  {
-    OSScheduler::criticalEnter();
-      {
-        ISR_ledActiveOn();
-      }
-    OSScheduler::criticalExit();
-  }
+inline void
+OSScheduler::ledActiveOn(void)
+{
+  OSScheduler::criticalEnter();
+    {
+      ISR_ledActiveOn();
+    }
+  OSScheduler::criticalExit();
+}
 
 /* Turn LED off (on interrupts) */
-inline void OSScheduler::ISR_ledActiveOff(void)
-  {
+inline void
+OSScheduler::ISR_ledActiveOff(void)
+{
 #if defined(OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW)
-    OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+  OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
 #else
-    OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
+  OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT, OS_CONFIG_ACTIVE_LED_BIT);
 #endif
-  }
+}
 
 /* Turn LED off (at sleep) */
-inline void OSScheduler::ledActiveOff(void)
-  {
-    OSScheduler::criticalEnter();
-      {
-        ISR_ledActiveOff();
-      }
-    OSScheduler::criticalExit();
+inline void
+OSScheduler::ledActiveOff(void)
+{
+  OSScheduler::criticalEnter();
+    {
+      ISR_ledActiveOff();
     }
+  OSScheduler::criticalExit();
+}
 
 #endif /* ! OS_EXCLUDE_OSSCHEDULER_LED_ACTIVE */
 
