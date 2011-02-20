@@ -6,12 +6,14 @@
 
 #include "portable/kernel/include/uOS.h"
 
+// ----------------------------------------------------------------------------
 // Here include headers for other object required by tasks,
 // like local objects (system objects should be visible via uOS.h)
 
+// ----------------------------------------------------------------------------
 // Here include headers for local tasks
 
-// ------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 /*
  * This is the minimal application in the uOS++ environment. 
@@ -20,10 +22,5 @@
  * the idle task.
  */
 
-// ------------------------------------------------------------------------------
-
-// message to be displayed on the debugging device at startup
-#if defined(DEBUG)
-const char greeting[]= "AVI minimal v1.2";
-#endif
+// ----------------------------------------------------------------------------
 
