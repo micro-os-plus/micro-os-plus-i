@@ -58,9 +58,11 @@ TaskBlink::taskMain(void)
 
       // finally toggle led
       m_oLed.toggle();
-#if defined(DEBUG)
-      debug.putString(getName());
-#endif
+
+      if (os.isDebug())
+        {
+          debug.putString(getName());
+        }
     }
 }
 
