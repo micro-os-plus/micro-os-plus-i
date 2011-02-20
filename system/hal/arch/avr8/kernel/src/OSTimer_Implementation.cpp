@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if !defined(OS_EXCLUDE_MULTITASKING)
+#if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 
@@ -112,52 +112,101 @@ void OSTimerTicks::implAcknowledgeInterrupt()
 
 #if defined(OS_INCLUDE_OSSCHEDULER_16BIT_TIMER)
 
-extern "C" void TIMER1_COMPA_vect(void) __attribute__((signal, naked));
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+extern "C" __attribute__((naked))
+#else
+extern "C" __attribute__((signal))
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+void TIMER1_COMPA_vect(void);
 
 void
 TIMER1_COMPA_vect(void)
   {
+#if true
+
+  OSTimerTicks::interruptContextHandler();
+
+#else
+
     // interrupts disabled in here
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
     OSScheduler::interruptEnter();
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
       {
         OSScheduler::timerTicks.interruptServiceRoutine();
       }
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
     OSScheduler::interruptExit();
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
     // interrupts enabled after this point
+
+#endif
   }
 
 #else
 
 #if defined (__AVR_AT90CAN128__)
 
-extern "C"
-void TIMER0_COMP_vect(void) __attribute__((signal, naked));
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+extern "C" __attribute__((naked))
+#else
+extern "C" __attribute__((signal))
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+void TIMER0_COMP_vect(void);
 
 void TIMER0_COMP_vect(void)
   {
+#if true
+
+  OSTimerTicks::interruptContextHandler();
+
+#else
+
     // interrupts disabled in here
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
     OSScheduler::interruptEnter();
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
       {
         OSScheduler::timerTicks.interruptServiceRoutine();
       }
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
     OSScheduler::interruptExit();
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
     // interrupts enabled after this point
+
+#endif
   }
 
 #else
 
-extern "C"
-void  TIMER0_COMPA_vect(void) __attribute__((signal, naked));
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+extern "C" __attribute__((naked))
+#else
+extern "C" __attribute__((signal))
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+void  TIMER0_COMPA_vect(void);
 
 void TIMER0_COMPA_vect(void)
   {
+#if true
+
+  OSTimerTicks::interruptContextHandler();
+
+#else
     // interrupts disabled in here
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
     OSScheduler::interruptEnter();
+#else
+    OSScheduler::ISR_ledActiveOn();
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
       {
         OSScheduler::timerTicks.interruptServiceRoutine();
       }
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
     OSScheduler::interruptExit();
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
     // interrupts enabled after this point
+#endif
   }
 
 #endif /* __AVR_AT90CAN128__ */
