@@ -183,7 +183,9 @@ public:
   static void applicationExceptionDetailsLog(unsigned int n);
 
 private:
+  // save to private member the reset bits using implementation dependent method
   static void saveResetBits(void);
+  // internal variable to keep reset bits
   static OSResetBits_t ms_resetBits;
   };
 
