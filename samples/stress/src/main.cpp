@@ -8,6 +8,7 @@
 
 #include "TaskBlink.h"
 #include "TaskStress.h"
+#include "TaskBlinkRealTime.h"
 
 // ---------------------------------------------------------------------------
 
@@ -15,19 +16,21 @@
 
 // tasks allocated on static storage
 TaskBlink taskA("A", APP_CONFIG_LED1, APP_CFGINT_BLINK_TICKS);
-TaskStress task0("0", 0, 50, 1,50);
-TaskStress task1("1", 0, 50, 1,50);
-TaskStress task2("2", 0, 50, 1,50);
-TaskStress task3("3", 30, 70, 1, 100);
+TaskStress task0("0", 0, 50,1,150);
+TaskStress task1("1", 0, 50, 1,150);
+TaskStress task2("2", 0, 50,1,150);
+TaskStress task3("3", 30, 70, 1, 200);
 #if true
-TaskStress task4("4", 30, 70, 1, 100);
+TaskStress task4("4", 500, 2500, 1, 200);
 TaskStress task5("5", 30, 70, 1, 100);
-TaskStress task6("6", 10, 90, 10, 200);
-TaskStress task7("7", 10, 90, 10, 200);
-TaskStress task8("8", 10, 90, 10, 200);
-TaskStress task9("9", 10, 90, 10, 200);
+TaskStress task6("6", 10, 90, 1, 200);
+TaskStress task7("7", 10, 90, 1, 200);
+TaskStress task8("8", 10, 90, 1, 200);
+TaskStress task9("9", 10, 90, 1, 200);
 #endif
+TaskBlinkRealTime taskRt("B", APP_CFGINT_TASKBLINKREALTIME_LEDBIT, APP_CFGINT_TASKBLINKREALTIME_TICKS);
 
+bool g_flagNotify;
 // ---------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
@@ -46,6 +49,11 @@ OSApplicationImpl::interruptTick(void)
     os.sched.eventNotify(APP_EVENT_DUMMY);
 #endif
 #endif
+  if(g_flagNotify)
+      {
+        g_flagNotify = false;
+        os.sched.eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
+      }
 }
 
 #endif /* defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK) */
