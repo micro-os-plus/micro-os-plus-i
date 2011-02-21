@@ -19,7 +19,3 @@ TaskBlink task3("C", APP_CONFIG_LED3, TICKS * 4);
 
 // ---------------------------------------------------------------------------
 
-// message to be displayed on the debugging device at startup
-#if defined(DEBUG)
-const char greeting[] = "AVI blinkX3Coop v1.1";
-#endif
