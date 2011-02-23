@@ -199,7 +199,7 @@ OSTimerTicks::implAcknowledgeInterrupt(void)
 #endif /*defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER)*/
 }
 
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
+#if defined(OS_INCLUDE_OSTIMERSECONDS)
 
 void
 OSTimerSeconds::init(void)
