@@ -13,12 +13,18 @@
 class OSDeviceCharacterBuffered : public OSDeviceCharacter
   {
 public:
+  OSDeviceCharacterBuffered();
+
   OSDeviceCharacterBuffered(unsigned char *pRxBuf, unsigned short rxBufSize,
       unsigned short rxHWM, unsigned short rxLWM, unsigned char *pTxBuf,
       unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM);
 
   OSDeviceCharacterBuffered(unsigned char *pRxBuf, unsigned short rxBufSize,
       unsigned char *pTxBuf, unsigned short txBufSize);
+
+  void init(unsigned char *pTxBuf, unsigned short txBufSize,
+      unsigned short txHWM, unsigned short txLWM, unsigned char *pRxBuf,
+      unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM);
 
   void interruptRxServiceRoutine(void);
   void interruptTxServiceRoutine(void);
@@ -54,4 +60,4 @@ private:
   virtual void implPortWrite(unsigned char b) = 0;
   };
 
-#endif /*OSDEVICECHARACTERUBUFFERED_H_*/
+#endif /* OSDEVICECHARACTERUBUFFERED_H_ */
