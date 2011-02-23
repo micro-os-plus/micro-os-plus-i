@@ -12,9 +12,11 @@
 typedef unsigned short schedTicks_t;
 
 class OSReadyList;
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
+
+#if defined(OS_INCLUDE_OSTIMERSECONDS)
 class OSTimerSeconds;
-#endif
+#endif /* defined(OS_INCLUDE_OSTIMERSECONDS) */
+
 class OSTimerTicks;
 class OSTask;
 
@@ -203,7 +205,7 @@ public:
   // timer used by scheduler to chedule the next task
   static OSTimerTicks timerTicks;
 
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
+#if defined(OS_INCLUDE_OSTIMERSECONDS)
   static OSTimerSeconds timerSeconds;
 #endif
 
