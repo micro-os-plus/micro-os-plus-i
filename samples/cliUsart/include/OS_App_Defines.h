@@ -25,7 +25,6 @@
 #define OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE     (1)
 #define OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1        (1)
 
-#define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          1
 
 #define OS_INCLUDE_OSTASK_GETSTACKUSED                  1
 //#define OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER             1
@@ -33,20 +32,24 @@
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG             1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE           1
 
+#if false
+#define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          1
+#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 #define OS_INCLUDE_CLOG                                 1
-#define OS_INCLUDE_SIMPLECLI                            1
-
 #define OS_INCLUDE_OSTREAM                              1
 #define OS_INCLUDE_ISTREAM                              1
 #define OS_INCLUDE_OSTREAM_OSTASK                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
+#endif
+
+#define OS_INCLUDE_SIMPLECLI                            1
+
 
 #define OS_INCLUDE_TASKBLINK                            1
 
 //#define OS_INCLUDE_USB_CDC_DUAL_INTERFACE               1
 //#define OS_INCLUDE_USB_CDC_DUAL_CONFIGURATION           1
 
-#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 
 #define OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_BAUD_RATE (9600)
 #define OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_DOUBLE_SPEED (true)

@@ -10,14 +10,17 @@
 
 /*
  * Task constructor. 
- * Initialize system task object, initialize member objects
+ * Initialise system task object, initialise member objects
  * and store parameters in private members.
  *
  */
 
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(&m_dev), m_cout(
-      &m_dev), m_cli(m_line, sizeof(m_line))
+  OSTask(pName, m_stack, sizeof(m_stack)), m_dev(dev),
+#if false
+  m_cin(&m_dev), m_cout(&m_dev),
+#endif
+  m_cli(m_line, sizeof(m_line))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskCli()=");
@@ -26,7 +29,7 @@ TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
 #endif
 }
 
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 static const char prompt[] = "> ";
 
@@ -44,34 +47,47 @@ TaskCli::taskMain(void)
     {
       os.sched.lock();
         {
-          clog << "TaskCli::taskMain(" << showbase << hex << this <<
 #if false
+          clog << "TaskCli::taskMain(" << showbase << hex << this <<
               ") SP="<< hex
               << ( unsigned short ) SP <<
-#endif
               endl;
+#else
+          debug.putString("TaskCli::taskMain()");
+          debug.putNewLine();
+#endif
         }
       os.sched.unlock();
     }
 
   OSDeviceCharacter& dev = m_dev;
 
+#if false
   istream& cin = m_cin;
   ostream& cout = m_cout;
 
   SimpleCli & cli = m_cli;
+#endif
 
   // task endless loop
   for (;;)
     {
       dev.open(); // wait for dtr
-
+#if false
       cout << endl << endl << greeting << endl;
+#else
+      dev.writeByte('\n');
+      dev.writeByte('\r');
+      for (const char* p = greeting; *p; ++p)
+        dev.writeByte(*p);
 
+      dev.writeByte('\n');
+      dev.writeByte('\r');
+#endif
       for (; dev.isConnected();)
         {
+#if false
           cout << endl << prompt;
-
           int c;
 
           c = cli.readLine(cin, cout);
@@ -97,12 +113,20 @@ TaskCli::taskMain(void)
               break;
             }
           lineProcess();
-
+#else
+          int c;
+          c = dev.readByte();
+          dev.writeByte(c);
+          dev.flush();
+          if (c == 0x03)
+            break; //CtrlC should quit
+#endif
         }
       dev.close();
     }
 }
 
+#if false
 static const char str_checksum[] = "Checksum?";
 
 /*
@@ -381,4 +405,5 @@ TaskCli::lineProcess()
   err: cout << endl << str_unknown;
   cout << endl << str_help;
 }
+#endif
 

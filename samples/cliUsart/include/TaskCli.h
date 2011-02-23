@@ -29,9 +29,10 @@ private:
   // members
   OSStack_t m_stack[ (OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
   OSDeviceCharacter & m_dev;
-
+#if false
   istream m_cin;
   ostream m_cout;
+#endif
   SimpleCli m_cli;
   unsigned char m_line[ 80 ];
   };
