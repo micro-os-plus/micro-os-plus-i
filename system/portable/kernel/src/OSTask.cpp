@@ -253,7 +253,8 @@ OSTask::getID(void)
 
 #if defined(OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER)
 
-#error "implement it in a portable way, this is avr8 only"
+#if defined(OS_CONFIG_ARCH_AVR8)
+
 OSProgramPtr_t OSTask::getProgramCounter(void)
   {
     unsigned char * p;
@@ -263,6 +264,10 @@ OSProgramPtr_t OSTask::getProgramCounter(void)
 
     return ( OSProgramPtr_t ) w;
   }
+
+#else
+#error "implement it in a portable way, this is avr8 only"
+#endif /* defined(OS_CONFIG_ARCH_AVR8) */
 
 #endif
 
