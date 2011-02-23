@@ -28,11 +28,12 @@ public:
   // Pattern for initialising the stack.
   static const OSStack_t STACK_FILL_BYTE = 0x5A;
 
-  // Constructors.
+  // Constructor; run static taskMain (C++ style).
   OSTask(const char *pName, const OSStack_t *pStack,
       unsigned short stackSize, OSTaskPriority_t priority =
       OSTask::DEFAULT_PRIORITY);
 
+  // Constructor; run given entryPoint function (C style).
   OSTask(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
       const OSStack_t *pStack, unsigned short stackSize,
       OSTaskPriority_t priority =
@@ -42,7 +43,7 @@ public:
   virtual ~OSTask();
 #endif
 
-  // Main function task,
+  // Main function task.
   // Overridden by actual implementation.
   virtual void taskMain(void);
 
@@ -56,13 +57,15 @@ public:
   bool isWaiting(void);
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
-  // Return TRUE if the task can go to sleep,
-  // FALSE otherwise.
+  // Return TRUE if the task can go to sleep, FALSE otherwise.
   bool isDeepSleepAllowed();
 #endif
 
 #if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
+  // Set the virtual watchdog expire interval (in seconds).
   void virtualWatchdogSet(unsigned short seconds);
+  // If the virtual watchdog interval expires, the MCU is reset using
+  // the hardware module watchdog.
   void virtualWatchdogCheck(void);
 #endif
 
@@ -126,7 +129,6 @@ public:
   void dumpPC(void);
 #endif
 
-public:
   // The SP is saved in this variable at contextSave 
   // and restored from here at contextRestore.
   OSStack_t *m_pStack;
@@ -167,7 +169,7 @@ private:
   // True if task is waiting for an event. The event value is in m_event.
   bool m_isWaiting;
 
-  //bool m_hasReturnValue;  // TODO: remove it fi no longer needed
+  //bool m_hasReturnValue;  // TODO: remove it if no longer needed
 
   // The event which the task is waiting for, or OSEvent::OS_NONE
   OSEvent_t m_event;
