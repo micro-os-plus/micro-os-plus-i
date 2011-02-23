@@ -12,7 +12,8 @@
  * Initialise system task object and store parameters in private members.
  */
 
-TaskStress::TaskStress(const char *pName, unsigned int minMicros, unsigned int maxMicros, unsigned int minTicks, unsigned int maxTicks) :
+TaskStress::TaskStress(const char *pName, unsigned int minMicros,
+    unsigned int maxMicros, unsigned int minTicks, unsigned int maxTicks) :
   OSTask(pName, m_stack, sizeof(m_stack))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -56,24 +57,35 @@ TaskStress::taskMain(void)
       os.sched.unlock();
     }
 
-  int nBusy,nSleep;
+  int nBusy, nSleep;
   int nCnt;
   nCnt = 0;
 
   // task endless loop
   for (;;)
     {
-      nBusy = (rand() % (m_maxMicros-m_minMicros)) + m_minMicros;
-      nSleep = (rand() % (m_maxTicks-m_minTicks)) + m_minTicks;
+      nBusy = (rand() % (m_maxMicros - m_minMicros)) + m_minMicros;
+      nSleep = (rand() % (m_maxTicks - m_minTicks)) + m_minTicks;
 
       os.busyWaitMicros(nBusy);
       os.sched.timerTicks.sleep(nSleep);
-      nCnt+=nSleep;
-      if(nCnt>= 1000)
+      nCnt += nSleep;
+      if (nCnt >= 1000)
         {
-          nCnt-=1000;
+          nCnt -= 1000;
           debug.putString(getName());
         }
 
     }
+}
+
+unsigned int
+TaskStress::rand(void)
+{
+  ms_rand = ms_rand * 214013L + 2531011L;
+#if (__SIZEOF_INT__ == 2)
+  return (ms_rand & 0x7fff);
+#else
+  return ((ms_rand >> 16) & 0x7fff);
+#endif
 }
