@@ -4,8 +4,8 @@
  *	This file is part of the uOS++ distribution.
  */
 
-#ifndef DEVICECHARACTERBUFFEREDSARTBASE_H_
-#define DEVICECHARACTERBUFFEREDSARTBASE_H_
+#ifndef HAL_DEVICECHARACTERBUFFEREDSARTBASE_H_
+#define HAL_DEVICECHARACTERBUFFEREDSARTBASE_H_
 
 #include "portable/devices/character/include/OSDeviceCharacterBuffered.h"
 
@@ -28,8 +28,11 @@ public:
 private:
 
   // actual port implementation routines
-  virtual void
+
+  virtual int
   implPortInit(void);
+  virtual int
+  implPortDisable(void);
 
   virtual void
   implInterruptTxEnable(void);
@@ -47,4 +50,4 @@ private:
   
 };
 
-#endif /* DEVICECHARACTERBUFFEREDSARTBASE_H_ */
+#endif /* HAL_DEVICECHARACTERBUFFEREDSARTBASE_H_ */
