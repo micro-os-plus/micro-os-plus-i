@@ -77,7 +77,7 @@ extern "C" OSStack_t **g_ppCurrentStack;
 
 #include "portable/kernel/include/OSTimer.h"
 
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
+#if defined(OS_INCLUDE_OSTIMERSECONDS)
 #include "portable/kernel/include/OSTimerSeconds.h"
 #endif
 
