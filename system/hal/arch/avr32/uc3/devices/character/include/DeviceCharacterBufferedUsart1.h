@@ -4,8 +4,8 @@
  *      This file is part of the uOS++ distribution.
  */
 
-#ifndef DEVICECHARACTERBUFFEREDUSART1_H_
-#define DEVICECHARACTERBUFFEREDUSART1_H_
+#ifndef HAL_DEVICECHARACTERBUFFEREDUSART1_H_
+#define HAL_DEVICECHARACTERBUFFEREDUSART1_H_
 
 #include "hal/arch/avr32/uc3/devices/character/include/DeviceCharacterBufferedUsartBase.h"
 
@@ -22,8 +22,10 @@ public:
       unsigned char *pTxBuf, unsigned short txBufSize);
 
 public:
+  virtual int implPortInit(void);
+
   static DeviceCharacterBufferedUsart1 * ms_pThis;
 
 };
 
-#endif /* DEVICECHARACTERBUFFEREDUSART1_H_ */
+#endif /* HAL_DEVICECHARACTERBUFFEREDUSART1_H_ */
