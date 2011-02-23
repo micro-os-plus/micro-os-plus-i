@@ -123,10 +123,14 @@ public:
   static OSTask *
   getTask(int i);
 
+#if defined(OS_INCLUDE_OSTASK_SLEEP)
+  // Return true if the deep sleep flag was set to true
   static bool
   isAllowDeepSleep(void);
+  // Set the value of the deep sleep flag
   static void
   setAllowDeepSleep(bool flag);
+#endif
 
   // enter a critical section, i.e. a section where interrupts are disabled.
   inline static void
@@ -152,6 +156,7 @@ public:
   static void
   yield(void);
 
+  // TODO: do we need this?
   inline static void
   ledActiveInit(void) __attribute__( ( always_inline ) );
   inline static void
@@ -202,14 +207,17 @@ public:
 
 #endif
 
-  // timer used by scheduler to chedule the next task
+  // timer used by scheduler to schedule the next task
   static OSTimerTicks timerTicks;
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
+  // timer expressed in seconds
   static OSTimerSeconds timerSeconds;
 #endif
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+  // Notifies a task which is waiting for time events
+  // (something like kill command in linux - SIGKILL)
   static void ISRcancelTask(OSTask *pTask);
 #endif
 
@@ -256,6 +264,7 @@ private:
   static OSReadyList ms_readyTasksList;
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
+  // records the deep sleep flag
   static bool ms_allowDeepSleep;
 #endif
 
@@ -275,7 +284,7 @@ public:
   inline static void
   yield(void) __attribute__( ( always_inline ) );
 
-  // used to initialize the stack for a task
+  // initialize the stack for a task
   static OSStack_t *
   stackInitialize(OSStack_t * pStackTop, void
   (*entryPoint)(void *), void *pParams, unsigned char id);
