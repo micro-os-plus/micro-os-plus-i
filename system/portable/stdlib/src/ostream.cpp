@@ -159,6 +159,110 @@ void print16(ostream& out, unsigned short w, bool sign)
     out.width( 0);
   }
 
+void print32(ostream& out, unsigned long l, bool sign = false);
+
+void print32(ostream& out, unsigned long l, bool sign)
+  {
+    streamsize width;
+    width = out.width();
+    if ( (out.flags() & ios_base::basefield ) == ios_base::hex)
+      {
+        unsigned char upp;
+        upp = 0;
+        if ( !(out.flags() & ios_base::uppercase ))
+          upp = 'a' - 'A';
+
+        if (out.flags() & ios_base::showbase)
+          {
+            out.put( '0');
+            out.put( 'X' + upp);
+          }
+
+        upp = 0; // ! explicitly set all hex to upper case
+
+        unsigned char c;
+        unsigned char b;
+        b = (l >> 24);
+        if (width == 0|| width > 7)
+          {
+            c = ( (b >> 4) & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+          }
+        if (width == 0|| width > 6)
+          {
+            c = (b & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+          }
+        b = (l >> 16);
+        if (width == 0|| width > 5)
+          {
+            c = ( (b >> 4) & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+          }
+        if (width == 0|| width > 4)
+          {
+            c = (b & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+          }
+        b = (l >> 8);
+        if (width == 0|| width > 3)
+          {
+            c = ( (b >> 4) & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+          }
+        if (width == 0|| width > 2)
+          {
+            c = (b & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+          }
+        b = (l & 0xFF);
+        if (width == 0|| width > 1)
+          {
+            c = ( (b >> 4) & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+          }
+        c = (b & 0x0F);
+        out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+      }
+    else if ( (out.flags() & ios_base::basefield ) == ios_base::oct)
+      {
+        ; // not yet implemented
+      }
+    else // decimal
+      {
+        if (sign)
+          {
+            long n;
+            n = l;
+            if (n < 0)
+              {
+                out.put( '-');
+                l = -n;
+              }
+          }
+        int i;
+        unsigned char buff[ 10 ];
+
+        for (i = sizeof(buff ) - 1; i >= 0; i--)
+          {
+            buff[ i ] = (l % 10) + '0';
+            l /= 10;
+          }
+
+        if ( 0 < width && width <= ( int ) sizeof(buff ) )
+          i = ( int ) sizeof(buff ) - width;
+        else
+          {
+            for (i = 0; i < ( int ) sizeof(buff ) - 1; ++i)
+              if (buff[ i ] != '0')
+                break;
+          }
+        for (; i < ( int ) sizeof(buff ); ++i)
+          out.put(buff[ i ]);
+      }
+    out.width( 0);
+  }
+
 ostream& ostream::operator <<( unsigned short n )
   {
     //sentry s( *this );
@@ -314,7 +418,7 @@ ostream::operator <<( long double f )
   }
 #endif
 
-#if 0
+#if true
 ostream&
 ostream::operator <<( void *p )
   {
@@ -322,6 +426,7 @@ ostream::operator <<( void *p )
     p = p;
     //-- char buffer[ 20 ];
     //-- write( buffer, snprintf( buffer, 20, "%p", p ));
+    print32( *this, ( unsigned int ) p );
 
     if ( ios::flags() & ios_base::unitbuf )
       {
