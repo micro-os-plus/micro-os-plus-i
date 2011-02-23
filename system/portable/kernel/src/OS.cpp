@@ -184,7 +184,7 @@ void OS::earlyInit(void)
 #endif /* defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
 
     OSDeviceDebug::putString_P(PSTR("SysTick: "));
-    OSDeviceDebug::putDec(OS_CFGINT_TICK_RATE_HZ);
+    OSDeviceDebug::putDec((unsigned short)OS_CFGINT_TICK_RATE_HZ);
     OSDeviceDebug::putString_P(PSTR(" ticks/sec"));
     OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_EXCLUDE_OSTIMER) */
