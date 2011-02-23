@@ -213,7 +213,12 @@ void TIMER0_COMPA_vect(void)
 
 #endif
 
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
+#if defined(OS_INCLUDE_OSTIMERSECONDS)
+
+void OSTimerSeconds::implAcknowledgeInterrupt()
+{
+  // nothing to do
+}
 
 void OSTimerSeconds::init(void)
   {
