@@ -9,7 +9,6 @@
 #define TASKSTRESS_H_
 
 #include "portable/kernel/include/uOS.h"
-#include <stdlib.h>
 
 class TaskStress : public OSTask
   {
@@ -20,6 +19,8 @@ public:
   // actual task main code
   virtual void taskMain(void);
 
+  static unsigned int rand(void);
+
 private:
   // members
   OSStack_t m_stack[ (OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
@@ -28,6 +29,8 @@ private:
   unsigned int m_maxMicros;
   unsigned int m_minTicks;
   unsigned int m_maxTicks;
+
+  static unsigned int ms_rand;
   };
 
 #endif /* TASKSTRESS_H_ */
