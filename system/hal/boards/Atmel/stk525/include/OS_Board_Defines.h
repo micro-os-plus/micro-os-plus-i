@@ -63,31 +63,31 @@
 
 // ----------------------------------------------------------------------------
 
-#if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)
-#define OS_CONFIG_BLINK_LED_PORT_INIT                   DDRD
+#if !defined(OS_CONFIG_BLINK_LED_PORT_CONFIG)
+#define OS_CONFIG_BLINK_LED_PORT_CONFIG                   DDRD
 #endif
-#if !defined(OS_CONFIG_BLINK_LED_PORT)
-#define OS_CONFIG_BLINK_LED_PORT                        PORTD
+#if !defined(OS_CONFIG_BLINK_LED_PORT_WRITE)
+#define OS_CONFIG_BLINK_LED_PORT_WRITE                        PORTD
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_BIT)
 #define OS_CONFIG_BLINK_LED_BIT                         5
 #endif
 
-#if !defined(OS_CONFIG_DEBUG_LED1_PORT)
-#define OS_CONFIG_DEBUG_LED1_PORT			PORTD
+#if !defined(OS_CONFIG_DEBUG_LED1_PORT_WRITE)
+#define OS_CONFIG_DEBUG_LED1_PORT_WRITE			PORTD
 #endif
-#if !defined(OS_CONFIG_DEBUG_LED1_PORT_INIT)
-#define OS_CONFIG_DEBUG_LED1_PORT_INIT                  DDRD
+#if !defined(OS_CONFIG_DEBUG_LED1_PORT_CONFIG)
+#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                  DDRD
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_BIT)
 #define OS_CONFIG_DEBUG_LED1_BIT			PORTD5
 #endif
 
-#if !defined(OS_CONFIG_DEBUG_LED2_PORT)
-#define OS_CONFIG_DEBUG_LED2_PORT			PORTD
+#if !defined(OS_CONFIG_DEBUG_LED2_PORT_WRITE)
+#define OS_CONFIG_DEBUG_LED2_PORT_WRITE			PORTD
 #endif
-#if !defined(OS_CONFIG_DEBUG_LED2_PORT_INIT)
-#define OS_CONFIG_DEBUG_LED2_PORT_INIT                  DDRD
+#if !defined(OS_CONFIG_DEBUG_LED2_PORT_CONFIG)
+#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                  DDRD
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_BIT)
 #define OS_CONFIG_DEBUG_LED2_BIT			PORTD6
