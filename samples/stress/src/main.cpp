@@ -8,7 +8,9 @@
 
 #include "TaskBlink.h"
 #include "TaskStress.h"
+#if defined(APP_INCLUDE_TASKBLINKREALTIME)
 #include "TaskBlinkRealTime.h"
+#endif
 
 // ---------------------------------------------------------------------------
 
@@ -28,9 +30,14 @@ TaskStress task7("7", 10, 90, 1, 200);
 TaskStress task8("8", 10, 90, 1, 200);
 TaskStress task9("9", 10, 90, 1, 200);
 #endif
-TaskBlinkRealTime taskRt("B", APP_CFGINT_TASKBLINKREALTIME_LEDBIT, APP_CFGINT_TASKBLINKREALTIME_TICKS);
 
+#if defined(APP_INCLUDE_TASKBLINKREALTIME)
+TaskBlinkRealTime taskRt("B", APP_CFGINT_TASKBLINKREALTIME_LEDBIT, APP_CFGINT_TASKBLINKREALTIME_TICKS);
 bool g_flagNotify;
+#endif
+
+unsigned int TaskStress::ms_rand;
+
 // ---------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
@@ -49,19 +56,17 @@ OSApplicationImpl::interruptTick(void)
     os.sched.eventNotify(APP_EVENT_DUMMY);
 #endif
 #endif
+
+#if defined(APP_INCLUDE_TASKBLINKREALTIME)
+
   if(g_flagNotify)
       {
         g_flagNotify = false;
         os.sched.eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
       }
+
+#endif
+
 }
 
 #endif /* defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK) */
-
-// ---------------------------------------------------------------------------
-
-// message to be displayed on the debugging device at startup
-#if defined(DEBUG)
-const char greeting[] = "AVI stress v1.1";
-const char buildDateTime[] = "(" __DATE__ " " __TIME__ ")";
-#endif
