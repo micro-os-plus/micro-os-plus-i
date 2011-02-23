@@ -32,12 +32,12 @@ OSTask *OSScheduler::ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 OSTimerTicks OSScheduler::timerTicks;
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
-bool OSScheduler::ms_allowDeepSleep;
+#if defined(OS_INCLUDE_OSTIMERSECONDS)
+OSTimerSeconds OSScheduler::timerSeconds;
 #endif
 
-#if defined(OS_INCLUDE_TIMERSECONDS)
-OSTimerSeconds OSScheduler::timerSeconds;
+#if defined(OS_INCLUDE_OSTASK_SLEEP)
+bool OSScheduler::ms_allowDeepSleep;
 #endif
 
 unsigned char OSReadyList::ms_count;
