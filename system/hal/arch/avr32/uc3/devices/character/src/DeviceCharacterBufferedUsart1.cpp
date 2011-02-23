@@ -45,7 +45,7 @@ DeviceCharacterBufferedUsart1::DeviceCharacterBufferedUsart1(
     unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
     unsigned short txLWM, unsigned char *pRxBuf, unsigned short rxBufSize,
     unsigned short rxHWM, unsigned short rxLWM) :
-  OSDeviceCharacterBuffered(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf, rxBufSize,
+    DeviceCharacterBufferedUsartBase(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf, rxBufSize,
       rxHWM, rxLWM)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -61,7 +61,7 @@ DeviceCharacterBufferedUsart1::DeviceCharacterBufferedUsart1(
 DeviceCharacterBufferedUsart1::DeviceCharacterBufferedUsart1(
     unsigned char *pTxBuf, unsigned short txBufSize, unsigned char *pRxBuf,
     unsigned short rxBufSize) :
-  OSDeviceCharacterBuffered(pTxBuf, txBufSize, pRxBuf, rxBufSize)
+    DeviceCharacterBufferedUsartBase(pTxBuf, txBufSize, pRxBuf, rxBufSize)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   OSDeviceDebug::putString("DeviceCharacterBufferedUsart1()=");
@@ -78,6 +78,7 @@ int
 DeviceCharacterBufferedUsart1::implPortInit(void)
 {
   ; // TODO: implement it
+  return 0;
 }
 
 
