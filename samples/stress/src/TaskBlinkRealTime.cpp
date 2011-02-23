@@ -4,8 +4,11 @@
  *	This file is part of the uOS++ distribution.
  */
 
-#include "TaskBlinkRealTime.h"
+#include "portable/kernel/include/uOS.h"
 
+#if defined(APP_INCLUDE_TASKBLINKREALTIME)
+
+#include "TaskBlinkRealTime.h"
 
 __attribute__((interrupt)) void
 RealTimeInterrupt_contextHandler(void);
@@ -235,3 +238,4 @@ RealTimeInterrupt_contextHandler(void)
 #endif
 }
 
+#endif /* APP_INCLUDE_TASKBLINKREALTIME */
