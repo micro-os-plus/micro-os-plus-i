@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2009 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -19,7 +19,7 @@
 
 // the second system timer functionality, intended to measure longer intervals
 class OSTimerSeconds : public OSTimer
-  {
+{
 public:
   // initialise internal structures
   OSTimerSeconds();
@@ -37,10 +37,12 @@ public:
 #endif
 
   // return the current number of ticks within the current second
-  static OSTimerTicks_t getSchedulerTicks(void);
+  static OSTimerTicks_t
+  getSchedulerTicks(void);
 
   // interrupt service routine called each second
-  void interruptServiceRoutine(void);
+  void
+  interruptServiceRoutine(void);
 
   // the number of OS ticks within current second
   static OSTimerTicks_t ms_schedulerTicks;
@@ -50,8 +52,10 @@ protected:
   friend class OSScheduler;
 
   // initialise and it is called from OSScheduler::start()
-  static void init(void);
-  static void implAcknowledgeInterrupt(void);
+  static void
+  init(void);
+  static void
+  implAcknowledgeInterrupt(void);
 
 private:
   // contain the timeouts( expressed in ticks) for every alarm
@@ -61,12 +65,13 @@ private:
   // current seconds number
   static OSTime_t ms_uptime;
 #endif
-  };
+};
 
-inline OSTimerTicks_t OSTimerSeconds::getSchedulerTicks(void)
-  {
-    return ms_schedulerTicks;
-  }
+inline OSTimerTicks_t
+OSTimerSeconds::getSchedulerTicks(void)
+{
+  return ms_schedulerTicks;
+}
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
 
@@ -82,21 +87,22 @@ inline OSTime_t OSTimerSeconds::getUptime(void)
 
 #endif
 
-inline void OSTimerSeconds::interruptServiceRoutine(void)
-  {
-    implAcknowledgeInterrupt();
-    interruptTick();
-    incrementTicks();
+inline void
+OSTimerSeconds::interruptServiceRoutine(void)
+{
+  implAcknowledgeInterrupt();
+  interruptTick();
+  incrementTicks();
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
-    incrementUptime();
+  incrementUptime();
 #endif
 
 #if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
-    checkVirtualWatchdogs();
+  checkVirtualWatchdogs();
 #endif
-  }
+}
 
 #endif
 
-#endif /*OSTIMERSECONDS_H_*/
+#endif /* OSTIMERSECONDS_H_ */
