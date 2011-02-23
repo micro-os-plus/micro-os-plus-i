@@ -8,6 +8,7 @@
 #define OSDEVICECHARACTER_H_
 
 #include "portable/kernel/include/OS.h"
+
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
 #include "portable/stdlib/include/streambuf"
 #endif
