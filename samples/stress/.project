@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>sample-stress</name>
+	<name>test-stress</name>
 	<comment></comment>
 	<projects>
 		<project>micro-os-plus</project>
