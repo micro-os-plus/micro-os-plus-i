@@ -53486,7 +53486,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.822581117" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections -finline-small-functions -Wa,-adhlns=&quot;$@.lst&quot; " valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.822581117" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections -finline-small-functions -Wa,-adhlns=&quot;$@.lst&quot; -fsigned-char " valueType="string"/>
 								<option id="avr32.cpp.compiler.option.gc-sections.1399497307" name="Prepare functions for garbage collection" superClass="avr32.cpp.compiler.option.gc-sections" value="true" valueType="boolean"/>
 								<inputType id="avr32.managedbuild.tool.gnu.cpp.compiler.input.1927311103" superClass="avr32.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
