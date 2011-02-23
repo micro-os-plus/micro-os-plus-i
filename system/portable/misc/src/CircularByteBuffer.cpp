@@ -16,7 +16,7 @@ CircularByteBuffer::CircularByteBuffer()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("CircularByteBuffer()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
   }
@@ -26,7 +26,7 @@ CircularByteBuffer::CircularByteBuffer(unsigned char *pBuf,
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("CircularByteBuffer()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
 
@@ -86,9 +86,9 @@ unsigned char CircularByteBuffer::get(void)
 void CircularByteBuffer::dump(void)
   {
     OSDeviceDebug::putString_P(PSTR("CircularByteBuffer *"));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putString_P(PSTR("=("));
-    OSDeviceDebug::putHex((unsigned short)m_pBuf);
+    OSDeviceDebug::putPtr(m_pBuf);
     OSDeviceDebug::putChar(',');
     OSDeviceDebug::putHex((unsigned short)m_len);
     OSDeviceDebug::putChar(',');
