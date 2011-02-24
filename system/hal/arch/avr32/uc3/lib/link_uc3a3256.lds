@@ -193,7 +193,6 @@ SECTIONS
   .dynamic        : { *(.dynamic) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   .got            : { *(.got.plt) *(.got) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   .ramtext        : { *(.ramtext .ramtext.*) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
-  .ddalign	: { . = ALIGN(8); } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   .data           :
   {
     *(.data .data.* .gnu.linkonce.d.*)
@@ -201,11 +200,12 @@ SECTIONS
     SORT(CONSTRUCTORS)
   } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   .data1          : { *(.data1) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
+  .ddalign	: { . = ALIGN(8); } >INTRAM AT>FLASH :INTRAM_AT_FLASH 
   .balign	: { . = ALIGN(8); PROVIDE(_edata = .); } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   PROVIDE (edata = .);
 
     PROVIDE (__data_end = .) ;
-/* ilg  __bss_start = .; */
+/* ilg  __bss_start = .; */ 
   .bss            :
   {
     PROVIDE (__bss_start = .) ;
