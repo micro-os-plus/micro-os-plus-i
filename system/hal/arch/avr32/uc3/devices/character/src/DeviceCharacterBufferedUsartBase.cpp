@@ -92,13 +92,13 @@ DeviceCharacterBufferedUsartBase::implPortDisable(void)
 void
 DeviceCharacterBufferedUsartBase::implInterruptTxEnable(void)
 {
-  ; // TODO: Implement it
+  usart_int_tx_enable(m_pPort);
 }
 
 void
 DeviceCharacterBufferedUsartBase::implInterruptTxDisable(void)
 {
-  ; // TODO: Implement it
+  usart_int_tx_disable(m_pPort) ;
 }
 
 unsigned char
