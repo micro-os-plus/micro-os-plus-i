@@ -475,7 +475,7 @@ int usart_init_sync_master(volatile avr32_usart_t *usart, const usart_options_t 
 }
 
 
-int usart_init_sync_slave(volatile avr32_usart_t *usart, const usart_options_t *opt, long pba_hz)
+int usart_init_sync_slave(volatile avr32_usart_t *usart, const usart_options_t *opt, long __attribute__((unused)) pba_hz)
 {
   // Reset the USART and shutdown TX and RX.
   usart_reset(usart);
@@ -700,7 +700,7 @@ int usart_init_spi_master(volatile avr32_usart_t *usart, const usart_spi_options
 }
 
 
-int usart_init_spi_slave(volatile avr32_usart_t *usart, const usart_spi_options_t *opt, long pba_hz)
+int usart_init_spi_slave(volatile avr32_usart_t *usart, const usart_spi_options_t *opt, long __attribute__((unused)) pba_hz)
 {
   // Reset the USART and shutdown TX and RX.
   usart_reset(usart);
