@@ -9,6 +9,79 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
+// ----------------------------------------------------------------------------
+
+typedef int OSReturn_t;
+
+class OSReturn
+  {
+public:
+  static const OSReturn_t OS_OK = 0;
+  static const OSReturn_t OS_TIMEOUT = -1;
+  static const OSReturn_t OS_DISCONNECTED = -2;
+  static const OSReturn_t OS_WOULD_BLOCK = -3;
+  static const OSReturn_t OS_NOT_OWNER = -4;
+  static const OSReturn_t OS_NOT_ACQUIRED = -5;
+  static const OSReturn_t OS_ALREADY_OPENED = -6;
+  static const OSReturn_t OS_NOT_OPENED = -7;
+  static const OSReturn_t OS_TOO_LONG = -8;
+  static const OSReturn_t OS_ILLEGAL_CHARACTER = -9;
+  static const OSReturn_t OS_BAD_CHECKSUM = -10;
+  static const OSReturn_t OS_NOT_INITIALIZED = -11;
+  static const OSReturn_t OS_BAD_PARAMETER = -12;
+  static const OSReturn_t OS_BUFFER_FULL = -13;
+  static const OSReturn_t OS_IMMEDIATELY = -14;
+
+  };
+
+// ----------------------------------------------------------------------------
+
+#if false
+class OSTimeout
+  {
+public:
+  static const OSTimerTicks_t OS_IMMEDIATELY = 0;
+  static const OSTimerTicks_t OS_NEVER = (0 - 1);
+  };
+#endif
+
+// ----------------------------------------------------------------------------
+
+// must allow to cast a pointer
+typedef unsigned int OSEvent_t;
+
+class OSEvent
+{
+public:
+  static const OSEvent_t OS_NONE = -1;
+  static const OSEvent_t OS_ALL = 0;
+  static const OSEvent_t OS_TIMEOUT = 1;
+  static const OSEvent_t OS_CUSTOM_TIMER = 2;
+};
+
+// ----------------------------------------------------------------------------
+
+// must allow to cast a pointer
+typedef unsigned int OSEventWaitReturn_t;
+
+class OSEventWaitReturn
+{
+public:
+  static const OSEventWaitReturn_t OS_NONE = -1;
+  static const OSEventWaitReturn_t OS_VOID = 0;
+  static const OSEventWaitReturn_t OS_LOCKED = 1;
+  static const OSEventWaitReturn_t OS_TIMEOUT = 2;
+  static const OSEventWaitReturn_t OS_CANCELED = 3;
+  static const OSEventWaitReturn_t OS_ALL = 4;
+  static const OSEventWaitReturn_t OS_IMMEDIATELY = 5;
+  static const OSEventWaitReturn_t OS_FAILED = 6;
+
+  // user values should be relative to this one
+  static const OSEventWaitReturn_t OS_CUSTOM = 10;
+};
+
+// ----------------------------------------------------------------------------
+
 class OSImpl
   {
 public:
@@ -88,36 +161,6 @@ extern "C" OSStack_t **g_ppCurrentStack;
 #include "portable/devices/debug/include/OSDeviceDebug.h"
 
 // ----------------------------------------------------------------------------
-
-typedef int OSReturn_t;
-
-class OSReturn
-  {
-public:
-  static const OSReturn_t OS_OK = 0;
-  static const OSReturn_t OS_TIMEOUT = -1;
-  static const OSReturn_t OS_DISCONNECTED = -2;
-  static const OSReturn_t OS_WOULD_BLOCK = -3;
-  static const OSReturn_t OS_NOT_OWNER = -4;
-  static const OSReturn_t OS_NOT_ACQUIRED = -5;
-  static const OSReturn_t OS_ALREADY_OPENED = -6;
-  static const OSReturn_t OS_NOT_OPENED = -7;
-  static const OSReturn_t OS_TOO_LONG = -8;
-  static const OSReturn_t OS_ILLEGAL_CHARACTER = -9;
-  static const OSReturn_t OS_BAD_CHECKSUM = -10;
-  static const OSReturn_t OS_NOT_INITIALIZED = -11;
-  static const OSReturn_t OS_BAD_PARAMETER = -12;
-  static const OSReturn_t OS_BUFFER_FULL = -13;
-  static const OSReturn_t OS_IMMEDIATELY = -14;
-
-  };
-
-class OSTimeout
-  {
-public:
-  static const OSTimerTicks_t OS_IMMEDIATELY = 0;
-  static const OSTimerTicks_t OS_NEVER = (0 - 1);
-  };
 
 class OS: public OSImpl
   {
