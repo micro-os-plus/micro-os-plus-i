@@ -8,6 +8,7 @@
 #define OSSCHEDULER_H_
 
 #include "portable/kernel/include/OS.h"
+#include "portable/kernel/include/OSTask.h"
 
 typedef unsigned short schedTicks_t;
 
@@ -19,40 +20,6 @@ class OSTimerSeconds;
 
 class OSTimerTicks;
 class OSTask;
-
-// ----------------------------------------------------------------------------
-
-// must allow to cast a pointer
-typedef unsigned int OSEvent_t;
-
-class OSEvent
-{
-public:
-  static const OSEvent_t OS_NONE = -1;
-  static const OSEvent_t OS_ALL = 0;
-  static const OSEvent_t OS_TIMEOUT = 1;
-  static const OSEvent_t OS_CUSTOM_TIMER = 2;
-};
-
-// ----------------------------------------------------------------------------
-
-// must allow to cast a pointer
-typedef unsigned int OSEventWaitReturn_t;
-
-class OSEventWaitReturn
-{
-public:
-  static const OSEventWaitReturn_t OS_NONE = -1;
-  static const OSEventWaitReturn_t OS_VOID = 0;
-  static const OSEventWaitReturn_t OS_LOCKED = 1;
-  static const OSEventWaitReturn_t OS_TIMEOUT = 2;
-  static const OSEventWaitReturn_t OS_CANCELED = 3;
-  static const OSEventWaitReturn_t OS_ALL = 4;
-  static const OSEventWaitReturn_t OS_IMMEDIATELY = 5;
-
-  // user values should be relative to this one
-  static const OSEventWaitReturn_t OS_CUSTOM = 10;
-};
 
 // ----------------------------------------------------------------------------
 
@@ -146,6 +113,12 @@ public:
   // sleep until event occurs
   static OSEventWaitReturn_t
   eventWait(OSEvent_t event);
+
+  static bool
+  eventWaitPrepare(OSEvent_t event) __attribute__( ( always_inline ) );
+
+  static OSEventWaitReturn_t
+  getEventWaitReturn(void);
 
   // wakeup all tasks waiting for event
   static int
@@ -457,6 +430,38 @@ OSScheduler::getTasksCount(void)
   return ms_tasksCount;
 }
 
+inline bool
+OSScheduler::eventWaitPrepare(OSEvent_t event)
+{
+  return ms_pTaskRunning->eventWaitPrepare(event);
+}
+
+inline OSEventWaitReturn_t
+OSScheduler::getEventWaitReturn(void)
+{
+  return ms_pTaskRunning->m_eventWaitReturn;
+}
+
+#if false
+// Failed test, kept here for archive
+
+inline OSEventWaitReturn_t
+OSScheduler::eventWait(bool condition, OSEvent_t event)
+  {
+    bool doYield;
+    OSScheduler::criticalEnter();
+      {
+        doYield = (condition) && (ms_pTaskRunning->eventWaitPrepare(event));
+      }
+    OSScheduler::criticalExit();
+    if (doYield)
+      {
+        OSScheduler::yield();
+      }
+    return ms_pTaskRunning->m_eventWaitReturn;
+  }
+#endif
+
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
 
 inline bool OSScheduler::isAllowDeepSleep(void)
@@ -475,17 +480,17 @@ inline void OSScheduler::setAllowDeepSleep(bool flag)
 
 inline void
 OSScheduler::contextSave(void)
-{
-  OSSchedulerImpl::registersSave();
-  OSSchedulerImpl::stackPointerSave();
-}
+  {
+    OSSchedulerImpl::registersSave();
+    OSSchedulerImpl::stackPointerSave();
+  }
 
 inline void
 OSScheduler::contextRestore(void)
-{
-  OSSchedulerImpl::stackPointerRestore();
-  OSSchedulerImpl::registersRestore();
-}
+  {
+    OSSchedulerImpl::stackPointerRestore();
+    OSSchedulerImpl::registersRestore();
+  }
 
 #endif
 
