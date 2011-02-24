@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2009 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -28,7 +28,7 @@ OSTask::OSTask(const char *pName, OSTaskMainPtr_t entryPoint,
   OSTask::init(pName, entryPoint, pParameters, pStack, stackSize, priority);
 }
 
-/* The stack size is in multiples of OSStack_t */
+// The stack size is in multiples of OSStack_t
 void
 OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
     const OSStack_t *pStack, unsigned short stackSize,
@@ -397,13 +397,15 @@ OSTask::setInterruption(bool flag)
 
 #endif
 
-int OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
+int
+OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
 {
   if (event == OSEvent::OS_NONE)
     return 0;
 
-  int cnt;
-  cnt = 0;
+  int ret;
+  ret = 0;
+
 #if defined (OSTASK_NOTIFY_MEASURE)
   OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_APP_CONFIG_LED3);
 #endif
@@ -418,28 +420,64 @@ int OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
         {
           OSEvent_t ev;
           ev = m_event;
-          if (ev == OSEvent::OS_ALL || ev == event)
+
+          // wakeup tasks
+          // - waiting for event
+          // - waiting for OS_ALL
+          // - notified with OS_ALL
+          if (ev == OSEvent::OS_ALL || ev == event || event == OSEvent::OS_ALL)
             {
-              // wakeup tasks waiting for event or for 0
               m_isWaiting = false;
               m_event = OSEvent::OS_NONE; // no longer wait for it
-              m_eventWaitReturn = ret;
+              m_eventWaitReturn = retVal;
 #if defined(DEBUG)
-              if (ret == OSEventWaitReturn::OS_NONE)
+              if (retVal == OSEventWaitReturn::OS_NONE)
                 OSDeviceDebug::putChar('^');
 #endif
-              OSReadyList::insert( this);
-              cnt = 1;
+              OSReadyList::insert(this);
+              ret = 1;
             }
         }
-
     }
   OSScheduler::criticalExit();
+
 #if defined (OSTASK_NOTIFY_MEASURE)
   OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_APP_CONFIG_LED3);
 #endif
+
   // return the number of notified tasks
-  return cnt;
+  return ret;
+}
+
+bool
+OSTask::eventWaitPrepare(OSEvent_t event)
+{
+#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+
+  if (m_isInterrupted)
+    {
+      m_eventWaitReturn = OSEventWaitReturn::OS_CANCELED;
+      return false;
+    }
+#endif
+  if (OSScheduler::isLocked())
+    {
+      m_eventWaitReturn = OSEventWaitReturn::OS_LOCKED;
+      return false;
+    }
+  if (event == OSEvent::OS_NONE)
+    {
+      // if no event, return NONE
+      m_eventWaitReturn = OSEventWaitReturn::OS_NONE;
+      return false;
+    }
+
+  // mark the task is waiting on the given event
+  m_event = event;
+  m_isWaiting = true;
+
+  // allow yield()
+  return true;
 }
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
