@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -7,16 +7,22 @@
 #ifndef APP_DEFINES_H_
 #define APP_DEFINES_H_
 
-// do not use parenthesis, will also be stringified
-#define APP_CFGINT_MAJOR                                2
-#define APP_CFGINT_MINOR                                2
-#define APP_CFGINT_REVISION                             541
+// ----------------------------------------------------------------------------
 
-// Strings
-#define APP_CONFIG_MAJOR                                xstr(APP_CFGINT_MAJOR)
-#define APP_CONFIG_MINOR                                xstr(APP_CFGINT_MINOR)
-#define APP_CONFIG_REVISION                             xstr(APP_CFGINT_REVISION)
+// Application versioning and greeting definitions
+// More definitions will be computer in uOS.h
 
+#define APP_CFGSTR_APPLICATION_NAME                     "USB-I2C"
+#define APP_CFGSTR_APPLICATION_MANUFACTURER             "AVI"
+
+// Notice: do not use parenthesis! (the values will be stringified)
+#define APP_CFGINT_VERSION_MAJOR                        2
+#define APP_CFGINT_VERSION_MINOR                        3
+#define APP_CFGINT_VERSION_REVISION                     1244
+
+// ----------------------------------------------------------------------------
+
+#if defined(OS_CONFIG_BOARD_A0739)
 #define APP_CONFIG_IMUXEN_PORT_INIT     DDRC
 #define APP_CONFIG_IMUXEN_PORT          PORTC
 #define APP_CONFIG_IMUXEN_BIT           PORTC5
@@ -24,5 +30,6 @@
 #define APP_CONFIG_IMUX_PORT_INIT       DDRC
 #define APP_CONFIG_IMUX_PORT            PORTC
 #define APP_CONFIG_IMUX_BIT             PORTC4
+#endif /* defined(OS_CONFIG_BOARD_A0739) */
 
 #endif /*APP_DEFINES_H_ */
