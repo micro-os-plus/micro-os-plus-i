@@ -9,6 +9,8 @@
 
 #include "portable/devices/character/include/OSDeviceCharacterBuffered.h"
 
+#include <avr32/io.h>
+
 class DeviceCharacterBufferedUsartBase : public OSDeviceCharacterBuffered
 {
 public:
@@ -22,8 +24,9 @@ public:
       unsigned char *pTxBuf, unsigned short txBufSize);
 
   // Used to set actual port address
-  void setPortAddress(void *pPort);
+  void setPortAddress(volatile avr32_usart_t* pPort);
 
+  void interruptServiceRoutine(void);
 
 private:
 
@@ -46,7 +49,7 @@ private:
   implPortWrite(unsigned char b);
 
 private:
-  void * m_pPort;
+   volatile avr32_usart_t* m_pPort;
   
 };
 
