@@ -9,19 +9,22 @@
 
 #include "portable/kernel/include/OS.h"
 
+class OSScheduler;
+
 typedef unsigned char OSTaskPriority_t;
 
-typedef void (*OSTaskMainPtr_t)(void *);
+typedef void
+(*OSTaskMainPtr_t)(void *);
 
 class OSTask
-  {
+{
 public:
 
   // Task range priorities.
   static const OSTaskPriority_t IDLE_PRIORITY = 0x00;
   static const OSTaskPriority_t MIN_PRIORITY = 0x01;
   static const OSTaskPriority_t MAX_PRIORITY = 0xFF;
-  static const OSTaskPriority_t DEFAULT_PRIORITY = (MAX_PRIORITY/2+1);
+  static const OSTaskPriority_t DEFAULT_PRIORITY = (MAX_PRIORITY / 2 + 1);
 
   // Value for the minimal size for a task.
   static const unsigned short STACK_MINIMAL_SIZE = OS_CFGINT_STACK_MINIMAL_SIZE;
@@ -29,15 +32,13 @@ public:
   static const OSStack_t STACK_FILL_BYTE = 0x5A;
 
   // Constructor; run static taskMain (C++ style).
-  OSTask(const char *pName, const OSStack_t *pStack,
-      unsigned short stackSize, OSTaskPriority_t priority =
-      OSTask::DEFAULT_PRIORITY);
+  OSTask(const char *pName, const OSStack_t *pStack, unsigned short stackSize,
+      OSTaskPriority_t priority = OSTask::DEFAULT_PRIORITY);
 
   // Constructor; run given entryPoint function (C style).
   OSTask(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
       const OSStack_t *pStack, unsigned short stackSize,
-      OSTaskPriority_t priority =
-      OSTask::DEFAULT_PRIORITY);
+      OSTaskPriority_t priority = OSTask::DEFAULT_PRIORITY);
 
 #if false
   virtual ~OSTask();
@@ -45,16 +46,21 @@ public:
 
   // Main function task.
   // Overridden by actual implementation.
-  virtual void taskMain(void);
+  virtual void
+  taskMain(void);
 
   // Suspend the task and remove it from the ready list.
-  void suspend(void);
+  void
+  suspend(void);
   // Resume the task, previously suspended by inserting it into the ready list.
-  void resume(void);
+  void
+  resume(void);
   // Check if the task is suspended.
-  bool isSuspended(void);
+  bool
+  isSuspended(void);
   // Check if the task is waiting on an event.
-  bool isWaiting(void);
+  bool
+  isWaiting(void);
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
   // Return TRUE if the task can go to sleep, FALSE otherwise.
@@ -70,48 +76,59 @@ public:
 #endif
 
   // Return the task name.
-  char const *getName(void);
-  
+  char const *
+  getName(void);
+
   // Return the address of the stack bottom.
   // Stack grows from high address to low address,
   // so this is the maximum address the stack can grow.
-  unsigned char *getStackBottom(void);
-  
+  unsigned char *
+  getStackBottom(void);
+
   // Return the current stack pointer of the task.
   // This value is stored only during context switch,
   // so the running task will not get the actual value.
-  OSStack_t *getStack(void);
-  
+  OSStack_t *
+  getStack(void);
+
   // Return the stack size given at task creation.
-  unsigned short getStackSize(void);    /* bytes */
+  unsigned short
+  getStackSize(void); /* bytes */
 
 #if defined(OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER)
   OSProgramPtr_t getProgramCounter(void);
 #endif
 
   // Return the task ID.
-  int getID(void);
-  
+  int
+  getID(void);
+
   // Return the task's context.
-  void *getContext(void);
+  void *
+  getContext(void);
 
   // Return task priority.
   // Higher means better priority.
-  OSTaskPriority_t getPriority(void);
-  
+  OSTaskPriority_t
+  getPriority(void);
+
   // Set task priority.
-  void setPriority(OSTaskPriority_t priority);
+  void
+  setPriority(OSTaskPriority_t priority);
 
   // Return the event the task is waiting for.
   // Cancelling a waiting task can be done by notifying
   // this event with a return value of OS_EVENT_WAIT_RETURN_CANCELED.
-  OSEvent_t getEvent(void);
+  OSEvent_t
+  getEvent(void);
 
   // Set the event the task is waiting for.
-  void setEvent(OSEvent_t event);
+  void
+  setEvent(OSEvent_t event);
 
   // Return the maximum usage of the stack, in bytes.
-  unsigned short getStackUsed(void);
+  unsigned short
+  getStackUsed(void);
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
   // Allow task to be put to sleep.
@@ -126,7 +143,8 @@ public:
 #endif
 
 #if defined(DEBUG)
-  void dumpPC(void);
+  void
+  dumpPC(void);
 #endif
 
   // The SP is saved in this variable at contextSave 
@@ -138,17 +156,25 @@ public:
   eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
       OSEventWaitReturn::OS_VOID);
 
+  bool
+  eventWaitPrepare(OSEvent_t event);
+
+  OSEventWaitReturn_t
+  getEventWaitReturn(void);
+
 private:
-  friend class OSScheduler;     // TODO: explain why they are here
+  friend class OSScheduler; // TODO: explain why they are here
   friend class OSReadyList;
 
   // Initialise task's environment.
-  void init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
+  void
+  init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
       const OSStack_t *pStackBottom, unsigned short stackSize,
       OSTaskPriority_t priority);
 
   // Redirect to virtual function (taskMain).
-  static void staticMain(OSTask * pt);
+  static void
+  staticMain(OSTask * pt);
 
 #if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK)
   // Warning: no longer run in critical section!
@@ -161,15 +187,11 @@ private:
   bool m_isInterrupted;
 #endif
 
-  //bool m_isPreempted; // TODO: remove it fi no longer needed
-
   // True if the task is suspended.
   bool m_isSuspended;
 
   // True if task is waiting for an event. The event value is in m_event.
   bool m_isWaiting;
-
-  //bool m_hasReturnValue;  // TODO: remove it if no longer needed
 
   // The event which the task is waiting for, or OSEvent::OS_NONE
   OSEvent_t m_event;
@@ -206,7 +228,7 @@ private:
 #if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
   unsigned short m_WDseconds;
 #endif
-  };
+};
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
 
@@ -217,4 +239,10 @@ inline void OSTask::ackInterruption(void)
 
 #endif
 
-#endif /*OSTASK_H_ */
+inline OSEventWaitReturn_t
+OSTask::getEventWaitReturn(void)
+{
+  return m_eventWaitReturn;
+}
+
+#endif /* OSTASK_H_ */
