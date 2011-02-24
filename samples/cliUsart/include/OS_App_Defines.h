@@ -32,7 +32,7 @@
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG             1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE           1
 
-#if false
+#if true
 #define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          1
 #define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 #define OS_INCLUDE_CLOG                                 1

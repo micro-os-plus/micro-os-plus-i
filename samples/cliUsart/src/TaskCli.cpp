@@ -17,7 +17,7 @@
 
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
   OSTask(pName, m_stack, sizeof(m_stack)), m_dev(dev),
-#if false
+#if true
   m_cin(&m_dev), m_cout(&m_dev),
 #endif
   m_cli(m_line, sizeof(m_line))
@@ -62,7 +62,7 @@ TaskCli::taskMain(void)
 
   OSDeviceCharacter& dev = m_dev;
 
-#if false
+#if true
   istream& cin = m_cin;
   ostream& cout = m_cout;
 
@@ -73,7 +73,7 @@ TaskCli::taskMain(void)
   for (;;)
     {
       dev.open(); // wait for dtr
-#if false
+#if true
       cout << endl << endl << greeting << endl;
 #else
       dev.writeByte('\n');
@@ -86,7 +86,7 @@ TaskCli::taskMain(void)
 #endif
       for (; dev.isConnected();)
         {
-#if false
+#if true
           cout << endl << prompt;
           int c;
 
@@ -126,7 +126,7 @@ TaskCli::taskMain(void)
     }
 }
 
-#if false
+#if true
 static const char str_checksum[] = "Checksum?";
 
 /*
