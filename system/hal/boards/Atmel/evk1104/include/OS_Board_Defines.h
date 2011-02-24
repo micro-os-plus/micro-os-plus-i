@@ -49,17 +49,43 @@
 #define OS_CFGINT_TICK_RATE_HZ             		        (1000)
 #endif
 
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT)
-#define OS_CONFIG_ACTIVE_LED_PORT			        GPIOX
-#endif
+// Led definitions
+#define OS_CFGREG_BOARD_LED0_PORT_CONFIG                        GPIOX
+#define OS_CFGREG_BOARD_LED0_PORT_WRITE                         GPIOX
+#define OS_CFGREG_BOARD_LED0_PORT_READ                          GPIOX
+#define OS_CFGPIN_BOARD_LED0_PIN                                AVR32_PIN_PX16
+#define OS_CFGBOOL_BOARD_LED0_ISACTIVE_LOW                      (true)
+
+#define OS_CFGREG_BOARD_LED1_PORT_CONFIG                        GPIOX
+#define OS_CFGREG_BOARD_LED1_PORT_WRITE                         GPIOX
+#define OS_CFGREG_BOARD_LED1_PORT_READ                          GPIOX
+#define OS_CFGPIN_BOARD_LED1_PIN                                AVR32_PIN_PX50
+#define OS_CFGBOOL_BOARD_LED1_ISACTIVE_LOW                      (true)
+
+#define OS_CFGREG_BOARD_LED2_PORT_CONFIG                        GPIOX
+#define OS_CFGREG_BOARD_LED2_PORT_WRITE                         GPIOX
+#define OS_CFGREG_BOARD_LED2_PORT_READ                          GPIOX
+#define OS_CFGPIN_BOARD_LED2_PIN                                AVR32_PIN_PX54
+#define OS_CFGBOOL_BOARD_LED2_ISACTIVE_LOW                      (true)
+
+#define OS_CFGREG_BOARD_LED3_PORT_CONFIG                        GPIOX
+#define OS_CFGREG_BOARD_LED3_PORT_WRITE                         GPIOX
+#define OS_CFGREG_BOARD_LED3_PORT_READ                          GPIOX
+#define OS_CFGPIN_BOARD_LED3_PIN                                AVR32_PIN_PX51
+#define OS_CFGBOOL_BOARD_LED3_ISACTIVE_LOW                      (true)
+
+// Default processor activity led is on Led0
 #if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
-#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG		        OS_CONFIG_ACTIVE_LED_PORT
+#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG		        OS_CFGREG_BOARD_LED0_PORT_CONFIG
+#endif
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT)
+#define OS_CONFIG_ACTIVE_LED_PORT                               OS_CFGREG_BOARD_LED0_PORT_WRITE
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
-#define OS_CONFIG_ACTIVE_LED_BIT			        AVR32_PIN_PX16
+#define OS_CONFIG_ACTIVE_LED_BIT			        OS_CFGPIN_BOARD_LED0_PIN
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW)
-#define OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW                       (1)
+#define OS_CONFIG_ACTIVE_LED_ISACTIVE_LOW                       OS_CFGBOOL_BOARD_LED0_ISACTIVE_LOW
 #endif
 
 #if defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED)
@@ -74,48 +100,53 @@
 #endif
 #endif /* OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED */
 
-#if false
-#if !defined(OS_CONFIG_USB_LED_PORT_INIT)
-#define OS_CONFIG_USB_LED_PORT_INIT			        DDRD
+
+// Default USB activity led on LED3
+#if !defined(OS_CFGREG_OSUSBLED_LED_PORT_CONFIG)
+#define OS_CFGREG_OSUSBLED_LED_PORT_CONFIG			        OS_CFGREG_BOARD_LED3_PORT_CONFIG
 #endif
-#if !defined(OS_CONFIG_USB_LED_PORT)
-#define OS_CONFIG_USB_LED_PORT					PORTD
+#if !defined(OS_CFGREG_OSUSBLED_LED_PORT_WRITE)
+#define OS_CFGREG_OSUSBLED_LED_PORT_WRITE				OS_CFGREG_BOARD_LED3_PORT_WRITE
 #endif
-#if !defined(OS_CONFIG_USB_LED_BIT)
-#define OS_CONFIG_USB_LED_BIT					PORTD7
+#if !defined(OS_CFGPIN_OSUSBLED_LED_PIN)
+#define OS_CFGPIN_OSUSBLED_LED_PIN			        OS_CFGPIN_BOARD_LED3_PIN
+#endif
+#if !defined(OS_CFGBOOL_OSUSBLED_LED_ISACTIVE_LOW)
+#define OS_CFGBOOL_OSUSBLED_LED_ISACTIVE_LOW                    OS_CFGBOOL_BOARD_LED3_ISACTIVE_LOW
 #endif
 
-#if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)
-#define OS_CONFIG_BLINK_LED_PORT_INIT				DDRD
+
+// Default blink led on LED1
+#if !defined(OS_CONFIG_BLINK_LED_PORT_CONFIG)
+#define OS_CONFIG_BLINK_LED_PORT_CONFIG				OS_CFGREG_BOARD_LED1_PORT_CONFIG
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_PORT)
-#define OS_CONFIG_BLINK_LED_PORT				PORTD
+#define OS_CONFIG_BLINK_LED_PORT				OS_CFGREG_BOARD_LED1_PORT_WRITE
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_BIT)
-#define OS_CONFIG_BLINK_LED_BIT					5
-#endif
+#define OS_CONFIG_BLINK_LED_BIT					OS_CFGPIN_BOARD_LED1_PIN
 #endif
 
-#if true
+// Default debug led 1 on LED1
 #if !defined(OS_CONFIG_DEBUG_LED1_PORT_WRITE)
-#define OS_CONFIG_DEBUG_LED1_PORT_WRITE                               GPIOX
+#define OS_CONFIG_DEBUG_LED1_PORT_WRITE                         OS_CFGREG_BOARD_LED1_PORT_CONFIG
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                        GPIOX
+#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                        OS_CFGREG_BOARD_LED1_PORT_WRITE
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_BIT)
-#define OS_CONFIG_DEBUG_LED1_BIT                                AVR32_PIN_PX50
+#define OS_CONFIG_DEBUG_LED1_BIT                                OS_CFGPIN_BOARD_LED1_PIN
 #endif
 
+// Default debug led 2 on LED1
 #if !defined(OS_CONFIG_DEBUG_LED2_PORT_WRITE)
-#define OS_CONFIG_DEBUG_LED2_PORT_WRITE                         GPIOX
+#define OS_CONFIG_DEBUG_LED2_PORT_WRITE                         OS_CFGREG_BOARD_LED2_PORT_CONFIG
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                        GPIOX
+#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                        OS_CFGREG_BOARD_LED2_PORT_WRITE
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_BIT)
-#define OS_CONFIG_DEBUG_LED2_BIT                                AVR32_PIN_PX54
-#endif
+#define OS_CONFIG_DEBUG_LED2_BIT                                OS_CFGPIN_BOARD_LED2_PIN
 #endif
 
 #endif /* HAL_OS_BOARD_DEFINES_H_ */
