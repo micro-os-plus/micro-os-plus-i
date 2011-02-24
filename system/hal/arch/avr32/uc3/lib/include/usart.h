@@ -234,6 +234,42 @@ extern void usart_reset(volatile avr32_usart_t *usart);
  */
 extern int usart_init_rs232(volatile avr32_usart_t *usart, const usart_options_t *opt, long pba_hz);
 
+extern void usart_tx_disable(volatile avr32_usart_t *usart);
+
+extern void usart_tx_enable(volatile avr32_usart_t *usart);
+
+#if (defined __GNUC__)
+__attribute__((__always_inline__))
+#endif
+extern __inline__ void usart_int_tx_enable(volatile avr32_usart_t *usart)
+{
+  usart->ier =  AVR32_USART_IER_TXRDY_MASK;
+}
+
+#if (defined __GNUC__)
+__attribute__((__always_inline__))
+#endif
+extern __inline__ void usart_int_tx_disable(volatile avr32_usart_t *usart)
+{
+  usart->idr =  AVR32_USART_IDR_TXRDY_MASK;
+}
+
+#if (defined __GNUC__)
+__attribute__((__always_inline__))
+#endif
+extern __inline__ void usart_int_rx_enable(volatile avr32_usart_t *usart)
+{
+  usart->ier =  AVR32_USART_IER_RXRDY_MASK;
+}
+
+#if (defined __GNUC__)
+__attribute__((__always_inline__))
+#endif
+extern __inline__ void usart_int_rx_disable(volatile avr32_usart_t *usart)
+{
+  usart->idr =  AVR32_USART_IDR_RXRDY_MASK;
+}
+
 /*! \brief Sets up the USART to use the standard RS232 protocol in TX-only mode.
  *
  * Compared to \ref usart_init_rs232, this function allows very high baud rates
