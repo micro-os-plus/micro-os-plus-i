@@ -12,6 +12,8 @@
 
 #include "hal/arch/avr32/uc3/devices/character/include/DeviceCharacterBufferedUsartBase.h"
 
+#include "hal/arch/avr32/uc3/lib/include/usart.h"
+
 // ----- constructors --------------------------------------------------------
 
 DeviceCharacterBufferedUsartBase::DeviceCharacterBufferedUsartBase(void)
@@ -52,9 +54,25 @@ DeviceCharacterBufferedUsartBase::DeviceCharacterBufferedUsartBase(
 }
 
 void
-DeviceCharacterBufferedUsartBase::setPortAddress(void *pPort)
+DeviceCharacterBufferedUsartBase::setPortAddress( volatile avr32_usart_t* pPort)
 {
   m_pPort = pPort;
+}
+
+void
+DeviceCharacterBufferedUsartBase::interruptServiceRoutine(void)
+{
+  int rc;
+  rc = usart_tx_ready(m_pPort);
+  if(rc)
+    {
+      interruptTxServiceRoutine();
+    }
+  rc = usart_test_hit(m_pPort);
+  if(rc)
+    {
+      interruptRxServiceRoutine();
+    }
 }
 
 int
@@ -67,7 +85,7 @@ DeviceCharacterBufferedUsartBase::implPortInit(void)
 int
 DeviceCharacterBufferedUsartBase::implPortDisable(void)
 {
-  ; // TODO: Implement it (probably not needed)
+  usart_reset(m_pPort);
   return 0;
 }
 
@@ -86,14 +104,15 @@ DeviceCharacterBufferedUsartBase::implInterruptTxDisable(void)
 unsigned char
 DeviceCharacterBufferedUsartBase::implPortRead(void)
 {
-  ; // TODO: Implement it
-  return 0;
+  int b;
+  usart_read_char(m_pPort,&b);
+  return (unsigned char)b;
 }
 
 void
 DeviceCharacterBufferedUsartBase::implPortWrite(unsigned char b)
 {
-  ; // TODO: Implement it
+  usart_write_char(m_pPort,b);
 }
 
 #endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE) */
