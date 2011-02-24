@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -59,7 +59,7 @@ public:
 
 protected:
   // insert a new timeout into the array
-  void insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret);
+  bool insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret);
 
   // remove the timeout from the given slot
   void remove(int i);
