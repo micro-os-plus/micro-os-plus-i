@@ -47,6 +47,10 @@
  *
  */
 
+#include "portable/kernel/include/OS_Defines.h"
+
+#if defined(OS_CONFIG_ARCH_AVR32)
+
 #include "../include/gpio.h"
 
 
@@ -455,5 +459,7 @@ int gpio_configure_pin_periph_event_mode(unsigned int pin, unsigned int mode, un
 }
 
 #endif
+
+#endif /* defined(OS_CONFIG_ARCH_AVR32) */
 
 //! @}
