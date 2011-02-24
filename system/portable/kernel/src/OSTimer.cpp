@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2009 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -46,7 +46,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
           event = (OSEvent_t) (OSScheduler::getTaskCurrent());
         }
 
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if false && defined(OS_INCLUDE_OSTASK_INTERRUPTION)
 
       if (OSScheduler::getTaskCurrent()->isInterrupted())
         {
@@ -55,12 +55,30 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
       else
 #endif /* OS_INCLUDE_OSTASK_INTERRUPTION */
         {
+
+#if false
+          bool doYield;
           OSScheduler::criticalEnter();
             {
-              insert(ticks, event, OSEventWaitReturn::OS_VOID);
+              doYield = insert(ticks, event, OSEventWaitReturn::OS_VOID)
+                  && OSScheduler::eventWaitPrepare(event);
             }
           OSScheduler::criticalExit();
-          ret = OSScheduler::eventWait(event);
+          if (doYield)
+            {
+              OSSchedulerImpl::yield();
+            }
+          ret = OSScheduler::getEventWaitReturn();
+#else
+          OSScheduler::criticalEnter();
+            {
+              if ( insert(ticks, event, OSEventWaitReturn::OS_VOID))
+                ret = OSScheduler::eventWait(event);
+              else
+                ret = OSEventWaitReturn::OS_FAILED;
+            }
+          OSScheduler::criticalExit();
+#endif
         }
     }
   else
@@ -135,7 +153,7 @@ OSTimer::eventRemove(OSEvent_t event)
 
 // insert an entry in the timer list
 // WARNING: needs synchronization
-void
+bool
 OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
 {
   if (ticks == 0)
@@ -144,7 +162,7 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
       OSDeviceDebug::putString_P(PSTR("insert() ticks=0"));
       OSDeviceDebug::putNewLine();
 #endif
-      return;
+      return false;
     }
 
   int cnt;
@@ -156,7 +174,7 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
       OSDeviceDebug::putString_P(PSTR("insert() full"));
       OSDeviceDebug::putNewLine();
 #endif
-      return;
+      return false;
     }
 
   OSTimerStruct_t *p;
@@ -200,6 +218,7 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
   OSDeviceDebug::putPtr(p);
   OSDeviceDebug::putNewLine();
 #endif
+  return true;
 }
 
 // remove the i-th list entry
@@ -241,11 +260,8 @@ OSTimer::interruptTick(void)
       OSTimerStruct_t *p;
       p = m_pArray;
 
-      if ((p->ticks == 0)||(--(p->ticks) == 0))
+      if (--(p->ticks) == 0)
         {
-          int cnt;
-          cnt = 0;
-
           do
             {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
@@ -279,13 +295,9 @@ OSTimer::interruptTick(void)
                   if (OSScheduler::eventNotify(p->event, p->u.ret) != 0)
                     {
                       // remove top timer from the array
-                      remove(cnt);
-                      cnt--;
-                      p--;
+                      remove(0);
                     }
                 }
-              ++cnt;
-              p++;
             }
           while ((p->ticks == 0) && (m_count > 0));
         }
