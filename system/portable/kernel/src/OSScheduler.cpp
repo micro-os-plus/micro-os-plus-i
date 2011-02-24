@@ -167,39 +167,14 @@ OSScheduler::yield(void)
 OSEventWaitReturn_t
 OSScheduler::eventWait(OSEvent_t event)
 {
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
-
-  if (getTaskCurrent()->isInterrupted())
+  if (ms_pTaskRunning->eventWaitPrepare(event))
     {
-      return OSEventWaitReturn::OS_CANCELED;
-    }
+      OSSchedulerImpl::yield();
 
-#endif
-
-  if (!ms_isLocked)
-    {
-      OSScheduler::criticalEnter();
-        {
-      if (event != OSEvent::OS_NONE)
-        {
-          // mark the entering task is waiting on the given event
-          ms_pTaskRunning->m_event = event;
-          ms_pTaskRunning->m_isWaiting = true;
-        }
-      else
-        {
-          // if no event, return NONE
-          ms_pTaskRunning->m_eventWaitReturn = OSEventWaitReturn::OS_NONE;
-        }
-        }
-      OSScheduler::criticalExit();
-    }
-
-  //ms_pTaskRunning->m_hasReturnValue = true;
-  OSSchedulerImpl::yield();
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_EVENTWAIT)
-  OSDeviceDebug::putString(" wk ");
+      OSDeviceDebug::putString(" wk ");
 #endif
+    }
   return ms_pTaskRunning->m_eventWaitReturn;
 }
 
@@ -217,7 +192,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 #endif
 #if false
   if (event == OSEvent::OS_NONE)
-    return 0;
+  return 0;
 #endif
 
   int cnt;
@@ -245,7 +220,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
                       pt->m_eventWaitReturn = ret;
 #if defined(DEBUG)
                       if (ret == OSEventWaitReturn::OS_NONE)
-                        OSDeviceDebug::putChar('^');
+                      OSDeviceDebug::putChar('^');
 #endif
                       OSReadyList::insert(pt);
 
@@ -264,7 +239,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
       pt = ms_tasks[i];
       if (pt != 0)
         {
-         cnt += pt->eventNotify(event,ret);
+          cnt += pt->eventNotify(event, ret);
         }
     }
 #endif
@@ -421,14 +396,14 @@ OSScheduler::interruptTick(void)
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
       if (pt->isInterrupted())
-        ISRcancelTask(pt);
+      ISRcancelTask(pt);
 #endif /* OS_INCLUDE_OSTASK_INTERRUPTION */
     }
 
 #endif /* defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) || defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
 
 #if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
-    OSApplicationImpl::interruptTick();
+  OSApplicationImpl::interruptTick();
 #endif /* OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK */
 }
 
@@ -492,7 +467,7 @@ OSReadyList::insert(OSTask *pTask)
     }
 
   if (i < ms_count)
-    // i is the place where to insert
+  // i is the place where to insert
     {
       int j;
       // shift right to make space
