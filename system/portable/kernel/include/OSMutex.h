@@ -16,9 +16,7 @@ public:
   // Initialise the internal variables.
   OSMutex();
 
-  // Constants
-
-  // OK is commented out because it is already defined (as macro) in compiler.h
+  // Constants ; all are used as result code for acquire and release methods.
   static const int OS_OK = 1;
   static const int OS_NOT_OWNER = -1;
   static const int OS_NOT_ACQUIRED = -2;
@@ -26,7 +24,7 @@ public:
   static const int OS_WOULD_BLOCK = -4;
 
   // try to acquire mutex
-  // if noBlock is false, the task is blocked until this mutex is released
+  // if doNotBlock is false, the task is blocked until this mutex is released
   int
   acquire(bool doNotBlock = false);
 
