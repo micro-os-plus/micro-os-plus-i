@@ -81,6 +81,7 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 		<nature>de.innot.avreclipse.core.avrnature</nature>
+		<nature>com.atmel.avr32.core.nature</nature>
 	</natures>
 	<linkedResources>
 		<link>

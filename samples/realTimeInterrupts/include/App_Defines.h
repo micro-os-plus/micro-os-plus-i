@@ -83,4 +83,4 @@ extern void delayWithYield(schedTicks_t n);
 //#define APP_EXCLUDE_TASKBLINKREALTIME_TASKMAIN_LED      (1)
 
 
-#endif /*APP_DEFINES_H_ */
+#endif /* APP_DEFINES_H_ */

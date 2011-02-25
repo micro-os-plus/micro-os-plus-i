@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2008 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -20,7 +20,7 @@ AppSDI12Sensor::AppSDI12Sensor(const char *pNameAquire,
     if (os.isDebug())
       {
         debug.putString("AppSDI12Sensor()=");
-        debug.putHex((unsigned short) this);
+        debug.putPtr(this);
         debug.putNewLine();
       }
   }

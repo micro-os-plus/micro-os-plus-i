@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -8,7 +8,7 @@
 
 /*
  * Task constructor.
- * Initialize system task object and store parameters in private members.
+ * Initialise system task object and store parameters in private members.
  */
 
 TaskBlink1::TaskBlink1(const char *pName, unsigned char iLed, schedTicks_t rate) :
@@ -16,7 +16,7 @@ TaskBlink1::TaskBlink1(const char *pName, unsigned char iLed, schedTicks_t rate)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     debug.putString("TaskBlink1()=");
-    debug.putHex((unsigned short)this);
+    debug.putPtr(this);
     debug.putNewLine();
 #endif
 
@@ -26,7 +26,7 @@ TaskBlink1::TaskBlink1(const char *pName, unsigned char iLed, schedTicks_t rate)
 
 /*
  * Task main code.
- * Initialize led and toggle it using the rate.
+ * Initialise led and toggle it using the rate.
  *
  * The toggle rate is done either with busy wait, or with real sleep.
  * Busy wait is of two kinds, if preemption is enabled a long loop is
@@ -50,7 +50,7 @@ void TaskBlink1::taskMain(void)
         os.sched.unlock();
       }
 
-    // initialize led port as output
+    // initialise led port as output
     m_oLed.init();
 
     // task endless loop

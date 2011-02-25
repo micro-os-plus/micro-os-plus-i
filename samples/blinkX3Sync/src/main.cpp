@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -54,9 +54,3 @@ TaskBlink3 task3("C", APP_CONFIG_LED3);
 TaskBlink4 task4("D", OS_CFGINT_TICK_RATE_HZ * 2, task1);
 
 // ------------------------------------------------------------------------------
-
-// message to be displayed on the debugging device at startup
-#if defined(DEBUG)
-const char greeting[]= "AVI blinkX3Sync v2.1";
-#endif
-

@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -18,10 +18,15 @@
 #define OS_INCLUDE_CIRCULARBYTEBUFFER_DUMP              1
 
 #define OS_INCLUDE_OSDEVICECHARACTER                    1
-#define OS_INCLUDE_DEVICECHARACTERMULTIUSART1           1
+#define OS_INCLUDE_OSDEVICECHARACTERBUFFERED            1
+//#define OS_INCLUDE_DEVICECHARACTERMULTIUSART1           1
+
+#define OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE     (1)
+#define OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1        (1)
+
 //#define OS_INCLUDE_DEVICECHARACTERMULTIUSART0           1
 #define OS_INCLUDE_DEVICECHARACTERUSART                 1
-#define OS_INCLUDE_DEVICECHARACTERUSB                   1
+//#define OS_INCLUDE_DEVICECHARACTERUSB                   1
 
 #define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          1
 
@@ -64,4 +69,4 @@
 
 #endif
 
-#endif /*OS_APP_DEFINES_H_ */
+#endif /* OS_APP_DEFINES_H_ */

@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -41,9 +41,4 @@ TaskBlink1 task1("A", APP_CONFIG_LED1, OS_CFGINT_TICK_RATE_HZ / 2);
 TaskBlink2 task2("B", APP_CONFIG_LED2, OS_CFGINT_TICK_RATE_HZ / 2);
 
 // ------------------------------------------------------------------------------
-
-// message to be displayed on the debugging device at startup
-#if defined(DEBUG)
-const char greeting[]= "AVI calibrateBusyWait v1.1";
-#endif
 

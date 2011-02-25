@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -10,7 +10,7 @@
 
 /*
  * Task constructor. 
- * Initialize system task object, initialize member objects
+ * Initialise system task object, initialise member objects
  * and store parameters in private members.
  *
  */
@@ -21,7 +21,7 @@ TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     debug.putString("TaskCli()=");
-    debug.putHex( ( unsigned short ) this );
+    debug.putPtr(this);
     debug.putNewLine();
 #endif
   }

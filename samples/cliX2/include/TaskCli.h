@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -27,7 +27,7 @@ private:
   int xorCheck(unsigned char *pc);
 
   // members
-  unsigned char m_stack[OSTask::STACK_MINIMAL_SIZE + 100];
+  unsigned char m_stack[OSTask::STACK_MINIMAL_SIZE + 400];
   OSDeviceCharacter & m_dev;
 
   istream m_cin;
@@ -36,4 +36,4 @@ private:
   unsigned char m_line[ 80 ];
   };
 
-#endif /*TASKCLI_H_*/
+#endif /* TASKCLI_H_ */

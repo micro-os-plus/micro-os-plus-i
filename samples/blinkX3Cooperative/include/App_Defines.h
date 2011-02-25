@@ -24,6 +24,8 @@
 
 extern void delayWithYield(schedTicks_t n);
 
+// ----------------------------------------------------------------------------
+
 #if defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 
 #define APP_CONFIG_LED_PORT             GPIOC
@@ -60,5 +62,6 @@ extern void delayWithYield(schedTicks_t n);
 #error "Missing OS_CONFIG_BOARD_* board definition"
 #endif
 
+// ----------------------------------------------------------------------------
 
 #endif /* APP_DEFINES_H_ */

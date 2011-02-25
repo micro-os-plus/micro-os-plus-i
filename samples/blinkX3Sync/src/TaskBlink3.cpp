@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -8,7 +8,7 @@
 
 /*
  * Task constructor.
- * Initialize system task object and store parameters in private members.
+ * Initialise system task object and store parameters in private members.
  */
 
 TaskBlink3::TaskBlink3(const char *pName, unsigned char iLed) :
@@ -16,14 +16,14 @@ TaskBlink3::TaskBlink3(const char *pName, unsigned char iLed) :
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     debug.putString("TaskBlink3()=");
-    debug.putHex((unsigned short)this);
+    debug.putPtr(this);
     debug.putNewLine();
 #endif
   }
 
 /*
  * Task main code.
- * Initialize led and toggle it based on events notified by task 2.
+ * Initialise led and toggle it based on events notified by task 2.
  */
 
 void TaskBlink3::taskMain(void)
@@ -41,7 +41,7 @@ void TaskBlink3::taskMain(void)
         os.sched.unlock();
       }
 
-    // initialize led port as output
+    // initialise led port as output
     m_oLed.init();
 
     // task endless loop

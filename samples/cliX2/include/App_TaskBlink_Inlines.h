@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -29,4 +29,4 @@ inline void TaskBlink::ledToggle(void)
     OSDebugLed1::toggle();
   }
 
-#endif /*TASKBLINKINLINES_H_*/
+#endif /* TASKBLINKINLINES_H_ */

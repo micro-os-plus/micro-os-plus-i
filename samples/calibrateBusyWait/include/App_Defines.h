@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -7,7 +7,24 @@
 #ifndef APP_DEFINES_H_
 #define APP_DEFINES_H_
 
+// ----------------------------------------------------------------------------
+
+// Application versioning and greeting definitions
+// More definitions will be computer in uOS.h
+
+#define APP_CFGSTR_APPLICATION_NAME                     "calibrateBusyWait"
+#define APP_CFGSTR_APPLICATION_MANUFACTURER             "AVI"
+
+// Notice: do not use parenthesis! (the values will be stringified)
+#define APP_CFGINT_VERSION_MAJOR                        1
+#define APP_CFGINT_VERSION_MINOR                        1
+#define APP_CFGINT_VERSION_REVISION                     1230
+
+// ----------------------------------------------------------------------------
+
 extern void delayWithYield(schedTicks_t n);
+
+// ----------------------------------------------------------------------------
 
 #if defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 
@@ -28,7 +45,9 @@ extern void delayWithYield(schedTicks_t n);
 #define APP_CONFIG_LED2                 6
 
 #else
-#error "Missing board"
+#error "Missing OS_CONFIG_BOARD_* definition"
 #endif
 
-#endif /*APP_DEFINES_H_ */
+// ----------------------------------------------------------------------------
+
+#endif /* APP_DEFINES_H_ */

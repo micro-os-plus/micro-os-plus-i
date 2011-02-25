@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -16,8 +16,3 @@
 AppSDI12Sensor appSDI12("dacq", "periodic", "sdi12");
 
 // ------------------------------------------------------------------------------
-
-// message to be displayed on the debugging device at startup
-#if defined(DEBUG)
-const char greeting[]= "AVI SDI12sensor v1.2";
-#endif

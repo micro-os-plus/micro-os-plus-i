@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -8,7 +8,7 @@
 
 /*
  * Task constructor.
- * Initialize system task object and store parameters in private members.
+ * Initialise system task object and store parameters in private members.
  */
 
 TaskBlink4::TaskBlink4(const char *pName, schedTicks_t rate, TaskBlink1& task) :
@@ -16,7 +16,7 @@ TaskBlink4::TaskBlink4(const char *pName, schedTicks_t rate, TaskBlink1& task) :
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     debug.putString("TaskBlink4()=");
-    debug.putHex((unsigned short)this);
+    debug.putPtr(this);
     debug.putNewLine();
 #endif
 

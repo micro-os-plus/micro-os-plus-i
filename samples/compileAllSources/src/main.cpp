@@ -22,8 +22,3 @@
 
 // ------------------------------------------------------------------------------
 
-// message to be displayed on the debugging device at startup
-#if defined(DEBUG)
-const char greeting[]= "AVI compileAllSources v1.1";
-#endif
-
