@@ -100,4 +100,4 @@ extern void delayWithYield(schedTicks_t n);
 #define APP_CFGINT_TASKBLINK_LEDBIT                     APP_CONFIG_LED1
 
 
-#endif /*APP_DEFINES_H_ */
+#endif /* APP_DEFINES_H_ */
