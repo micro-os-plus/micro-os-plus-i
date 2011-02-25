@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -110,7 +110,7 @@ void os_init_data_and_bss(void)
   {
     unsigned long *pSrc, *pDest;
 
-    /* Copy the data segment initializers from flash to SRAM */
+    /* Copy the data segment initialisers from flash to SRAM */
     pSrc = &__os_data_load_start;
     pDest = &__os_data_start;
     for (; pDest < &__os_data_end;)

@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -12,7 +12,7 @@
 
 /*
  * Task constructor.
- * Initialize system task object and store parameters in private members.
+ * Initialise system task object and store parameters in private members.
  *
  */
 
@@ -37,7 +37,7 @@ TaskBlink::TaskBlink(const char *pName, schedTicks_t rate) :
 
 /*
  * Task main code.
- * Initialize led and toggle it using the rate.
+ * Initialise led and toggle it using the rate.
  *
  * Used mainly to show the device is stil alive.
  *
@@ -53,7 +53,7 @@ void TaskBlink::taskMain(void)
       }
     OSScheduler::unlock();
 #endif
-    // initialize led port as output, turn led off
+    // initialise led port as output, turn led off
     ledInit();
     ledOff();
 

@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -21,15 +21,15 @@ DeviceCharacterMultiUsart0::DeviceCharacterMultiUsart0(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM,
     unsigned char *pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
     unsigned short rxLWM) :
-  DeviceCharacterUsart(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf, rxBufSize,
-      rxHWM, rxLWM)
+DeviceCharacterUsart(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf, rxBufSize,
+    rxHWM, rxLWM)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("DeviceCharacterMultiUsart0()=");
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
-    
+
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART)
     ms_pThis = this;
 #endif
@@ -38,14 +38,14 @@ DeviceCharacterMultiUsart0::DeviceCharacterMultiUsart0(unsigned char *pTxBuf,
 // use default 3/4 high and 1/4 low water marks
 DeviceCharacterMultiUsart0::DeviceCharacterMultiUsart0(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned char *pRxBuf, unsigned short rxBufSize) :
-  DeviceCharacterUsart(pTxBuf, txBufSize, pRxBuf, rxBufSize)
+DeviceCharacterUsart(pTxBuf, txBufSize, pRxBuf, rxBufSize)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("DeviceCharacterMultiUsart0()=");
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
-    
+
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART)
     ms_pThis = this;
 #endif

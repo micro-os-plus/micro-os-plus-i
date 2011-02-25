@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008-2009 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -7,6 +7,8 @@
 #include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_OSDEVICECAN)
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/devices/block/include/OSDeviceCAN.h"
 
@@ -24,7 +26,7 @@ OSDeviceCAN::OSDeviceCAN(CANPacket *pRxBuf, unsigned short rxBufSize,
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("OSDeviceCAN()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
 
@@ -60,7 +62,7 @@ int OSDeviceCAN::readPacket(CANPacket *p)
           }
         OSScheduler::criticalExit();
         if (flag)
-          break;
+        break;
 
 #if (false)
         if (getReadTimeout() == OS_TIMEOUT_IMMEDIATELY )
@@ -89,7 +91,7 @@ int OSDeviceCAN::readPacket(CANPacket *p)
       }
 
     if ( !isConnected() )
-      return OSReturn::OS_DISCONNECTED;
+    return OSReturn::OS_DISCONNECTED;
 
     int c;
     OSScheduler::criticalEnter();
@@ -122,7 +124,7 @@ int OSDeviceCAN::writePacket(CANPacket *p)
 
         // adjust illegal packet length
         if (p->len > 8)
-          p->len = 8;
+        p->len = 8;
 
         c = implWritePacket(p);
       }

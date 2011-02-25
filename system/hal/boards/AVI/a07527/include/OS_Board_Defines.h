@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2008-2009 Liviu Ionescu.
+ *	Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -48,8 +48,8 @@
 #if !defined(OS_CONFIG_USB_LED_PORT)
 #define OS_CONFIG_USB_LED_PORT                          PORTA
 #endif
-#if !defined(OS_CONFIG_USB_LED_BIT)
-#define OS_CONFIG_USB_LED_BIT                           2
+#if !defined(OS_CFGPIN_OSUSBLED_LED_PIN)
+#define OS_CFGPIN_OSUSBLED_LED_PIN                           2
 #endif
 
 #if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)

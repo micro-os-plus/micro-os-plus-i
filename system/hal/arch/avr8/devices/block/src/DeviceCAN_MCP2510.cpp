@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008-2009 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -23,7 +23,7 @@ DeviceCAN_MCP2510::DeviceCAN_MCP2510(CANPacket *pRxBuf,
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("DeviceCAN_MCP2510()=");
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
 

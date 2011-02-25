@@ -16,24 +16,28 @@ class DeviceCharacterBufferedUsartBase : public OSDeviceCharacterBuffered
 public:
   DeviceCharacterBufferedUsartBase(void);
 
-  DeviceCharacterBufferedUsartBase(unsigned char *pRxBuf, unsigned short rxBufSize,
-      unsigned short rxHWM, unsigned short rxLWM, unsigned char *pTxBuf,
-      unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM);
+  DeviceCharacterBufferedUsartBase(unsigned char *pRxBuf,
+      unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
+      unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
+      unsigned short txLWM);
 
-  DeviceCharacterBufferedUsartBase(unsigned char *pRxBuf, unsigned short rxBufSize,
-      unsigned char *pTxBuf, unsigned short txBufSize);
+      DeviceCharacterBufferedUsartBase(unsigned char *pRxBuf,
+          unsigned short rxBufSize, unsigned char *pTxBuf,
+          unsigned short txBufSize);
 
   // Used to set actual port address
-  void setPortAddress(volatile avr32_usart_t* pPort);
+  void
+  setPortAddress(volatile avr32_usart_t* pPort);
 
-  void interruptServiceRoutine(void);
+  void
+  interruptServiceRoutine(void);
 
 private:
 
   // actual port implementation routines
 
   virtual int
-  implPortInit(void);
+  implPortInit(void) = 0;
   virtual int
   implPortDisable(void);
 
@@ -49,8 +53,8 @@ private:
   implPortWrite(unsigned char b);
 
 private:
-   volatile avr32_usart_t* m_pPort;
-  
+  volatile avr32_usart_t* m_pPort;
+
 };
 
 #endif /* HAL_DEVICECHARACTERBUFFEREDSARTBASE_H_ */

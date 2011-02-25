@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -7,6 +7,8 @@
 #include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_SDI12BOOTLOADER)
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/devices/sdi12/include/SDI12BootLoader.h"
 
@@ -29,8 +31,7 @@ unsigned char SDI12BootLoader::ms_bufOut[Flash::BLOCK_SIZE];
 unsigned char SDI12BootLoader::ms_tmp[4];
 
 unsigned char SDI12BootLoader::ms_base64chars[65] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 void SDI12BootLoader::base64out(unsigned char ch)
   {

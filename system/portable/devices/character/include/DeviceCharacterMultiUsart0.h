@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -42,7 +42,7 @@
 #endif
 
 class DeviceCharacterMultiUsart0 : public DeviceCharacterUsart
-  {
+{
 public:
   DeviceCharacterMultiUsart0(unsigned char *pTxBuf, unsigned short txBufSize,
       unsigned short txHWM, unsigned short txLWM, unsigned char *pRxBuf,
@@ -52,14 +52,19 @@ public:
       unsigned char *pRxBuf, unsigned short rxBufSize);
 
 private:
-  virtual void implPortInit(void);
-  virtual void implInterruptTxEnable(void);
-  virtual void implInterruptTxDisable(void);
-  virtual unsigned char implPortRead(void);
-  virtual void implPortWrite(unsigned char b);
+  virtual void
+  implPortInit(void);
+  virtual void
+  implInterruptTxEnable(void);
+  virtual void
+  implInterruptTxDisable(void);
+  virtual unsigned char
+  implPortRead(void);
+  virtual void
+  implPortWrite(unsigned char b);
 
 public:
   static DeviceCharacterMultiUsart0 *ms_pThis;
-  };
+};
 
 #endif /*DEVICECHARACTERMULTIUSART0_H_*/

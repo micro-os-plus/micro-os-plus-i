@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2009 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -8,6 +8,7 @@
 #define OSSCHEDULER_H_
 
 #include "portable/kernel/include/OS.h"
+
 #include "portable/kernel/include/OSTask.h"
 
 typedef unsigned short schedTicks_t;
@@ -257,9 +258,9 @@ public:
   inline static void
   yield(void) __attribute__( ( always_inline ) );
 
-  // initialize the stack for a task
+  // initialise the stack for a task
   static OSStack_t *
-  stackInitialize(OSStack_t * pStackTop, void
+  stackInitialise(OSStack_t * pStackTop, void
   (*entryPoint)(void *), void *pParams, unsigned char id);
 
   // TODO: remove if no longer needed

@@ -25,7 +25,7 @@ os_exception_handler(unsigned short n, const char *s = NULL)
   OSDeviceDebug::putNewLine();
 
   for (;;)
-  ;
+    ;
 
 #else
 

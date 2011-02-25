@@ -43,8 +43,8 @@
 #if !defined(OS_CONFIG_USB_LED_PORT)
 #define OS_CONFIG_USB_LED_PORT							PORTD
 #endif
-#if !defined(OS_CONFIG_USB_LED_BIT)
-#define OS_CONFIG_USB_LED_BIT							PORTD7
+#if !defined(OS_CFGPIN_OSUSBLED_LED_PIN)
+#define OS_CFGPIN_OSUSBLED_LED_PIN							PORTD7
 #endif
 
 #if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)

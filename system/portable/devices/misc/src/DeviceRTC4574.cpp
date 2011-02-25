@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -7,6 +7,8 @@
 #include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_DEVICERTC4574)
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/devices/misc/include/DeviceRTC4574.h"
 
@@ -24,7 +26,7 @@ void DeviceRTC4574::init(void)
 void DeviceRTC4574::delay(void)
   {
     for (int i=0; i < 10; ++i)
-      OS::NOP();
+    OS::NOP();
   }
 
 unsigned char DeviceRTC4574::readBytes(unsigned char addr, unsigned char *pBuf,
@@ -32,7 +34,7 @@ unsigned char DeviceRTC4574::readBytes(unsigned char addr, unsigned char *pBuf,
   {
     unsigned char ret;
     ret = 0;
-    
+
     implSelectEnable();
       {
         delay();
@@ -95,9 +97,9 @@ void DeviceRTC4574::writeByte(unsigned char c)
         clkLow();
         delay();
         if ((c & 0x01) != 0)
-          dataHigh();
+        dataHigh();
         else
-          dataLow();
+        dataLow();
         c >>= 1;
         delay();
 
@@ -111,7 +113,7 @@ unsigned char DeviceRTC4574::readByte(void)
   {
     unsigned char c;
     c = 0;
-    
+
     for (unsigned char i = 0; i < 8; ++i)
       {
         clkLow();
@@ -119,7 +121,7 @@ unsigned char DeviceRTC4574::readByte(void)
         delay();
         c >>= 1;
         if (!dataIsLow())
-          c |= 0x80;
+        c |= 0x80;
 
         clkHigh();
         delay();

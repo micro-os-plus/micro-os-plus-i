@@ -44,7 +44,7 @@
  *     \n
  *    --- Error 530: --- \n
  *    return(__regBasePri); \n
- *    Warning 530: Symbol '__regBasePri' (line 264) not initialized \n
+ *    Warning 530: Symbol '__regBasePri' (line 264) not initialised \n
  *     \n
  *    --- Error 550: --- \n
  *      __regBasePri = (basePri & 0x1ff); \n
@@ -1192,7 +1192,7 @@ static __INLINE uint32_t NVIC_GetPriority(IRQn_Type IRQn)
 #define SYSTICK_MAXCOUNT       ((1<<24) -1)                                    /* SysTick MaxCount                                                      */
 
 /**
- * @brief  Initialize and start the SysTick counter and its interrupt.
+ * @brief  Initialise and start the SysTick counter and its interrupt.
  *
  * @param  uint32_t ticks is the number of ticks between two interrupts
  * @return  none
@@ -1226,7 +1226,7 @@ static __INLINE uint32_t SysTick_Config(uint32_t ticks)
  * @param   none
  * @return  none
  *
- * Initialize a system reset request to reset the MCU
+ * Initialise a system reset request to reset the MCU
  */
 static __INLINE void NVIC_SystemReset(void)
 {

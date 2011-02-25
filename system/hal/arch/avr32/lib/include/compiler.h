@@ -396,7 +396,7 @@ typedef struct
  * Under AVR32-GCC, __builtin_clz and __builtin_ctz behave like macros when
  * applied to constant expressions (values known at compile time), so they are
  * more optimized than the use of the corresponding assembly instructions and
- * they can be used as constant expressions e.g. to initialize objects having
+ * they can be used as constant expressions e.g. to initialise objects having
  * static storage duration, and like the corresponding assembly instructions
  * when applied to non-constant expressions (values unknown at compile time), so
  * they are more optimized than an assembly periphrasis. Hence, clz and ctz

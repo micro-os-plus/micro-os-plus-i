@@ -89,7 +89,7 @@ static __inline__ int usart_mode_is_multidrop(volatile avr32_usart_t *usart)
  * \param baudrate  Baud rate set point.
  * \param pba_hz    USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Baud rate successfully initialized.
+ * \retval USART_SUCCESS        Baud rate successfully initialised.
  * \retval USART_INVALID_INPUT  Baud rate set point is out of range for the given input clock frequency.
  */
 static int usart_set_async_baudrate(volatile avr32_usart_t *usart, unsigned int baudrate, unsigned long pba_hz)
@@ -126,7 +126,7 @@ static int usart_set_async_baudrate(volatile avr32_usart_t *usart, unsigned int 
  * \param baudrate  Baud rate set point.
  * \param pba_hz    USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Baud rate successfully initialized.
+ * \retval USART_SUCCESS        Baud rate successfully initialised.
  * \retval USART_INVALID_INPUT  Baud rate set point is out of range for the given input clock frequency.
  */
 static int usart_set_sync_master_baudrate(volatile avr32_usart_t *usart, unsigned int baudrate, unsigned long pba_hz)
@@ -151,7 +151,7 @@ static int usart_set_sync_master_baudrate(volatile avr32_usart_t *usart, unsigne
  *
  * \param usart Base address of the USART instance.
  *
- * \retval USART_SUCCESS  Baud rate successfully initialized.
+ * \retval USART_SUCCESS  Baud rate successfully initialised.
  */
 static int usart_set_sync_slave_baudrate(volatile avr32_usart_t *usart)
 {
@@ -173,7 +173,7 @@ static int usart_set_sync_slave_baudrate(volatile avr32_usart_t *usart)
  * \param clock   ISO7816 clock set point.
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        ISO7816 clock successfully initialized.
+ * \retval USART_SUCCESS        ISO7816 clock successfully initialised.
  * \retval USART_INVALID_INPUT  ISO7816 clock set point is out of range for the given input clock frequency.
  */
 static int usart_set_iso7816_clock(volatile avr32_usart_t *usart, unsigned int clock, unsigned long pba_hz)
@@ -212,7 +212,7 @@ static int usart_set_iso7816_clock(volatile avr32_usart_t *usart, unsigned int c
  * \param baudrate  Baud rate set point.
  * \param pba_hz    USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Baud rate successfully initialized.
+ * \retval USART_SUCCESS        Baud rate successfully initialised.
  * \retval USART_INVALID_INPUT  Baud rate set point is out of range for the given input clock frequency.
  */
 static int usart_set_spi_master_baudrate(volatile avr32_usart_t *usart, unsigned int baudrate, unsigned long pba_hz)
@@ -236,7 +236,7 @@ static int usart_set_spi_master_baudrate(volatile avr32_usart_t *usart, unsigned
  *
  * \param usart Base address of the USART instance.
  *
- * \retval USART_SUCCESS  Baud rate successfully initialized.
+ * \retval USART_SUCCESS  Baud rate successfully initialised.
  */
 static int usart_set_spi_slave_baudrate(volatile avr32_usart_t *usart)
 {

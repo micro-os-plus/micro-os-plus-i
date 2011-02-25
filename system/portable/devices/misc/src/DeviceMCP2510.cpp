@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -7,6 +7,8 @@
 #include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_DEVICEMCP2510)
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/devices/misc/include/DeviceMCP2510.h"
 
@@ -25,7 +27,7 @@ void DeviceMCP2510::init()
 
     // be sure we wait the 128 Osc cycles
     for (unsigned int i = (128); i > 0; --i)
-      OS::NOP();
+    OS::NOP();
     //cmdReset();
   }
 
@@ -44,7 +46,7 @@ void DeviceMCP2510::cmdReset(void)
 
     // be sure we wait the 128 Osc cycles
     for (unsigned int i = (128); i > 0; --i)
-      OS::NOP();
+    OS::NOP();
   }
 
 void DeviceMCP2510::cmdWrite(unsigned char addr, unsigned char data)

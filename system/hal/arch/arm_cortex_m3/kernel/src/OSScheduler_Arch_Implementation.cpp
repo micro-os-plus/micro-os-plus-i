@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2009 Liviu Ionescu.
+ *      Copyright (C) 2009-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -8,7 +8,7 @@
 
 #if defined(OS_CONFIG_ARCH_TEMPLATE)
 
-OSStack_t * OSScheduler::stackInitialize(OSStack_t * pStackTop, void(*pCode)(
+OSStack_t * OSScheduler::stackInitialise(OSStack_t * pStackTop, void(*pCode)(
     void *), void *pParams, unsigned char id)
   {
     /* The value on the right is the offset from the task stack pointer */

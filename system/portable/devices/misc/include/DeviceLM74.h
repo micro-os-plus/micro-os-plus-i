@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -12,23 +12,33 @@
 #include "portable/devices/misc/include/DeviceLM74Select.h"
 
 class DeviceLM74 : public DeviceLM74Select
-  {
+{
 public:
-  static void init(void);
+  static void
+  init(void);
 
-  static signed short read(void);
+  static signed short
+  read(void);
 
 private:
-  static void clkInit(void);
-  static void clkHigh(void);
-  static void clkLow(void);
+  static void
+  clkInit(void);
+  static void
+  clkHigh(void);
+  static void
+  clkLow(void);
 
-  static void dataIn(void);
-  static void dataOut(void);
-  static void dataHigh(void);
-  static void dataLow(void);
-  static bool dataIsLow(void);
-  };
+  static void
+  dataIn(void);
+  static void
+  dataOut(void);
+  static void
+  dataHigh(void);
+  static void
+  dataLow(void);
+  static bool
+  dataIsLow(void);
+};
 
 #if defined(OS_CONFIG_BOARD_AVI_A07524)
 #include "hal/boards/AVI/a07524/include/DeviceLM74_Defines.h"

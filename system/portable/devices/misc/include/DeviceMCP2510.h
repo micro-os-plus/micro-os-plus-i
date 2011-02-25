@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -13,17 +13,23 @@
 #include "portable/devices/misc/include/DeviceMCP2510SPI.h"
 
 class DeviceMCP2510 : public DeviceMCP2510Select, public DeviceMCP2510SPI
-  {
+{
 public:
-  static void init();
+  static void
+  init();
 
-  static void cmdReset(void);
-  static void cmdWrite(unsigned char addr, unsigned char data);
-  static unsigned char cmdRead(unsigned char addr);
-  static void cmdBitsModify(unsigned char addr, unsigned char mask,
-      unsigned char data);
-  static unsigned char cmdReadStatus(void);
-  static void cmdRts(unsigned char channel);
+  static void
+  cmdReset(void);
+  static void
+  cmdWrite(unsigned char addr, unsigned char data);
+  static unsigned char
+  cmdRead(unsigned char addr);
+  static void
+  cmdBitsModify(unsigned char addr, unsigned char mask, unsigned char data);
+  static unsigned char
+  cmdReadStatus(void);
+  static void
+  cmdRts(unsigned char channel);
 
   // Register definitions
   const static unsigned char RXF0SIDH = 0x00;
@@ -171,7 +177,7 @@ public:
   const static unsigned char TXWAR = 0x04;
   const static unsigned char RXWAR = 0x02;
   const static unsigned char EWARN = 0x01;
-  
+
   /* CANINTF bits */
   const static unsigned char MERRF = 0x80;
   const static unsigned char WAKIF = 0x40;
@@ -209,6 +215,6 @@ private:
   const static unsigned char READ_STATUS_CMD = 0xA0;
   const static unsigned char BIT_MODIFY_CMD = 0x05;
 
-  };
+};
 
 #endif /*DEVICEMCP2510_H_*/

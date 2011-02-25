@@ -203,60 +203,60 @@ OSTimerTicks::implAcknowledgeInterrupt(void)
 
 void
 OSTimerSeconds::init(void)
-{
+  {
 #if defined(OS_INCLUDE_32KHZ_TIMER)
 
-  volatile avr32_rtc_t* rtc_reg = &AVR32_RTC;
+    volatile avr32_rtc_t* rtc_reg = &AVR32_RTC;
 
-  if(rtc_init(rtc_reg, RTC_OSC_32KHZ, 0))
-    {
-      rtc_set_top_value(rtc_reg, (OS_CFG_RTC_TOP / 2) - 1);
+    if(rtc_init(rtc_reg, RTC_OSC_32KHZ, 0))
+      {
+        rtc_set_top_value(rtc_reg, (OS_CFG_RTC_TOP / 2) - 1);
 #if defined(DEBUG)
-      OSDeviceDebug::putChar('Q');
-      OSDeviceDebug::putNewLine();
+        OSDeviceDebug::putChar('Q');
+        OSDeviceDebug::putNewLine();
 #endif /*defined(DEBUG)*/
-    }
-  else
-    {
-      rtc_init(rtc_reg, RTC_OSC_RC, 0);
-      rtc_set_top_value(rtc_reg, ((115000) / 2) - 1);
+      }
+    else
+      {
+        rtc_init(rtc_reg, RTC_OSC_RC, 0);
+        rtc_set_top_value(rtc_reg, ((115000) / 2) - 1);
 #if defined(DEBUG)
-      OSDeviceDebug::putChar('R');
-      OSDeviceDebug::putNewLine();
+        OSDeviceDebug::putChar('R');
+        OSDeviceDebug::putNewLine();
 #endif /*defined(DEBUG)*/
-    }
+      }
 
-  rtc_enable_wake_up(rtc_reg);
-  rtc_enable(rtc_reg);
-  //register the interrupt
-  INTC_register_interrupt(SysSeconds_contextHandler, AVR32_RTC_IRQ,
-      OS_CFGINT_TIMER_IRQ_LEVEL);
-  rtc_enable_interrupt(rtc_reg);
+    rtc_enable_wake_up(rtc_reg);
+    rtc_enable(rtc_reg);
+    //register the interrupt
+    INTC_register_interrupt(SysSeconds_contextHandler, AVR32_RTC_IRQ,
+        OS_CFGINT_TIMER_IRQ_LEVEL);
+    rtc_enable_interrupt(rtc_reg);
 #endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
-}
+  }
 
 void
 OSTimerSeconds::implAcknowledgeInterrupt(void)
-{
+  {
 #if defined(OS_INCLUDE_32KHZ_TIMER)
-  rtc_clear_interrupt(&AVR32_RTC);
+    rtc_clear_interrupt(&AVR32_RTC);
 #endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
-}
+  }
 
 #if defined(OS_INCLUDE_32KHZ_TIMER)
 void
 SysSeconds_contextHandler(void)
-{
+  {
 #if !defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)
-  OSScheduler::interruptEnter();
+    OSScheduler::interruptEnter();
 #endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR) */
-    {
-      OSScheduler::timerSeconds.interruptServiceRoutine();
-    }
+      {
+        OSScheduler::timerSeconds.interruptServiceRoutine();
+      }
 #if !defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)
-  OSScheduler::interruptExit();
+    OSScheduler::interruptExit();
 #endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR) */
-}
+  }
 #endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
 
 #endif /*defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)*/

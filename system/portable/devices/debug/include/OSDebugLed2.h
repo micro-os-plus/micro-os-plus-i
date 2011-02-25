@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -10,23 +10,29 @@
 #include "portable/kernel/include/OS.h"
 
 class OSDebugLed2
-  {
+{
 public:
   OSDebugLed2();
 
-  static void toggle(void);
-  static void on(void);
-  static void off(void);
-  static void init(void);
+  static void
+  toggle(void);
+  static void
+  on(void);
+  static void
+  off(void);
+  static void
+  init(void);
 
-  unsigned char bitNumber(void);
+  unsigned char
+  bitNumber(void);
 
 private:
-  };
+};
 
-inline OSDebugLed2::OSDebugLed2()
-  {
-  }
+inline
+OSDebugLed2::OSDebugLed2()
+{
+}
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/devices/debug/include/OSDebugLed2_Inlines.h"

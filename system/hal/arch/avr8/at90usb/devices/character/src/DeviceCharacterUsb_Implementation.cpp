@@ -1,12 +1,14 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_DEVICECHARACTERUSB) && defined(OS_CONFIG_FAMILY_AT90USB)
+#if defined(OS_CONFIG_FAMILY_AT90USB)
+
+#if defined(OS_INCLUDE_DEVICECHARACTERUSB)
 
 #include "portable/devices/character/include/DeviceCharacterUsb.h"
 #include "portable/devices/usb/include/OSUsbDevice.h"
@@ -542,4 +544,6 @@ void DeviceCharacterUsb::specificCdcEndpointInit(unsigned char __attribute__( ( 
 #endif
   }
 
-#endif /*OS_INCLUDE_DEVICECHARACTERUSB*/
+#endif /* defined(OS_INCLUDE_DEVICECHARACTERUSB) */
+
+#endif /* defined(OS_CONFIG_FAMILY_AT90USB) */

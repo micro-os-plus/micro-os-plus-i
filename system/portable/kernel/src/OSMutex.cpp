@@ -8,6 +8,8 @@
 
 #if defined(OS_INCLUDE_OSMUTEX)
 
+#include "portable/kernel/include/OS.h"
+
 #include "portable/kernel/include/OSMutex.h"
 
 OSMutex::OSMutex()

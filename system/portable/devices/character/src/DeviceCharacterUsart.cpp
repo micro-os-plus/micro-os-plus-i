@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -24,7 +24,7 @@ DeviceCharacterUsart::DeviceCharacterUsart(void)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("DeviceCharacterUsart()=");
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
   }
@@ -47,12 +47,12 @@ DeviceCharacterUsart::DeviceCharacterUsart(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM,
     unsigned char *pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
     unsigned short rxLWM) :
-  m_txBuf(pTxBuf, txBufSize, txHWM, txLWM), m_rxBuf(pRxBuf, rxBufSize, rxHWM,
-      rxLWM)
+m_txBuf(pTxBuf, txBufSize, txHWM, txLWM), m_rxBuf(pRxBuf, rxBufSize, rxHWM,
+    rxLWM)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("DeviceCharacterUsart()=");
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
 
@@ -64,12 +64,12 @@ DeviceCharacterUsart::DeviceCharacterUsart(unsigned char *pTxBuf,
 // use default 3/4 high and 1/4 low water marks
 DeviceCharacterUsart::DeviceCharacterUsart(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned char *pRxBuf, unsigned short rxBufSize) :
-  m_txBuf(pTxBuf, txBufSize, txBufSize * 3/ 4, txBufSize / 4), m_rxBuf(pRxBuf,
-      rxBufSize, rxBufSize * 3/ 4, rxBufSize / 4)
+m_txBuf(pTxBuf, txBufSize, txBufSize * 3/ 4, txBufSize / 4), m_rxBuf(pRxBuf,
+    rxBufSize, rxBufSize * 3/ 4, rxBufSize / 4)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("DeviceCharacterUsart()=");
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
 
@@ -147,7 +147,7 @@ void DeviceCharacterUsart::interruptTxServiceRoutine(void)
   {
 #if 0
     OSDeviceDebug::putChar('!');
-    OSDeviceDebug::putHex((unsigned short)ms_pThis);
+    OSDeviceDebug::putPtr(ms_pThis);
     OSDeviceDebug::putChar(' ');
     ms_pThis->m_txBuf.dump();
 #endif
@@ -197,7 +197,7 @@ void DeviceCharacterUsart::interruptRxServiceRoutine(void)
   {
 #if 0
     OSDeviceDebug::putChar('#');
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putChar(' ');
     m_rxBuf.dump();
 #endif

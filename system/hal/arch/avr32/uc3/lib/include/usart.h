@@ -229,7 +229,7 @@ extern void usart_reset(volatile avr32_usart_t *usart);
  * \param opt     Options needed to set up RS232 communication (see \ref usart_options_t).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  */
 extern int usart_init_rs232(volatile avr32_usart_t *usart, const usart_options_t *opt, long pba_hz);
@@ -279,7 +279,7 @@ extern __inline__ void usart_int_rx_disable(volatile avr32_usart_t *usart)
  * \param opt     Options needed to set up RS232 communication (see \ref usart_options_t).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  *
  * \note The \c 1.5 stop bit is not supported in this mode.
@@ -292,7 +292,7 @@ extern int usart_init_rs232_tx_only(volatile avr32_usart_t *usart, const usart_o
  * \param opt     Options needed to set up RS232 communication (see \ref usart_options_t).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  *
  * \note \ref usart_init_rs232 does not need to be invoked before this function.
@@ -305,7 +305,7 @@ extern int usart_init_hw_handshaking(volatile avr32_usart_t *usart, const usart_
  * \param opt     Options needed to set up RS232 communication (see \ref usart_options_t).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  */
 extern int usart_init_modem(volatile avr32_usart_t *usart, const usart_options_t *opt, long pba_hz);
@@ -316,7 +316,7 @@ extern int usart_init_modem(volatile avr32_usart_t *usart, const usart_options_t
  * \param opt     Options needed to set up RS232 communication (see \ref usart_options_t).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  */
 extern int usart_init_sync_master(volatile avr32_usart_t *usart, const usart_options_t *opt, long pba_hz);
@@ -327,7 +327,7 @@ extern int usart_init_sync_master(volatile avr32_usart_t *usart, const usart_opt
  * \param opt     Options needed to set up RS232 communication (see \ref usart_options_t).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  */
 extern int usart_init_sync_slave(volatile avr32_usart_t *usart, const usart_options_t *opt, long pba_hz);
@@ -338,7 +338,7 @@ extern int usart_init_sync_slave(volatile avr32_usart_t *usart, const usart_opti
  * \param opt     Options needed to set up RS232 communication (see \ref usart_options_t).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  */
 extern int usart_init_rs485(volatile avr32_usart_t *usart, const usart_options_t *opt, long pba_hz);
@@ -350,7 +350,7 @@ extern int usart_init_rs485(volatile avr32_usart_t *usart, const usart_options_t
  * \param pba_hz        USART module input clock frequency (PBA clock, Hz).
  * \param irda_filter   Counter used to distinguish received ones from zeros.
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  */
 extern int usart_init_IrDA(volatile avr32_usart_t *usart, const usart_options_t *opt,
@@ -367,7 +367,7 @@ extern int usart_init_IrDA(volatile avr32_usart_t *usart, const usart_options_t 
  * \param t       ISO7816 mode to use (T=0 or T=1).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  */
 extern int usart_init_iso7816(volatile avr32_usart_t *usart, const usart_iso7816_options_t *opt, int t, long pba_hz);
@@ -405,7 +405,7 @@ extern int usart_init_lin_slave(volatile avr32_usart_t *usart, unsigned long bau
  * \param opt     Options needed to set up SPI mode (see \ref usart_spi_options_t).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  */
 extern int usart_init_spi_master(volatile avr32_usart_t *usart, const usart_spi_options_t *opt, long pba_hz);
@@ -416,7 +416,7 @@ extern int usart_init_spi_master(volatile avr32_usart_t *usart, const usart_spi_
  * \param opt     Options needed to set up SPI mode (see \ref usart_spi_options_t).
  * \param pba_hz  USART module input clock frequency (PBA clock, Hz).
  *
- * \retval USART_SUCCESS        Mode successfully initialized.
+ * \retval USART_SUCCESS        Mode successfully initialised.
  * \retval USART_INVALID_INPUT  One or more of the arguments is out of valid range.
  */
 extern int usart_init_spi_slave(volatile avr32_usart_t *usart, const usart_spi_options_t *opt, long pba_hz);

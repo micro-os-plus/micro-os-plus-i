@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -58,91 +58,98 @@ void masterPutAck(bool b)
 #endif
 
 // Extra half delay at end
-bool masterGetAck(void)
-  {
-    bool r;
+bool
+masterGetAck(void)
+{
+  bool r;
 
-    masterSdaHigh();
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-    masterSclHigh();
-    masterSclSynchronize();
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-    r = masterSdaIsLow();
+  masterSdaHigh();
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+  masterSclHigh();
+  masterSclSynchronize();
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+  r = masterSdaIsLow();
 
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-    masterSclLow();
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+  masterSclLow();
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
 
-    return r;
-  }
+  return r;
+}
 
-void masterCleanup(void)
-  {
-    masterSclHigh();
-    masterSdaHigh();
-  }
+void
+masterCleanup(void)
+{
+  masterSclHigh();
+  masterSdaHigh();
+}
 
 // No arbitration implemented yet
 
-void masterStart(void)
-  {
-    masterSdaHigh();
-    masterSdaSynchronize();
-    masterSclHigh();
-    masterSclSynchronize();
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-    masterSdaLow();
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT);
-    masterSclLow();
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-  }
+void
+masterStart(void)
+{
+  masterSdaHigh();
+  masterSdaSynchronize();
+  masterSclHigh();
+  masterSclSynchronize();
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+  masterSdaLow();
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT);
+  masterSclLow();
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+}
 
-void masterPutAddress(unsigned char addr, unsigned char mode)
-  {
-    masterPutByte( (addr << 1 ) | (mode & 1 ));
-  }
+void
+masterPutAddress(unsigned char addr, unsigned char mode)
+{
+  masterPutByte((addr << 1) | (mode & 1));
+}
 
 // Also wait for SDA to go high to confirm stop condition
-void masterStop(void)
-  {
-    masterSdaLow();
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-    masterSclHigh();
-    masterSclSynchronize();
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT);
-    masterSdaHigh();
-    masterSdaSynchronize();
-    masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-  }
+void
+masterStop(void)
+{
+  masterSdaLow();
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+  masterSclHigh();
+  masterSclSynchronize();
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT);
+  masterSdaHigh();
+  masterSdaSynchronize();
+  masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+}
 
-void masterDelay(int n)
-  {
-    OSDeviceDebug::implWDReset();
-    for (++n; --n != 0;)
-      {
-        OSDeviceDebug::implWDReset();
-      }
-  }
+void
+masterDelay(int n)
+{
+  OSDeviceDebug::implWDReset();
+  for (++n; --n != 0;)
+    {
+      OSDeviceDebug::implWDReset();
+    }
+}
 
-void masterPutByte(unsigned char b)
-  {
-    for (int i = 8; i != 0; --i, b <<= 1)
-      {
-        if ( (b & 0x80 ) != 0)
-          masterSdaHigh();
-        else
-          masterSdaLow();
+void
+masterPutByte(unsigned char b)
+{
+  for (int i = 8; i != 0; --i, b <<= 1)
+    {
+      if ((b & 0x80) != 0)
+        masterSdaHigh();
+      else
+        masterSdaLow();
 
-        masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-        masterSclHigh();
-        masterSclSynchronize();
-        masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT);
-        masterSclLow();
-        masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
-      }
-    masterSdaHigh();
-  }
+      masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+      masterSclHigh();
+      masterSclSynchronize();
+      masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT);
+      masterSclLow();
+      masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
+    }
+  masterSdaHigh();
+}
 
 #endif
 

@@ -102,7 +102,7 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
   memset((void *) pStack, STACK_FILL_BYTE, stackSize);
 
   // Initialise the stack so that a context restore will be performed
-  m_pStack = OSSchedulerImpl::stackInitialize((OSStack_t*) (&pStack[stackSize
+  m_pStack = OSSchedulerImpl::stackInitialise((OSStack_t*) (&pStack[stackSize
       / sizeof(OSStack_t) - 1]), entryPoint, pParameters, m_id);
 
   // pStack points to first register on arm and
@@ -206,7 +206,7 @@ OSTask::getStackSize(void)
 // since all registers are saved on the task stack,
 // the 'context' in simply a pointer to the stack (the address below
 // the deepest register pushed; for offsets to registers please see
-// OSScheduler::stackInitialize()).
+// OSScheduler::stackInitialise()).
 void *
 OSTask::getContext(void)
 {

@@ -163,45 +163,45 @@ OSDeviceDebug::putHex(unsigned short w)
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG)
 void
 OSDeviceDebug::putHex(unsigned long l)
-  {
-    unsigned char c;
-    unsigned char b;
-    unsigned char buff[8];
+{
+  unsigned char c;
+  unsigned char b;
+  unsigned char buff[8];
 
-    b = (l >> 24);
-    c = ((b >> 4) & 0x0F);
-    buff[0] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l >> 24);
+  c = ((b >> 4) & 0x0F);
+  buff[0] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[1] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[1] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    b = (l >> 16);
-    c = ((b >> 4) & 0x0F);
-    buff[2] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l >> 16);
+  c = ((b >> 4) & 0x0F);
+  buff[2] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[3] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[3] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    b = (l >> 8);
-    c = ((b >> 4) & 0x0F);
-    buff[4] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l >> 8);
+  c = ((b >> 4) & 0x0F);
+  buff[4] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[5] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[5] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    b = (l & 0xFF);
-    c = ((b >> 4) & 0x0F);
-    buff[6] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l & 0xFF);
+  c = ((b >> 4) & 0x0F);
+  buff[6] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[7] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[7] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    OSScheduler::criticalEnter();
-      {
-        commonPutBytes((const char*) buff, sizeof(buff));
-      }
-    OSScheduler::criticalExit();
-  }
+  OSScheduler::criticalEnter();
+    {
+      commonPutBytes((const char*) buff, sizeof(buff));
+    }
+  OSScheduler::criticalExit();
+}
 
 #endif
 
@@ -209,106 +209,106 @@ OSDeviceDebug::putHex(unsigned long l)
 
 void
 OSDeviceDebug::putHex(unsigned int l)
-  {
-    unsigned char c;
-    unsigned char b;
-    unsigned char buff[8];
+{
+  unsigned char c;
+  unsigned char b;
+  unsigned char buff[8];
 
-    b = (l >> 24);
-    c = ((b >> 4) & 0x0F);
-    buff[0] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l >> 24);
+  c = ((b >> 4) & 0x0F);
+  buff[0] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[1] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[1] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    b = (l >> 16);
-    c = ((b >> 4) & 0x0F);
-    buff[2] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l >> 16);
+  c = ((b >> 4) & 0x0F);
+  buff[2] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[3] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[3] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    b = (l >> 8);
-    c = ((b >> 4) & 0x0F);
-    buff[4] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l >> 8);
+  c = ((b >> 4) & 0x0F);
+  buff[4] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[5] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[5] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    b = (l & 0xFF);
-    c = ((b >> 4) & 0x0F);
-    buff[6] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l & 0xFF);
+  c = ((b >> 4) & 0x0F);
+  buff[6] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[7] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[7] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    OSScheduler::criticalEnter();
-      {
-        commonPutBytes((const char*) buff, sizeof(buff));
-      }
-    OSScheduler::criticalExit();
-  }
+  OSScheduler::criticalEnter();
+    {
+      commonPutBytes((const char*) buff, sizeof(buff));
+    }
+  OSScheduler::criticalExit();
+}
 
 #endif
 
 void
 OSDeviceDebug::putPC(const char * PROGMEM pc)
-  {
-    unsigned char c;
-    unsigned char b;
+{
+  unsigned char c;
+  unsigned char b;
 
-    int i;
-    i = 0;
+  int i;
+  i = 0;
 
 #if defined(OS_CONFIG_ARCH_AVR8)
-    unsigned char buff[ 5 ];
-    unsigned short l;
-    l = (unsigned short)pc;
+  unsigned char buff[ 5 ];
+  unsigned short l;
+  l = (unsigned short)pc;
 
-    c = ( (l >> 15 ) & 0x01 );
-    buff[i++] = c + '0';
+  c = ( (l >> 15 ) & 0x01 );
+  buff[i++] = c + '0';
 
-    l <<= 1;
+  l <<= 1;
 #else
-    unsigned char buff[8];
-    unsigned long l;
-    l = (unsigned long) pc;
+  unsigned char buff[8];
+  unsigned long l;
+  l = (unsigned long) pc;
 
-    b = (l >> 24);
-    c = ((b >> 4) & 0x0F);
-    buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l >> 24);
+  c = ((b >> 4) & 0x0F);
+  buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    b = (l >> 16);
-    c = ((b >> 4) & 0x0F);
-    buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l >> 16);
+  c = ((b >> 4) & 0x0F);
+  buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 #endif
 
-    b = (l >> 8);
-    c = ((b >> 4) & 0x0F);
-    buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l >> 8);
+  c = ((b >> 4) & 0x0F);
+  buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    b = (l & 0xFF);
-    c = ((b >> 4) & 0x0F);
-    buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
+  b = (l & 0xFF);
+  c = ((b >> 4) & 0x0F);
+  buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    c = (b & 0x0F);
-    buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
+  c = (b & 0x0F);
+  buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-    OSScheduler::criticalEnter();
-      {
-        commonPutBytes((const char*) buff, sizeof(buff));
-      }
-    OSScheduler::criticalExit();
-  }
+  OSScheduler::criticalEnter();
+    {
+      commonPutBytes((const char*) buff, sizeof(buff));
+    }
+  OSScheduler::criticalExit();
+}
 
 void
 OSDeviceDebug::putPtr(const void *p)
@@ -452,35 +452,37 @@ OSDeviceDebug::__assert(const char *func, const char *file, int lineno,
 // streambuf methods
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
 
-int OSDeviceDebug::overflow(int c)
-  {
-    int r;
-    OSScheduler::criticalEnter();
-      {
-        r = commonPutByte(c);
-      }
-    OSScheduler::criticalExit();
+int
+OSDeviceDebug::overflow(int c)
+{
+  int r;
+  OSScheduler::criticalEnter();
+    {
+      r = commonPutByte(c);
+    }
+  OSScheduler::criticalExit();
 
-    return r;
-  }
+  return r;
+}
 
-streamsize OSDeviceDebug::xsputn(const char* s, streamsize n)
-  {
+streamsize
+OSDeviceDebug::xsputn(const char* s, streamsize n)
+{
 #if defined(DEBUG)
 
-    int r;
-    OSScheduler::criticalEnter();
-      {
-        r = commonPutBytes(s, n);
-      }
-    OSScheduler::criticalExit();
+  int r;
+  OSScheduler::criticalEnter();
+    {
+      r = commonPutBytes(s, n);
+    }
+  OSScheduler::criticalExit();
 
-    return r;
+  return r;
 #else
 
-    return -1;
+  return -1;
 #endif /*DEBUG*/
-  }
+}
 
 #endif /* OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF */
 

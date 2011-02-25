@@ -27,7 +27,6 @@ typedef void *OSProgramPtr_t;
 #define PSTR(_S_) ((const char *)_S_)
 #define putString_P putString
 
-
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG            (1)
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT             (1)
 
@@ -35,7 +34,6 @@ typedef void *OSProgramPtr_t;
 
 //#define OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT      (1)
 #define OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING   (1)
-
 
 #if !defined(OS_CFGINT_STACK_MINIMAL_SIZE)
 #define OS_CFGINT_STACK_MINIMAL_SIZE                    (400)

@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -8,11 +8,13 @@
 
 #if defined(OS_INCLUDE_TASKPITPALAC)
 
+#include "portable/kernel/include/OS.h"
+
 #include "portable/tasks/include/TaskPitpalac.h"
 
 /*
  * Task constructor.
- * Initialize system task object and store parameters in private members.
+ * Initialise system task object and store parameters in private members.
  *
  */
 
@@ -34,7 +36,7 @@ TaskPitpalac::TaskPitpalac(const char *pName, schedTicks_t rate) :
 
 /*
  * Task main code.
- * Initialize led and progressively toggle it using the rate,
+ * Initialise led and progressively toggle it using the rate,
  * giving the feeling of a live heart beat.
  *
  * Used as a luxury way to show the device is still alive.
@@ -52,7 +54,7 @@ void TaskPitpalac::taskMain(void)
       }
     OSScheduler::unlock();
 #endif
-    // initialize led port as output
+    // initialise led port as output
     ledInit();
 
     unsigned int n;

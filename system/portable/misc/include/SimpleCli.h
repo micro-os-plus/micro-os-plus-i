@@ -1,11 +1,13 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
 
 #ifndef SIMPLECLI_H_
 #define SIMPLECLI_H_
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/stdlib/include/istream"
 #include "portable/stdlib/include/ostream"

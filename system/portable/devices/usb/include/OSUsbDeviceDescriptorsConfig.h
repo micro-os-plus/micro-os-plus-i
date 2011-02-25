@@ -1,11 +1,13 @@
 /*
- *      Copyright (C) 2007-2008 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
 
 #ifndef OSUSBDEVICEDESCRIPTORS_CONFIG_H_
 #define OSUSBDEVICEDESCRIPTORS_CONFIG_H_
+
+#include "portable/kernel/include/OS.h"
 
 // English US
 #define LANGUAGE_ID           0x0409

@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -12,38 +12,53 @@
 typedef unsigned short FlashAddress_t;
 
 class Flash
-  {
+{
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/devices/memory/include/Flash_Constants.h"
 #endif
 
 public:
-  static unsigned char getUninitializedValue(void);
-  static unsigned char readByte(FlashAddress_t addr);
+  static unsigned char
+  getUninitialisedValue(void);
+  static unsigned char
+  readByte(FlashAddress_t addr);
 
-  static void pageErase(FlashAddress_t addr);
-  static void pageEraseBusyWait(void);
+  static void
+  pageErase(FlashAddress_t addr);
+  static void
+  pageEraseBusyWait(void);
 
-  static void pageFillWord(FlashAddress_t addr, unsigned short w);
-  static void pageWrite(FlashAddress_t addr);
-  static void pageWriteBusyWait(void);
+  static void
+  pageFillWord(FlashAddress_t addr, unsigned short w);
+  static void
+  pageWrite(FlashAddress_t addr);
+  static void
+  pageWriteBusyWait(void);
 
-  static void enableRead(void);
+  static void
+  enableRead(void);
 
   // implementation methods
-  static unsigned char implReadByte(FlashAddress_t addr);
+  static unsigned char
+  implReadByte(FlashAddress_t addr);
 
-  static void implPageErase(FlashAddress_t addr);
-  static void implPageEraseBusyWait(void);
+  static void
+  implPageErase(FlashAddress_t addr);
+  static void
+  implPageEraseBusyWait(void);
 
-  static void implPageFillWord(FlashAddress_t addr, unsigned short w);
-  static void implPageWrite(FlashAddress_t addr);
-  static void implPageWriteBusyWait(void);
+  static void
+  implPageFillWord(FlashAddress_t addr, unsigned short w);
+  static void
+  implPageWrite(FlashAddress_t addr);
+  static void
+  implPageWriteBusyWait(void);
 
-  static void implEnableRead(void);
+  static void
+  implEnableRead(void);
 
-  };
+};
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/devices/memory/include/Flash_Inlines.h"

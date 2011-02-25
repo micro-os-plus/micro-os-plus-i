@@ -337,7 +337,7 @@ extern void gpio_clear_pin_interrupt_flag(unsigned int pin);
  *          which the GPIO peripheral is connected must be set to the CPU clock
  *          frequency (fPB = fCPU).
  *
- * \note This interface has to be initialized in order to be available.
+ * \note This interface has to be initialised in order to be available.
  */
 //! @{
 
@@ -459,7 +459,7 @@ extern __inline__ void gpio_local_tgl_gpio_pin(unsigned int pin)
   AVR32_GPIO_LOCAL.port[pin >> 5].ovrt = 1 << (pin & 0x1F);
 }
 
-/*! \brief Initializes the configuration of a GPIO pin so that it can be used
+/*! \brief Initialises the configuration of a GPIO pin so that it can be used
  *         with GPIO open-drain functions.
  *
  * \note This function must have been called at least once before using

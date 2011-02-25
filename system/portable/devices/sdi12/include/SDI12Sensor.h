@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2008 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -7,9 +7,8 @@
 #ifndef SDI12SENSOR_H_
 #define SDI12SENSOR_H_
 
-#include "portable/kernel/include/OS_Defines.h"
-
 #include "portable/kernel/include/OS.h"
+
 #include "portable/kernel/include/OSEventFlags.h"
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
@@ -47,7 +46,7 @@ typedef struct SDI12Value
 #define OS_CFGINT_SDI12SENSOR_TMP_SIZE                          (10)
 
 class SDI12Sensor
-  {
+{
 public:
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
@@ -103,16 +102,22 @@ public:
 
 #endif
 
-  static OSTimerTicks_t getPeriodicSeconds(void);
-  static void setPeriodicSeconds(OSTimerTicks_t seconds);
+  static OSTimerTicks_t
+  getPeriodicSeconds(void);
+  static void
+  setPeriodicSeconds(OSTimerTicks_t seconds);
 
   static const unsigned char DEFAULT_ADDRESS = '0';
 
-  static unsigned char getAddress(void);
-  static void setAddress(unsigned char addr);
+  static unsigned char
+  getAddress(void);
+  static void
+  setAddress(unsigned char addr);
 
-  static bool storeCharResponse(unsigned char ch);
-  static bool storeStringResponse(const char *pStr, unsigned short n = 0);
+  static bool
+  storeCharResponse(unsigned char ch);
+  static bool
+  storeStringResponse(const char *pStr, unsigned short n = 0);
 #if defined(OS_INCLUDE_SDI12SENSOR)
   static bool storeUnsignedResponse(unsigned short w, unsigned short n = 0);
 #endif
@@ -124,15 +129,22 @@ public:
 
 #endif
 
-  static unsigned short getOutputBufferSize(void);
+  static unsigned short
+  getOutputBufferSize(void);
 
-  static void parseInit(const char *p);
-  static unsigned char parsePeek(void); // return '\0' at end
-  static unsigned char parseNext(void); // return '\0' at end
-  static bool parseIsValid(void);
-  static bool parseIsEnd(void);
+  static void
+  parseInit(const char *p);
+  static unsigned char
+  parsePeek(void); // return '\0' at end
+  static unsigned char
+  parseNext(void); // return '\0' at end
+  static bool
+  parseIsValid(void);
+  static bool
+  parseIsEnd(void);
 
-  static unsigned short crc16(unsigned short crc, unsigned char ch);
+  static unsigned short
+  crc16(unsigned short crc, unsigned char ch);
 
 #if defined(OS_INCLUDE_SDI12SENSOR_TINY)
   static unsigned short parseHex(void);
@@ -172,29 +184,47 @@ protected:
 #endif
 
 private:
-  static bool isAddressValid(unsigned char addr);
+  static bool
+  isAddressValid(unsigned char addr);
 
-  static void rs485Init(void);
-  static void rs485Receive(void);
-  static void rs485Transmit(void);
+  static void
+  rs485Init(void);
+  static void
+  rs485Receive(void);
+  static void
+  rs485Transmit(void);
 
-  static void usartRxEnable(void);
-  static void usartRxDisable(void);
-  static void usartTxEnable(void);
-  static void usartTxDisable(void);
+  static void
+  usartRxEnable(void);
+  static void
+  usartRxDisable(void);
+  static void
+  usartTxEnable(void);
+  static void
+  usartTxDisable(void);
 
-  static bool usartWriteAvailable(void);
-  static void usartWriteByte(unsigned char ch);
-  static bool usartWriteComplete(void);
-  static bool usartReadAvailable(void);
-  static unsigned char usartReadByte(void);
-  static bool usartIsFramingError(void);
-  static bool usartIsParityError(void);
+  static bool
+  usartWriteAvailable(void);
+  static void
+  usartWriteByte(unsigned char ch);
+  static bool
+  usartWriteComplete(void);
+  static bool
+  usartReadAvailable(void);
+  static unsigned char
+  usartReadByte(void);
+  static bool
+  usartIsFramingError(void);
+  static bool
+  usartIsParityError(void);
 
-  static void pinInit(void);
-  static bool pinChangedIsHigh(void);
+  static void
+  pinInit(void);
+  static bool
+  pinChangedIsHigh(void);
 
-  static void clearInputBuff(void);
+  static void
+  clearInputBuff(void);
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
   static void init(void);
@@ -296,7 +326,7 @@ public:
   static unsigned char *ms_pParse;
 
 #if !defined(OS_EXCLUDE_PCINT3_VECT)
-    unsigned char ms_prevValue3;
+  unsigned char ms_prevValue3;
 #endif
 
 #if defined(OS_INCLUDE_SDI12SENSOR_TINY)
@@ -367,12 +397,13 @@ private:
 
 #endif
 
-  };
+};
 
-inline unsigned short SDI12Sensor::getOutputBufferSize(void)
-  {
-    return OS_CFGINT_SDI12SENSOR_BUFFER_SIZE;
-  }
+inline unsigned short
+SDI12Sensor::getOutputBufferSize(void)
+{
+  return OS_CFGINT_SDI12SENSOR_BUFFER_SIZE;
+}
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
 

@@ -501,7 +501,7 @@ extern long pm_disable_module(volatile avr32_pm_t *pm, unsigned long module);
  *
  * \param param    pointer on the configuration structure.
  *
- * \retval PM_FREQ_STATUS_OK    Mode successfully initialized.
+ * \retval PM_FREQ_STATUS_OK    Mode successfully initialised.
  * \retval PM_FREQ_STATUS_FAIL  The configuration can not be done.
  */
 

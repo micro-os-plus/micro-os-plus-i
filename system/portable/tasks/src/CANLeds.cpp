@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -12,7 +12,7 @@
 
 /*
  * Task constructor. 
- * Initialize system task object, initialize member objects
+ * Initialise system task object, initialise member objects
  * and store parameters in private members.
  *
  */
@@ -22,7 +22,7 @@ CANLeds::CANLeds(const char *pName) :
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("CANLeds()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
   }
@@ -33,7 +33,7 @@ CANLed::CANLed()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("CANLed()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
     m_status = STATUS_OFF;
@@ -57,7 +57,7 @@ CANLedGreen::CANLedGreen()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("CANLedGreen()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
     init();
@@ -144,7 +144,7 @@ CANLedRed::CANLedRed()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("CANLedRed()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
     init();

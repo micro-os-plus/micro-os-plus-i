@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2009 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -7,6 +7,8 @@
 #include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_OSEVENTFLAGS)
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/kernel/include/OSEventFlags.h"
 

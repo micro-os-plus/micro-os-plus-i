@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -39,10 +39,10 @@ protected:
   // OSScheduler calls OSTimerTicks::init() from OSScheduler::start()
   friend class OSScheduler;
 
-  // initialize and it is called from OSScheduler::start()
+  // initialise and it is called from OSScheduler::start()
   static void init(void);
 
-  // initialize the low level timer (implementation related)
+  // initialise the low level timer (implementation related)
   static void implInit(void);
 
   // clear the interrupt flag; used in interruptServiceRoutine (implementation related)

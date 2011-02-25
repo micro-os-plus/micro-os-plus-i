@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -85,7 +85,7 @@ public:
 class OSImpl
   {
 public:
-  // Initialize the SP register in order to point to the stack section.
+  // Initialise the SP register in order to point to the stack section.
   inline static void CPUstackInit(void) __attribute__((always_inline));
   // Some CPU initializations.
   inline static void CPUinit(void) __attribute__((always_inline));

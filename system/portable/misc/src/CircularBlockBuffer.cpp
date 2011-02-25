@@ -1,12 +1,14 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
 
-#include "portable/kernel/include/OS.h"
+#include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_CIRCULARBLOCKBUFFER)
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/misc/include/CircularBlockBuffer.h"
 #include <string.h>
@@ -15,7 +17,7 @@ CircularBlockBuffer::CircularBlockBuffer()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("CircularBlockBuffer()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
   }
@@ -26,7 +28,7 @@ CircularBlockBuffer::CircularBlockBuffer(unsigned char *pBuf,
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("CircularBlockBuffer()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
 

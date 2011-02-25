@@ -37,13 +37,11 @@ OSImpl::CPUinit(void)
   Set_system_register(AVR32_EVBA, (int)&_evba);
 }
 
-
 inline OSResetBits_t
 OSImpl::CPUfetchResetBits(void)
 {
-  return -1;    // TODO: fetch bits telling reset reason.
+  return -1; // TODO: fetch bits telling reset reason.
 }
-
 
 inline void
 OSImpl::returnFromInterrupt(void)
@@ -129,7 +127,7 @@ OSImpl::CPUsleep(void)
 {
   asm volatile
   (
-      " sleep 0 \n"     /* To be updated !!! */
+      " sleep 0 \n" /* To be updated !!! */
       :::
   );
 }
@@ -139,7 +137,7 @@ OSImpl::CPUdeepSleep(void)
 {
   asm volatile
   (
-      " sleep 0 \n"     /* To be updated !!! */
+      " sleep 0 \n" /* To be updated !!! */
       :::
   );
 }

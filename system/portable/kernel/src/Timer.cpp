@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2009 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -9,6 +9,9 @@
 #if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
 
 #if defined(OS_INCLUDE_TIMER)
+
+#include "portable/kernel/include/OS.h"
+
 
 Timer::Timer(OSTimer *pTimer)
   {

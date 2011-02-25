@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2008 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -7,6 +7,8 @@
 #include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_PINCHANGEDISPATCHERS)
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/devices/misc/include/PinChangeDispatchers.h"
 
@@ -84,11 +86,11 @@ void PCINT3_vect(void)
 namespace PinChangeDispatchers
   {
 #if defined(OS_INCLUDE_PINCHANGEDISPATCHERS_REG2)
-  unsigned char ms_prevValue2;
+    unsigned char ms_prevValue2;
 #endif
 
 #if defined(OS_INCLUDE_PINCHANGEDISPATCHERS_REG2)
-  unsigned char ms_prevValue3;
+    unsigned char ms_prevValue3;
 #endif
   }
 

@@ -14,15 +14,18 @@ class DeviceCharacterBufferedUsart1 : public DeviceCharacterBufferedUsartBase
 public:
   DeviceCharacterBufferedUsart1();
 
-  DeviceCharacterBufferedUsart1(unsigned char *pRxBuf, unsigned short rxBufSize,
-      unsigned short rxHWM, unsigned short rxLWM, unsigned char *pTxBuf,
-      unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM);
+  DeviceCharacterBufferedUsart1(unsigned char *pRxBuf,
+      unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
+      unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
+      unsigned short txLWM);
 
-  DeviceCharacterBufferedUsart1(unsigned char *pRxBuf, unsigned short rxBufSize,
-      unsigned char *pTxBuf, unsigned short txBufSize);
+      DeviceCharacterBufferedUsart1(unsigned char *pRxBuf,
+          unsigned short rxBufSize, unsigned char *pTxBuf,
+          unsigned short txBufSize);
 
 public:
-  virtual int implPortInit(void);
+  virtual int
+  implPortInit(void);
 
   static DeviceCharacterBufferedUsart1 * ms_pThis;
 

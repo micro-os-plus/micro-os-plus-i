@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -9,7 +9,7 @@
 
 #include <avr/boot.h>
 
-inline unsigned char Flash::getUninitializedValue(void)
+inline unsigned char Flash::getUninitialisedValue(void)
   {
     return 0xFF;
   }

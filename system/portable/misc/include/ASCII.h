@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2008 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -17,4 +17,5 @@ public:
   static const unsigned char CR = 0x0D;
   
 };
-#endif /*ASCII_H_*/
+
+#endif /* ASCII_H_ */

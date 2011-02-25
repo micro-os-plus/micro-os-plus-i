@@ -155,7 +155,7 @@ static void SetSysClock(void);
 
 /**
   * @brief Setup the microcontroller system
-  *        Initialize the Embedded Flash Interface,  initialize the PLL and update th SystemFrequency variable
+  *        Initialise the Embedded Flash Interface,  initialise the PLL and update th SystemFrequency variable
   * @param None.
   * @arg None.
   * @note : This function should be used only after reset.

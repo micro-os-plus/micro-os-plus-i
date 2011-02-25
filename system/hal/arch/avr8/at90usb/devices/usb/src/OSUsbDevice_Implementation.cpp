@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2008 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -196,7 +196,7 @@ void OSUsbDevice::interruptGenServiceRoutine(void)
 
 // usb_init_device.
 //
-// This function initializes the USB device controller and
+// This function initialises the USB device controller and
 // configures the Default Control Endpoint.
 //
 //
@@ -253,7 +253,7 @@ bool OSUsbDevice::usb_config_ep(unsigned char config0, unsigned char config1)
     return (OSUsbDevice::Is_endpoint_configured() );
   }
 
-// @brief This function initializes the USB device controller
+// @brief This function initialises the USB device controller
 //
 // This function enables the USB controller and init the USB interrupts.
 // The aim is to allow the USB connection detection in order to send

@@ -9,7 +9,7 @@
 #if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
 
 #include "portable/kernel/include/OS.h"
-//#include "portable/kernel/include/OSTimer.h"
+
 
 OSTimer::OSTimer(OSTimerStruct_t *pArray, int size)
 {

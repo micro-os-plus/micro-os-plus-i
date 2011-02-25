@@ -1,11 +1,13 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
 
 #ifndef PARSER_H_
 #define PARSER_H_
+
+#include "portable/kernel/include/OS.h"
 
 class Parser
   {

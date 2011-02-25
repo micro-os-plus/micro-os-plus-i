@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2008 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -22,10 +22,11 @@
 #endif
 
 class PinChangeDispatchers
-  {
+{
 public:
 
-  static void init(void);
+  static void
+  init(void);
 
 #if defined(OS_INCLUDE_PINCHANGEDISPATCHERS_PINC21)
   static void interruptPinChange21enable(void);
@@ -64,7 +65,7 @@ protected:
 #if defined(OS_INCLUDE_PINCHANGEDISPATCHERS_REG3)
   static unsigned char ms_prevValue3;
 #endif
-  };
+};
 
 #if defined(OS_INCLUDE_PINCHANGEDISPATCHERS_REG2)
 inline void PinChangeDispatchers::setPrevValue2(unsigned char c)

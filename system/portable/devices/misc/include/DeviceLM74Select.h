@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -7,15 +7,20 @@
 #ifndef DEVICELM74SELECT_H_
 #define DEVICELM74SELECT_H_
 
+#include "portable/kernel/include/OS.h"
+
 #include "portable/devices/misc/include/DeviceChipSelect.h"
 
 class DeviceLM74Select : public DeviceChipSelect
-  {
+{
 public:
-  static void implSelectInit(void);
-  static void implSelectEnable(void);
-  static void implSelectDisable(void);
-  };
+  static void
+  implSelectInit(void);
+  static void
+  implSelectEnable(void);
+  static void
+  implSelectDisable(void);
+};
 
 #if defined(OS_CONFIG_BOARD_AVI_A07524)
 #include "hal/boards/AVI/a07524/include/DeviceLM74Select_Defines.h"

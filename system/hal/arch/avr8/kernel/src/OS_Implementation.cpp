@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2009 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -35,7 +35,7 @@
 #endif
 
 // ----- init3 ---------------------------------------------------------------
-// earliest moment we can use C code to initialize processor,
+// earliest moment we can use C code to initialise processor,
 // before constructors
 extern "C" void processor_init(void)
 __attribute__( ( naked, section( ".init3" ) ) );

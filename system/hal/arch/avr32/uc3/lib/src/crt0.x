@@ -88,7 +88,7 @@ _stext:
   // Enable the exception processing.
   csrf    AVR32_SR_EM_OFFSET
 
-  // Load initialized data having a global lifetime from the data LMA.
+  // Load initialised data having a global lifetime from the data LMA.
   lda.w   r0, _data
   lda.w   r1, _edata
   cp      r0, r1
@@ -101,7 +101,7 @@ idata_load_loop:
   brlo    idata_load_loop
 idata_load_loop_end:
 
-  // Clear uninitialized data having a global lifetime in the blank static storage section.
+  // Clear uninitialised data having a global lifetime in the blank static storage section.
   lda.w   r0, __bss_start
   lda.w   r1, _end
   cp      r0, r1

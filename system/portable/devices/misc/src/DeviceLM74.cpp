@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -7,6 +7,8 @@
 #include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_DEVICELM74)
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/devices/misc/include/DeviceLM74.h"
 
@@ -32,7 +34,7 @@ signed short DeviceLM74::read(void)
             clkHigh();
             ret <<= 1;
             if (!dataIsLow())
-              ret |= 1;
+            ret |= 1;
             clkLow();
           }
       }

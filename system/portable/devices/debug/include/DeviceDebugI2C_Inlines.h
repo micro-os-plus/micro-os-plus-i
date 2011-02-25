@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -43,31 +43,50 @@
 #error "Missing OS_CONFIG_BOARD_* definition"
 #endif
 
-static void masterInit(void);
+static void
+masterInit(void);
 
-extern void masterSclInit(void);
-extern void masterSclHigh(void);
-extern void masterSclLow(void);
-extern bool masterSclIsLow(void);
+extern void
+masterSclInit(void);
+extern void
+masterSclHigh(void);
+extern void
+masterSclLow(void);
+extern bool
+masterSclIsLow(void);
 
-extern void masterSdaInit(void);
-extern void masterSdaHigh(void);
-extern void masterSdaLow(void);
-extern bool masterSdaIsLow(void);
+extern void
+masterSdaInit(void);
+extern void
+masterSdaHigh(void);
+extern void
+masterSdaLow(void);
+extern bool
+masterSdaIsLow(void);
 
-extern void masterSclSynchronize(void);
-extern void masterSdaSynchronize(void);
+extern void
+masterSclSynchronize(void);
+extern void
+masterSdaSynchronize(void);
 
-extern void masterStart(void);
-extern void masterDelay(int n) __attribute__( ( noinline ) );
+extern void
+masterStart(void);
+extern void
+masterDelay(int n) __attribute__( ( noinline ) );
 
-extern void masterPutAddress(unsigned char addr, unsigned char mode);
-extern void masterPutByte(unsigned char c);
+extern void
+masterPutAddress(unsigned char addr, unsigned char mode);
+extern void
+masterPutByte(unsigned char c);
 //static unsigned char masterGetByte(void);
-extern void masterPutAck(bool b);
-extern bool masterGetAck(void);
-extern void masterStop(void);
-extern void masterCleanup(void);
+extern void
+masterPutAck(bool b);
+extern bool
+masterGetAck(void);
+extern void
+masterStop(void);
+extern void
+masterCleanup(void);
 
 static const int I2C_WRITE = 0x0;
 static const int I2C_READ = 0x1;
@@ -137,7 +156,8 @@ masterSclLow(void)
 inline bool
 masterSclIsLow(void)
 {
-  return OS_GPIO_PIN_ISLOW(OS_CONFIG_DEBUG_SCL_PORT_READ, OS_CONFIG_DEBUG_SCL_BIT);
+  return OS_GPIO_PIN_ISLOW(OS_CONFIG_DEBUG_SCL_PORT_READ,
+      OS_CONFIG_DEBUG_SCL_BIT);
 }
 
 inline void
@@ -172,7 +192,8 @@ masterSdaLow(void)
 inline bool
 masterSdaIsLow(void)
 {
-  return OS_GPIO_PIN_ISLOW(OS_CONFIG_DEBUG_SDA_PORT_READ, OS_CONFIG_DEBUG_SDA_BIT);
+  return OS_GPIO_PIN_ISLOW(OS_CONFIG_DEBUG_SDA_PORT_READ,
+      OS_CONFIG_DEBUG_SDA_BIT);
 }
 
 inline void
@@ -198,7 +219,6 @@ masterSdaSynchronize(void)
 }
 
 #endif /* OS_EXCLUDE_OSDEVICEDEBUG_IMPLEMENTATION */
-
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/devices/debug/include/DeviceDebugI2CEmuMaster_Inlines.h"
@@ -234,83 +254,86 @@ masterSdaSynchronize(void)
 
 // ----- public methods ------------------------------------------------------
 
-inline void OSDeviceDebug::implEarlyInit(void)
-  {
+inline void
+OSDeviceDebug::implEarlyInit(void)
+{
 #if true
-      {
-        unsigned int _i, _j;
-        for (_i = 0; _i < OS_CFGINT_DEBUG_I2C_EMU_INIT_DELAY_COUNT; ++_i)
-          for (_j = 0; _j < OS_CFGINT_BUSYWAIT_CALIBRATION; ++_j)
-            implWDReset();
-      }
+    {
+      unsigned int _i, _j;
+      for (_i = 0; _i < OS_CFGINT_DEBUG_I2C_EMU_INIT_DELAY_COUNT; ++_i)
+        for (_j = 0; _j < OS_CFGINT_BUSYWAIT_CALIBRATION; ++_j)
+          implWDReset();
+    }
 #endif
 
-    masterInit();
+  masterInit();
 
-    masterSclInit();
-    masterSdaInit();
-  }
+  masterSclInit();
+  masterSdaInit();
+}
 
-inline void OSDeviceDebug::implPutByte(unsigned char c)
-  {
-    for (;;) // loop until we succeed to transmit
+inline void
+OSDeviceDebug::implPutByte(unsigned char c)
+{
+  for (;;) // loop until we succeed to transmit
 
-      {
-        masterStart();
-        masterPutAddress(OS_CFGINT8_DEBUG_I2C_DEBUGGER_ADDR, I2C_WRITE);
-        if (!masterGetAck())
-          {
-            masterCleanup();
-            goto retry;
-          }
+    {
+      masterStart();
+      masterPutAddress(OS_CFGINT8_DEBUG_I2C_DEBUGGER_ADDR, I2C_WRITE);
+      if (!masterGetAck())
+        {
+          masterCleanup();
+          goto retry;
+        }
 
-        masterPutByte(c);
-        if (!masterGetAck())
-          {
-            masterCleanup();
-            goto retry;
-          }
+      masterPutByte(c);
+      if (!masterGetAck())
+        {
+          masterCleanup();
+          goto retry;
+        }
 
-        masterStop();
-        break;
+      masterStop();
+      break;
 
-        retry: masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT * 10);
-      }
-  }
+      retry: masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT * 10);
+    }
+}
 
-inline int OSDeviceDebug::implPutBytes(const char *s, unsigned int n)
-  {
-    unsigned int i;
+inline int
+OSDeviceDebug::implPutBytes(const char *s, unsigned int n)
+{
+  unsigned int i;
 #if defined(OS_INCLUDE_DEVICEDEBUGI2C_SINGLE_BYTE)
-    for (i = 0; i < n; ++i)
-    implPutByte(s[i]);
+  for (i = 0; i < n; ++i)
+  implPutByte(s[i]);
 #else
-    for (i = 0; i < n;)
-      { // loop until we succeed to transmit
-        masterStart();
-        masterPutAddress(OS_CFGINT8_DEBUG_I2C_DEBUGGER_ADDR, I2C_WRITE);
-        if (!masterGetAck())
-          {
-            masterCleanup();
-            goto retry;
-          }
+  for (i = 0; i < n;)
+    { // loop until we succeed to transmit
+      masterStart();
+      masterPutAddress(OS_CFGINT8_DEBUG_I2C_DEBUGGER_ADDR, I2C_WRITE);
+      if (!masterGetAck())
+        {
+          masterCleanup();
+          goto retry;
+        }
 
-        for (; i < n; ++i)
-          {
-            masterPutByte(s[i]);
-            if (!masterGetAck())
-              {
-                masterCleanup();
-                goto retry;
-              }
-          }
-        masterStop();
-        break;
+      for (; i < n; ++i)
+        {
+          masterPutByte(s[i]);
+          if (!masterGetAck())
+            {
+              masterCleanup();
+              goto retry;
+            }
+        }
+      masterStop();
+      break;
 
-        retry: masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT * 10);
-      }
+      retry: masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT * 10);
+    }
 #endif
-    return n;
-  }
+  return n;
+}
 
 #endif /*DEVICEDEBUGI2C_INLINES_H_*/

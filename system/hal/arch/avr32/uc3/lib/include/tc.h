@@ -203,7 +203,7 @@ typedef struct
 //! Parameters when initializing a timer/counter in capture mode.
 typedef struct
 {
-  //! Channel to initialize.
+  //! Channel to initialise.
   unsigned int channel            ;
 
   unsigned int                 :12;
@@ -280,7 +280,7 @@ typedef struct
 //! Parameters when initializing a timer/counter in waveform mode.
 typedef struct
 {
-  //! Channel to initialize.
+  //! Channel to initialise.
   unsigned int channel            ;
 
   //! Software trigger effect on TIOB:\n

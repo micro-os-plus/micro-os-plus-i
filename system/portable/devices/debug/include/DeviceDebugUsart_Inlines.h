@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -21,13 +21,14 @@
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-inline int OSDeviceDebug::implPutBytes(const char *s, unsigned int n)
-  {
-    unsigned int i;
-    for (i = 0; i < n; ++i)
-      implPutByte(s[i]);
+inline int
+OSDeviceDebug::implPutBytes(const char *s, unsigned int n)
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    implPutByte(s[i]);
 
-    return n;
-  }
+  return n;
+}
 
 #endif /*DEVICEDEBUGUSART_INLINES_H_*/

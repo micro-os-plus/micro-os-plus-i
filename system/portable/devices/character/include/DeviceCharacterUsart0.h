@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -26,7 +26,7 @@
 #endif
 
 class DeviceCharacterUsart0 : public OSDeviceCharacterBuffered
-  {
+{
 public:
   DeviceCharacterUsart0(unsigned char *pRxBuf, unsigned short rxBufSize,
       unsigned short rxHWM, unsigned short rxLWM, unsigned char *pTxBuf,
@@ -36,14 +36,19 @@ public:
       unsigned char *pTxBuf, unsigned short txBufSize);
 
 private:
-  virtual int implPortInit(void);
-  virtual void implInterruptTxEnable(void);
-  virtual void implInterruptTxDisable(void);
-  virtual unsigned char implPortRead(void);
-  virtual void implPortWrite(unsigned char b);
+  virtual int
+  implPortInit(void);
+  virtual void
+  implInterruptTxEnable(void);
+  virtual void
+  implInterruptTxDisable(void);
+  virtual unsigned char
+  implPortRead(void);
+  virtual void
+  implPortWrite(unsigned char b);
 
 public:
   static DeviceCharacterUsart0 *ms_pThis;
-  };
+};
 
 #endif /*DEVICECHARACTERUSART1_H_*/

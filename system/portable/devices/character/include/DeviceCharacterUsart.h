@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -47,14 +47,15 @@
 #endif /*OS_INCLUDE_DEVICECHARACTERMULTIUSART*/
 
 class DeviceCharacterUsart : public OSDeviceCharacter
-  {
+{
 public:
   DeviceCharacterUsart(void);
 
-  void init(unsigned char *pTxBuf, unsigned short txBufSize,
-      unsigned short txHWM, unsigned short txLWM, unsigned char *pRxBuf,
-      unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM);
-  
+  void
+  init(unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
+      unsigned short txLWM, unsigned char *pRxBuf, unsigned short rxBufSize,
+      unsigned short rxHWM, unsigned short rxLWM);
+
   DeviceCharacterUsart(unsigned char *pTxBuf, unsigned short txBufSize,
       unsigned short txHWM, unsigned short txLWM, unsigned char *pRxBuf,
       unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM);
@@ -64,40 +65,59 @@ public:
 
   //static DeviceCharacterUsart *ms_pThis;
 
-  void interruptTxServiceRoutine(void);
-  void interruptRxServiceRoutine(void);
+  void
+  interruptTxServiceRoutine(void);
+  void
+  interruptRxServiceRoutine(void);
 
 protected:
   CircularByteBuffer m_txBuf;
   CircularByteBuffer m_rxBuf;
 
 private:
-  virtual int implOpen(void);
-  virtual OSEvent_t implGetOpenEvent(void);
+  virtual int
+  implOpen(void);
+  virtual OSEvent_t
+  implGetOpenEvent(void);
 
-  virtual int implClose(void);
+  virtual int
+  implClose(void);
 
-  virtual bool implIsConnected(void) const;
+  virtual bool
+  implIsConnected(void) const;
 
-  virtual bool implCanWrite(void);
-  virtual OSEvent_t implGetWriteEvent(void);
-  virtual int implWriteByte(unsigned char b);
+  virtual bool
+  implCanWrite(void);
+  virtual OSEvent_t
+  implGetWriteEvent(void);
+  virtual int
+  implWriteByte(unsigned char b);
 
-  virtual int implFlush(void);
+  virtual int
+  implFlush(void);
 
-  virtual bool implCanRead(void);
-  virtual int implAvailableRead(void);
-  virtual OSEvent_t implGetReadEvent(void);
-  virtual int implReadByte(void);
+  virtual bool
+  implCanRead(void);
+  virtual int
+  implAvailableRead(void);
+  virtual OSEvent_t
+  implGetReadEvent(void);
+  virtual int
+  implReadByte(void);
 
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART)
   // actual port implementation routines
-  void implPortInit(void);
-  inline static void implInterruptTxEnable(void);
-  inline static void implInterruptTxDisable(void);
-  inline unsigned char implPortRead(void);
-  inline void implPortWrite(unsigned char b);
-  
+  void
+  implPortInit(void);
+  inline static void
+  implInterruptTxEnable(void);
+  inline static void
+  implInterruptTxDisable(void);
+  inline unsigned char
+  implPortRead(void);
+  inline void
+  implPortWrite(unsigned char b);
+
 public:
   static DeviceCharacterUsart *ms_pThis;
 
@@ -109,7 +129,7 @@ public:
   virtual unsigned char implPortRead(void) = 0;
   virtual void implPortWrite(unsigned char b) = 0;
 #endif /*OS_INCLUDE_DEVICECHARACTERMULTIUSART*/
-  };
+};
 
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART)
 

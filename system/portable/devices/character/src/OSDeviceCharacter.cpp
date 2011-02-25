@@ -4,6 +4,8 @@
  *	This file is part of the uOS++ distribution.
  */
 
+#include "portable/kernel/include/OS.h"
+
 #include "portable/devices/character/include/OSDeviceCharacter.h"
 
 // ----- constructors --------------------------------------------------------
@@ -75,14 +77,14 @@ int OSDeviceCharacter::open(void)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
     OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::open("));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putChar(')');
     OSDeviceDebug::putNewLine();
 #endif
 
     int r;
     if (m_isOpened)
-      return OSReturn::OS_ALREADY_OPENED;
+    return OSReturn::OS_ALREADY_OPENED;
 
     m_openEvent = implGetOpenEvent();
     m_readEvent = implGetReadEvent();
@@ -94,7 +96,7 @@ int OSDeviceCharacter::open(void)
       }
     OSScheduler::criticalExit();
     if (r < 0)
-      return r;
+    return r;
 
     m_isOpened = true;
 
@@ -107,14 +109,14 @@ int OSDeviceCharacter::open(void)
           }
         OSScheduler::criticalExit();
         if (flag)
-          break;
+        break;
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
         OSTimerTicks_t timeout;
         timeout = getOpenTimeout();
 
         if (timeout == OSTimeout::OS_IMMEDIATELY)
-          return OSReturn::OS_WOULD_BLOCK;
+        return OSReturn::OS_WOULD_BLOCK;
 #endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
 
         OSEvent_t event;
@@ -174,7 +176,7 @@ int OSDeviceCharacter::close(void)
     //OSDeviceDebug::putNewLine();
 
     if (!m_isOpened)
-      return OSReturn::OS_NOT_OPENED;
+    return OSReturn::OS_NOT_OPENED;
 
     int r;
     OSScheduler::criticalEnter();
@@ -207,7 +209,7 @@ int OSDeviceCharacter::writeByte(unsigned char b)
 #endif
 
     if (!m_isOpened)
-      return OSReturn::OS_NOT_OPENED;
+    return OSReturn::OS_NOT_OPENED;
 
     bool flag;
     for (;;)
@@ -218,7 +220,7 @@ int OSDeviceCharacter::writeByte(unsigned char b)
           }
         OSScheduler::criticalExit();
         if (flag)
-          break;
+        break;
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
         OSTimerTicks_t timeout;
@@ -275,7 +277,7 @@ int OSDeviceCharacter::writeByte(unsigned char b)
       }
 
     if (!isConnected())
-      return OSReturn::OS_DISCONNECTED;
+    return OSReturn::OS_DISCONNECTED;
 
     OSScheduler::criticalEnter();
       {
@@ -292,7 +294,7 @@ int OSDeviceCharacter::writeByte(unsigned char b)
 int OSDeviceCharacter::flush(void)
   {
     if (!m_isOpened)
-      return OSReturn::OS_NOT_OPENED;
+    return OSReturn::OS_NOT_OPENED;
 
     int r;
     OSScheduler::criticalEnter();
@@ -316,7 +318,7 @@ int OSDeviceCharacter::readByte(void)
 #endif
 
     if (!m_isOpened)
-      return OSReturn::OS_NOT_OPENED;
+    return OSReturn::OS_NOT_OPENED;
 
     bool flag;
     for (;;)
@@ -327,7 +329,7 @@ int OSDeviceCharacter::readByte(void)
           }
         OSScheduler::criticalExit();
         if (flag)
-          break;
+        break;
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
         OSTimerTicks_t timeout;
@@ -377,7 +379,7 @@ int OSDeviceCharacter::readByte(void)
       }
 
     if (!isConnected())
-      return OSReturn::OS_DISCONNECTED;
+    return OSReturn::OS_DISCONNECTED;
 
     int c;
     OSScheduler::criticalEnter();

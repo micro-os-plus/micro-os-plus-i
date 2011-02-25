@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2008 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -20,7 +20,7 @@ typedef unsigned char OSEventFlagsBits_t;
 class OSEventFlags
   {
 public:
-  // initialize internal structures
+  // initialise internal structures
   OSEventFlags();
 
   // Set bits and send an internally identified event.

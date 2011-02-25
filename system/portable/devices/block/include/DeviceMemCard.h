@@ -1,11 +1,13 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
 
 #ifndef DEVICEMEMCARD_H_
 #define DEVICEMEMCARD_H_
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/devices/block/include/DeviceMemCardSelect.h"
 #include "portable/devices/block/include/DeviceMemCardSPI.h"
@@ -92,56 +94,78 @@
 typedef unsigned long memCardAddr_t;
 
 class DeviceMemCard : public DeviceMemCardSelect, public DeviceMemCardSPI
-  {
+{
 public:
   DeviceMemCard();
 
-  static int open(unsigned short vhs = 0);
-  static int close(void);
-
-  static int execCmd(unsigned char cmd, unsigned long arg, unsigned char *pbuf,
-      unsigned short len);
-  static int setBlkLen(unsigned short blen);
   static int
-      readCtrl(unsigned char cmd, unsigned char *pbuf, unsigned short len);
-  static int readBuffer(memCardAddr_t addr, unsigned char *pbuf,
-      unsigned short len);
-  static int writeBuffer(memCardAddr_t addr, unsigned char *pbuf,
-      unsigned short len);
+  open(unsigned short vhs = 0);
+  static int
+  close(void);
 
-  static int tagEraseStart(memCardAddr_t addr);
-  static int tagEraseEnd(memCardAddr_t addr);
-  static int erase(void);
+  static int
+  execCmd(unsigned char cmd, unsigned long arg, unsigned char *pbuf,
+      unsigned short len);
+  static int
+  setBlkLen(unsigned short blen);
+  static int
+  readCtrl(unsigned char cmd, unsigned char *pbuf, unsigned short len);
+  static int
+  readBuffer(memCardAddr_t addr, unsigned char *pbuf, unsigned short len);
+  static int
+  writeBuffer(memCardAddr_t addr, unsigned char *pbuf, unsigned short len);
 
-  static unsigned short getWriteBufferSize(void);
+  static int
+  tagEraseStart(memCardAddr_t addr);
+  static int
+  tagEraseEnd(memCardAddr_t addr);
+  static int
+  erase(void);
+
+  static unsigned short
+  getWriteBufferSize(void);
 
 #if defined(OS_INCLUDE_MEMCARD_VALIDATEVOLTAGE)
 
   static bool validateVoltage( unsigned long l );
 #endif
 
-  static int getCapabilities(void);
-  static void setWaitCycles(unsigned short n);
-  static unsigned short getWaitCycles(void);
+  static int
+  getCapabilities(void);
+  static void
+  setWaitCycles(unsigned short n);
+  static unsigned short
+  getWaitCycles(void);
 
-  static bool isOpened(void);
+  static bool
+  isOpened(void);
 
-  static void waitWhileBusy(void);
+  static void
+  waitWhileBusy(void);
 
 private:
 
-  static void safeSelectOn(void);
-  static void safeSelectOff(void);
+  static void
+  safeSelectOn(void);
+  static void
+  safeSelectOff(void);
 
-  static int enterIdle(void);
+  static int
+  enterIdle(void);
 
-  static void sendCommand(unsigned char cmd, unsigned long arg);
-  static unsigned char receiveR1(void);
-  static unsigned char receiveDataBlock(void);
-  static unsigned long receiveLong(void);
+  static void
+  sendCommand(unsigned char cmd, unsigned long arg);
+  static unsigned char
+  receiveR1(void);
+  static unsigned char
+  receiveDataBlock(void);
+  static unsigned long
+  receiveLong(void);
 
-  static unsigned char crc7(unsigned char crc, unsigned char data);
-  static unsigned short crc16(unsigned short crc, unsigned char data);
+  static unsigned char
+  crc7(unsigned char crc, unsigned char data);
+  static unsigned short
+  crc16(unsigned short crc, unsigned char data);
 
   // member variables
   static unsigned short m_waitCycles;
@@ -158,77 +182,78 @@ private:
 
   static bool m_isOpened;
 
-  };
+};
 
-inline bool DeviceMemCard::isOpened(void)
-  {
-    return m_isOpened;
-  }
+inline bool
+DeviceMemCard::isOpened(void)
+{
+  return m_isOpened;
+}
 
 // MMC 1.0 CID
 typedef struct
-__attribute__  ( ( __packed__ ) )
-    {
-      unsigned long manufacturerID:
-      24;
-      unsigned char productName[ 7 ];
-      unsigned char hwRevision:
-      4;
-      unsigned char fwRevision:
-      4;
-      unsigned long serialNumber:
-      24;
-      unsigned char monthCode:
-      4;
-      unsigned char yearCode:
-      4;
-      unsigned char crc7:
-      7;
-    }
-  memCardCID_mmc10_t;
+__attribute__ ( ( __packed__ ) )
+  {
+    unsigned long manufacturerID:
+    24;
+    unsigned char productName[ 7 ];
+    unsigned char hwRevision:
+    4;
+    unsigned char fwRevision:
+    4;
+    unsigned long serialNumber:
+    24;
+    unsigned char monthCode:
+    4;
+    unsigned char yearCode:
+    4;
+    unsigned char crc7:
+    7;
+  }
+memCardCID_mmc10_t;
 
-  // MMC 1.3 CID
+// MMC 1.3 CID
 typedef struct
-__attribute__  ( ( __packed__ ) )
-    {
-      unsigned int manufacturerID:
-      8; // [0]
-      unsigned int applicationID:
-      16; // [1]
-      unsigned char productName[ 6 ]; // [3]
-      unsigned char productRevision:
-      8; // [9]
-      unsigned long serialNumber:
-      32; // [10]
-      unsigned char manufacturingDateCode:
-      8; // [14]
-      unsigned char crc7:
-      7; // [15]
-    }
-  memCardCID_mmc13_t;
+__attribute__ ( ( __packed__ ) )
+  {
+    unsigned int manufacturerID:
+    8; // [0]
+    unsigned int applicationID:
+    16; // [1]
+    unsigned char productName[ 6 ]; // [3]
+    unsigned char productRevision:
+    8; // [9]
+    unsigned long serialNumber:
+    32; // [10]
+    unsigned char manufacturingDateCode:
+    8; // [14]
+    unsigned char crc7:
+    7; // [15]
+  }
+memCardCID_mmc13_t;
 
-  // SDC CID
+// SDC CID
 typedef struct
-__attribute__  ( ( __packed__ ) )
-    {
-      unsigned int manufacturerID:
-      8; // [0]
-      unsigned int applicationID:
-      16; // [1]
-      unsigned char productName[ 5 ]; // [3]
-      unsigned char productRevision:
-      8; // [8]
-      unsigned long serialNumber:
-      32; // [9]
-      unsigned char reserved:
-      4; // [13]
-      unsigned char yearCode:
-      8;
-      unsigned char monthCode:
-      4;
-      unsigned char crc7:
-      7; // [15]
-    }
-  memCardCID_sdc_t;
+__attribute__ ( ( __packed__ ) )
+  {
+    unsigned int manufacturerID:
+    8; // [0]
+    unsigned int applicationID:
+    16; // [1]
+    unsigned char productName[ 5 ]; // [3]
+    unsigned char productRevision:
+    8; // [8]
+    unsigned long serialNumber:
+    32; // [9]
+    unsigned char reserved:
+    4; // [13]
+    unsigned char yearCode:
+    8;
+    unsigned char monthCode:
+    4;
+    unsigned char crc7:
+    7; // [15]
+  }
+memCardCID_sdc_t;
 
 #endif /*DEVICEMEMCARD_H_*/

@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008-2009 Liviu Ionescu.
+ *      Copyright (C) 2008-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -25,7 +25,7 @@ DeviceCAN_AT90CAN::DeviceCAN_AT90CAN(CANPacket *pRxBuf,
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("DeviceCAN_AT90CAN()="));
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
 

@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -7,6 +7,10 @@
 #include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_MEMCARD)
+
+#include "portable/kernel/include/OS.h"
+
+#include "portable/devices/block/include/DeviceMemCard.h"
 
 /*
  * Memory Card support (MultiMedia & Secure Digital cards).
@@ -25,15 +29,11 @@
  * lower limit CMD0 and CMD1 can do the trick for both MMC and standard size SDC). 
  */
 
-#include "portable/kernel/include/OS.h"
-
-#include "portable/devices/block/include/DeviceMemCard.h"
-
 DeviceMemCard::DeviceMemCard()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("DeviceMemCard()=");
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
 
@@ -104,7 +104,7 @@ unsigned short DeviceMemCard::getWaitCycles(void)
   }
 
 /*
- * initialize card.
+ * initialise card.
  * logic from SD Simplified, page 95, with extentions
  * for SanDisk MMCs 1.3 that accept CMD55
  */
@@ -115,7 +115,7 @@ int DeviceMemCard::open(unsigned short vhs)
     int res;
 
     if (m_isOpened)
-      return MEMCARD_ERROR_OPENED;
+    return MEMCARD_ERROR_OPENED;
 
     m_bufLen = 0;
     m_capabilities = 0;
@@ -127,7 +127,7 @@ int DeviceMemCard::open(unsigned short vhs)
     // send more than 80 clocks prior to starting bus communication
     // before slecting the card
     for (i = 10; i != 0; --i)
-      spiRead();
+    spiRead();
 
     // 1 mS for just in case, not from the specs
     OS::busyWaitMillis(1);
@@ -267,7 +267,7 @@ int DeviceMemCard::open(unsigned short vhs)
 
                 r1 = receiveR1();
                 if (r1 == 0)
-                  break;
+                break;
 
                 if ( (r1 & ~MMC_R1_IN_IDLE_STATE ) != 0)
                   {
@@ -353,7 +353,7 @@ int DeviceMemCard::open(unsigned short vhs)
 
         r1 = receiveR1();
         if (r1 == 0)
-          break;
+        break;
 
         if ( (r1 & ~MMC_R1_IN_IDLE_STATE ) != 0)
           {
@@ -408,7 +408,7 @@ int DeviceMemCard::enterIdle(void)
         r1 = receiveR1();
 
         if (r1 == MMC_R1_IN_IDLE_STATE)
-          break; // no errors & idle state detected
+        break; // no errors & idle state detected
 
         if ( (i % 10) == 0)
           {
@@ -416,7 +416,7 @@ int DeviceMemCard::enterIdle(void)
           }
 
         if (r1 == 0xFF)
-          ++j;
+        ++j;
 
         OSDeviceDebug::putString("CMD0 R1=");
         OSDeviceDebug::putHex(r1);
@@ -425,9 +425,9 @@ int DeviceMemCard::enterIdle(void)
     if (i == 0)
       {
         if (j == MEMCARD_IDLE_RETRIES)
-          return MEMCARD_ERROR_MISSING;
+        return MEMCARD_ERROR_MISSING;
         else
-          return MEMCARD_ERROR_GO_IDLE;
+        return MEMCARD_ERROR_GO_IDLE;
       }
 
     // now in idle state
@@ -508,14 +508,14 @@ int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
     unsigned short maxlen;
 
     if (cmd == MMC_SEND_CSD || cmd == MMC_SEND_CID)
-      maxlen = 16;
+    maxlen = 16;
     else if (cmd == MMC_READ_SINGLE_BLOCK)
-      maxlen = m_bufLen;
+    maxlen = m_bufLen;
     else if (cmd == MMC_WRITE_BLOCK)
       {
         maxlen = getWriteBufferSize();
         if (len > maxlen)
-          len = maxlen;
+        len = maxlen;
       }
     else if (cmd == MMC_TAG_SECTOR_START || cmd == MMC_TAG_SECTOR_END || cmd
         == MMC_ERASE)
@@ -575,11 +575,11 @@ int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
     if (cmd != MMC_SEND_CSD && cmd != MMC_SEND_CID)
       {
         while (spiRead() != 0xFF)
-          ; // Nac >= 1
+        ; // Nac >= 1
       }
 
     if (cmd == MMC_TAG_SECTOR_START || cmd == MMC_TAG_SECTOR_END)
-      goto out;
+    goto out;
 
     if (cmd == MMC_WRITE_BLOCK)
       {
@@ -604,9 +604,9 @@ int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
           {
             unsigned char r;
             if (i < len)
-              r = *p;
+            r = *p;
             else
-              r = 0xFF;
+            r = 0xFF;
             spiReadWrite(r);
             crc = crc16(crc, r);
           }
@@ -617,17 +617,17 @@ int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
         do
           {
             r = spiRead();
-          } while ((r & 0x11) != 0x1);
+          }while ((r & 0x11) != 0x1);
 
         r &= 0x1F;
         if (r != ((0x02 << 1) | 0x1))
           {
             if (r == ((0x05 << 1) | 0x1))
-              res = MEMCARD_ERROR_DATA_CRC;
+            res = MEMCARD_ERROR_DATA_CRC;
             else if (r == ((0x06 << 1) | 0x1))
-              res = MEMCARD_ERROR_WRITE;
+            res = MEMCARD_ERROR_WRITE;
             else
-              res = MEMCARD_ERROR_UNKNOWN;
+            res = MEMCARD_ERROR_UNKNOWN;
 
             OSDeviceDebug::putString("wr r=");
             OSDeviceDebug::putHex(r);
@@ -636,11 +636,11 @@ int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
           }
 
         while (spiRead() != 0x00)
-          ; // wait for first busy response
+        ; // wait for first busy response
 
         // not mandatory, but safer
         for (i = 8; (((r = spiRead()) ) == 0x00) && (i != 0); --i)
-          ;
+        ;
 
       }
     else
@@ -662,6 +662,7 @@ int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
         unsigned char *p;
         unsigned int i;
         for (i = 0, p = pbuf; i < maxlen + 2; ++i, ++p) // +2 crc
+
           {
             r = spiRead();
             if (i < len)
@@ -740,7 +741,7 @@ unsigned char DeviceMemCard::crc7(unsigned char crc, unsigned char b)
       {
         crc <<= 1;
         if ( ( (b << i ) ^ crc ) & 0x80)
-          crc ^= 0x09;
+        crc ^= 0x09;
       }
     return crc;
   }
@@ -760,9 +761,9 @@ unsigned short DeviceMemCard::crc16(unsigned short crc, unsigned char b)
     for (i = 0; i < 8; i++)
       {
         if (crc & 0x8000)
-          crc = (crc << 1) ^ 0x1021;
+        crc = (crc << 1) ^ 0x1021;
         else
-          crc <<= 1;
+        crc <<= 1;
       }
 
     return crc;
@@ -808,8 +809,8 @@ void DeviceMemCard::sendCommand(unsigned char cmd, unsigned long arg)
     spiReadWrite(crc);
 
     if (true)
-      while (spiRead() != 0xFF)
-        ; // Ncr >= 1, at least one H after command
+    while (spiRead() != 0xFF)
+    ; // Ncr >= 1, at least one H after command
   }
 
 unsigned char DeviceMemCard::receiveR1(void)

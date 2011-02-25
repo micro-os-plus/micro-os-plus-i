@@ -9,6 +9,7 @@
 #if defined(OS_INCLUDE_SIMPLECLI)
 
 #include "portable/kernel/include/OS.h"
+
 #include "portable/misc/include/SimpleCli.h"
 
 SimpleCli::SimpleCli(unsigned char *pLine, unsigned short iSize)

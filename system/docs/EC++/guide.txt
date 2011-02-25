@@ -30,12 +30,12 @@ A.2   Object declaration at file scope
           In C++, a declaration of an object at file scope without a
           storage class specifier is a definition of that object
           with external linkage.  If the definition does not have an
-          initializer, the object has initial value 0.  (As in C, an
+          initialiser, the object has initial value 0.  (As in C, an
           object declared in a C++ program must be defined exactly
           once.)
 
           In C, a declaration of an object at file scope without a
-          storage class specifier and without an initializer is a
+          storage class specifier and without an initialiser is a
           tentative definition, which may appear more than once in a
           translation unit.
 
@@ -56,11 +56,11 @@ A.2   Object declaration at file scope
 
           In C++, a declaration of an object at file scope is just a
           declaration (and not also a definition) if and only if it
-          has an explicit extern specifier and no initializer.
+          has an explicit extern specifier and no initialiser.
 
           Each object declared at file scope must be defined exactly
           once.  All but one declaration must have both an explicit
-          extern specifier and no initializer.
+          extern specifier and no initialiser.
 
 A.3   const type qualifier
 
@@ -216,7 +216,7 @@ A.7   Transfer of control past the definition of a local object
           }
 
           This is valid in C, assuming the code following LABEL:
-          does not depend on v being initialized to 0.  It is always
+          does not depend on v being initialised to 0.  It is always
           an error in C++.
 
       Guideline
@@ -228,7 +228,7 @@ A.8   Character array initialization
 
       Note
 
-          A C program can initialize an array of characters using a
+          A C program can initialise an array of characters using a
           string literal that defines one more character (counting
           the terminating '\0') than the array can hold.
           A C++ program cannot.
@@ -242,7 +242,7 @@ A.8   Character array initialization
 
       Guideline
 
-          Do not initialize an array of characters using a string
+          Do not initialise an array of characters using a string
           literal with more characters (including the '\0') than the
           array. Therefore, it is necessary to specify the correct size of 
           a string literal (char s[4] = "abc";). 
@@ -412,7 +412,7 @@ B.1   Object initialization
 
           (2) In some implementations, this applies a constructor
               directly to x as above.  In others, it constructs a
-              temporary object, and initializes x from the
+              temporary object, and initialises x from the
               temporary, as if by calling:
 
               temp.T(i);        // apply constructor to temp
@@ -421,7 +421,7 @@ B.1   Object initialization
 
           (3) This is the same as (2).
 
-          (4) This initializes x using T's default constructor, then
+          (4) This initialises x using T's default constructor, then
               later assigns a new value to x using an assignment
               operator.  The assignment operator may release
               resources that x is using and acquire new resources.
@@ -521,9 +521,9 @@ B.5   Initialization of global objects
                                                 return a++;
                                             }
 
-          The program may initialize 'a' with 0 and 'b' with 1, or
+          The program may initialise 'a' with 0 and 'b' with 1, or
           vice versa, depending on the order the implementation
-          chooses to initialize them.
+          chooses to initialise them.
 
           It is possible to make the initialization order well
           defined by moving the declaration of 'b' in file2 to
@@ -595,7 +595,7 @@ D.1   const objects in ROM
 
           --  has static storage duration,
 
-          -- is initialized by a constant expression, and
+          -- is initialised by a constant expression, and
 
           --  has a POD (plain old data) type.
 
@@ -628,7 +628,7 @@ D.1   const objects in ROM
       Guideline
 
           Declare objects to be placed in ROM with POD types and
-          with constant initializers.
+          with constant initialisers.
 
 NOTE: The form of presentation used here, and several of the specific
 guidelines, were inspired by the excellent book by Thomas Plum and

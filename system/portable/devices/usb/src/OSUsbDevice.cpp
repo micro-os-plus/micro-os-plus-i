@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2008 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -9,6 +9,7 @@
 #if defined(OS_INCLUDE_OSUSBDEVICE)
 
 #include "portable/kernel/include/OS.h"
+
 #include "portable/devices/usb/include/OSUsbDevice.h"
 #include "portable/devices/character/include/DeviceCharacterUsb.h"
 #include "portable/devices/usb/include/OSUsbDeviceDescriptors.h"
@@ -36,7 +37,7 @@ OSUsbDevice::OSUsbDevice()
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString("OSUsbDevice()=");
-    OSDeviceDebug::putHex((unsigned short)this);
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
 
@@ -677,7 +678,7 @@ void OSUsbDevice::usb_set_interface(void)
   }
 
 /*
- * Initialize the main usb variables:
+ * Initialise the main usb variables:
  * - endpoint status
  * - connection status
  */

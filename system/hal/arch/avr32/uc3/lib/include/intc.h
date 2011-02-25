@@ -72,7 +72,7 @@ typedef void (*__int_handler)(void);
 typedef void (__interrupt *__int_handler)(void);
 #endif
 
-/*! \brief Initializes the hardware interrupt controller driver.
+/*! \brief Initialises the hardware interrupt controller driver.
  *
  * \note Taken and adapted from Newlib.
  */

@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2009 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -26,36 +26,44 @@ class OSDeviceCharacter
 : public streambuf
 #endif
 
-  {
+{
 public:
   OSDeviceCharacter();
 
   // open device, blocking if necessary
-  OSReturn_t open(void);
+  OSReturn_t
+  open(void);
 
   // close device
-  OSReturn_t close(void);
+  OSReturn_t
+  close(void);
 
   // test if device is opened
-  bool isOpened(void) const;
+  bool
+  isOpened(void) const;
 
   // test if device is in connected state
-  bool isConnected(void) const;
+  bool
+  isConnected(void) const;
 
   // blocking read.
   // return byte or negative (OSReturn::OS_DISCONNECTED, OSReturn::OS_TIMEOUT)
-  OSReturn_t readByte(void);
+  OSReturn_t
+  readByte(void);
 
   // Check if there is available data to be read
   // and if it is return the size of the data.
-  OSReturn_t availableRead(void);
+  OSReturn_t
+  availableRead(void);
 
   // blocking write. does not flush, unless buffer full.
   // return byte or negative (OSReturn::OS_DISCONNECTED, OSReturn::OS_TIMEOUT)
-  int writeByte(unsigned char b);
+  int
+  writeByte(unsigned char b);
 
   // flush existing buffer
-  OSReturn_t flush(void);
+  OSReturn_t
+  flush(void);
 
 #if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
   // get device type
@@ -63,53 +71,71 @@ public:
 #endif
 
   // set/get the task event to be used by read
-  void setReadEvent(OSEvent_t event);
-  OSEvent_t getReadEvent(void);
+  void
+  setReadEvent(OSEvent_t event);
+  OSEvent_t
+  getReadEvent(void);
 
   // set/get the task event to be used by write
-  void setWriteEvent(OSEvent_t event);
-  OSEvent_t getWriteEvent(void);
+  void
+  setWriteEvent(OSEvent_t event);
+  OSEvent_t
+  getWriteEvent(void);
 
   // set/get the task event to be used by open
-  void setOpenEvent(OSEvent_t event);
-  OSEvent_t getOpenEvent(void);
+  void
+  setOpenEvent(OSEvent_t event);
+  OSEvent_t
+  getOpenEvent(void);
 
 #if 1
   // OSTimeout::OS_NEVER = no timeout (default)
   // OSTimeout::IMMEDIATELLY = return WOULD_BLOCK if necessary
 
   // set/get the open timeout()
-  void setOpenTimeout(OSTimerTicks_t t);
-  OSTimerTicks_t getOpenTimeout(void);
+  void
+  setOpenTimeout(OSTimerTicks_t t);
+  OSTimerTicks_t
+  getOpenTimeout(void);
 
   // set/get the read timeout()
-  void setReadTimeout(OSTimerTicks_t t);
-  OSTimerTicks_t getReadTimeout(void);
+  void
+  setReadTimeout(OSTimerTicks_t t);
+  OSTimerTicks_t
+  getReadTimeout(void);
 
   // set/get the write timeout()
-  void setWriteTimeout(OSTimerTicks_t t);
-  OSTimerTicks_t getWriteTimeout(void);
+  void
+  setWriteTimeout(OSTimerTicks_t t);
+  OSTimerTicks_t
+  getWriteTimeout(void);
 
   // Set timer to be used by the open function.
   // If the operation doesn't succeed after the open-timeout
   // (set with setOpenTimeout), this timer is used to
   // wake-up the task and return with an error code.
-  void setOpenTimer(OSTimer *pTimer);
-  OSTimer *getOpenTimer(void);
+  void
+  setOpenTimer(OSTimer *pTimer);
+  OSTimer *
+  getOpenTimer(void);
 
   // Set timer to be used by the read functions.
   // If the operation doesn't succeed after the read-timeout
   // (set with setReadTimeout), this timer is used to
   // wake-up the task and return with an error code.
-  void setReadTimer(OSTimer *pTimer);
-  OSTimer *getReadTimer(void);
+  void
+  setReadTimer(OSTimer *pTimer);
+  OSTimer *
+  getReadTimer(void);
 
   // Set timer to be used by the write functions.
   // If the operation doesn't succeed after the write-timeout
   // (set with setWriteTimeout), this timer is used to
   // wake-up the task and return with an error code.
-  void setWriteTimer(OSTimer *pTimer);
-  OSTimer *getWriteTimer(void);
+  void
+  setWriteTimer(OSTimer *pTimer);
+  OSTimer *
+  getWriteTimer(void);
 
 #endif
 
@@ -125,22 +151,34 @@ private:
 
   // Implementation for different methods.
 
-  virtual OSEvent_t implGetOpenEvent(void);
-  virtual OSEvent_t implGetReadEvent(void);
-  virtual OSEvent_t implGetWriteEvent(void);
+  virtual OSEvent_t
+  implGetOpenEvent(void);
+  virtual OSEvent_t
+  implGetReadEvent(void);
+  virtual OSEvent_t
+  implGetWriteEvent(void);
 
-  virtual OSReturn_t implOpen(void) = 0;
-  virtual OSReturn_t implClose(void) = 0;
-  virtual bool implIsConnected(void) const;
+  virtual OSReturn_t
+  implOpen(void) = 0;
+  virtual OSReturn_t
+  implClose(void) = 0;
+  virtual bool
+  implIsConnected(void) const;
 
-  virtual bool implCanRead(void) = 0;
-  virtual int implAvailableRead(void) = 0;
-  virtual int implReadByte(void) = 0;
+  virtual bool
+  implCanRead(void) = 0;
+  virtual int
+  implAvailableRead(void) = 0;
+  virtual int
+  implReadByte(void) = 0;
 
-  virtual bool implCanWrite(void) = 0;
-  virtual int implWriteByte(unsigned char b) = 0;
+  virtual bool
+  implCanWrite(void) = 0;
+  virtual int
+  implWriteByte(unsigned char b) = 0;
 
-  virtual int implFlush(void) = 0;
+  virtual int
+  implFlush(void) = 0;
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
 
@@ -159,7 +197,6 @@ private:
   OSEvent_t m_readEvent;
   OSEvent_t m_writeEvent;
 
-
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
   // streambuf definitions
   virtual int overflow(int c = traits::eof());
@@ -168,39 +205,45 @@ private:
   virtual int sync();
 #endif
 
-  };
+};
 
 // ----- inline implementations ----------------------------------------------
 
-inline void OSDeviceCharacter::setOpenEvent(OSEvent_t event)
-  {
-    m_openEvent = event;
-  }
+inline void
+OSDeviceCharacter::setOpenEvent(OSEvent_t event)
+{
+  m_openEvent = event;
+}
 
-inline OSEvent_t OSDeviceCharacter::getOpenEvent(void)
-  {
-    return m_openEvent;
-  }
+inline OSEvent_t
+OSDeviceCharacter::getOpenEvent(void)
+{
+  return m_openEvent;
+}
 
-inline void OSDeviceCharacter::setReadEvent(OSEvent_t event)
-  {
-    m_readEvent = event;
-  }
+inline void
+OSDeviceCharacter::setReadEvent(OSEvent_t event)
+{
+  m_readEvent = event;
+}
 
-inline OSEvent_t OSDeviceCharacter::getReadEvent(void)
-  {
-    return m_readEvent;
-  }
+inline OSEvent_t
+OSDeviceCharacter::getReadEvent(void)
+{
+  return m_readEvent;
+}
 
-inline void OSDeviceCharacter::setWriteEvent(OSEvent_t event)
-  {
-    m_writeEvent = event;
-  }
+inline void
+OSDeviceCharacter::setWriteEvent(OSEvent_t event)
+{
+  m_writeEvent = event;
+}
 
-inline OSEvent_t OSDeviceCharacter::getWriteEvent(void)
-  {
-    return m_writeEvent;
-  }
+inline OSEvent_t
+OSDeviceCharacter::getWriteEvent(void)
+{
+  return m_writeEvent;
+}
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
 

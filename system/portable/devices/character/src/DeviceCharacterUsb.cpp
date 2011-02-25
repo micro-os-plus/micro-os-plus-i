@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2008 Liviu Ionescu.
+ *	Copyright (C) 2007-2011 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -7,6 +7,8 @@
 #include "portable/kernel/include/OS_Defines.h"
 
 #if defined(OS_INCLUDE_DEVICECHARACTERUSB)
+
+#include "portable/kernel/include/OS.h"
 
 #include "portable/devices/character/include/DeviceCharacterUsb.h"
 
@@ -18,7 +20,7 @@ DeviceCharacterUsb::DeviceCharacterUsb(int device)
     OSDeviceDebug::putString("DeviceCharacterUsb(");
     OSDeviceDebug::putDec((unsigned short)device);
     OSDeviceDebug::putString(")=");
-    OSDeviceDebug::putHex( ( unsigned short ) this );
+    OSDeviceDebug::putPtr(this );
     OSDeviceDebug::putNewLine();
 #endif
 
@@ -63,4 +65,4 @@ DeviceCharacterUsb *g_usb0;
 DeviceCharacterUsb *g_usb1;
 #endif
 
-#endif /*OS_INCLUDE_DEVICECHARACTERUSB*/
+#endif /* OS_INCLUDE_DEVICECHARACTERUSB */
