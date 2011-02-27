@@ -40,8 +40,8 @@ OSTimerSeconds OSScheduler::timerSeconds;
 bool OSScheduler::ms_allowDeepSleep;
 #endif
 
-unsigned char OSReadyList::ms_count;
-OSTask *OSReadyList::ms_array[OS_CFGINT_TASKS_TABLE_SIZE + 1];
+unsigned char OSActiveTasks::ms_count;
+OSTask *OSActiveTasks::ms_array[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 
 // ----------------------------------------------------------------------------
 
@@ -96,14 +96,14 @@ OSScheduler::start(void)
       OSTask *pt;
       pt = ms_tasks[i];
       if (!pt->isSuspended())
-        OSReadyList::insert(pt);
+        OSActiveTasks::insert(pt);
 
       if (pt->getPriority() == OSTask::IDLE_PRIORITY)
         setTaskIdle(pt);
     }
 
 #if defined(DEBUG)
-  OSReadyList::dump();
+  OSActiveTasks::dump();
 #endif
 
   if (getTaskIdle() == 0)
@@ -116,7 +116,7 @@ OSScheduler::start(void)
   else
     {
       // Get the task with the highest priority.
-      ms_pTaskRunning = OSReadyList::getTop();
+      ms_pTaskRunning = OSActiveTasks::getTop();
       // Prepare the global value with the pointer to the m_pStack.
       g_ppCurrentStack = &ms_pTaskRunning->m_pStack;
 
@@ -222,7 +222,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
                       if (ret == OSEventWaitReturn::OS_NONE)
                       OSDeviceDebug::putChar('^');
 #endif
-                      OSReadyList::insert(pt);
+                      OSActiveTasks::insert(pt);
 
                       ++cnt;
                     }
@@ -259,7 +259,7 @@ OSScheduler::isContextSwitchRequired()
 
   bool bRequire;
   bRequire = (ms_isPreemptive || (ms_pTaskRunning == ms_pTaskIdle))
-      && (OSReadyList::getCount() > 1);
+      && (OSActiveTasks::getCount() > 1);
 
   return bRequire;
 }
@@ -291,14 +291,14 @@ OSScheduler::performContextSwitch()
       OSScheduler::criticalEnter();
         {
           // remove the running task from the ready list
-          OSReadyList::remove(ms_pTaskRunning);
+          OSActiveTasks::remove(ms_pTaskRunning);
 
           // eventually reinsert it at the end of the list (round robin)
           if (!ms_pTaskRunning->m_isSuspended && !ms_pTaskRunning->m_isWaiting)
-            OSReadyList::insert(ms_pTaskRunning);
+            OSActiveTasks::insert(ms_pTaskRunning);
 
           // select the running task from the top of the list
-          ms_pTaskRunning = OSReadyList::getTop();
+          ms_pTaskRunning = OSActiveTasks::getTop();
           // Prepare the global value with the pointer to the m_pStack.
           g_ppCurrentStack = &ms_pTaskRunning->m_pStack;
         }
@@ -317,7 +317,7 @@ OSScheduler::performContextSwitch()
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH)
     {
-      //OSReadyList::dump();
+      //OSActiveTasks::dump();
       OSDeviceDebug::putChar('>');
       OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
       OSDeviceDebug::putNewLine();
@@ -361,7 +361,7 @@ OSScheduler::taskRegister(OSTask *pTask)
       // initial tasks are inserted in ready list at start()
       // later tasks should be inserted when constructed
       if (id != 0xFF && ms_isRunning)
-        OSReadyList::insert(pTask); // insert task in ready list
+        OSActiveTasks::insert(pTask); // insert task in ready list
     }
   OSScheduler::criticalExit();
 
@@ -430,10 +430,10 @@ void OSScheduler::ISRcancelTask(OSTask *pTask)
 
 // ==========================================================================
 
-OSReadyList::OSReadyList()
+OSActiveTasks::OSActiveTasks()
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSReadyList()="));
+  OSDeviceDebug::putString_P(PSTR("OSActiveTasks()="));
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
@@ -446,9 +446,9 @@ OSReadyList::OSReadyList()
   ms_count = 0;
 }
 
-// insert order by increasing priority
+// Insert tasks in order of decreasing priority
 void
-OSReadyList::insert(OSTask *pTask)
+OSActiveTasks::insert(OSTask *pTask)
 {
   int i;
   i = find(pTask);
@@ -481,7 +481,7 @@ OSReadyList::insert(OSTask *pTask)
   ms_array[i] = pTask;
   ms_count++;
 
-#if defined(DEBUG) && defined(OS_DEBUG_OSREADYLIST_INSERT)
+#if defined(DEBUG) && defined(OS_DEBUG_OSACTIVETASKS_INSERT)
     {
       OSDeviceDebug::putString_P(PSTR("ins "));
       OSDeviceDebug::putString(pTask->getName());
@@ -491,7 +491,7 @@ OSReadyList::insert(OSTask *pTask)
 }
 
 void
-OSReadyList::remove(OSTask * pTask)
+OSActiveTasks::remove(OSTask * pTask)
 {
   if (pTask == OSScheduler::getTaskIdle())
     return; // do not remove the idle task
@@ -510,7 +510,7 @@ OSReadyList::remove(OSTask * pTask)
     }
   ms_count--;
 
-#if defined(DEBUG) && defined(OS_DEBUG_OSREADYLIST_REMOVE)
+#if defined(DEBUG) && defined(OS_DEBUG_OSACTIVETASKS_REMOVE)
     {
       OSDeviceDebug::putString_P(PSTR("rem "));
       OSDeviceDebug::putString(pTask->getName());
@@ -520,7 +520,7 @@ OSReadyList::remove(OSTask * pTask)
 }
 
 int
-OSReadyList::find(OSTask *pTask)
+OSActiveTasks::find(OSTask *pTask)
 {
   int i;
   for (i = 0; i < ms_count; ++i)
@@ -534,7 +534,7 @@ OSReadyList::find(OSTask *pTask)
 
 #if defined(DEBUG)
 void
-OSReadyList::dump(void)
+OSActiveTasks::dump(void)
 {
   int i;
   OSDeviceDebug::putString_P(PSTR("Tasks: "));

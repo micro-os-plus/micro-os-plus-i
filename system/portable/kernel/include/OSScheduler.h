@@ -13,7 +13,7 @@
 
 typedef unsigned short schedTicks_t;
 
-class OSReadyList;
+class OSActiveTasks;
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
 class OSTimerSeconds;
@@ -102,24 +102,31 @@ public:
 
   // enter a critical section, i.e. a section where interrupts are disabled.
   inline static void
-  criticalEnter(void) __attribute__( ( always_inline ) );
+  criticalEnter(void) __attribute__((always_inline));
   // enter a real time critical section, i.e. a section where
   // all interrupts are disabled.
   inline static void
-  realTimeCriticalEnter(void) __attribute__( ( always_inline ) );
+  realTimeCriticalEnter(void) __attribute__((always_inline));
   // exit from critical section.
   inline static void
-  criticalExit(void) __attribute__( ( always_inline ) );
+  criticalExit(void) __attribute__((always_inline));
 
   // sleep until event occurs
   static OSEventWaitReturn_t
   eventWait(OSEvent_t event);
 
   static bool
-  eventWaitPrepare(OSEvent_t event) __attribute__( ( always_inline ) );
+  eventWaitPrepare(OSEvent_t event) __attribute__((always_inline));
+
+  // Perform the actual wait
+  static OSEventWaitReturn_t
+  eventWaitPerform(void) __attribute__((always_inline));
 
   static OSEventWaitReturn_t
-  getEventWaitReturn(void);
+  getEventWaitReturn(void) __attribute__((always_inline));
+
+  static void
+  setEventWaitReturn(OSEventWaitReturn_t ret) __attribute__((always_inline));
 
   // wakeup all tasks waiting for event
   static int
@@ -132,15 +139,15 @@ public:
 
   // TODO: do we need this?
   inline static void
-  ledActiveInit(void) __attribute__( ( always_inline ) );
+  ledActiveInit(void) __attribute__((always_inline));
   inline static void
-  ISR_ledActiveOn(void) __attribute__( ( always_inline ) );
+  ISR_ledActiveOn(void) __attribute__((always_inline));
   inline static void
-  ledActiveOn(void) __attribute__( ( always_inline ) );
+  ledActiveOn(void) __attribute__((always_inline));
   inline static void
-  ISR_ledActiveOff(void) __attribute__( ( always_inline ) );
+  ISR_ledActiveOff(void) __attribute__((always_inline));
   inline static void
-  ledActiveOff(void) __attribute__( ( always_inline ) );
+  ledActiveOff(void) __attribute__((always_inline));
 
   // register a task to the scheduler
   static unsigned char
@@ -164,20 +171,20 @@ public:
   // called in order to save the context of the current task
   // must be called in conjunction with interruptExit
   inline static void
-  interruptEnter(void) __attribute__( ( always_inline ) );
+  interruptEnter(void) __attribute__((always_inline));
   // called in order to perform the context switch
   // must be called in conjunction with interruptEnter
   inline static void
-  interruptExit(void) __attribute__( ( always_inline ) );
+  interruptExit(void) __attribute__((always_inline));
 
 #endif
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE)
 
   inline static void
-  contextSave(void) __attribute__( ( always_inline ) );
+  contextSave(void) __attribute__((always_inline));
   inline static void
-  contextRestore(void) __attribute__( ( always_inline ) );
+  contextRestore(void) __attribute__((always_inline));
 
 #endif
 
@@ -235,7 +242,7 @@ private:
   static OSTask *ms_pTaskIdle;
 
   // the ready list used for managing the runnable tasks
-  static OSReadyList ms_readyTasksList;
+  static OSActiveTasks ms_activeTasks;
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
   // records the deep sleep flag
@@ -256,7 +263,7 @@ public:
 
   // yield function
   inline static void
-  yield(void) __attribute__( ( always_inline ) );
+  yield(void) __attribute__((always_inline));
 
   // initialise the stack for a task
   static OSStack_t *
@@ -281,25 +288,25 @@ public:
 
   // restore the context for the next task to be scheduled
   inline static void
-  FirstTask_contextRestore(void) __attribute__( ( always_inline ) );
+  FirstTask_contextRestore(void) __attribute__((always_inline));
 
 #if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
   // save the SP for the active task
   inline static void
-  stackPointerSave(void) __attribute__( ( always_inline ) );
+  stackPointerSave(void) __attribute__((always_inline));
 
   // restore the SP for the active task
   inline static void
-  stackPointerRestore(void) __attribute__( ( always_inline ) );
+  stackPointerRestore(void) __attribute__((always_inline));
 
   // save the registers for the active task
   inline static void
-  registersSave(void) __attribute__( ( always_inline ) );
+  registersSave(void) __attribute__((always_inline));
 
   // restore the registers for the active task
   inline static void
-  registersRestore(void) __attribute__( ( always_inline ) );
+  registersRestore(void) __attribute__((always_inline));
 
   // check if the context switch can be done. The context
   // switch cannot be done if the current context is a nested interrupt.
@@ -308,7 +315,7 @@ public:
   // See the OSScheduler::interruptEnter or OSScheduler::interruptExit
   // in order to see how this is used.
   inline static bool
-  isContextSwitchAllowed(void) __attribute__( ( always_inline ) );
+  isContextSwitchAllowed(void) __attribute__((always_inline));
 
 #endif
 
@@ -316,10 +323,10 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class OSReadyList
+class OSActiveTasks
 {
 public:
-  OSReadyList();
+  OSActiveTasks();
 
   // insert task in ready list
   static void
@@ -438,30 +445,23 @@ OSScheduler::eventWaitPrepare(OSEvent_t event)
 }
 
 inline OSEventWaitReturn_t
-OSScheduler::getEventWaitReturn(void)
+OSScheduler::eventWaitPerform(void)
 {
-  return ms_pTaskRunning->m_eventWaitReturn;
+  return ms_pTaskRunning->eventWaitPerform();
 }
 
-#if false
-// Failed test, kept here for archive
-
 inline OSEventWaitReturn_t
-OSScheduler::eventWait(bool condition, OSEvent_t event)
-  {
-    bool doYield;
-    OSScheduler::criticalEnter();
-      {
-        doYield = (condition) && (ms_pTaskRunning->eventWaitPrepare(event));
-      }
-    OSScheduler::criticalExit();
-    if (doYield)
-      {
-        OSScheduler::yield();
-      }
-    return ms_pTaskRunning->m_eventWaitReturn;
-  }
-#endif
+OSScheduler::getEventWaitReturn(void)
+{
+  return ms_pTaskRunning->getEventWaitReturn();
+}
+
+inline void
+OSScheduler::setEventWaitReturn(OSEventWaitReturn_t ret)
+{
+  ms_pTaskRunning->setEventWaitReturn(ret);
+}
+
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
 
@@ -607,13 +607,13 @@ OSScheduler::ledActiveOff(void)
 //-----------------------------------------------------------------------------
 
 inline OSTask *
-OSReadyList::getTop(void)
+OSActiveTasks::getTop(void)
 {
   return ms_array[0];
 }
 
 inline unsigned char
-OSReadyList::getCount(void)
+OSActiveTasks::getCount(void)
 {
   return ms_count;
 }
