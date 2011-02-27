@@ -379,9 +379,9 @@ OSSchedulerImpl::FirstTask_contextRestore(void)
 }
 
 void
-SCALL_contextSave(void) __attribute__( ( always_inline ) );
+SCALL_contextSave(void) __attribute__((always_inline));
 void
-SCALL_contextRestore(void) __attribute__( ( always_inline ) );
+SCALL_contextRestore(void) __attribute__((always_inline));
 
 /*
  * Push all registers onto the stack and remember position in global variable
