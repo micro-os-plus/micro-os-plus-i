@@ -24,13 +24,13 @@ public:
   // transform  the microseconds number into ticks number
   // possible issues: the result is approximative, the higher the tick rate the better the approximation
   // and the result should fit the range of OSTimerTicks_t, otherwise results are erroneous
-  inline static OSTimerTicks_t microsToTicks(unsigned short micros) __attribute__( ( always_inline ) );
+  inline static OSTimerTicks_t microsToTicks(unsigned short micros) __attribute__((always_inline));
 
   // called each time a tick expire
   // increment the current ticks number, and call the OSTimer::interruptTick.
   void interruptServiceRoutine(void);
 
-  inline static void interruptContextHandler(void) __attribute__( ( always_inline ) );
+  inline static void interruptContextHandler(void) __attribute__((always_inline));
 
   // TODO: delete if not needed
   // static OSTimerTicks_t ms_secondTicks;
