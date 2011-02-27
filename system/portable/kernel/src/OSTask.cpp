@@ -146,6 +146,11 @@ OSTask::staticMain(OSTask * pt)
   OS::SOFTreset();
 }
 
+void
+OSTask::yield()
+{
+  OSSchedulerImpl::yield();
+}
 // Should be overridden by actual implementation
 void
 OSTask::taskMain(void)
@@ -162,7 +167,7 @@ OSTask::suspend(void)
   OSScheduler::criticalEnter();
     {
       m_isSuspended = true;
-      OSReadyList::remove(this);
+      OSActiveTasks::remove(this);
     }
   OSScheduler::criticalExit();
 }
@@ -174,7 +179,7 @@ OSTask::resume(void)
   OSScheduler::criticalEnter();
     {
       m_isSuspended = false;
-      OSReadyList::insert(this);
+      OSActiveTasks::insert(this);
     }
   OSScheduler::criticalExit();
 }
@@ -434,7 +439,7 @@ OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
               if (retVal == OSEventWaitReturn::OS_NONE)
                 OSDeviceDebug::putChar('^');
 #endif
-              OSReadyList::insert(this);
+              OSActiveTasks::insert(this);
               ret = 1;
             }
         }
@@ -456,19 +461,19 @@ OSTask::eventWaitPrepare(OSEvent_t event)
 
   if (m_isInterrupted)
     {
-      m_eventWaitReturn = OSEventWaitReturn::OS_CANCELED;
+      setEventWaitReturn(OSEventWaitReturn::OS_CANCELED);
       return false;
     }
 #endif
   if (OSScheduler::isLocked())
     {
-      m_eventWaitReturn = OSEventWaitReturn::OS_LOCKED;
+      setEventWaitReturn(OSEventWaitReturn::OS_LOCKED);
       return false;
     }
   if (event == OSEvent::OS_NONE)
     {
       // if no event, return NONE
-      m_eventWaitReturn = OSEventWaitReturn::OS_NONE;
+      setEventWaitReturn(OSEventWaitReturn::OS_NONE);
       return false;
     }
 

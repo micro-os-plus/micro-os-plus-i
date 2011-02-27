@@ -151,20 +151,34 @@ public:
   // and restored from here at contextRestore.
   OSStack_t *m_pStack;
 
-  // Wake up this task if it waits for the event received as parameter.
+  // Prepare the task to enter the wait state
+  bool
+  eventWaitPrepare(OSEvent_t event);
+
+  // Perform the actual wait
+  OSEventWaitReturn_t
+  eventWaitPerform(void);
+
+  // Chain the prepare and perform actions
+  OSEventWaitReturn_t
+  eventWait(OSEvent_t event);
+
+  // Wake up this task if it waits for the given event.
   int
   eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
       OSEventWaitReturn::OS_VOID);
 
-  bool
-  eventWaitPrepare(OSEvent_t event);
-
+  // Retrieve the value returned by the last eventWait()
   OSEventWaitReturn_t
   getEventWaitReturn(void);
 
+  // Set the value to be returned by getEventWaitReturn()
+  void
+  setEventWaitReturn(OSEventWaitReturn_t ret);
+
 private:
   friend class OSScheduler; // TODO: explain why they are here
-  friend class OSReadyList;
+  friend class OSActiveTasks;
 
   // Initialise task's environment.
   void
@@ -175,6 +189,9 @@ private:
   // Redirect to virtual function (taskMain).
   static void
   staticMain(OSTask * pt);
+
+  static void
+  yield(void);
 
 #if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK)
   // Warning: no longer run in critical section!
@@ -240,9 +257,30 @@ inline void OSTask::ackInterruption(void)
 #endif
 
 inline OSEventWaitReturn_t
+OSTask::eventWait(OSEvent_t event)
+{
+  if (eventWaitPrepare(event))
+    eventWaitPerform();
+  return m_eventWaitReturn;
+}
+
+inline OSEventWaitReturn_t
+OSTask::eventWaitPerform(void)
+{
+  yield();
+  return m_eventWaitReturn;
+}
+
+inline OSEventWaitReturn_t
 OSTask::getEventWaitReturn(void)
 {
   return m_eventWaitReturn;
+}
+
+inline void
+OSTask::setEventWaitReturn(OSEventWaitReturn_t ret)
+{
+  m_eventWaitReturn = ret;
 }
 
 #endif /* OSTASK_H_ */
