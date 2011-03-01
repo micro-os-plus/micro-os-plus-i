@@ -69,7 +69,6 @@ DeviceCharacterBufferedUsart1::implPortInit(void)
 
 // ===== ISRs =================================================================
 
-
 void
 Usart1_contextHandler(void)
 {
@@ -84,6 +83,6 @@ Usart1_contextHandler(void)
 #endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART1_NAKED_TX_ISR)*/
 }
 
-#endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE) */
+#endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1) */
 
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
