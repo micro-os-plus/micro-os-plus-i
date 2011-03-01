@@ -368,8 +368,13 @@ void OSUsbDevice::usb_get_descriptor(void)
               {
                 break;
               }
+#if defined(OS_INCLUDE_SEPARATE_PROGMEM)
             // assumes devices descriptors are stored in the lower 64Kbytes of on-chip flash memory
-            OSUsbDevice::writeByte( ( unsigned int ) pbuffer );
+            OSUsbDevice::writeByte(PROGMEM_READ_BYTE(pbuffer));
+            //OSUsbDevice::writeByte(pgm_read_byte_near( ( unsigned int ) pbuffer ));
+#else
+            OSUsbDevice::writeByte( *(( unsigned char * ) pbuffer) );
+#endif
             pbuffer = ( unsigned char * ) pbuffer + 1;
 
             data_to_transfer--;
