@@ -223,6 +223,5 @@
 #define putString_P putString
 #endif
 
-//#define DEBUG_USART_ISR         (1)// for test the tx/rx isr
 
 #endif /*OS_DEFINES_H_*/
