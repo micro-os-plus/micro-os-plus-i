@@ -103,7 +103,7 @@ DeviceCharacterBufferedUsart1::implPortInit(void)
 
     usart_init_rs232(&AVR32_USART1, &usartConfig, OS_CFGLONG_OSCILLATOR_HZ);
     INTC_register_interrupt(Usart1_contextHandler, AVR32_USART1_IRQ, 0);
-    usart_int_tx_enable(&AVR32_USART1);
+//    usart_int_tx_enable(&AVR32_USART1);
     usart_int_rx_enable(&AVR32_USART1);
     return 0;
   }
