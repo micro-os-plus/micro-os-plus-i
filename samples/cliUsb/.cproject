@@ -53548,7 +53548,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="portable/devices/character/src/DeviceCharacterMultiUsart0.cpp|portable/devices/character/src/DeviceCharacterMultiUsart1.cpp|portable/devices/character/src/DeviceCharacterUsart.cpp|portable/devices/character/src/DeviceCharacterUsart0.cpp|portable/devices/character/src/DeviceCharacterUsart1.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/block|hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="portable/devices/character/src/DeviceCharacterMultiUsart0.cpp|portable/devices/character/src/DeviceCharacterMultiUsart1.cpp|portable/devices/character/src/DeviceCharacterUsart.cpp|portable/devices/character/src/DeviceCharacterUsart0.cpp|portable/devices/character/src/DeviceCharacterUsart1.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/fs|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/block|hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
