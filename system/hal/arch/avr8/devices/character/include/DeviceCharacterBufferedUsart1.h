@@ -7,11 +7,11 @@
 #ifndef HAL_DEVICECHARACTERBUFFEREDSART1_H_
 #define HAL_DEVICECHARACTERBUFFEREDSART1_H_
 
-#include "portable/devices/character/include/OSDeviceCharacterBuffered.h"
+#include "portable/devices/character/include/DeviceCharacterBufferedUsartBase.h"
 
 #include "avr/io.h"
 
-class DeviceCharacterBufferedUsart1 : public OSDeviceCharacterBuffered
+class DeviceCharacterBufferedUsart1 : public DeviceCharacterBufferedUsartBase
 {
 public:
   DeviceCharacterBufferedUsart1(void);
