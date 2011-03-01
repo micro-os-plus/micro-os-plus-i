@@ -13,18 +13,14 @@
 
 #define OS_CFGINT_TASKS_TABLE_SIZE                      (4)
 
-#define OS_INCLUDE_TIMER                                1
 #define OS_INCLUDE_OSTIMERSECONDS                       1
 
-#define OS_INCLUDE_CIRCULARBYTEBUFFER                   1
 #define OS_INCLUDE_CIRCULARBYTEBUFFER_DUMP              1
 
-#define OS_INCLUDE_OSDEVICECHARACTER                    1
-#define OS_INCLUDE_OSDEVICECHARACTERBUFFERED            1
-
-#define OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE     (1)
-#define OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1        (1)
+#if defined(OS_CONFIG_FAMILY_AVR32UC3)
 #define OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART0        (1)
+#endif
+#define OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1        (1)
 
 #define OS_INCLUDE_OSTASK_GETSTACKUSED                  1
 //#define OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER             1
@@ -33,13 +29,13 @@
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE           1
 
 #if true
-#define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          1
-#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
+//#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 #define OS_INCLUDE_CLOG                                 1
-#define OS_INCLUDE_OSTREAM                              1
-#define OS_INCLUDE_ISTREAM                              1
+//#define OS_INCLUDE_OSTREAM                              1
+//#define OS_INCLUDE_ISTREAM                              1
 #define OS_INCLUDE_OSTREAM_OSTASK                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
+//#define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          1
 #endif
 
 #define OS_INCLUDE_SIMPLECLI                            1
