@@ -39,53 +39,6 @@ __attribute__((interrupt))
 void
 Usart0_contextHandler(void);
 
-// ----- static data ----------------------------------------------------------
-
-DeviceCharacterBufferedUsart0 * DeviceCharacterBufferedUsart0::ms_pThis;
-
-// ----- constructors ---------------------------------------------------------
-
-DeviceCharacterBufferedUsart0::DeviceCharacterBufferedUsart0(void)
-{
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterBufferedUsart0()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
-}
-
-// set custom high/low water marks
-DeviceCharacterBufferedUsart0::DeviceCharacterBufferedUsart0(
-    unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
-    unsigned short txLWM, unsigned char *pRxBuf, unsigned short rxBufSize,
-    unsigned short rxHWM, unsigned short rxLWM) :
-  DeviceCharacterBufferedUsartBase(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf,
-      rxBufSize, rxHWM, rxLWM)
-{
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterBufferedUsart0()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
-
-  ms_pThis = this;
-}
-
-// use default 3/4 high and 1/4 low water marks
-DeviceCharacterBufferedUsart0::DeviceCharacterBufferedUsart0(
-    unsigned char *pTxBuf, unsigned short txBufSize, unsigned char *pRxBuf,
-    unsigned short rxBufSize) :
-  DeviceCharacterBufferedUsartBase(pTxBuf, txBufSize, pRxBuf, rxBufSize)
-{
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterBufferedUsart0()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
-
-  ms_pThis = this;
-}
-
 // ----- inits ---------------------------------------------------------------
 
 int
@@ -133,6 +86,6 @@ Usart0_contextHandler(void)
 #endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART1_NAKED_TX_ISR)*/
 }
 
-#endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE) */
+#endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART0) */
 
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
