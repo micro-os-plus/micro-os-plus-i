@@ -124,11 +124,11 @@ OSDeviceCharacterBuffered::implReadByte(void)
 void
 OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
   {
-#if false
+#if defined(DEBUG_USART_ISR) && false
     OSDeviceDebug::putChar('#');
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putChar(' ');
-    m_rxBuf.dump();
+   // OSDeviceDebug::putPtr(this);
+   // OSDeviceDebug::putChar(' ');
+    //m_rxBuf.dump();
 #endif
 
     unsigned char c;
@@ -145,7 +145,7 @@ OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
         ; // character is lost, no place to store it in the receive queue
         OSDeviceDebug::putChar('-');
       }
-#if false
+#if defined(DEBUG_USART_ISR) && false
     OSDeviceDebug::putHex((unsigned short)getReadEvent());
     OSDeviceDebug::putNewLine();
 #endif
@@ -191,22 +191,28 @@ OSDeviceCharacterBuffered::implFlush(void)
 void
 OSDeviceCharacterBuffered::interruptTxServiceRoutine(void)
   {
-#if false
-    OSDeviceDebug::putChar('!');
-    OSDeviceDebug::putPtr(ms_pThis);
+#if defined(DEBUG_USART_ISR) && false
+    OSDeviceDebug::putChar('|');
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putChar(' ');
-    ms_pThis->m_txBuf.dump();
+    m_txBuf.dump();
 #endif
 
     if (m_txBuf.isEmpty())
       {
         implInterruptTxDisable();
+#if defined(DEBUG_USART_ISR)
+        OSDeviceDebug::putChar('<');
+        OSDeviceDebug::putNewLine();
+#endif
       }
     else
       {
         unsigned char c;
         c = m_txBuf.get();
-        //OSDeviceDebug::putChar(c);
+#if defined(DEBUG_USART_ISR) && false
+        OSDeviceDebug::putHex(c);
+#endif
         implPortWrite(c);
 
         if (m_txBuf.isBelowLowWM())
