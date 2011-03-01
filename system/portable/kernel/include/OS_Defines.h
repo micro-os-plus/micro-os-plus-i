@@ -167,6 +167,14 @@
 
 // ----- OSDeviceCharacter dependencies ---------------------------------------
 
+#if !defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE) && (defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART0) || defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1))
+#define OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE     (1)
+#endif
+
+#if !defined(OS_INCLUDE_OSDEVICECHARACTERBUFFERED) && defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE)
+#define OS_INCLUDE_OSDEVICECHARACTERBUFFERED            (1)
+#endif
+
 #if !defined(OS_INCLUDE_OSDEVICECHARACTERBUFFERED) && (defined(OS_INCLUDE_DEVICECHARACTERUSART1) || defined(OS_INCLUDE_DEVICECHARACTERUSART0))
 #define OS_INCLUDE_OSDEVICECHARACTERBUFFERED            (1)
 #endif
@@ -175,6 +183,7 @@
 #define OS_INCLUDE_OSDEVICECHARACTER                    (1)
 #endif
 
+#if false
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART) && (defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART1) || defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART0))
 #define OS_INCLUDE_DEVICECHARACTERMULTIUSART            (1)
 #endif
@@ -186,8 +195,9 @@
 #if !defined(OS_INCLUDE_OSDEVICECHARACTER) && defined(OS_INCLUDE_DEVICECHARACTERUSART)
 #define OS_INCLUDE_OSDEVICECHARACTER                    (1)
 #endif
+#endif
 
-#if !defined(OS_INCLUDE_CIRCULARBYTEBUFFER) && defined(OS_INCLUDE_OSDEVICECHARACTER)
+#if !defined(OS_INCLUDE_CIRCULARBYTEBUFFER) && defined(OS_INCLUDE_OSDEVICECHARACTERBUFFERED)
 #define OS_INCLUDE_CIRCULARBYTEBUFFER                   (1)
 #endif
 
@@ -214,8 +224,36 @@
 #endif
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS) && (!defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT) && !defined(OS_INCLUDE_32KHZ_TIMER) && !defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_EXTERNAL))
-#define OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT             (1)
+#define OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT        (1)
 #endif
+
+#if !defined(OS_INCLUDE_TIMER) && defined(OS_INCLUDE_OSTIMERSECONDS)
+#define OS_INCLUDE_TIMER                                (1)
+#endif
+
+// ----- streambuf ------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF) && defined(OS_INCLUDE_CLOG)
+#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              (1)
+#endif
+
+#if !defined(OS_INCLUDE_OSTREAM) && defined(OS_INCLUDE_CLOG)
+#define OS_INCLUDE_OSTREAM                              (1)
+#endif
+
+#if !defined(OS_INCLUDE_OSTREAM) && defined(OS_INCLUDE_SIMPLECLI)
+#define OS_INCLUDE_OSTREAM                              (1)
+#endif
+
+#if !defined(OS_INCLUDE_ISTREAM) && defined(OS_INCLUDE_SIMPLECLI)
+#define OS_INCLUDE_ISTREAM                              (1)
+#endif
+
+#if !defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF) && defined(OS_INCLUDE_SIMPLECLI)
+#define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          (1)
+#endif
+
+// ----- PROGMEM --------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_SEPARATE_PROGMEM)
 #define PROGMEM
