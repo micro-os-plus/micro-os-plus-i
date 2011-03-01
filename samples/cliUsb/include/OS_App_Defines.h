@@ -75,6 +75,7 @@
 #define OS_DEBUG_OSUSBDEVICE_REQUEST                    1
 #define OS_DEBUG_DEVICECHARACTERUSB_WRITE               1
 #define OS_DEBUG_DEVICECHARACTERUSB_READ                1
+#define OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY    (0)
 
 #endif /* defined(DEBUG) */
 
