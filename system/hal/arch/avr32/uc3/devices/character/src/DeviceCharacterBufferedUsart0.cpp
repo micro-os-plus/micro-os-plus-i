@@ -94,7 +94,7 @@ DeviceCharacterBufferedUsart0::implPortInit(void)
   volatile avr32_usart_t* port;
   port = &AVR32_USART0;
 
-  this->setPortAddress(&AVR32_USART0);
+  setPortAddress(&AVR32_USART0);
   gpio_enable_module_pin(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_RX_PIN,
       OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_GPIO_FUNCTION);
   gpio_enable_module_pin(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_TX_PIN,
