@@ -341,16 +341,6 @@ int usart_init_rs232(volatile avr32_usart_t *usart, const usart_options_t *opt, 
   return USART_SUCCESS;
 }
 
-void usart_tx_disable(volatile avr32_usart_t *usart)
-{
-  usart->cr = AVR32_USART_CR_TXDIS_MASK;
-}
-
-void usart_tx_enable(volatile avr32_usart_t *usart)
-{
-  usart->cr = AVR32_USART_CR_TXEN_MASK;
-}
-
 
 int usart_init_rs232_tx_only(volatile avr32_usart_t *usart, const usart_options_t *opt, long pba_hz)
 {
