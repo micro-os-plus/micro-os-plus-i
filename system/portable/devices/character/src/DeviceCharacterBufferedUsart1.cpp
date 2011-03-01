@@ -80,4 +80,4 @@ Usart1_contextHandler(void)
 }
 #endif
 
-#endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE) */
+#endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1) */
