@@ -342,6 +342,7 @@ public:
   static unsigned char endpoint_status[NB_ENDPOINTS];
   static bool usb_connected;
   static unsigned char usb_configuration_nb;
+  static unsigned char m_selectedEndpoint;
 
 };
 

@@ -31,6 +31,8 @@
     bool OSUsbDevice::usb_connected;
 
     unsigned char OSUsbDevice::usb_configuration_nb;
+
+    unsigned char OSUsbDevice::m_selectedEndpoint;
 // ---------------------------------------------------------------------------
 
 OSUsbDevice::OSUsbDevice()
@@ -367,7 +369,7 @@ void OSUsbDevice::usb_get_descriptor(void)
                 break;
               }
             // assumes devices descriptors are stored in the lower 64Kbytes of on-chip flash memory
-            OSUsbDevice::writeByte(pgm_read_byte_near( ( unsigned int ) pbuffer ));
+            OSUsbDevice::writeByte( ( unsigned int ) pbuffer );
             pbuffer = ( unsigned char * ) pbuffer + 1;
 
             data_to_transfer--;

@@ -12,14 +12,23 @@
 
 #include "portable/devices/character/include/DeviceCharacterUsb.h"
 #include "portable/devices/usb/include/OSUsbDevice.h"
+#include "hal/arch/avr32/uc3/lib/include/intc.h"
 
 // ----- implementation code -------------------------------------------------
+
+extern void
+USB_contextHandler(void) __attribute__((interrupt));
 
 int
 DeviceCharacterUsb::implOpen()
   {
     OSDeviceDebug::putString("DeviceCharacterUsb::open()");
     OSDeviceDebug::putNewLine();
+
+    // Register interrupt.
+    // TODO: check if is ok to put it here!
+    INTC_register_interrupt(USB_contextHandler, AVR32_USBB_IRQ,
+        OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY);
 
     static bool flagShouldNotInit;
 

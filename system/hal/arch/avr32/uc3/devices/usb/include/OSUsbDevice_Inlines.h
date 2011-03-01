@@ -80,7 +80,7 @@ OSUsbDevice::endpointSelect(unsigned char ep)
 #if TO_BE_PORTED
   UENUM = ep;
 #else
-  ep = ep;
+  m_selectedEndpoint = ep;
 #endif
 }
 
@@ -92,7 +92,7 @@ OSUsbDevice::endpointReset(unsigned char ep)
   UERST = _BV(ep);
   UERST = 0;
 #else
-  ep = ep;
+  AVR32_usb_reset_endpoint(ep);
 #endif
 }
 
@@ -103,7 +103,7 @@ OSUsbDevice::isInterruptReceiveSetup(void)
 #if TO_BE_PORTED
   return ((UEINTX & _BV(RXSTPI)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_setup_received();
 #endif
 }
 
@@ -114,7 +114,7 @@ OSUsbDevice::isInterruptReceiveSetupEnabled(void)
 #if TO_BE_PORTED
   return ((UEIENX & _BV(RXSTPE)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_setup_received_interrupt_enabled();
 #endif
 }
 
@@ -124,48 +124,56 @@ OSUsbDevice::interruptReceiveSetupEnable(void)
 {
 #if TO_BE_PORTED
   UEIENX |= _BV(RXSTPE);
+#else
+  AVR32_usb_enable_setup_received_interrupt();
 #endif
 }
 
-// test if receive OUT interrupt received
+// tests if OUT received on selected endpoint
 inline bool
 OSUsbDevice::isInterruptReceiveOut(void)
 {
 #if TO_BE_PORTED
   return (((UEINTX & _BV(RXOUTI))) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_out_received(m_selectedEndpoint);
 #endif
 }
 
-// test if receive OUT interrupt enabled
+// test if receive OUT interrupt is enabled on selected endpoint
 inline bool
 OSUsbDevice::isInterruptReceiveOutEnabled(void)
 {
 #if TO_BE_PORTED
   return ((UEIENX & _BV(RXOUTE)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_out_received_interrupt_enabled(m_selectedEndpoint);
 #endif
 }
 
-// ack receive OUT interrupt on control endpoint
+// acks OUT received on selected endpoint and frees current bank
 inline void
 OSUsbDevice::interruptReceiveOutAck(void)
 {
 #if TO_BE_PORTED
   UEINTX &= ~_BV(RXOUTI);
+#else
+  AVR32_usb_ack_out_received(m_selectedEndpoint);
 #endif
 }
 
-// enable receive OUT interrupt
+// enables OUT received interrupt on selected endpoint
 inline void
 OSUsbDevice::interruptReceiveOutEnable(void)
 {
 #if TO_BE_PORTED
   UEIENX |= _BV(RXOUTE);
+#else
+  AVR32_usb_enable_out_received_interrupt(m_selectedEndpoint);
 #endif
 }
+
+extern U32 usb_read_ep_rxpacket(U8 ep, void *rxbuf, U32 data_length, void **prxbuf);
 
 // return FIFO byte for current endpoint
 inline unsigned char
@@ -174,9 +182,39 @@ OSUsbDevice::readByte(void)
 #if TO_BE_PORTED
   return UEDATX;
 #else
-  return 0;
+  int availableSize;
+  int status;
+  unsigned char ret;
+
+  // tests if OUT received
+  status = AVR32_is_usb_out_received(RX_EP);
+
+  if( !status )
+  {
+      return 0;
+  }
+
+  // returns the byte count
+  availableSize = AVR32_usb_byte_count(RX_EP);
+
+  // Reset known position inside FIFO
+  // data register of selected endpoint
+  AVR32_usb_reset_endpoint_fifo_access(RX_EP);
+
+  // read min bytes into pBuf
+  usb_read_ep_rxpacket(RX_EP, &ret, 1, NULL);
+
+  // acknowledge OUT received and frees current bank
+  if(availableSize == 1)
+    {
+      AVR32_usb_ack_out_received_free(RX_EP);
+    }
+
+  return ret;
 #endif
 }
+
+extern U32 usb_write_ep_txpacket(U8 ep, const void *txbuf, U32 data_length, const void **ptxbuf);
 
 // write byte in FIFO for current endpoint
 inline void
@@ -185,7 +223,28 @@ OSUsbDevice::writeByte(unsigned char b)
 #if TO_BE_PORTED
   UEDATX = b;
 #else
-  b = b; // unused
+  int status;
+
+  status = AVR32_is_usb_in_ready(TX_EP);
+
+  if( !status )
+  {
+      return;
+  }
+
+  // Reset known position inside FIFO
+  // data register of selected endpoint
+  AVR32_usb_reset_endpoint_fifo_access(TX_EP);
+
+  // write 1 byte
+  usb_write_ep_txpacket(TX_EP, &b, 1, NULL);
+
+  // acknowledge IN ready and sends current bank
+  AVR32_usb_ack_in_ready_send(TX_EP);
+
+  // wait for previous data to be sent
+  while (!AVR32_is_usb_in_ready(TX_EP)) ;
+
 #endif
 }
 
@@ -195,6 +254,8 @@ OSUsbDevice::Usb_enable_stall_handshake(void)
 {
 #if TO_BE_PORTED
   UECONX |= _BV(STALLRQ);
+#else
+  AVR32_usb_enable_stall_handshake(m_selectedEndpoint);
 #endif
 }
 
@@ -204,6 +265,8 @@ OSUsbDevice::Usb_ack_receive_setup(void)
 {
 #if TO_BE_PORTED
   UEINTX &= ~_BV(RXSTPI);
+#else
+  AVR32_usb_ack_setup_received_free();
 #endif
 }
 
@@ -213,6 +276,8 @@ OSUsbDevice::Usb_enable_regulator(void)
 {
 #if TO_BE_PORTED
   UHWCON |=_BV(UVREGE);
+#else
+
 #endif
 }
 
@@ -222,6 +287,8 @@ OSUsbDevice::Usb_disable_uid_pin(void)
 {
 #if TO_BE_PORTED
   UHWCON &= ~_BV(UIDE);
+#else
+  AVR32_usb_disable_id_pin();
 #endif
 }
 
@@ -229,9 +296,10 @@ OSUsbDevice::Usb_disable_uid_pin(void)
 inline void
 OSUsbDevice::Usb_force_device_mode(void)
 {
-  OSUsbDevice::Usb_disable_uid_pin();
 #if TO_BE_PORTED
   UHWCON |= _BV(UIMOD);
+#else
+  AVR32_usb_force_device_mode();
 #endif
 }
 
@@ -241,6 +309,8 @@ OSUsbDevice::Usb_disable(void)
 {
 #if TO_BE_PORTED
   USBCON &= ~(_BV(USBE) | _BV(OTGPADE));
+#else
+  AVR32_usb_disable();
 #endif
 }
 
@@ -250,6 +320,8 @@ OSUsbDevice::Usb_enable(void)
 {
 #if TO_BE_PORTED
   USBCON |=(_BV(USBE) |_BV(OTGPADE));
+#else
+  AVR32_usb_enable();
 #endif
 }
 
@@ -259,6 +331,8 @@ OSUsbDevice::Usb_select_device(void)
 {
 #if TO_BE_PORTED
   USBCON &= ~_BV(HOST);
+#else
+
 #endif
 }
 
@@ -268,6 +342,8 @@ OSUsbDevice::Usb_enable_vbus_interrupt(void)
 {
 #if TO_BE_PORTED
   USBCON |= _BV(VBUSTE);
+#else
+  AVR32_usb_enable_vbus_interrupt();
 #endif
 }
 
@@ -278,7 +354,7 @@ OSUsbDevice::Is_usb_write_enabled(void)
 #if TO_BE_PORTED
   return ((UEINTX & _BV(RWAL)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_write_enabled(TX_EP);
 #endif
 }
 
@@ -289,7 +365,7 @@ OSUsbDevice::Is_usb_tx_ready(void)
 #if TO_BE_PORTED
   return ((UEINTX & _BV(RWAL)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_in_ready(TX_EP);
 #endif
 }
 
@@ -299,6 +375,8 @@ OSUsbDevice::Usb_send_in(void)
 {
 #if TO_BE_PORTED
   UEINTX &= ~_BV(FIFOCON);
+#else
+  AVR32_usb_send_in(m_selectedEndpoint);
 #endif
 }
 
@@ -309,7 +387,7 @@ OSUsbDevice::Usb_byte_counter(void)
 #if TO_BE_PORTED
   return UEBCX;
 #else
-  return 0;
+  return AVR32_usb_byte_count(m_selectedEndpoint);
 #endif
 }
 
@@ -319,6 +397,8 @@ OSUsbDevice::Usb_ack_fifocon(void)
 {
 #if TO_BE_PORTED
   UEINTX &= ~_BV(FIFOCON);
+#else
+  AVR32_usb_ack_fifocon(m_selectedEndpoint);
 #endif
 }
 
@@ -328,7 +408,7 @@ OSUsbDevice::Is_usb_vbus_transition(void)
 #if TO_BE_PORTED
   return ((USBINT & (1<<VBUSTI)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_vbus_transition();
 #endif
 }
 
@@ -338,7 +418,7 @@ OSUsbDevice::Is_usb_vbus_interrupt_enabled(void)
 #if TO_BE_PORTED
   return ((USBCON & (1<<VBUSTE)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_vbus_interrupt_enabled();
 #endif
 }
 
@@ -347,6 +427,8 @@ OSUsbDevice::Usb_ack_vbus_transition(void)
 {
 #if TO_BE_PORTED
   USBINT = ~_BV(VBUSTI);
+#else
+  AVR32_usb_ack_vbus_transition();
 #endif
 }
 
@@ -356,7 +438,7 @@ OSUsbDevice::Is_usb_vbus_high(void)
 #if TO_BE_PORTED
   return ((USBSTA & (1<<VBUS)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_vbus_high();
 #endif
 }
 
@@ -366,6 +448,8 @@ OSUsbDevice::Usb_enable_reset_interrupt(void)
 {
 #if TO_BE_PORTED
   UDIEN |= _BV(EORSTE);
+#else
+  AVR32_usb_enable_reset_interrupt();
 #endif
 }
 
@@ -376,7 +460,7 @@ OSUsbDevice::Is_usb_read_control_enabled(void)
 #if TO_BE_PORTED
   return ((UEINTX & _BV(TXINI)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_control_in_ready();
 #endif
 }
 
@@ -386,6 +470,8 @@ OSUsbDevice::Usb_send_control_in(void)
 {
 #if TO_BE_PORTED
   UEINTX &= ~_BV(TXINI);
+#else
+  AVR32_usb_ack_control_in_ready_send();
 #endif
 }
 
@@ -396,7 +482,7 @@ OSUsbDevice::Usb_ack_receive_out(void)
 #if TO_BE_PORTED
   UEINTX &= ~_BV(RXOUTI);
 #endif
-  OSUsbDevice::Usb_ack_fifocon();
+  AVR32_usb_ack_out_received(m_selectedEndpoint);
 }
 
 // ack IN ready
@@ -406,7 +492,7 @@ OSUsbDevice::Usb_ack_in_ready(void)
 #if TO_BE_PORTED
   UEINTX &= ~_BV(TXINI);
 #endif
-  OSUsbDevice::Usb_ack_fifocon();
+  AVR32_usb_ack_in_ready(m_selectedEndpoint);
 }
 
 // test if IN ready
@@ -416,7 +502,7 @@ OSUsbDevice::Is_usb_in_ready(void)
 #if TO_BE_PORTED
   return ((UEINTX & _BV(TXINI)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_in_ready(m_selectedEndpoint);
 #endif
 }
 
@@ -427,7 +513,7 @@ OSUsbDevice::Is_usb_endpoint_enabled(void)
 #if TO_BE_PORTED
   return ((UECONX & _BV(EPEN)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_endpoint_enabled(m_selectedEndpoint);
 #endif
 }
 
@@ -437,6 +523,8 @@ OSUsbDevice::Usb_disable_stall_handshake(void)
 {
 #if TO_BE_PORTED
   UECONX |= _BV(STALLRQC);
+#else
+  AVR32_usb_disable_stall_handshake(m_selectedEndpoint);
 #endif
 }
 
@@ -446,6 +534,8 @@ OSUsbDevice::Usb_reset_data_toggle(void)
 {
 #if TO_BE_PORTED
   UECONX |= _BV(RSTDT);
+#else
+  AVR32_usb_reset_data_toggle(m_selectedEndpoint);
 #endif
 }
 
@@ -455,6 +545,8 @@ OSUsbDevice::Usb_enable_address(void)
 {
 #if TO_BE_PORTED
   UDADDR |= _BV(ADDEN);
+#else
+  AVR32_usb_enable_address();
 #endif
 }
 
@@ -465,7 +557,7 @@ OSUsbDevice::Usb_configure_address(unsigned char addr)
 #if TO_BE_PORTED
   UDADDR = (UDADDR & _BV(ADDEN)) |(addr & MSK_UADD);
 #else
-  addr = addr;
+  AVR32_usb_configure_address(addr);
 #endif
 }
 
@@ -481,6 +573,8 @@ OSUsbDevice::Usb_attach(void)
 {
 #if TO_BE_PORTED
   UDCON &= ~_BV(DETACH);
+#else
+  AVR32_usb_attach();
 #endif
 }
 
@@ -491,7 +585,7 @@ OSUsbDevice::Is_usb_sof(void)
 #if TO_BE_PORTED
   return ((UDINT & _BV(SOFI)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_sof();
 #endif
 }
 
@@ -501,7 +595,7 @@ OSUsbDevice::Is_sof_interrupt_enabled(void)
 #if TO_BE_PORTED
   return ((UDIEN & _BV(SOFE)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_sof_interrupt_enabled();
 #endif
 }
 
@@ -511,6 +605,8 @@ OSUsbDevice::Usb_ack_sof(void)
 {
 #if TO_BE_PORTED
   UDINT = ~_BV(SOFI);
+#else
+  AVR32_usb_ack_sof();
 #endif
 }
 
@@ -521,7 +617,7 @@ OSUsbDevice::Is_usb_suspend(void)
 #if TO_BE_PORTED
   return ((UDINT & _BV(SUSPI)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_suspend();
 #endif
 }
 
@@ -531,7 +627,7 @@ OSUsbDevice::Is_suspend_interrupt_enabled(void)
 #if TO_BE_PORTED
   return ((UDIEN & _BV(SUSPE)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_suspend_interrupt_enabled();
 #endif
 }
 
@@ -541,6 +637,8 @@ OSUsbDevice::Usb_ack_suspend(void)
 {
 #if TO_BE_PORTED
   UDINT = ~_BV(SUSPI);
+#else
+  AVR32_usb_ack_suspend();
 #endif
 }
 
@@ -550,6 +648,8 @@ OSUsbDevice::Usb_enable_wake_up_interrupt(void)
 {
 #if TO_BE_PORTED
   UDIEN |= _BV(WAKEUPE);
+#else
+  AVR32_usb_enable_wake_up_interrupt();
 #endif
 }
 
@@ -559,6 +659,8 @@ OSUsbDevice::Usb_ack_wake_up(void)
 {
 #if TO_BE_PORTED
   UDINT = ~_BV(WAKEUPI);
+#else
+  AVR32_usb_ack_wake_up();
 #endif
 }
 
@@ -568,6 +670,8 @@ OSUsbDevice::Usb_freeze_clock(void)
 {
 #if TO_BE_PORTED
   USBCON |= _BV(FRZCLK);
+#else
+  AVR32_usb_freeze_clock();
 #endif
 }
 
@@ -576,6 +680,8 @@ OSUsbDevice::Usb_unfreeze_clock(void)
 {
 #if TO_BE_PORTED
   USBCON &= ~_BV(FRZCLK);
+#else
+  AVR32_usb_unfreeze_clock();
 #endif
 }
 
@@ -585,6 +691,8 @@ OSUsbDevice::Usb_disable_wake_up_interrupt(void)
 {
 #if TO_BE_PORTED
   UDIEN &= ~_BV(WAKEUPE);
+#else
+  AVR32_usb_disable_wake_up_interrupt();
 #endif
 }
 
@@ -594,6 +702,8 @@ OSUsbDevice::Usb_ack_resume(void)
 {
 #if TO_BE_PORTED
   UDINT = ~_BV(EORSMI);
+#else
+  AVR32_usb_ack_resume();
 #endif
 }
 
@@ -603,6 +713,8 @@ OSUsbDevice::Usb_disable_resume_interrupt(void)
 {
 #if TO_BE_PORTED
   UDIEN &= ~_BV(EORSME);
+#else
+  AVR32_usb_disable_resume_interrupt();
 #endif
 }
 
@@ -612,6 +724,8 @@ OSUsbDevice::Usb_ack_reset(void)
 {
 #if TO_BE_PORTED
   UDINT = ~_BV(EORSTI);
+#else
+  AVR32_usb_ack_reset();
 #endif
 }
 
@@ -622,7 +736,7 @@ OSUsbDevice::Is_usb_wake_up(void)
 #if TO_BE_PORTED
   return ((UDINT & _BV(WAKEUPI)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_wake_up();
 #endif
 }
 
@@ -632,7 +746,7 @@ OSUsbDevice::Is_swake_up_interrupt_enabled(void)
 #if TO_BE_PORTED
   return ((UDIEN & (1<<WAKEUPE)) != 0) ? true : true;
 #else
-  return false;
+  return AVR32_is_usb_wake_up_interrupt_enabled();
 #endif
 }
 
@@ -643,7 +757,7 @@ OSUsbDevice::Is_usb_resume(void)
 #if TO_BE_PORTED
   return ((UDINT & _BV(EORSMI)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_resume();
 #endif
 }
 
@@ -653,7 +767,7 @@ OSUsbDevice::Is_resume_interrupt_enabled(void)
 #if TO_BE_PORTED
   return ((UDIEN & _BV(EORSME)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_resume_interrupt_enabled();
 #endif
 }
 
@@ -664,7 +778,7 @@ OSUsbDevice::Is_usb_reset(void)
 #if TO_BE_PORTED
   return ((UDINT & _BV(EORSTI)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_reset();
 #endif
 }
 
@@ -674,7 +788,7 @@ OSUsbDevice::Is_reset_interrupt_enabled(void)
 #if TO_BE_PORTED
   return ((UDIEN & _BV(EORSTE)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_reset_interrupt_enabled();
 #endif
 }
 
@@ -684,7 +798,7 @@ OSUsbDevice::Is_usb_id_device(void)
 #if TO_BE_PORTED
   return ((USBSTA & _BV(ID)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_id_device();
 #endif
 }
 
@@ -694,6 +808,8 @@ OSUsbDevice::Usb_enable_endpoint(void)
 {
 #if TO_BE_PORTED
   UECONX |= _BV(EPEN);
+#else
+  AVR32_usb_enable_endpoint(m_selectedEndpoint);
 #endif
 }
 
@@ -703,6 +819,8 @@ OSUsbDevice::Usb_allocate_memory(void)
 {
 #if TO_BE_PORTED
   UECFG1X |= _BV(ALLOC);
+#else
+  AVR32_usb_allocate_memory(m_selectedEndpoint);
 #endif
 }
 
@@ -713,7 +831,7 @@ OSUsbDevice::Is_endpoint_configured(void)
 #if TO_BE_PORTED
   return ((UESTA0X & _BV(CFGOK)) != 0) ? true : false;
 #else
-  return false;
+  return AVR32_is_usb_endpoint_configured(m_selectedEndpoint);
 #endif
 }
 
@@ -723,6 +841,8 @@ OSUsbDevice::Usb_enable_suspend_interrupt(void)
 {
 #if TO_BE_PORTED
   UDIEN |= _BV(SUSPE);
+#else
+  AVR32_usb_enable_suspend_interrupt();
 #endif
 }
 
