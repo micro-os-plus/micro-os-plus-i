@@ -50,24 +50,23 @@
 
 // ----------------------------------------------------------------------------
 
-// TODO: update PORT_INIT to PORT_CONFIG instead
-#if !defined(OS_CONFIG_USB_LED_PORT_INIT)
-#define OS_CONFIG_USB_LED_PORT_INIT                     DDRD
+#if !defined(OS_CFGREG_OSUSBLED_LED_PORT_CONFIG)
+#define OS_CFGREG_OSUSBLED_LED_PORT_CONFIG              DDRD
 #endif
-#if !defined(OS_CONFIG_USB_LED_PORT)
-#define OS_CONFIG_USB_LED_PORT                          PORTD
+#if !defined(OS_CFGREG_OSUSBLED_LED_PORT_WRITE)
+#define OS_CFGREG_OSUSBLED_LED_PORT_WRITE               PORTD
 #endif
 #if !defined(OS_CFGPIN_OSUSBLED_LED_PIN)
-#define OS_CFGPIN_OSUSBLED_LED_PIN                           PORTD7
+#define OS_CFGPIN_OSUSBLED_LED_PIN                      PORTD7
 #endif
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_CONFIG_BLINK_LED_PORT_CONFIG)
-#define OS_CONFIG_BLINK_LED_PORT_CONFIG                   DDRD
+#define OS_CONFIG_BLINK_LED_PORT_CONFIG                 DDRD
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_PORT_WRITE)
-#define OS_CONFIG_BLINK_LED_PORT_WRITE                        PORTD
+#define OS_CONFIG_BLINK_LED_PORT_WRITE                  PORTD
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_BIT)
 #define OS_CONFIG_BLINK_LED_BIT                         5
@@ -77,7 +76,7 @@
 #define OS_CONFIG_DEBUG_LED1_PORT_WRITE			PORTD
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                  DDRD
+#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                DDRD
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_BIT)
 #define OS_CONFIG_DEBUG_LED1_BIT			PORTD5
@@ -87,7 +86,7 @@
 #define OS_CONFIG_DEBUG_LED2_PORT_WRITE			PORTD
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                  DDRD
+#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                DDRD
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_BIT)
 #define OS_CONFIG_DEBUG_LED2_BIT			PORTD6
