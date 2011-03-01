@@ -31,20 +31,41 @@ USB_contextHandler(void)
   {
     OSScheduler::ledActiveOn();
 
+    // AVR32 does not have separate interrupts, so we call both
+    // routines heere
     OSUsbDevice::interruptGenServiceRoutine();
+    OSUsbDevice::interruptComServiceRoutine();
   }
 
 
 
+#if true
 /* USB Endpoint/Pipe Interrupt Communication Request */
 
 void
 OSUsbDevice::interruptComServiceRoutine(void)
   {
+  OSUsbLed::toggle();
+  //OSDeviceDebug::putString("!");
 #if TO_BE_PORTED
-    if (UEINT & _BV(EP_CONTROL))
+      if (UEINT & _BV(EP_CONTROL))
 #endif
+        {
+          OSUsbDevice::endpointSelect(EP_CONTROL);
+          if (OSUsbDevice::isInterruptReceiveSetup()
+              && OSUsbDevice::isInterruptReceiveSetupEnabled())
+            {
+              OSDeviceDebug::putString("Vs ");
+              //OSDeviceDebug::putNewLine();
+
+              OSUsbDevice::standardProcessRequest();
+            }
+        }
+      DeviceCharacterUsb::specificCdcInterruptServiceRoutine();
+
+      OSUsbLed::toggle();
   }
+#endif
 
 // @brief USB interrupt subroutine
 //
@@ -151,6 +172,7 @@ OSUsbDevice::interruptGenServiceRoutine(void)
         OSUsbDevice::Usb_send_event(EVT_USB_RESET);
       }
 
+#if false
     if (OSUsbDevice::isInterruptReceiveSetup()
         && OSUsbDevice::isInterruptReceiveSetupEnabled())
       {
@@ -161,8 +183,10 @@ OSUsbDevice::interruptGenServiceRoutine(void)
 
         OSUsbDevice::standardProcessRequest();
 
-        DeviceCharacterUsb::specificCdcInterruptServiceRoutine();
       }
+
+    DeviceCharacterUsb::specificCdcInterruptServiceRoutine();
+#endif
 
     OSUsbLed::toggle();
   }
