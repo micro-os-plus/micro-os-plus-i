@@ -48,10 +48,12 @@ DeviceCharacterBufferedUsart1::implPortInit(void)
   port = &AVR32_USART1;
 
   setPortAddress(&AVR32_USART1);
+
   gpio_enable_module_pin(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_RX_PIN,
       OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_GPIO_FUNCTION);
   gpio_enable_module_pin(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_TX_PIN,
       OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_GPIO_FUNCTION);
+
   usart_options_t usartConfig;
   usartConfig.baudrate = OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_BAUD_RATE;
   usartConfig.channelmode = USART_NORMAL_CHMODE;
@@ -60,10 +62,13 @@ DeviceCharacterBufferedUsart1::implPortInit(void)
   usartConfig.stopbits = USART_1_STOPBIT;
 
   usart_init_rs232(&AVR32_USART1, &usartConfig, OS_CFGLONG_OSCILLATOR_HZ);
+
   INTC_register_interrupt(Usart1_contextHandler, AVR32_USART1_IRQ,
       OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_IRQ_PRIORITY);
+
   //enable the rx interrupt
   port->ier = AVR32_USART_IER_RXRDY_MASK;
+
   return 0;
 }
 
