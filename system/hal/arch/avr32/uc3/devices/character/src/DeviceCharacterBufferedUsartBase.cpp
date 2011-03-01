@@ -97,15 +97,13 @@ DeviceCharacterBufferedUsartBase::implInterruptTxDisable(void)
 unsigned char
 DeviceCharacterBufferedUsartBase::implPortRead(void)
   {
-    int b;
-    usart_read_char(m_pPort,&b);
-    return (unsigned char)b;
+   return usart_basic_read_char(m_pPort);
   }
 
 void
 DeviceCharacterBufferedUsartBase::implPortWrite(unsigned char b)
   {
-    usart_write_char(m_pPort,b);
+    usart_basic_write_char(m_pPort,b);
   }
 
 #endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE) */
