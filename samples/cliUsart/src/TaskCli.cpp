@@ -86,7 +86,7 @@ TaskCli::taskMain(void)
 #endif
       for (; dev.isConnected();)
         {
-#if true
+#if !defined(APP_EXCLUDE_TASKCLI_TASKMAIN_CLI)
           cout << endl << prompt;
           int c;
 
@@ -118,8 +118,10 @@ TaskCli::taskMain(void)
           c = dev.readByte();
           dev.writeByte(c);
           dev.flush();
+#if false
           if (c == 0x03)
             break; //CtrlC should quit
+#endif
 #endif
         }
       dev.close();
