@@ -62,7 +62,7 @@ TaskCli::taskMain(void)
 
   OSDeviceCharacter& dev = m_dev;
 
-#if true
+#if !defined(APP_EXCLUDE_TASKCLI_TASKMAIN_CLI)
   istream& cin = m_cin;
   ostream& cout = m_cout;
 
@@ -73,7 +73,7 @@ TaskCli::taskMain(void)
   for (;;)
     {
       dev.open(); // wait for dtr
-#if true
+#if !defined(APP_EXCLUDE_TASKCLI_TASKMAIN_CLI)
       cout << endl << endl << greeting << endl;
 #else
       dev.writeByte('\n');
