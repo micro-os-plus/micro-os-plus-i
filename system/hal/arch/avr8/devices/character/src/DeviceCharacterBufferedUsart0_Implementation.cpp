@@ -84,12 +84,14 @@ DeviceCharacterBufferedUsart0::implPortWrite(unsigned char b)
 void
 DeviceCharacterBufferedUsart0::implInterruptTxEnable(void)
 {
+  // runs in critical section
   UCSR0B |= _BV(UDRIE0);
 }
 
 void
 DeviceCharacterBufferedUsart0::implInterruptTxDisable(void)
 {
+  // runs in ISR
   UCSR0B &= ~_BV(UDRIE0);
 }
 
