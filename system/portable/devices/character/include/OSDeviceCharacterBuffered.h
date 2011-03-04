@@ -66,18 +66,28 @@ private:
   // port implementation routines
   virtual int
   implPortInit(void) = 0;
+  // called from implOpen()
+
   virtual int
   implPortDisable(void);
+  // called from implClose()
 
   virtual void
   implInterruptTxEnable(void) = 0;
+  // called from implWriteByte() in critical section
+  // called from implFlush() in critical section
+
   virtual void
   implInterruptTxDisable(void) = 0;
+  // called from interruptTxServiceRoutine()
 
   virtual unsigned char
   implPortRead(void) = 0;
+  // called from interruptRxServiceRoutine()
+
   virtual void
   implPortWrite(unsigned char b) = 0;
+  // called from interruptTxServiceRoutine()
 };
 
 #endif /* OSDEVICECHARACTERUBUFFERED_H_ */
