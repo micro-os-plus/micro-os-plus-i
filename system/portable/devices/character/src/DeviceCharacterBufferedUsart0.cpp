@@ -60,23 +60,12 @@ DeviceCharacterBufferedUsart0::DeviceCharacterBufferedUsart0(
 
 // ----- inits ---------------------------------------------------------------
 
-#if false
-int
-DeviceCharacterBufferedUsart0::implPortInit(void)
-{
-  // implemented in hal/...
-  return 0;
-}
-#endif
+// DeviceCharacterBufferedUsart0::implPortInit(void)
+// must be implemented in hal/...
 
 // ===== ISRs =================================================================
 
-#if false
-void
-Usart0_contextHandler(void)
-{
-  // implemented in hal/...
-}
-#endif
+// Usart0_[RX|TX]_contextHandler(void)
+// must implemented in hal/...
 
 #endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART0) */

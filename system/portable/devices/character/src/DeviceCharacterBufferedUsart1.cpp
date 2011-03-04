@@ -10,7 +10,6 @@
 
 #include "portable/devices/character/include/DeviceCharacterBufferedUsart1.h"
 
-
 // ----- static data ----------------------------------------------------------
 
 DeviceCharacterBufferedUsart1 * DeviceCharacterBufferedUsart1::ms_pThis;
@@ -60,24 +59,12 @@ DeviceCharacterBufferedUsart1::DeviceCharacterBufferedUsart1(
 
 // ----- inits ---------------------------------------------------------------
 
-#if false
-int
-DeviceCharacterBufferedUsart1::implPortInit(void)
-{
-  // implemented in hal/...
-  return 0;
-}
-#endif
+// DeviceCharacterBufferedUsart1::implPortInit(void)
+// must be implemented in hal/...
 
 // ===== ISRs =================================================================
 
-
-#if false
-void
-Usart1_contextHandler(void)
-{
-  // implemented in hal/...
-}
-#endif
+// Usart1_[RX|TX]_contextHandler(void)
+// must implemented in hal/...
 
 #endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1) */
