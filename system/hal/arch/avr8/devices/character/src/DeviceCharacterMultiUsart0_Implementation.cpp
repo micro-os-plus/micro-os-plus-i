@@ -6,7 +6,9 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART0)
+// DEPRECATED
+
+#if false && defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART0)
 
 #include "portable/devices/character/include/DeviceCharacterMultiUsart0.h"
 

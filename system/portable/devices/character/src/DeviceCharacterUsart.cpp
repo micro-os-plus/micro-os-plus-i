@@ -6,7 +6,9 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_DEVICECHARACTERUSART)
+// DEPRECATED
+
+#if false && defined(OS_INCLUDE_DEVICECHARACTERUSART)
 
 #include "portable/devices/character/include/DeviceCharacterUsart.h"
 
@@ -180,7 +182,7 @@ bool DeviceCharacterUsart::implCanRead()
 
 int DeviceCharacterUsart::implAvailableRead()
   {
-    return !m_rxBuf.length();
+    return m_rxBuf.length();
   }
 
 OSEvent_t DeviceCharacterUsart::implGetReadEvent(void)
