@@ -12,15 +12,6 @@
 
 // ----- constructors ---------------------------------------------------------
 
-DeviceCharacterBufferedUsartBase::DeviceCharacterBufferedUsartBase(void)
-{
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterBufferedUsartBase()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
-}
-
 // set custom high/low water marks
 DeviceCharacterBufferedUsartBase::DeviceCharacterBufferedUsartBase(
     unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,

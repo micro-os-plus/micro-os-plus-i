@@ -12,8 +12,6 @@
 class DeviceCharacterBufferedUsart0 : public DeviceCharacterBufferedUsartBase
 {
 public:
-  DeviceCharacterBufferedUsart0();
-
   DeviceCharacterBufferedUsart0(unsigned char *pRxBuf,
       unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
       unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,

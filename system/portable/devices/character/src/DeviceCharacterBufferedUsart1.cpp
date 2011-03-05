@@ -16,15 +16,6 @@ DeviceCharacterBufferedUsart1 * DeviceCharacterBufferedUsart1::ms_pThis;
 
 // ----- constructors ---------------------------------------------------------
 
-DeviceCharacterBufferedUsart1::DeviceCharacterBufferedUsart1(void)
-{
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterBufferedUsart1()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
-}
-
 // set custom high/low water marks
 DeviceCharacterBufferedUsart1::DeviceCharacterBufferedUsart1(
     unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
