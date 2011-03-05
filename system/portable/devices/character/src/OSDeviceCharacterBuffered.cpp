@@ -14,15 +14,6 @@
 
 // ----- constructors ---------------------------------------------------------
 
-OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(void)
-{
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("OSDeviceCharacterBuffered()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
-}
-
 OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
     unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
     unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
