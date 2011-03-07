@@ -49,9 +49,9 @@ DeviceCharacterBufferedUsart0::implPortInit(void)
 
   setPortAddress(&AVR32_USART0);
 
-  gpio_enable_module_pin(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_RX_PIN,
+  gpio_enable_module_pin(OS_CFGPIN_DEVICECHARACTERBUFFEREDUSART0_RX_PIN,
       OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_GPIO_FUNCTION);
-  gpio_enable_module_pin(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_TX_PIN,
+  gpio_enable_module_pin(OS_CFGPIN_DEVICECHARACTERBUFFEREDUSART0_TX_PIN,
       OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_GPIO_FUNCTION);
 
   usart_options_t usartConfig;
@@ -62,7 +62,7 @@ DeviceCharacterBufferedUsart0::implPortInit(void)
   usartConfig.paritytype = USART_NO_PARITY;
   usartConfig.stopbits = USART_1_STOPBIT;
 
-  usart_init_rs232(&AVR32_USART0, &usartConfig, OS_CFGLONG_OSCILLATOR_HZ);
+  usart_init_rs232(&AVR32_USART0, &usartConfig, OS_CFGLONG_PBA_FREQUENCY_HZ);
 
   INTC_register_interrupt(Usart0_contextHandler, AVR32_USART0_IRQ,
       OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_IRQ_PRIORITY);
