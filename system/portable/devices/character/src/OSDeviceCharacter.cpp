@@ -39,6 +39,8 @@ OSDeviceCharacter::OSDeviceCharacter()
   m_isOpened = false;
 }
 
+// Defaults for event codes; return their addresses,
+// guaranteed to be unique.
 OSEvent_t
 OSDeviceCharacter::implGetOpenEvent(void)
 {
@@ -61,11 +63,7 @@ bool
 OSDeviceCharacter::isConnected(void) const
 {
   bool flag;
-  OSScheduler::criticalEnter();
-    {
-      flag = implIsConnected();
-    }
-  OSScheduler::criticalExit();
+  flag = implIsConnected();
   return flag;
 }
 
@@ -379,9 +377,9 @@ OSDeviceCharacter::readByte(void)
 int
 OSDeviceCharacter::availableRead(void)
 {
-  int c;
-  c = implAvailableRead();
-  return c;
+  int r;
+  r = implAvailableRead();
+  return r;
 }
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
