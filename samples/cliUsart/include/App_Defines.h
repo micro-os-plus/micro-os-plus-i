@@ -35,5 +35,5 @@
 #error "Missing OS_CONFIG_BOARD_* definition"
 #endif
 
-#define APP_EXCLUDE_TASKCLI_TASKMAIN_CLI        (1)
+//#define APP_EXCLUDE_TASKCLI_TASKMAIN_CLI        (1)
 #endif /* APP_DEFINES_H_ */
