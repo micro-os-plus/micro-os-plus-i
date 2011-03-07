@@ -151,6 +151,8 @@ private:
 
   // Implementation for different methods.
 
+  // The next three methods are called at open(). If not redefined
+  // by implementation, they return unique addresses anyway.
   virtual OSEvent_t
   implGetOpenEvent(void);
   virtual OSEvent_t
@@ -192,7 +194,8 @@ private:
 
 #endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
 
-  // Events for open/read/write methods.
+  // Events for open/read/write methods. By default they contain
+  // exactly their addresses.
   OSEvent_t m_openEvent;
   OSEvent_t m_readEvent;
   OSEvent_t m_writeEvent;
