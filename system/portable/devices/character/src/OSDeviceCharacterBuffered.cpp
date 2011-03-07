@@ -101,11 +101,11 @@ OSDeviceCharacterBuffered::implCanRead()
   bool f;
   OSScheduler::criticalEnter();
     {
-      !m_rxBuf.isEmpty();
+      f = m_rxBuf.isEmpty();
     }
   OSScheduler::criticalExit();
 
-  return f;
+  return !f;
 }
 
 int
