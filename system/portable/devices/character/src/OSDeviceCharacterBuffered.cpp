@@ -59,20 +59,35 @@ OSDeviceCharacterBuffered::init(unsigned char *pTxBuf,
 int
 OSDeviceCharacterBuffered::implOpen(void)
 {
-  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered::implOpen()"));
-  OSDeviceDebug::putNewLine();
+#if defined(DEBUG)
+  OSScheduler::criticalEnter();
+    {
+      // TODO : eventually define and use lockEnter()/lockExit()
+      OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered::implOpen()"));
+      OSDeviceDebug::putNewLine();
+    }
+  OSScheduler::criticalExit();
+#endif /* defined(DEBUG) */
 
   //assert(ms_pThis == this);
 
   implPortInit();
+
   return 0;
 }
 
 int
 OSDeviceCharacterBuffered::implClose(void)
 {
-  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered::implClose()"));
-  OSDeviceDebug::putNewLine();
+#if defined(DEBUG)
+  // TODO : eventually define and use lockEnter()/lockExit()
+  OSScheduler::criticalEnter();
+    {
+      OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered::implClose()"));
+      OSDeviceDebug::putNewLine();
+    }
+  OSScheduler::criticalExit();
+#endif /* defined(DEBUG) */
 
   // TODO: probably should wait queue to drain and disable port
   implPortDisable();
