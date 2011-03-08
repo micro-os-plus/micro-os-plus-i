@@ -8,6 +8,30 @@
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
 
+void
+OSImpl::familyEarlyInit(void)
+{
+#if defined(DEBUG)
+
+  //OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString("CPU/HSB=");
+  OSDeviceDebug::putDec(OS_CFGLONG_CPU_FREQUENCY_HZ);
+  OSDeviceDebug::putString(" Hz");
+  OSDeviceDebug::putNewLine();
+
+  OSDeviceDebug::putString("PBA=");
+  OSDeviceDebug::putDec(OS_CFGLONG_PBA_FREQUENCY_HZ);
+  OSDeviceDebug::putString(" Hz");
+  OSDeviceDebug::putNewLine();
+
+  OSDeviceDebug::putString("PBB=");
+  OSDeviceDebug::putDec(OS_CFGLONG_PBB_FREQUENCY_HZ);
+  OSDeviceDebug::putString(" Hz");
+  OSDeviceDebug::putNewLine();
+
+#endif /* defined(DEBUG) */
+}
+
 // common point for all exceptions
 extern "C" void
 os_exception_handler(unsigned short n, const char *s);
@@ -40,7 +64,7 @@ os_exception_handler(unsigned short n, const char *s = NULL)
 
 #endif
 
-  OSImpl::SOFTreset();
+  OSCPU::softReset();
 
 #endif
 }
