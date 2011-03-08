@@ -152,7 +152,7 @@ OSDeviceCharacterBuffered::implReadByte(void)
 void
 OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
 {
-#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_ISR) && false
+#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_RX_ISR) && false
   OSDeviceDebug::putChar('#');
   // OSDeviceDebug::putPtr(this);
   // OSDeviceDebug::putChar(' ');
@@ -173,7 +173,7 @@ OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
       ; // character is lost, no place to store it in the receive queue
       OSDeviceDebug::putChar('-');
     }
-#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_ISR) && false
+#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_RX_ISR_EVENT) && false
   OSDeviceDebug::putHex((unsigned short)getReadEvent());
   OSDeviceDebug::putNewLine();
 #endif
@@ -218,7 +218,9 @@ OSDeviceCharacterBuffered::implWriteByte(unsigned char b)
 int
 OSDeviceCharacterBuffered::implFlush(void)
 {
-  //OSDeviceDebug::putChar('f');
+#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_IMPLFLUSH)
+  OSDeviceDebug::putChar('f');
+#endif
   OSScheduler::criticalEnter();
     {
       if (!m_txBuf.isEmpty())
@@ -234,17 +236,19 @@ OSDeviceCharacterBuffered::implFlush(void)
 void
 OSDeviceCharacterBuffered::interruptTxServiceRoutine(void)
 {
-#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_ISR) && false
+#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_TX_ISR)
   OSDeviceDebug::putChar('|');
+#if false
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putChar(' ');
   m_txBuf.dump();
+#endif
 #endif
 
   if (m_txBuf.isEmpty())
     {
       implInterruptTxDisable();
-#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_ISR)
+#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_TX_ISR)
       OSDeviceDebug::putChar('<');
       OSDeviceDebug::putNewLine();
 #endif
@@ -253,7 +257,7 @@ OSDeviceCharacterBuffered::interruptTxServiceRoutine(void)
     {
       unsigned char c;
       c = m_txBuf.get();
-#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_ISR) && false
+#if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_TX_ISR)
       OSDeviceDebug::putHex(c);
 #endif
       implPortWrite(c);
