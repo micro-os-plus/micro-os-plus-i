@@ -432,8 +432,8 @@ OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
           // - notified with OS_ALL
           if (ev == OSEvent::OS_ALL || ev == event || event == OSEvent::OS_ALL)
             {
-              m_isWaiting = false;
-              m_event = OSEvent::OS_NONE; // no longer wait for it
+              eventWaitClear();
+
               m_eventWaitReturn = retVal;
 #if defined(DEBUG)
               if (retVal == OSEventWaitReturn::OS_NONE)

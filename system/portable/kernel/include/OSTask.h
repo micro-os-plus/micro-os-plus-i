@@ -159,6 +159,9 @@ public:
   OSEventWaitReturn_t
   eventWaitPerform(void);
 
+  void
+  eventWaitClear(void);
+
   // Chain the prepare and perform actions
   OSEventWaitReturn_t
   eventWait(OSEvent_t event);
@@ -281,6 +284,13 @@ inline void
 OSTask::setEventWaitReturn(OSEventWaitReturn_t ret)
 {
   m_eventWaitReturn = ret;
+}
+
+inline void
+OSTask::eventWaitClear(void)
+{
+  m_isWaiting = false;
+  m_event = OSEvent::OS_NONE; // no longer wait for it
 }
 
 #endif /* OSTASK_H_ */

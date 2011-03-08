@@ -128,6 +128,9 @@ public:
   static void
   setEventWaitReturn(OSEventWaitReturn_t ret) __attribute__((always_inline));
 
+  static void
+  eventWaitClear(void);
+
   // wakeup all tasks waiting for event
   static int
   eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
@@ -450,6 +453,12 @@ inline OSEventWaitReturn_t
 OSScheduler::eventWaitPerform(void)
 {
   return ms_pTaskRunning->eventWaitPerform();
+}
+
+inline void
+OSScheduler::eventWaitClear(void)
+{
+  ms_pTaskRunning->eventWaitClear();
 }
 
 inline OSEventWaitReturn_t
