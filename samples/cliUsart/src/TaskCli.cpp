@@ -57,6 +57,7 @@ TaskCli::taskMain(void)
           debug.putNewLine();
           debug.putString("PBA Frequency:");
           debug.putHex(OS_CFGLONG_PBA_FREQUENCY_HZ);
+          debug.putNewLine();
 #endif
         }
       os.sched.unlock();
