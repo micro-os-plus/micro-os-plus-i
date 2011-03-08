@@ -36,7 +36,7 @@
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 
 inline void
-OSImpl::CPUstackInit(void)
+OSCPUImpl::stackInit(void)
 {
   asm volatile (
       " lda.w   sp, _estack \n"
@@ -47,7 +47,7 @@ OSImpl::CPUstackInit(void)
 extern unsigned long _evba;
 
 inline void
-OSImpl::CPUinit(void)
+OSCPUImpl::earlyInit(void)
 {
   //Configure peripheral clock's
   pm_cksel(&AVR32_PM, CFG_INT_PBA_DIV, CFG_INT_PBA_SEL, CFG_INT_PBB_DIV,
@@ -66,13 +66,13 @@ OSImpl::CPUinit(void)
 }
 
 inline OSResetBits_t
-OSImpl::CPUfetchResetBits(void)
+OSCPUImpl::fetchResetBits(void)
 {
   return -1; // TODO: fetch bits telling reset reason.
 }
 
 inline void
-OSImpl::returnFromInterrupt(void)
+OSCPUImpl::returnFromInterrupt(void)
 {
   asm volatile (
       " rete \n"
@@ -83,7 +83,7 @@ OSImpl::returnFromInterrupt(void)
 }
 
 inline void
-OSImpl::returnFromSubroutine(void)
+OSCPUImpl::returnFromSubroutine(void)
 {
   asm volatile
   (
@@ -95,7 +95,7 @@ OSImpl::returnFromSubroutine(void)
 }
 
 inline void
-OSImpl::NOP(void)
+OSCPUImpl::nop(void)
 {
   asm volatile
   (
@@ -105,7 +105,7 @@ OSImpl::NOP(void)
 }
 
 inline void
-OSImpl::interruptsEnable(void)
+OSCPUImpl::interruptsEnable(void)
 {
   asm volatile
   (
@@ -117,7 +117,7 @@ OSImpl::interruptsEnable(void)
 }
 
 inline void
-OSImpl::interruptsDisable(void)
+OSCPUImpl::interruptsDisable(void)
 {
   asm volatile
   (
@@ -129,19 +129,19 @@ OSImpl::interruptsDisable(void)
 }
 
 inline void
-OSImpl::interruptsClearMask(void)
+OSCPUImpl::interruptsClearMask(void)
 {
   ; // TODO: implement it
 }
 
 inline void
-OSImpl::interruptsSetMask(void)
+OSCPUImpl::interruptsSetMask(void)
 {
   ; // TODO: implement it
 }
 
 inline void
-OSImpl::CPUidle(void)
+OSCPUImpl::idle(void)
 {
   asm volatile
   (
@@ -151,7 +151,7 @@ OSImpl::CPUidle(void)
 }
 
 inline void
-OSImpl::CPUsleep(void)
+OSCPUImpl::sleep(void)
 {
   asm volatile
   (
@@ -161,7 +161,7 @@ OSImpl::CPUsleep(void)
 }
 
 inline void
-OSImpl::CPUdeepSleep(void)
+OSCPUImpl::deepSleep(void)
 {
   asm volatile
   (
@@ -171,7 +171,7 @@ OSImpl::CPUdeepSleep(void)
 }
 
 inline void
-OSImpl::WDTreset(void)
+OSCPUImpl::watchdogReset(void)
 {
   ; // TODO: fill it in
 }
@@ -179,7 +179,7 @@ OSImpl::WDTreset(void)
 // as per manual, JMP 0 is not recommended since
 // registers are not set to their initial status
 inline void
-OSImpl::SOFTreset(void)
+OSCPUImpl::softReset(void)
 {
 #if false
   wdt_enable(WDTO_15MS);

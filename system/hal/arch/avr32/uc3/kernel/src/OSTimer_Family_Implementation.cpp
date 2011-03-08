@@ -145,7 +145,7 @@ SysTick_contextHandler(void)
         OSSchedulerImpl::stackPointerSave();
       }
     else
-    OSImpl::NOP();
+    OSCPU::nop();
 #endif
     OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
 
@@ -162,10 +162,10 @@ SysTick_contextHandler(void)
         OSSchedulerImpl::stackPointerRestore();
       }
     else
-    OSImpl::NOP();
+    OSCPU::nop();
     OSSchedulerImpl::registersRestore();
 
-    OSImpl::returnFromInterrupt();
+    OSCPU::returnFromInterrupt();
 #endif
 
   }

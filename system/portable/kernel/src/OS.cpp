@@ -7,7 +7,7 @@
 #include "portable/kernel/include/OS.h"
 
 // static members
-OSResetBits_t OS::ms_resetBits;
+OSResetBits_t OSCPU::ms_resetBits;
 
 #if defined(DEBUG) && !defined(OS_EXCLUDE_MULTITASKING)
 
@@ -22,10 +22,19 @@ OS::OS()
 
 #endif /* defined(DEBUG) */
 
-void
-OS::saveResetBits(void)
+OSCPU::OSCPU()
 {
-  ms_resetBits = OSImpl::CPUfetchResetBits();
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+    OSDeviceDebug::putString_P(PSTR("OSCPU()="));
+    OSDeviceDebug::putPtr(this);
+    OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
+}
+
+void
+OSCPU::saveResetBits(void)
+{
+  ms_resetBits = fetchResetBits();
 }
 
 
@@ -49,15 +58,17 @@ os_init_static_constructors(void) __attribute__((noinline));
 void
 os_reset_handler(void)
 {
-  // mandatory in the first position, before any C call
-  OSImpl::CPUstackInit();
+  // Mandatory in the top position, before any C call
+  OSCPU::stackInit();
   // from this point on, C calls are available
 
-  // be sure we start with interrupts disabled
-  OS::interruptsDisable();
+  // WARNING: no debug outputs before OSDeviceDebug::earlyInit()
 
-  // should also init GPIO, so that leds will be available
-  OSImpl::CPUinit();
+  // Be sure we start with interrupts disabled
+  OSCPU::interruptsDisable();
+
+  // earlyInit() should also init GPIO, so that leds will be available
+  OSCPU::earlyInit();
 
   OSScheduler::ledActiveInit();
   OSScheduler::ISR_ledActiveOn();
@@ -73,6 +84,7 @@ os_reset_handler(void)
 #endif
 
 #if defined(DEBUG)
+  // WARNING: No debug output before this point!
   OSDeviceDebug::earlyInit();
 #endif /* defined(DEBUG) */
 
@@ -164,6 +176,11 @@ void OS::nakedEarlyInit(void)
 // runs before constructors
 void OS::earlyInit(void)
   {
+#if defined(DEBUG)
+    OSDeviceDebug::putString_P(PSTR("OS::earlyInit()"));
+    OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
+
 #if defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING)
     OSDeviceDebug::putString_P(PSTR("Multitasking: disabled"));
     OSDeviceDebug::putNewLine();
@@ -183,24 +200,26 @@ void OS::earlyInit(void)
     OSDeviceDebug::putNewLine();
 #endif /* defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
 
-    OSDeviceDebug::putString_P(PSTR("SysTick: "));
+    OSDeviceDebug::putString_P(PSTR("SysTick="));
     OSDeviceDebug::putDec((unsigned short)OS_CFGINT_TICK_RATE_HZ);
     OSDeviceDebug::putString_P(PSTR(" ticks/sec"));
     OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_EXCLUDE_OSTIMER) */
 
-#if defined(DEBUG)
-    OSDeviceDebug::putString_P(PSTR("OS::earlyInit()"));
-    OSDeviceDebug::putNewLine();
-#endif /* defined(DEBUG) */
-
-    saveResetBits();
+    OSCPU::saveResetBits();
 
 #if defined(DEBUG)
     OSDeviceDebug::putString_P(PSTR("ResetBits="));
-    OSDeviceDebug::putHex((unsigned char) OS::getResetBits());
+    OSDeviceDebug::putHex((unsigned char) OSCPU::getResetBits());
+    OSDeviceDebug::putNewLine();
+
+    OSDeviceDebug::putString_P(PSTR("Oscillator="));
+    OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ);
+    OSDeviceDebug::putString_P(PSTR(" Hz"));
     OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
+
+    OS::familyEarlyInit();
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
     OSScheduler::earlyInit();
@@ -217,7 +236,7 @@ void OS::busyWaitMillis(unsigned int n)
         // calibrate from OSC
         for (i = (OS_CFGLONG_SYSCLOCK_HZ / OS_CFGINT_BUSYWAIT_CALIBRATION ); i--;)
           {
-            NOP();
+            OSCPU::nop();
           }
       }
   }
@@ -233,7 +252,7 @@ OS::busyWaitMicros(unsigned int n)
   // calibrate from OSC
   for (i = (OS_CFGLONG_SYSCLOCK_HZ / 1000 * n / OS_CFGINT_BUSYWAIT_CALIBRATION); i--;)
     {
-      OSImpl::NOP();
+      OSCPU::nop();
     }
 }
 

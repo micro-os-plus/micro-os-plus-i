@@ -488,7 +488,7 @@ SCALL_contextSave(void)
   );
 
 #else
-  OSImpl::interruptsDisable();
+  OSCPUImpl::interruptsDisable();
 #endif
 
   OSSchedulerImpl::stackPointerSave();

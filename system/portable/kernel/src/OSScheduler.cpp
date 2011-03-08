@@ -255,7 +255,7 @@ bool
 OSScheduler::isContextSwitchRequired()
 {
   // should be used only here, in scheduler core routines!!!
-  OS::WDTreset();
+  OSCPU::watchdogReset();
 
   bool bRequire;
   bRequire = (ms_isPreemptive || (ms_pTaskRunning == ms_pTaskIdle))
@@ -283,7 +283,7 @@ OSScheduler::performContextSwitch()
 #endif
 
   // should be used only here, in scheduler core routines!!!
-  OS::WDTreset();
+  OSCPU::watchdogReset();
 
   // if scheduler is not locked, perform the context switch
   if (!ms_isLocked)

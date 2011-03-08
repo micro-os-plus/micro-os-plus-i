@@ -249,6 +249,8 @@ private:
   static bool ms_allowDeepSleep;
 #endif
 
+  // Added to avoid the ABI warning "contains empty classes..."
+  char m_dummy;
 };
 
 // ----------------------------------------------------------------------------
@@ -530,7 +532,7 @@ OSScheduler::interruptExit(void)
 #endif
 
   OSSchedulerImpl::registersRestore();
-  OSImpl::returnFromInterrupt();
+  OSCPUImpl::returnFromInterrupt();
 
   // interrupts re-enabled after this point
 }

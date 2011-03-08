@@ -143,7 +143,7 @@ OSTask::staticMain(OSTask * pt)
   OSDeviceDebug::putNewLine();
 #endif
 
-  OS::SOFTreset();
+  OSCPU::softReset();
 }
 
 void
@@ -347,7 +347,7 @@ void OSTask::virtualWatchdogCheck(void)
             OSDeviceDebug::putNewLine();
 #endif
 
-            OS::SOFTreset();
+            OS::softReset();
           }
         else
           {

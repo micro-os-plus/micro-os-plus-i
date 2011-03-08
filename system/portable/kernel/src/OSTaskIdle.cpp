@@ -25,6 +25,7 @@ OSTaskIdle::OSTaskIdle() :
 void OSTaskIdle::taskMain(void)
   {
 #if defined(DEBUG)
+    // TODO : eventually define and use lockEnter()/lockExit()
     OSScheduler::criticalEnter();
       {
         OSDeviceDebug::putString_P(PSTR("OSTaskIdle::taskMain()"));
@@ -40,11 +41,11 @@ void OSTaskIdle::taskMain(void)
         if (!enterSleep())
           {
             OSScheduler::ledActiveOff(); // turn activity led off
-            OS::CPUidle();
+            OSCPU::idle();
           }
 #else
         OSScheduler::ledActiveOff(); // turn activity led off
-        OS::CPUidle();
+        OSCPU::idle();
 #endif
         // required for cooperative and after non-scheduled interrupts
         OSScheduler::yield();
@@ -69,12 +70,12 @@ bool OSTaskIdle::enterSleep(void)
     if (OSScheduler::isAllowDeepSleep())
       {
         OSScheduler::ledActiveOff(); // turn activity led off
-        OS::CPUdeepSleep();
+        OSCPU::deepSleep();
       }
     else
       {
         OSScheduler::ledActiveOff(); // turn activity led off
-        OS::CPUsleep();
+        OSCPU::sleep();
       }
 
     return true;

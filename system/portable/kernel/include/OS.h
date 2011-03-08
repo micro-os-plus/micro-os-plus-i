@@ -82,27 +82,27 @@ public:
 
 // ----------------------------------------------------------------------------
 
-class OSImpl
+class OSCPUImpl
   {
 public:
   // Initialise the SP register in order to point to the stack section.
-  inline static void CPUstackInit(void) __attribute__((always_inline));
-  // Some CPU initializations.
-  inline static void CPUinit(void) __attribute__((always_inline));
+  inline static void stackInit(void) __attribute__((always_inline));
+  // Some CPU initialisations.
+  inline static void earlyInit(void) __attribute__((always_inline));
   // Put MCU to the idle sleep mode.
-  inline static void CPUidle(void) __attribute__((always_inline));
+  inline static void idle(void) __attribute__((always_inline));
   // Put MCU to sleep.
-  inline static void CPUsleep(void) __attribute__((always_inline));
+  inline static void sleep(void) __attribute__((always_inline));
   // Put MCU to deep sleep.
-  inline static void CPUdeepSleep(void) __attribute__((always_inline));
+  inline static void deepSleep(void) __attribute__((always_inline));
   // Returns the reset bits used to know the reset reason.
-  inline static OSResetBits_t CPUfetchResetBits(void) __attribute__((always_inline));
+  inline static OSResetBits_t fetchResetBits(void) __attribute__((always_inline));
   // Reset the WDT.
-  inline static void WDTreset(void) __attribute__((always_inline));
+  inline static void watchdogReset(void) __attribute__((always_inline));
   // No operation performed. Embeds the nop assembly command.
-  inline static void NOP(void) __attribute__((always_inline));
+  inline static void nop(void) __attribute__((always_inline));
   // Generate a soft reset.
-  inline static void SOFTreset(void) __attribute__((always_inline));
+  inline static void softReset(void) __attribute__((always_inline));
   // Wrapper for the rete instruction.
   inline static void returnFromInterrupt(void) __attribute__((always_inline,noreturn));
   // Copy link register's (LR) value into the PC. This will restart execution
@@ -125,8 +125,20 @@ public:
   inline static void interruptsClearMask(void) __attribute__((always_inline));
   inline static void interruptsSetMask(void) __attribute__((always_inline));
 
+private:
+
   };
 
+
+// ----------------------------------------------------------------------------
+
+class OSImpl
+  {
+public:
+  static void familyEarlyInit(void);
+  };
+
+// ----------------------------------------------------------------------------
 
 class OSApplicationImpl
 {
@@ -141,6 +153,8 @@ public:
 #endif /* OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK */
 
 };
+
+// ----------------------------------------------------------------------------
 
 extern "C" OSStack_t **g_ppCurrentStack;
 
@@ -162,12 +176,45 @@ extern "C" OSStack_t **g_ppCurrentStack;
 
 // ----------------------------------------------------------------------------
 
-class OS: public OSImpl
+class OSCPU: public OSCPUImpl
+{
+  // inherit all methods from CPU implementation
+public:
+#if defined(DEBUG)
+  // Constructor.
+  OSCPU();
+#endif
+  // Returns the reset bits used to know the reset reason.
+  static OSResetBits_t getResetBits(void);
+
+  // save to private member the reset bits using implementation dependent method
+  static void saveResetBits(void);
+
+private:
+  // internal variable to keep reset bits
+  static OSResetBits_t ms_resetBits;
+
+  // Added to avoid the ABI warning "contains empty classes..."
+  char m_dummy;
+};
+
+inline OSResetBits_t OSCPU::getResetBits(void)
+  {
+    return ms_resetBits;
+  }
+
+
+// ----------------------------------------------------------------------------
+
+class OS : public OSImpl
   {
 
 public:
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
+  // The cpu object to be used by applications
+  OSCPU cpu;
+
   // Scheduler object used by this class.
   OSScheduler sched;
 #endif
@@ -219,23 +266,9 @@ public:
   // Busy waiting for n microseconds.
   static void busyWaitMicros(unsigned int n);
 #endif
-  // Returns the reset bits used to know the reset reason.
-  static OSResetBits_t getResetBits(void);
-
-  // TODO: please remove it if is no longer necessarily.
-  static void applicationExceptionDetailsLog(unsigned int n);
 
 private:
-  // save to private member the reset bits using implementation dependent method
-  static void saveResetBits(void);
-  // internal variable to keep reset bits
-  static OSResetBits_t ms_resetBits;
   };
-
-inline OSResetBits_t OS::getResetBits(void)
-  {
-    return ms_resetBits;
-  }
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/include/OS_Arch_Inlines.h"
