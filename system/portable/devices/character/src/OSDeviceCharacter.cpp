@@ -1,7 +1,7 @@
 /*
- *	Copyright (C) 2007-2011 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
- *	This file is part of the uOS++ distribution.
+ *      This file is part of the uOS++ distribution.
  */
 
 #include "portable/kernel/include/OS.h"
@@ -28,10 +28,10 @@ OSDeviceCharacter::OSDeviceCharacter()
   m_readTimeout = OSTimeout::OS_NEVER;
   m_writeTimeout = OSTimeout::OS_NEVER;
   m_openTimeout = OSTimeout::OS_NEVER;
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
-  // init events with default values
-  // will be set to the implentation values at open
+  // initialise events with default values
+  // will be set to the implementation values at open
   m_readEvent = OSEvent::OS_NONE;
   m_writeEvent = OSEvent::OS_NONE;
   m_openEvent = OSEvent::OS_NONE;
@@ -70,7 +70,7 @@ OSDeviceCharacter::isConnected(void) const
 bool
 OSDeviceCharacter::implIsConnected(void) const
 {
-  // implement it in children classes
+  // must implement it in children classes
   return true;
 }
 
@@ -102,21 +102,36 @@ OSDeviceCharacter::open(void)
 
   for (;;)
     {
-      bool flag;
-      flag = implIsConnected();
-      if (flag)
+      OSEvent_t event;
+      bool isConnected;
+      bool doWait;
+      doWait = false;
+      OSScheduler::criticalEnter();
+        {
+          isConnected = implIsConnected();
+          if (!isConnected)
+            {
+              event = getOpenEvent();
+              // Must be done in critical section
+              doWait = OSScheduler::eventWaitPrepare(event);
+            }
+        }
+      OSScheduler::criticalExit();
+      if (isConnected)
         break;
+
+      // eventWait already prepared properly
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
       OSTimerTicks_t timeout;
       timeout = getOpenTimeout();
 
       if (timeout == OSTimeout::OS_IMMEDIATELY)
-      return OSReturn::OS_WOULD_BLOCK;
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
-
-      OSEvent_t event;
-      event = getOpenEvent();
+        {
+          OSScheduler::eventWaitClear();
+          return OSReturn::OS_WOULD_BLOCK;
+        }
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
       if (timeout != OSTimeout::OS_NEVER)
@@ -124,7 +139,7 @@ OSDeviceCharacter::open(void)
           m_pOpenTimer->eventNotify(timeout, event,
               OSEventWaitReturn::OS_TIMEOUT);
         }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
       OSDeviceDebug::putString_P(PSTR("eventWait("));
@@ -132,8 +147,12 @@ OSDeviceCharacter::open(void)
       OSDeviceDebug::putChar(')');
       OSDeviceDebug::putNewLine();
 #endif
+      if (doWait)
+        OSScheduler::eventWaitPerform();
+
       OSEventWaitReturn_t ret;
-      ret = OSScheduler::eventWait(event);
+      ret = OSScheduler::getEventWaitReturn();
+
       //OSDeviceDebug::putHex((unsigned short)ret);
       //OSDeviceDebug::putNewLine();
 
@@ -152,7 +171,7 @@ OSDeviceCharacter::open(void)
             {
               m_pOpenTimer->eventRemove(event);
             }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
         }
       //OSDeviceDebug::putChar( '!' );
     }
@@ -169,8 +188,10 @@ OSDeviceCharacter::open(void)
 int
 OSDeviceCharacter::close(void)
 {
-  //OSDeviceDebug::putString( "OSDeviceCharacter::close()" );
-  //OSDeviceDebug::putNewLine();
+#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_CLOSE)
+  OSDeviceDebug::putString( "OSDeviceCharacter::close()" );
+  OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_CLOSE) */
 
   if (!m_isOpened)
     return OSReturn::OS_NOT_OPENED;
@@ -206,11 +227,25 @@ OSDeviceCharacter::writeByte(unsigned char b)
   if (!m_isOpened)
     return OSReturn::OS_NOT_OPENED;
 
-  bool flag;
+  bool canWrite;
   for (;;)
     {
-      flag = implCanWrite() || !implIsConnected();
-      if (flag)
+      bool doWait;
+      doWait = false;
+      OSEvent_t event;
+      OSScheduler::criticalEnter();
+        {
+          canWrite = implCanWrite() || !implIsConnected();
+          if (!canWrite)
+            {
+              event = getWriteEvent();
+              // Must be done in critical section
+              doWait = OSScheduler::eventWaitPrepare(event);
+            }
+        }
+      OSScheduler::criticalExit();
+
+      if (canWrite)
         break;
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
@@ -223,12 +258,10 @@ OSDeviceCharacter::writeByte(unsigned char b)
           OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeByte() would block"));
           OSDeviceDebug::putNewLine();
 #endif
+          OSScheduler::eventWaitClear();
           return OSReturn::OS_WOULD_BLOCK;
         }
 #endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
-
-      OSEvent_t event;
-      event = getWriteEvent();
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
       if (timeout != OSTimeout::OS_NEVER)
@@ -243,8 +276,11 @@ OSDeviceCharacter::writeByte(unsigned char b)
       OSDeviceDebug::putHex((unsigned short)event);
       OSDeviceDebug::putNewLine();
 #endif
+      if (doWait)
+        OSScheduler::eventWaitPerform();
+
       OSEventWaitReturn_t ret;
-      ret = OSScheduler::eventWait(event);
+      ret = OSScheduler::getEventWaitReturn();
       //OSDeviceDebug::putHex((unsigned short)ret);
       //OSDeviceDebug::putNewLine();
 
@@ -263,7 +299,7 @@ OSDeviceCharacter::writeByte(unsigned char b)
             {
               m_pWriteTimer->eventRemove(event);
             }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
         }
     }
 
@@ -306,11 +342,25 @@ OSDeviceCharacter::readByte(void)
   if (!m_isOpened)
     return OSReturn::OS_NOT_OPENED;
 
-  bool flag;
+  bool canRead;
   for (;;)
     {
-      flag = implCanRead() || !implIsConnected();
-      if (flag)
+      bool doWait;
+      doWait = false;
+      OSEvent_t event;
+      OSScheduler::criticalEnter();
+        {
+          canRead = implCanRead() || !implIsConnected();
+          if (!canRead)
+            {
+              event = getReadEvent();
+              // Must be done in critical section
+              doWait = OSScheduler::eventWaitPrepare(event);
+            }
+        }
+      OSScheduler::criticalExit();
+
+      if (canRead)
         break;
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
@@ -319,12 +369,11 @@ OSDeviceCharacter::readByte(void)
 
       if (timeout == OSTimeout::OS_IMMEDIATELY)
         {
+          OSScheduler::eventWaitClear();
           return OSReturn::OS_WOULD_BLOCK;
         }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
-      OSEvent_t event;
-      event = getReadEvent();
       //OSDeviceDebug::putHex((unsigned short)event);
       //OSDeviceDebug::putNewLine();
 
@@ -334,10 +383,14 @@ OSDeviceCharacter::readByte(void)
           m_pReadTimer->eventNotify(timeout, event,
               OSEventWaitReturn::OS_TIMEOUT);
         }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
+
+      if (doWait)
+        OSScheduler::eventWaitPerform();
 
       OSEventWaitReturn_t ret;
-      ret = OSScheduler::eventWait(event);
+      ret = OSScheduler::getEventWaitReturn();
+
       //OSDeviceDebug::putHex((unsigned short)ret);
       //OSDeviceDebug::putNewLine();
 
@@ -356,7 +409,7 @@ OSDeviceCharacter::readByte(void)
             {
               m_pReadTimer->eventRemove(event);
             }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
         }
     }
 
@@ -424,6 +477,6 @@ OSDeviceCharacter::sync(void)
   return flush();
 }
 
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF */
 
-#endif /*OS_INCLUDE_OSDEVICECHARACTER*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER */
