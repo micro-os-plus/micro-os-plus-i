@@ -16,7 +16,8 @@ iostream::iostream(streambuf* sb) :
   ostream(sb), istream(sb)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("iostream()");
+    OSDeviceDebug::putString("iostream()=");
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
   }

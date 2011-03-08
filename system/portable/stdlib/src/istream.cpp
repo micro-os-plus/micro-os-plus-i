@@ -18,7 +18,8 @@ void __skipws(istream& is);
 istream::istream(streambuf* sb)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("istream()");
+    OSDeviceDebug::putString("istream()=");
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
     
@@ -30,7 +31,8 @@ istream::istream(streambuf* sb)
 istream::istream( OSDeviceCharacter * dev )
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString( "istream()" );
+    OSDeviceDebug::putString( "istream()=" );
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
     

@@ -16,7 +16,8 @@ ostream::ostream(streambuf * sb) :
   ios(sb)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("ostream()");
+    OSDeviceDebug::putString("ostream()=");
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
   }
@@ -25,7 +26,8 @@ ostream::ostream(streambuf * sb) :
 ostream::ostream( OSDeviceCharacter * dev ) : ios( dev )
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString( "ostream()" );
+    OSDeviceDebug::putString( "ostream()=" );
+    OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
   }
