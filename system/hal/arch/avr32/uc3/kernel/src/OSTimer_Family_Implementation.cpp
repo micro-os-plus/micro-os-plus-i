@@ -101,7 +101,7 @@ OSTimerTicks::implInit(void)
   tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].CCR.swtrg = 1;
 
 #define DIVIDER (1 << ((OS_CFGINT_TIMER_CLOCK_SELECT-2)*2+1))
-#define COUNTER (OS_CFGLONG_OSCILLATOR_HZ/OS_CFGINT_TIMER_PRESCALLER/DIVIDER/OS_CFGINT_TICK_RATE_HZ)
+#define COUNTER (OS_CFGLONG_PBA_FREQUENCY_HZ/OS_CFGINT_TIMER_PRESCALLER/DIVIDER/OS_CFGINT_TICK_RATE_HZ)
 
 #if defined(DEBUG)
 
@@ -125,7 +125,7 @@ OSTimerTicks::implInit(void)
 
 #else
   Set_system_register(AVR32_COUNT, 0);
-  Set_system_register(AVR32_COMPARE, OS_CFGLONG_OSCILLATOR_HZ
+  Set_system_register(AVR32_COMPARE, OS_CFGLONG_CPU_FREQUENCY_HZ
       /OS_CFGINT_TICK_RATE_HZ);
   //register the interrupt
   INTC_register_interrupt(SysTick_contextHandler, COUNT_IRQ_NUM,
