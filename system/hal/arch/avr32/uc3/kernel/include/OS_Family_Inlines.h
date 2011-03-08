@@ -7,6 +7,30 @@
 #ifndef HAL_FAMILY_OS_INLINES_H_
 #define HAL_FAMILY_OS_INLINES_H_
 
+#if OS_CFGINT_PBA_PRESCALLER_SEL == 0
+#define CFG_INT_PBA_DIV          0
+#define CFG_INT_PBA_SEL          0
+#else
+#define CFG_INT_PBA_DIV          1
+#define CFG_INT_PBA_SEL          (OS_CFGINT_PBA_PRESCALLER_SEL - 1)
+#endif
+
+#if OS_CFGINT_PBB_PRESCALLER_SEL == 0
+#define CFG_INT_PBB_DIV          0
+#define CFG_INT_PBB_SEL          0
+#else
+#define CFG_INT_PBB_DIV          1
+#define CFG_INT_PBB_SEL          (OS_CFGINT_PBB_PRESCALLER_SEL - 1)
+#endif
+
+#if OS_CFGINT_HSB_PRESCALLER_SEL == 0
+#define CFG_INT_HSB_DIV          0
+#define CFG_INT_HSB_SEL          0
+#else
+#define CFG_INT_HSB_DIV          1
+#define CFG_INT_HSB_SEL          (OS_CFGINT_HSB_PRESCALLER_SEL - 1)
+#endif
+
 #include <avr32/io.h>
 #include "hal/arch/avr32/lib/include/compiler.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
@@ -25,6 +49,10 @@ extern unsigned long _evba;
 inline void
 OSImpl::CPUinit(void)
 {
+  //Configure peripheral clock's
+  pm_cksel(&AVR32_PM, CFG_INT_PBA_DIV, CFG_INT_PBA_SEL, CFG_INT_PBB_DIV,
+      CFG_INT_PBB_SEL, CFG_INT_HSB_DIV, CFG_INT_HSB_SEL);
+
   // Switch to external Oscillator 0
   pm_switch_to_osc0(&AVR32_PM, OS_CFGLONG_OSCILLATOR_HZ,
       AVR32_PM_OSCCTRL0_STARTUP_2048_RCOSC);
