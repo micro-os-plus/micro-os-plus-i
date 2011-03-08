@@ -82,7 +82,11 @@
 
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG            1
 
-//#define OS_DEBUG_OSDEVICECHARACTERBUFFERED_ISR         (1)// for test the tx/rx isr
+#if false
+#define OS_DEBUG_OSDEVICECHARACTERBUFFERED_IMPLFLUSH    (1)
+#define OS_DEBUG_OSDEVICECHARACTERBUFFERED_TX_ISR       (1)
+#define OS_DEBUG_OSDEVICECHARACTERBUFFERED_RX_ISR       (1)
+#endif
 
 #endif /* defined(DEBUG) */
 
