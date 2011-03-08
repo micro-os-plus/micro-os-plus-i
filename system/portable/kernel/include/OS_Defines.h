@@ -30,31 +30,6 @@
 
 // ----------------------------------------------------------------------------
 
-#if false
-
-// Deprecated, replace with above definitions
-
-// Notice: do not use parenthesis! (the values will be stringified)
-#define OS_CFGINT_MAJOR                 3
-#define OS_CFGINT_MINOR                 1
-#define OS_CFGINT_REVISION              1287
-
-#define xstr(x)  str(x)
-#define str(x)  #x
-
-// stringify above integers
-#define OS_STRING_OSMAJOR               xstr(OS_CFGINT_MAJOR)
-#define OS_STRING_OSMINOR               xstr(OS_CFGINT_MINOR)
-#define OS_STRING_OSREVISION            xstr(OS_CFGINT_REVISION)
-
-#define OS_STRING_OSVERSION             OS_STRING_OSMAJOR "." OS_STRING_OSMINOR "." OS_STRING_OSREVISION
-
-#define OS_STRING_OSGREETING            "uOS++ v" OS_STRING_OSVERSION ", GCC " __VERSION__
-
-#endif
-
-// ----------------------------------------------------------------------------
-
 // include additional OS definitions from the application space
 #include "OS_App_Defines.h"
 
