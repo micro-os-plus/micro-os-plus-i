@@ -18,35 +18,11 @@
 #include "hal/arch/avr32/uc3/lib/include/usart.h"
 #include "hal/arch/avr32/uc3/lib/include/gpio.h"
 
-#if defined(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_BAUD_CONSTANT)
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_CONSTANT     OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_BAUD_CONSTANT
-#endif
-
-#if (OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_DOUBLE_SPEED)
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER        (8)
-#else
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER        (16)
-#endif
-
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_CLOCK_HZ          (OS_CFGLONG_OSCILLATOR_HZ / OS_CFGINT_CLOCK_PRESCALER / CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER)
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_CONSTANT     ((CFGINT_DEVICECHARACTERBUFFEREDUSART_CLOCK_HZ / OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_BAUD_RATE)- 1UL)
-
-#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_NAKED_TX_ISR)
-__attribute__((naked))
-#else
-__attribute__((interrupt))
-#endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART1_NAKED_TX_ISR)*/
-void
-Usart0_contextHandler(void);
-
 // ----- inits ---------------------------------------------------------------
 
 int
 DeviceCharacterBufferedUsart0::implPortInit(void)
 {
-  volatile avr32_usart_t* port;
-  port = &AVR32_USART0;
-
   setPortAddress(&AVR32_USART0);
 
   gpio_enable_module_pin(OS_CFGPIN_DEVICECHARACTERBUFFEREDUSART0_RX_PIN,
@@ -64,11 +40,13 @@ DeviceCharacterBufferedUsart0::implPortInit(void)
 
   usart_init_rs232(&AVR32_USART0, &usartConfig, OS_CFGLONG_PBA_FREQUENCY_HZ);
 
-  INTC_register_interrupt(Usart0_contextHandler, AVR32_USART0_IRQ,
-      OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_IRQ_PRIORITY);
+  INTC_register_interrupt(DeviceCharacterBufferedUsart0::contextHandler,
+      AVR32_USART0_IRQ, OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_IRQ_PRIORITY);
 
-  //enable the rx interrupt
-  port->ier = AVR32_USART_IER_RXRDY_MASK;
+  // Enable the RX interrupt
+  AVR32_USART0.ier = AVR32_USART_IER_RXRDY_MASK;
+
+  // Do not enable TX interrupts
 
   return 0;
 }
@@ -77,17 +55,19 @@ DeviceCharacterBufferedUsart0::implPortInit(void)
 
 
 void
-Usart0_contextHandler(void)
+DeviceCharacterBufferedUsart0::contextHandler(void)
 {
-#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART1_NAKED_TX_ISR)
+#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_ISR_PREEMPTION)
   OSScheduler::interruptEnter();
-#endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART1_NAKED_TX_ISR)*/
+#else
+  OSScheduler::ISR_ledActiveOn();
+#endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_ISR_PREEMPTION)*/
     {
-      ((DeviceCharacterBufferedUsart0 *) DeviceCharacterBufferedUsart0::ms_pThis)->interruptServiceRoutine();
+      ms_pThis->interruptServiceRoutine();
     }
-#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART1_NAKED_TX_ISR)
+#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_ISR_PREEMPTION)
   OSScheduler::interruptExit();
-#endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART1_NAKED_TX_ISR)*/
+#endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_ISR_PREEMPTION)*/
 }
 
 #endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART0) */
