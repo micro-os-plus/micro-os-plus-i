@@ -10,7 +10,7 @@
 // ----------------------------------------------------------------------------
 
 // Application versioning and greeting definitions
-// More definitions will be computer in uOS.h
+// More definitions will be computed in uOS.h
 
 #define APP_CFGSTR_APPLICATION_NAME                     "blinkX3Sync"
 #define APP_CFGSTR_APPLICATION_MANUFACTURER             "AVI"
