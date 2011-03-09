@@ -39,4 +39,4 @@ typedef void *OSProgramPtr_t;
 #define OS_CFGINT_STACK_MINIMAL_SIZE                    (400)
 #endif
 
-#endif /*HAL_ARCH_OS_DEFS_H_*/
+#endif /* HAL_ARCH_OS_DEFS_H_ */
