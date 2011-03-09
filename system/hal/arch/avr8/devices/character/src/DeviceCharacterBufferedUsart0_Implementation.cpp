@@ -12,18 +12,24 @@
 
 #include "portable/devices/character/include/DeviceCharacterBufferedUsart0.h"
 
-#if defined(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_BAUD_CONSTANT)
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_CONSTANT     OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_BAUD_CONSTANT
-#endif
-
 #if (OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_DOUBLE_SPEED)
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER        (8)
+#define CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER          (8)
 #else
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER        (16)
+#define CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER          (16)
 #endif
 
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_CLOCK_HZ          (OS_CFGLONG_OSCILLATOR_HZ / OS_CFGINT_CLOCK_PRESCALER / CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER)
-#define CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_CONSTANT     ((CFGINT_DEVICECHARACTERBUFFEREDUSART_CLOCK_HZ / OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_BAUD_RATE)- 1UL)
+#if defined(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_BAUD_RATE)
+#define CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_RATE           (OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_BAUD_RATE)
+#else
+#define CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_RATE           (9600)
+#endif
+
+#if defined(OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_BAUD_CONSTANT)
+#define CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_CONSTANT       OS_CFGINT_DEVICECHARACTERBUFFEREDUSART0_BAUD_CONSTANT
+#else
+#define CFGINT_DEVICECHARACTERBUFFEREDUSART_CLOCK_HZ            (OS_CFGLONG_OSCILLATOR_HZ / OS_CFGINT_CLOCK_PRESCALER / CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER)
+#define CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_CONSTANT       ((CFGINT_DEVICECHARACTERBUFFEREDUSART_CLOCK_HZ / CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_RATE)- 1UL)
+#endif
 
 // ----- inits ---------------------------------------------------------------
 
@@ -32,7 +38,15 @@ DeviceCharacterBufferedUsart0::implPortInit(void)
 {
   OSScheduler::criticalEnter();
     {
-      OSDeviceDebug::putString("Baud constant=");
+    OSDeviceDebug::putString("Baud rate=");
+    OSDeviceDebug::putDec(
+        (unsigned short) CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_RATE, 0);
+    OSDeviceDebug::putNewLine();
+
+      OSDeviceDebug::putString("Baud scale/constant=");
+      OSDeviceDebug::putDec(
+          (unsigned short) CFGINT_DEVICECHARACTERBUFFEREDUSART_PRESCALLER, 0);
+      OSDeviceDebug::putChar('/');
       OSDeviceDebug::putDec(
           (unsigned short) CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_CONSTANT, 0);
       OSDeviceDebug::putNewLine();
@@ -99,32 +113,54 @@ DeviceCharacterBufferedUsart0::implInterruptTxDisable(void)
 // ===== ISRs =================================================================
 
 extern "C" void
-USART1_UDRE_vect(void) __attribute__( ( signal, naked ) );
+#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_TX_ISR_PREEMPTION)
+__attribute__((naked))
+#else
+__attribute__((signal))
+#endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_TX_ISR_PREEMPTION)*/
+USART0_UDRE_vect(void);
 
 void
-USART1_UDRE_vect(void)
+USART0_UDRE_vect(void)
 {
   // interrupts disabled in here
+#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_TX_ISR_PREEMPTION)
   OSScheduler::interruptEnter();
+#else
+  OSScheduler::ISR_ledActiveOn();
+#endif /* !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_TX_ISR_PREEMPTION) */
     {
-      ((DeviceCharacterBufferedUsart0 *) DeviceCharacterBufferedUsart0::ms_pThis)->interruptTxServiceRoutine();
+      DeviceCharacterBufferedUsart0::ms_pThis->interruptTxServiceRoutine();
     }
+#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_TX_ISR_PREEMPTION)
   OSScheduler::interruptExit();
+#endif /* !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_TX_ISR_PREEMPTION) */
   // interrupts enabled after this point
 }
 
 extern "C" void
-USART1_RX_vect(void) __attribute__( ( signal, naked ) );
+#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_RX_ISR_PREEMPTION)
+__attribute__((naked))
+#else
+__attribute__((signal))
+#endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_RX_ISR_PREEMPTION)*/
+USART0_RX_vect(void);
 
 void
-USART1_RX_vect(void)
+USART0_RX_vect(void)
 {
   // interrupts disabled in here
+#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_RX_ISR_PREEMPTION)
   OSScheduler::interruptEnter();
+#else
+  OSScheduler::ISR_ledActiveOn();
+#endif /* !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_RX_ISR_PREEMPTION) */
     {
-      ((DeviceCharacterBufferedUsart0 *) DeviceCharacterBufferedUsart0::ms_pThis)->interruptRxServiceRoutine();
+      DeviceCharacterBufferedUsart0::ms_pThis->interruptRxServiceRoutine();
     }
+#if !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_RX_ISR_PREEMPTION)
   OSScheduler::interruptExit();
+#endif /* !defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_RX_ISR_PREEMPTION) */
   // interrupts enabled after this point
 }
 
