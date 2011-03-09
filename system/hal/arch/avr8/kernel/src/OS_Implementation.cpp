@@ -73,17 +73,5 @@ OSImpl::familyEarlyInit(void)
 }
 
 
-// nothing smart to do, normally should never be called, just a reference.
-
-extern "C" void __cxa_pure_virtual(void);
-
-void __cxa_pure_virtual(void)
-  {
-#if defined(DEBUG)
-    OSDeviceDebug::putString_P(PSTR("Pure Virtual"));
-    OSDeviceDebug::putNewLine();
-#endif
-  }
-
 #endif
 
