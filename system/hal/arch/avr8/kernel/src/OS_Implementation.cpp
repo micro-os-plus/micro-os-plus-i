@@ -58,6 +58,21 @@ void processor_init(void)
 #endif
   }
 
+void
+OSImpl::familyEarlyInit(void)
+{
+#if defined(DEBUG)
+
+  //OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString("CPU=");
+  OSDeviceDebug::putDec(OS_CFGLONG_CPU_FREQUENCY_HZ);
+  OSDeviceDebug::putString(" Hz");
+  OSDeviceDebug::putNewLine();
+
+#endif /* defined(DEBUG) */
+}
+
+
 // nothing smart to do, normally should never be called, just a reference.
 
 extern "C" void __cxa_pure_virtual(void);
