@@ -9,20 +9,15 @@
 
 #include "portable/devices/character/include/DeviceCharacterBufferedUsartBase.h"
 
-#include "avr/io.h"
-
 class DeviceCharacterBufferedUsart1 : public DeviceCharacterBufferedUsartBase
 {
 public:
-  DeviceCharacterBufferedUsart1(void);
-
   DeviceCharacterBufferedUsart1(unsigned char *pRxBuf, unsigned short rxBufSize,
       unsigned short rxHWM, unsigned short rxLWM, unsigned char *pTxBuf,
       unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM);
 
   DeviceCharacterBufferedUsart1(unsigned char *pRxBuf, unsigned short rxBufSize,
       unsigned char *pTxBuf, unsigned short txBufSize);
-
 
 private:
 
