@@ -113,7 +113,7 @@ OSSchedulerImpl::start(void)
   // interrupts enabled after pop-ing flags
   OSScheduler::contextRestore();
 
-  OS::returnFromSubroutine();
+  OSCPU::returnFromSubroutine();
 }
 
 #if defined(DEBUG)
