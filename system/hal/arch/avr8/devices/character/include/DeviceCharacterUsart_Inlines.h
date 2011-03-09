@@ -7,6 +7,9 @@
 #ifndef HAL_DEVICECHARACTERUSART_INLINES_H_
 #define HAL_DEVICECHARACTERUSART_INLINES_H_
 
+// DEPRECATED
+
+#if false
 #include "avr/io.h"
 
 #if defined(OS_CONFIG_DEVICECHARACTERUSART_BAUD_CONSTANT)
@@ -69,5 +72,6 @@ inline void DeviceCharacterUsart::implInterruptTxDisable(void)
   {
     UCSR1B &= ~_BV(UDRIE1);
   }
+#endif
 
 #endif /*HAL_DEVICECHARACTERUSART_INLINES_H_*/
