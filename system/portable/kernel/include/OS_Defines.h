@@ -121,6 +121,8 @@
 
 // ----- Default definitions for various variables ----------------------------
 
+#if defined(OS_CONFIG_ARCH_AVR8)
+
 #if !defined(OS_CFGINT_CLOCK_PRESCALER)
 #define OS_CFGINT_CLOCK_PRESCALER (1)
 #endif
@@ -133,6 +135,7 @@
 #define OS_CFGLONG_SYSCLOCK_HZ                          (OS_CFGLONG_OSCILLATOR_HZ / OS_CFGINT_CLOCK_PRESCALER * OS_CFGINT_CLOCK_MULTIPLIER)
 #endif
 
+#endif /* defined(OS_CONFIG_ARCH_AVR8) */
 
 // ----- Interdependencies between various definitions ------------------------
 
