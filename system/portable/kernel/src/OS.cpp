@@ -165,7 +165,8 @@ void os_init_static_constructors(void)
 #endif /* OS_EXCLUDE_RESET_HANDLER */
 
 #if defined(OS_INCLUDE_NAKED_INIT)
-// ----- init5 ---------------------------------------------------------------
+
+// ----- init5 ----------------------------------------------------------------
 
 void OS::nakedEarlyInit(void)
   {
@@ -258,7 +259,7 @@ OS::busyWaitMicros(unsigned int n)
 
 #endif /* OS_INCLUDE_OS_BUSYWAITMICROS */
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // default main. may be redefined by application
 
 int main()
@@ -279,7 +280,7 @@ int main()
     //no return
   }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_NEW_DELETE)
 
@@ -313,3 +314,17 @@ delete(void *p __attribute__( ( unused ) ) )
 
 #endif /*OS_INCLUDE_NEW_DELETE*/
 
+// ----------------------------------------------------------------------------
+
+// Nothing smart to do, normally should never be called, just a reference.
+// Without it here we risk the linker will add a lot of useless stuff from
+// the standard C++ library.
+extern "C" void __cxa_pure_virtual(void);
+
+void __cxa_pure_virtual(void)
+  {
+#if defined(DEBUG)
+    OSDeviceDebug::putString_P(PSTR("Pure Virtual"));
+    OSDeviceDebug::putNewLine();
+#endif
+  }
