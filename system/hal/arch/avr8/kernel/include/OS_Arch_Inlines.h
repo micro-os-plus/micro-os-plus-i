@@ -8,7 +8,7 @@
 #define HAL_OS_ARCH_INLINES_H_
 
 inline void
-OSImpl::returnFromInterrupt(void)
+OSCPUImpl::returnFromInterrupt(void)
 {
   asm volatile( "reti":: );
   for (;;)
@@ -16,7 +16,7 @@ OSImpl::returnFromInterrupt(void)
 }
 
 inline void
-OSImpl::returnFromSubroutine(void)
+OSCPUImpl::returnFromSubroutine(void)
 {
   asm volatile( "ret":: );
   for (;;)
@@ -24,34 +24,34 @@ OSImpl::returnFromSubroutine(void)
 }
 
 inline void
-OSImpl::CPUidle(void)
+OSCPUImpl::idle(void)
 {
   set_sleep_mode( SLEEP_MODE_IDLE);
   sleep_cpu();
 }
 
 inline void
-OSImpl::CPUsleep(void)
+OSCPUImpl::sleep(void)
 {
   set_sleep_mode( SLEEP_MODE_EXT_STANDBY);
   sleep_cpu();
 }
 
 inline void
-OSImpl::CPUdeepSleep(void)
+OSCPUImpl::deepSleep(void)
 {
   set_sleep_mode( SLEEP_MODE_PWR_SAVE);
   sleep_cpu();
 }
 
 inline void
-OSImpl::WDTreset(void)
+OSCPUImpl::watchdogReset(void)
 {
   wdt_reset();
 }
 
 inline void
-OSImpl::NOP(void)
+OSCPUImpl::nop(void)
 {
   asm volatile( "nop":: );
 }
@@ -59,7 +59,7 @@ OSImpl::NOP(void)
 // as per manual, JMP 0 is not recommended since
 // registers are not set to their initial status
 inline void
-OSImpl::SOFTreset(void)
+OSCPUImpl::softReset(void)
 {
   wdt_enable( WDTO_15MS);
   cli();
@@ -68,19 +68,19 @@ OSImpl::SOFTreset(void)
 }
 
 inline void
-OSImpl::interruptsEnable(void)
+OSCPUImpl::interruptsEnable(void)
 {
   sei();
 }
 
 inline void
-OSImpl::interruptsDisable(void)
+OSCPUImpl::interruptsDisable(void)
 {
   cli();
 }
 
 inline OSResetBits_t
-OSImpl::CPUfetchResetBits(void)
+OSCPUImpl::fetchResetBits(void)
 {
   OSResetBits_t ret;
   ret = MCUSR;
@@ -99,8 +99,8 @@ OSSchedulerImpl::yield(void)
   OSScheduler::contextRestore();
 
   // For unknown reasons, interrupts must be re-enabled here
-  OS::interruptsEnable();
-  OS::returnFromSubroutine(); // necessary because it is 'naked'
+  OSCPU::interruptsEnable();
+  OSCPU::returnFromSubroutine(); // necessary because it is 'naked'
 }
 
 #endif /* HAL_OS_ARCH_INLINES_H_ */
