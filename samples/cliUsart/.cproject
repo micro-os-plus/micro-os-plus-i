@@ -53358,7 +53358,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.822581117" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections -finline-small-functions -Wa,-adhlns=&quot;$@.lst&quot; -fsigned-char " valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.822581117" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections -finline-small-functions -fsigned-char " valueType="string"/>
 								<option id="avr32.cpp.compiler.option.gc-sections.1399497307" name="Prepare functions for garbage collection" superClass="avr32.cpp.compiler.option.gc-sections" value="true" valueType="boolean"/>
 								<inputType id="avr32.managedbuild.tool.gnu.cpp.compiler.input.1927311103" superClass="avr32.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -53376,7 +53376,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.misc.other.856628185" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wextra -std=gnu99 -ffunction-sections -fdata-sections -Wa,-adhlns=&quot;$@.lst&quot; -finline-small-functions" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.other.856628185" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -Wextra -std=gnu99 -ffunction-sections -fdata-sections -finline-small-functions" valueType="string"/>
 								<inputType id="avr32.managedbuild.tool.gnu.c.compiler.input.1339390958" superClass="avr32.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="avr32.managedbuild.tool.gnu.c.linker.exe.debug.1847292687" name="32-bit AVR/GNU C Linker" superClass="avr32.managedbuild.tool.gnu.c.linker.exe.debug">
@@ -53394,6 +53394,7 @@
 								<option id="gnu.cpp.link.option.nostart.455718355" name="Do not use standard start files (-nostartfiles)" superClass="gnu.cpp.link.option.nostart" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.flags.1358369747" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-Wl,-Map,${BuildArtifactFileBaseName}.map -Xlinker --cref  -Wl,-e,_trampoline -T &quot;${workspace_loc}/micro-os-plus/hal/arch/avr32/uc3/lib/link_uc3a3256.lds&quot;" valueType="string"/>
 								<option id="avr32.cpp.linker.option.rodata-writable.1137554388" name="Put read-only data in writable data section" superClass="avr32.cpp.linker.option.rodata-writable" value="false" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.nodeflibs.1505136429" name="Do not use default libraries (-nodefaultlibs)" superClass="gnu.cpp.link.option.nodeflibs" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.931742988" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
