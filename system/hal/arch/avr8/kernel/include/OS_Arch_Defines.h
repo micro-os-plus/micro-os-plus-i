@@ -39,6 +39,11 @@ typedef PGM_VOID_P OSProgramPtr_t;
 #endif
 #endif
 
+#if !defined(OS_CFGLONG_CPU_FREQUENCY_HZ)
+// TODO: check what is the situation with prescallers
+#define OS_CFGLONG_CPU_FREQUENCY_HZ    (OS_CFGLONG_OSCILLATOR_HZ)
+#endif
+
 #define OS_S1B(_BIT)            (0x1<<(_BIT))
 #define OS_SVB(_BIT,_VALUE)     (((_VALUE) & 0x1) << (_BIT))
 //#define OS_CFV(_MODE,_SPEED)    ((((_MODE) & 0x3) << 2) | ((_SPEED) & 0x03))
