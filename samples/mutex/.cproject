@@ -39,7 +39,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -3797,7 +3797,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -7551,7 +7551,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -11292,8 +11292,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -15040,8 +15040,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -18840,7 +18840,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -22579,14 +22579,15 @@
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GmakeErrorParser" id="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152" name="Debug-Atmel-EVK1104" parent="avr32.managedbuild.config.gnu.exe.debug" postbuildStep="">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GmakeErrorParser" id="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152" name="Debug-Atmel-EVK1104" parent="avr32.managedbuild.config.gnu.exe.debug" postbuildStep="avr32-objdump -h -S ${BuildArtifactFileBaseName}.elf &gt;${BuildArtifactFileBaseName}.lst">
 					<folderInfo id="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152." name="/" resourcePath="">
 						<toolChain errorParsers="" id="avr32.managedbuild.toolchain.gnu.exe.debug.1593498409" name="32-bit AVR/GNU C/C++ Toolchain" superClass="avr32.managedbuild.toolchain.gnu.exe.debug">
 							<targetPlatform id="avr32.managedbuild.target.gnu.platform.exe.debug.1881945783" name="%PlatformName.Dbg" superClass="avr32.managedbuild.target.gnu.platform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/sample-minimal-avr32/Debug}" errorParsers="" id="avr32.managedbuild.target.gnu.builder.exe.debug.169627754" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="avr32.managedbuild.target.gnu.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/sample-mutex/Debug-Atmel-EVK1104}" id="de.innot.avreclipse.target.builder.winavr.base.160113108" keepEnvironmentInBuildfile="false" name="AVR GNU Make Builder" superClass="de.innot.avreclipse.target.builder.winavr.base"/>
 							<tool id="avr32.managedbuild.tool.gnu.archiver.exe.debug.778585860" name="32-bit AVR/GNU Archiver" superClass="avr32.managedbuild.tool.gnu.archiver.exe.debug"/>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.1539239020" name="32-bit AVR/GNU C++ Compiler" superClass="avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 								<option id="gnu.cpp.compiler.option.optimization.level.274411552" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
@@ -22602,7 +22603,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.822581117" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.822581117" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections  -finline-small-functions -Wa,-adhlns=&quot;$@.lst&quot; " valueType="string"/>
 								<option id="avr32.cpp.compiler.option.gc-sections.1399497307" name="Prepare functions for garbage collection" superClass="avr32.cpp.compiler.option.gc-sections" value="true" valueType="boolean"/>
 								<inputType id="avr32.managedbuild.tool.gnu.cpp.compiler.input.1927311103" superClass="avr32.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -22664,7 +22665,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src|hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
