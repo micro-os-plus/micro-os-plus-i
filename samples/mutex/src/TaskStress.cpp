@@ -12,6 +12,10 @@ extern OSMutex mutex;
 extern int resourceValue;
 extern int resourceAccessNum[];
 
+// the random global variable
+unsigned int TaskStress::ms_rand;
+
+
 /*
  * Task constructor.
  * Initialise system task object and store parameters in private members.
@@ -59,20 +63,22 @@ TaskStress::taskMain(void)
       os.sched.timerTicks.sleep(sleepTicks);
 
       // obtain mutex while did not reach the maximum number of access
-      if (resourceAccessNum[m_taskId] > m_maxAccessNum)
-        continue;
+      //if (resourceAccessNum[m_taskId] > m_maxAccessNum)
+      //  continue;
 
       // block task until the mutex is acquired
-      mutex.acquire(false);
+      mutex.acquire();
       {
-        resourceValue ++; //access the resource
-        resourceAccessNum[m_taskId] ++; // increment the number of access
+        resourceValue++; //access the resource
+        resourceAccessNum[m_taskId]++; // increment the number of access
+
+        os.sched.timerTicks.sleep(rand()%200);
 
         // check if the task is the current owner of the mutex
         if (this != mutex.getOwnerTask())
           resourceAccessNum[m_taskId] = APP_CONFIG_ERROR_CODE;
       }
-      mutex.release(this);
+      mutex.release();
     }
 }
 
