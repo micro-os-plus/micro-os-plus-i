@@ -33,7 +33,7 @@ private:
   // the random seed
   static unsigned int ms_rand;
 
-  static const unsigned int m_maxSleepTicks = 200;
+  static const unsigned int m_maxSleepTicks = 500;
   static const unsigned int m_minSleepTicks = 2;
   static const int m_maxAccessNum = 1000;
   };
