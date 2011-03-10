@@ -45,7 +45,7 @@ TaskBlink::taskMain(void)
           debug.putString("Task '");
           debug.putString(getName());
           debug.putString("', led=");
-          debug.putDec(m_oLed.bitNumber());
+          debug.putDec((unsigned short)m_oLed.bitNumber());
           debug.putString(", ticks=");
           debug.putDec(m_rate);
           debug.putNewLine();
@@ -64,42 +64,35 @@ TaskBlink::taskMain(void)
       if (os.isDebug())
         {
           // block this task until the mutex is acquired
-          mutex.acquire(false);
+          mutex.acquire();
           // Disable all other tasks to write during the display.
           // Only the interrupts may write something
           os.sched.lock();
             {
-              int nTasks;
-              nTasks = os.sched.getTasksCount();
+              //int nTasks;
+              //nTasks = os.sched.getTasksCount();
+              int sum;
+              sum = 0;
               clog << endl;
               clog << resourceValue;
               clog << " : [ ";
-              for (int j = 0; j < nTasks; ++j)
+              for (int j = 0; j < APP_CONFIG_TASKS_NUM_MAX; ++j)
                 {
-                  OSTask *pt;
-                  pt = os.sched.getTask(j);
-
-                  // nothing to show for the current task
-                  if (pt == this)
-                    continue;
-
-                  // make sure the max number of tasks was not exceeded
-                  if (j >= APP_CONFIG_TASKS_NUM_MAX)
-                    continue;
-
+                  sum += resourceAccessNum[j];
                   clog << resourceAccessNum[j];
                   clog << ' ';
                 }
-              clog << ']';
+              clog << "] sum=";
+              clog << sum;
               clog << endl;
             }
           os.sched.unlock();
-          mutex.release(this);
+          mutex.release();
         }
 
       os.sched.timerTicks.sleep(m_rate);
 
-      debug.putChar(',');
+      //debug.putChar(',');
 
 #if OS_TEST_PHASE == 1
       ;
