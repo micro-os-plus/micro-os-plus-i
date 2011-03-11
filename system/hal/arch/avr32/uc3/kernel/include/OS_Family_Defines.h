@@ -9,6 +9,30 @@
 
 #include <avr32/io.h>
 
+// UC3 family clock default definitions
+
+#if !defined(OS_CFGLONG_OSCILLATOR_HZ)
+#define OS_CFGLONG_OSCILLATOR_HZ                                (16000000UL)
+#endif
+
+#if !defined(OS_CFGINT_HSB_PRESCALLER)
+#define OS_CFGINT_HSB_PRESCALLER_SEL                                (0)
+#endif
+
+#if !defined(OS_CFGINT_PBA_PRESCALLER)
+#define OS_CFGINT_PBA_PRESCALLER_SEL                                (0)
+#endif
+
+#if !defined(OS_CFGINT_PBB_PRESCALLER)
+#define OS_CFGINT_PBB_PRESCALLER_SEL                                (0)
+#endif
+
+#define OS_CFGLONG_CPU_FREQUENCY_HZ    (OS_CFGLONG_OSCILLATOR_HZ/(1 << OS_CFGINT_HSB_PRESCALLER_SEL))
+#define OS_CFGLONG_HSB_FREQUENCY_HZ    (OS_CFGLONG_OSCILLATOR_HZ/(1 << OS_CFGINT_HSB_PRESCALLER_SEL))
+#define OS_CFGLONG_PBA_FREQUENCY_HZ    (OS_CFGLONG_OSCILLATOR_HZ/(1 << OS_CFGINT_PBA_PRESCALLER_SEL))
+#define OS_CFGLONG_PBB_FREQUENCY_HZ    (OS_CFGLONG_OSCILLATOR_HZ/(1 << OS_CFGINT_PBB_PRESCALLER_SEL))
+
+
 /*
  * Usage:
  *      _PORT = GPIOX (currently ignored)
