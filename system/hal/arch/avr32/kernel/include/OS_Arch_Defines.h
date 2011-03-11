@@ -27,6 +27,7 @@ typedef void *OSProgramPtr_t;
 #define PSTR(_S_) ((const char *)_S_)
 #define putString_P putString
 
+#define OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG            (1)
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG            (1)
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT             (1)
 
