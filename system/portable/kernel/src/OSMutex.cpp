@@ -34,6 +34,8 @@ OSMutex::acquire(bool doNotBlock)
   for (;;)
     {
       OSEventWaitReturn_t ret;
+      bool doWait;
+      doWait = false;
       OSScheduler::criticalEnter();
         {
           isAcquired = m_isAcquired;
@@ -46,8 +48,8 @@ OSMutex::acquire(bool doNotBlock)
           else
             {
               if (!doNotBlock)
-                // if we are allowed, block
-                ret = OSScheduler::eventWait(m_event);
+                // if we are allowed, prepare to block
+                doWait = OSScheduler::eventWaitPrepare(m_event);
             }
         }
       OSScheduler::criticalExit();
@@ -63,6 +65,11 @@ OSMutex::acquire(bool doNotBlock)
 
       if (doNotBlock)
         return OS_WOULD_BLOCK;
+
+      if (doWait)
+        OSScheduler::eventWaitPerform();
+
+      ret = OSScheduler::getEventWaitReturn();
 
       if (ret != (OSEventWaitReturn_t) m_event && ret
           != OSEventWaitReturn::OS_ALL)
