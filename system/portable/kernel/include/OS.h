@@ -31,7 +31,8 @@ public:
   static const OSReturn_t OS_BAD_PARAMETER = -12;
   static const OSReturn_t OS_BUFFER_FULL = -13;
   static const OSReturn_t OS_IMMEDIATELY = -14;
-
+  static const OSReturn_t OS_ITEM_NOT_FOUND = -15;
+  static const OSReturn_t OS_NOT_ENOUGH_SPACE = -16;
   };
 
 // ----------------------------------------------------------------------------
