@@ -9,12 +9,42 @@
 
 #include "portable/kernel/include/OS.h"
 
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+
+class OSMutexWaitingTasks
+{
+public:
+  OSMutexWaitingTasks(OSTask** pWaitingTasksArray, int waitingTasksArraySize);
+
+  OSReturn_t
+  add(OSTask* pTask);
+  OSReturn_t
+  remove(OSTask * pTask);
+  OSTask*
+  getItem(int i);
+
+  int
+  getSize(void);
+  int
+  getCount(void);
+
+private:
+  OSTask** m_pWaitingTasksArray;
+  unsigned short m_waitingTasksArraySize;
+  unsigned short m_waitingTasksCount;
+};
+
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+
 // The mutual exclusion (mutex) inter-task synchronisation mechanism.
 class OSMutex
 {
 public:
   // Initialise the internal variables.
   OSMutex();
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+  OSMutex(OSTask** pWaitingTasksArray, int waitingTasksArraySize);
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
 
   // Constants ; all are used as result code for acquire and release methods.
   static const int OS_OK = 1;
@@ -60,6 +90,11 @@ private:
 
   // the event return value of the event used for notification
   OSEventWaitReturn_t m_eventRet;
+
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+  OSMutexWaitingTasks m_waitingTasks;
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+
 };
 
 inline OSTask *
@@ -85,5 +120,28 @@ OSMutex::getEventReturn(void)
 {
   return m_eventRet;
 }
+
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+
+// Get the first task in the array
+inline OSTask*
+OSMutexWaitingTasks::getItem(int i)
+{
+  return m_pWaitingTasksArray[i];
+}
+
+inline int
+OSMutexWaitingTasks::getSize(void)
+{
+  return m_waitingTasksArraySize;
+}
+
+inline int
+OSMutexWaitingTasks::getCount(void)
+{
+  return m_waitingTasksCount;
+}
+
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
 
 #endif /* OSMUTEX_H_ */
