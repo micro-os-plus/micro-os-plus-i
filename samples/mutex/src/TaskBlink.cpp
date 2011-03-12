@@ -6,11 +6,6 @@
 
 #include "TaskBlink.h"
 
-// global variables defined in main.cpp
-extern OSMutex mutex;
-extern int resourceValue;
-extern int resourceAccessNum[];
-
 /*
  * Task constructor.
  * Initialise system task object and store parameters in private members.
@@ -32,7 +27,7 @@ TaskBlink::TaskBlink(const char *pName, unsigned char iLed, schedTicks_t rate) :
  * Task main code.
  * Initialise led and toggle it using the rate.
  *
- * The toggle rate is done with busy wait, the loop being interrupted by yields.
+ * The toggle rate is done with sleep().
  */
 
 void
@@ -45,7 +40,7 @@ TaskBlink::taskMain(void)
           debug.putString("Task '");
           debug.putString(getName());
           debug.putString("', led=");
-          debug.putDec((unsigned short)m_oLed.bitNumber());
+          debug.putDec((unsigned short) m_oLed.bitNumber());
           debug.putString(", ticks=");
           debug.putDec(m_rate);
           debug.putNewLine();
@@ -56,51 +51,12 @@ TaskBlink::taskMain(void)
   // initialise led port as output
   m_oLed.init();
 
-
   // task endless loop
   for (;;)
     {
-
-      if (os.isDebug())
-        {
-          // block this task until the mutex is acquired
-          mutex.acquire();
-          // Disable all other tasks to write during the display.
-          // Only the interrupts may write something
-          os.sched.lock();
-            {
-              //int nTasks;
-              //nTasks = os.sched.getTasksCount();
-              int sum;
-              sum = 0;
-              clog << endl;
-              clog << resourceValue;
-              clog << " : [ ";
-              for (int j = 0; j < APP_CONFIG_TASKS_NUM_MAX; ++j)
-                {
-                  sum += resourceAccessNum[j];
-                  clog << resourceAccessNum[j];
-                  clog << ' ';
-                }
-              clog << "] sum=";
-              clog << sum;
-              clog << endl;
-            }
-          os.sched.unlock();
-          mutex.release();
-        }
-
       os.sched.timerTicks.sleep(m_rate);
 
-      //debug.putChar(',');
-
-#if OS_TEST_PHASE == 1
-      ;
-#else
-      // finally toggle led
       m_oLed.toggle();
-#endif
-
     }
 }
 
