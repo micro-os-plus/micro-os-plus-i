@@ -35,7 +35,8 @@ private:
 
   static const unsigned int m_maxSleepTicks = 500;
   static const unsigned int m_minSleepTicks = 2;
-  static const int m_maxAccessNum = 1000;
+
+  static const unsigned int m_maxActivityTicks = 200;
   };
 
 #endif /* TASKSTRESS_H_ */
