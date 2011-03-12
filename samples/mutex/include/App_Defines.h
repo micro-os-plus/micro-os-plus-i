@@ -61,27 +61,15 @@
 #error "Missing OS_CONFIG_BOARD_* board definition"
 #endif
 
-#define APP_CFGINT_BLINK_TICKS          (OS_CFGINT_TICK_RATE_HZ * 3)
-#define APP_CFGINT_NESTED_TICKS         (APP_CFGINT_BLINK_TICKS * 7)
+#define APP_CFGINT_TASKBLINK_TICKS      (OS_CFGINT_TICK_RATE_HZ)
 
-#define APP_INCLUDE_DUMP_TASKS          1
-#define APP_CFGINT_DUMP_INTERVAL_SECONDS (10)
-#define APP_CFGINT_DUMP_INCREASE_RATE_PROCENTS (25)
-#define APP_CFGINT_DUMP_MAX_INTERVAL_SECONDS (300)
+#define APP_CFGINT_TASKREPORT_SECONDS   (4)
+#define APP_CFGINT_TASKBLINK_LEDBIT     APP_CONFIG_LED1
 
-//#define APP_EXCLUDE_NAKED_ISR
-#define APP_ISR_ACTION_BUSYWAIT         1
-//#define APP_EXCLUDE_ISR_ACTION
-//#define APP_INCLUDE_LENGTHEN_SYSTICK    1
-//#define APP_INCLUDE_BUSY_WAIT           1
-#define APP_BUSY_PROCENTAGE             40
-#define APP_EVENT_DUMMY                 0x1111
-#define APP_CFGINT_NOTIFIES             5
-
-#define APP_CFGINT_TASKBLINK_LEDBIT                     APP_CONFIG_LED1
+#define APP_INCLUDE_OSMUTEX_WAITING_TASKS (1)
 
 // the maximum number of tasks
-#define APP_CONFIG_TASKS_NUM_MAX                         10
-#define APP_CONFIG_ERROR_CODE                            (-1)
+#define APP_CONFIG_RESOURCES_ARRAY_SIZE (10)
+#define APP_CONFIG_ERROR_CODE           (-1)
 
 #endif /* APP_DEFINES_H_ */
