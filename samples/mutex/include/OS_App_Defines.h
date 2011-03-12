@@ -43,13 +43,7 @@
 #define OS_INCLUDE_OSMUTEX                              (1)
 #define OS_INCLUDE_OSMUTEX_WAITING_TASKS                (1)
 
-//#define OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION  (1)
-//#define OS_INCLUDE_OSSCHEDULER_YIELD_UNDER_CONSTRUCTION (1)
-
 #if defined(DEBUG)
-// One of the following must be defined in Eclipse project or Makefile
-//#define OS_CONFIG_DEBUG_DEVICE_I2C                    1
-//#define OS_CONFIG_DEBUG_DEVICE_USART			1
 
 #define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS       (1)
 
