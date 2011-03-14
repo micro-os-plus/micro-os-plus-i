@@ -115,13 +115,13 @@ taskPeriodic(pNamePeriodic, (OSTaskMainPtr_t) staticMainPeriodic,
   {
 
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSScheduler::lock();
+    OSSchedulerLock::enter();
       {
         OSDeviceDebug::putString("SDI12Sensor()=");
         OSDeviceDebug::putPtr(this);
         OSDeviceDebug::putNewLine();
       }
-    OSScheduler::unlock();
+    OSSchedulerLock::exit();
 #endif
 
     //ms_bInitialised = false;
@@ -264,7 +264,7 @@ void SDI12Sensor::staticMainSDI12(SDI12Sensor *pt)
 
 void SDI12Sensor::taskMainSDI12(void)
   {
-    OSScheduler::lock();
+    OSSchedulerLock::enter();
       {
 #if defined(DEBUG)
         OSDeviceDebug::putString("SDI12Sensor::taskMainSDI12()");
@@ -286,7 +286,7 @@ void SDI12Sensor::taskMainSDI12(void)
         // all initializations must be done at this point
         ms_flags.notify(INITIALIZED);
       }
-    OSScheduler::unlock();
+    OSSchedulerLock::exit();
 
     OSDebugLed1::init();
     OSDebugLed1::on();
@@ -1314,12 +1314,12 @@ void SDI12Sensor::taskMainAcquire(void)
   {
 
 #if defined(DEBUG)
-    OSScheduler::lock();
+    OSSchedulerLock::enter();
       {
         OSDeviceDebug::putString("taskMainAcquire()");
         OSDeviceDebug::putNewLine();
       }
-    OSScheduler::unlock();
+    OSSchedulerLock::exit();
 #endif
 
     // wait for initializations to complete
@@ -1623,12 +1623,12 @@ void SDI12Sensor::staticMainPeriodic(SDI12Sensor *pt)
 void SDI12Sensor::taskMainPeriodic(void)
   {
 #if defined(DEBUG)
-    OSScheduler::lock();
+    OSSchedulerLock::enter();
       {
         OSDeviceDebug::putString("taskMainPeriodic()");
         OSDeviceDebug::putNewLine();
       }
-    OSScheduler::unlock();
+    OSSchedulerLock::exit();
 #endif
 
     // wait for initializations to complete
