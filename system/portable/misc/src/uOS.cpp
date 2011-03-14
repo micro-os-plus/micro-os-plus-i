@@ -13,7 +13,7 @@ OS os;
 // low level debug device
 OSDeviceDebug debug;
 
-#if defined(OS_INCLUDE_CLOG)
+#if defined(DEBUG) && defined(OS_INCLUDE_CLOG)
 // high level debug stream used to display task messages
 ostream clog(&debug);
 #endif
