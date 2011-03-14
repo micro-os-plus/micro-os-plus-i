@@ -40,7 +40,10 @@ OSCPUImpl::stackInit(void)
 {
   asm volatile (
       " lda.w   sp, _estack \n"
-      :::
+
+      :
+      :
+      :
   );
 }
 
@@ -76,7 +79,10 @@ OSCPUImpl::returnFromInterrupt(void)
 {
   asm volatile (
       " rete \n"
-      :::
+
+      :
+      :
+      :
   );
   for (;;)
     ; // noreturn
@@ -88,7 +94,10 @@ OSCPUImpl::returnFromSubroutine(void)
   asm volatile
   (
       " mov pc, lr \n"
-      :::
+
+      :
+      :
+      :
   );
   for (;;)
     ; // noreturn
@@ -100,7 +109,10 @@ OSCPUImpl::nop(void)
   asm volatile
   (
       " nop \n"
-      :::
+
+      :
+      :
+      :
   );
 }
 
@@ -110,6 +122,7 @@ OSCPUImpl::interruptsEnable(void)
   asm volatile
   (
       " csrf    %[GM] \n"
+
       :
       : [GM] "i" (AVR32_SR_GM_OFFSET)
       :
@@ -122,6 +135,7 @@ OSCPUImpl::interruptsDisable(void)
   asm volatile
   (
       " ssrf    %[GM] \n"
+
       :
       : [GM] "i" (AVR32_SR_GM_OFFSET)
       :
@@ -146,7 +160,10 @@ OSCPUImpl::idle(void)
   asm volatile
   (
       " sleep 0 \n"
-      :::
+
+      :
+      :
+      :
   );
 }
 
@@ -155,8 +172,11 @@ OSCPUImpl::sleep(void)
 {
   asm volatile
   (
-      " sleep 0 \n" /* To be updated !!! */
-      :::
+      " sleep 0 \n" /* TODO: updated it!!! */
+
+      :
+      :
+      :
   );
 }
 
@@ -165,8 +185,11 @@ OSCPUImpl::deepSleep(void)
 {
   asm volatile
   (
-      " sleep 0 \n" /* To be updated !!! */
-      :::
+      " sleep 0 \n" /* TODO: updated it!!! */
+
+      :
+      :
+      :
   );
 }
 
@@ -189,4 +212,37 @@ OSCPUImpl::softReset(void)
     ; // trigger WD
 }
 
-#endif /*HAL_FAMILY_OS_INLINES_H_*/
+inline void
+OSCPUImpl::stackPush(OSStack_t reg)
+{
+  register OSStack_t tmp; // asm("r8");
+
+  tmp = reg;
+
+  asm volatile
+  (
+      " st.w    --sp, %[R] \n" // push value onto stack
+
+      :
+      : [R] "r" (tmp)
+      : "sp"
+  );
+}
+
+inline OSStack_t
+OSCPUImpl::stackPop(void)
+{
+  register OSStack_t tmp; // asm("r8");
+
+  asm volatile
+  (
+      " ld.w    %[R], sp++ \n"  // pop value from stack
+
+      : [R] "=r" (tmp)
+      :
+      : "sp"
+  );
+  return tmp;
+}
+
+#endif /* HAL_FAMILY_OS_INLINES_H_ */
