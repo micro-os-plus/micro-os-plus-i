@@ -17,12 +17,10 @@
 
 // Notice: do not use parenthesis! (the values will be stringified)
 #define APP_CFGINT_VERSION_MAJOR                        1
-#define APP_CFGINT_VERSION_MINOR                        1
-#define APP_CFGINT_VERSION_REVISION                     1877
+#define APP_CFGINT_VERSION_MINOR                        2
+#define APP_CFGINT_VERSION_REVISION                     1901
 
 // ----------------------------------------------------------------------------
-
-//extern void delayWithYield(schedTicks_t n);
 
 #if defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 
@@ -68,7 +66,7 @@
 
 #define APP_INCLUDE_OSMUTEX_WAITING_TASKS (1)
 
-// the maximum number of tasks
+// The maximum number of mutex stress tasks
 #define APP_CONFIG_RESOURCES_ARRAY_SIZE (10)
 #define APP_CONFIG_ERROR_CODE           (-1)
 
