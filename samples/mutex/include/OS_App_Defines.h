@@ -50,6 +50,7 @@
 //#define OS_DEBUG_OSSCHEDULER_STACKINITIALIZE            (1)
 #define OS_DEBUG_CONSTRUCTORS                           (1)
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
+//#define OS_DEBUG_OSTIMER_SLEEP                          (1)
 //#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
 //#define OS_DEBUG_OSSCHEDULER_TASKREGISTER               (1)
 //#define OS_DEBUG_OSSCHEDULER_EVENTWAIT                  (1)
