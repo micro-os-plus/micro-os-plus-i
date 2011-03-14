@@ -48,17 +48,17 @@ TaskBlinkRealTime::taskMain(void)
 {
   if (os.isDebug())
     {
-      os.sched.lock();
+      os.sched.lock.enter();
         {
           debug.putString("Task '");
           debug.putString(getName());
           debug.putString("', led=");
-          debug.putDec(m_oLed.bitNumber());
+          debug.putDec((unsigned short)m_oLed.bitNumber());
           debug.putString(", divider=");
           debug.putDec(m_rate);
           debug.putNewLine();
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
     }
 
 #if !defined(APP_EXCLUDE_TASKBLINKREALTIME_TASKMAIN_LED)
@@ -161,11 +161,11 @@ TaskBlinkRealTime::interruptInit(void)
 
 #if defined(DEBUG)
 
-  OSDeviceDebug::putDec(APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER);
+  OSDeviceDebug::putDec((unsigned short)APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER);
   OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putDec(T_DIVIDER);
+  OSDeviceDebug::putDec((unsigned short)T_DIVIDER);
   OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putDec(nCounter);
+  OSDeviceDebug::putDec((unsigned short)nCounter);
   OSDeviceDebug::putNewLine();
 
 #endif

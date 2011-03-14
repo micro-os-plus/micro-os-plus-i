@@ -45,7 +45,7 @@ TaskCli::taskMain(void)
 {
   if (os.isDebug())
     {
-      os.sched.lock();
+      os.sched.lock.enter();
         {
 #if false
           clog << "TaskCli::taskMain(" << showbase << hex << this <<
@@ -57,7 +57,7 @@ TaskCli::taskMain(void)
           debug.putNewLine();
 #endif
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
     }
 
   OSDeviceCharacter& dev = m_dev;

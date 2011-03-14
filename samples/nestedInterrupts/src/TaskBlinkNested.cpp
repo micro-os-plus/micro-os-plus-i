@@ -50,7 +50,7 @@ TaskBlinkNested::taskMain(void)
 {
   if (os.isDebug())
     {
-      os.sched.lock();
+      os.sched.lock.enter();
         {
           debug.putString("Task '");
           debug.putString(getName());
@@ -60,7 +60,7 @@ TaskBlinkNested::taskMain(void)
           debug.putDec(m_rate);
           debug.putNewLine();
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
     }
 
 #if !defined(APP_EXCLUDE_TASKBLINKNESTED_TASKMAIN_LED)

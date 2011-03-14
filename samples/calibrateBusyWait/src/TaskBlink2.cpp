@@ -33,7 +33,7 @@ void TaskBlink2::taskMain(void)
   {
     if (os.isDebug())
       {
-        os.sched.lock();
+        os.sched.lock.enter();
           {
             debug.putString("Task '");
             debug.putString(getName());
@@ -43,7 +43,7 @@ void TaskBlink2::taskMain(void)
             debug.putDec(m_rate);
             debug.putNewLine();
           }
-        os.sched.unlock();
+        os.sched.lock.exit();
       }
 
     // initialise led port as output

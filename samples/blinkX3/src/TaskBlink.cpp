@@ -33,7 +33,7 @@ void TaskBlink::taskMain(void)
     if (os.isDebug())
       {
         // lock scheduler to ensure line is atomic.
-        os.sched.lock();
+        os.sched.lock.enter();
           {
             // display task parameters.
             debug.putString("Task '");
@@ -44,7 +44,7 @@ void TaskBlink::taskMain(void)
             debug.putDec(m_iRate);
             debug.putNewLine();
           }
-        os.sched.unlock();
+        os.sched.lock.exit();
       }
 
     // initialise led port as output

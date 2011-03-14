@@ -35,74 +35,25 @@ TaskBlink::taskMain(void)
 {
   if (os.isDebug())
     {
-      os.sched.lock();
+      os.sched.lock.enter();
         {
           debug.putString("Task '");
           debug.putString(getName());
           debug.putString("', led=");
-          debug.putDec(m_oLed.bitNumber());
+          debug.putDec((unsigned short) m_oLed.bitNumber());
           debug.putString(", ticks=");
           debug.putDec(m_rate);
           debug.putNewLine();
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
     }
 
   // initialise led port as output
   m_oLed.init();
 
-#if defined(APP_INCLUDE_DUMP_TASKS)
-  int i;
-  i = 0;
-
-  int n;
-  n = APP_CFGINT_DUMP_INTERVAL_SECONDS;
-#endif
-
   // task endless loop
   for (;;)
     {
-
-#if defined(APP_INCLUDE_DUMP_TASKS)
-
-      if (os.isDebug())
-        {
-          // Disable all other tasks to write during the display.
-          // Only the interrupts may write something
-          os.sched.lock();
-            {
-              if (i > n)
-                {
-                  if (n < APP_CFGINT_DUMP_MAX_INTERVAL_SECONDS)
-                    {
-                      // if max limit not reached,
-                      // increase the limit with given rate
-                      n = n * (100 + APP_CFGINT_DUMP_INCREASE_RATE_PROCENTS)
-                          / 100;
-                    }
-                  i = 0;
-                }
-              if (i == 0)
-                {
-                  int nTasks;
-                  nTasks = os.sched.getTasksCount();
-                  for (int j = 0; j < nTasks; ++j)
-                    {
-                      OSTask *pt;
-                      pt = os.sched.getTask(j);
-                      clog << endl;
-                      clog << ((pt == this) ? '*' : ' ');
-
-                      clog << *pt; // print task info
-                    }
-                  clog << endl;
-                }
-              ++i;
-            }
-          os.sched.unlock();
-        }
-#endif
-
       os.sched.timerTicks.sleep(m_rate);
 
       debug.putChar(',');
@@ -113,7 +64,6 @@ TaskBlink::taskMain(void)
       // finally toggle led
       m_oLed.toggle();
 #endif
-
     }
 }
 

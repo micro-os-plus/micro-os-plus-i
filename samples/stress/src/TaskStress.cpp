@@ -7,6 +7,8 @@
 
 #include "TaskStress.h"
 
+unsigned int TaskStress::ms_rand;
+
 /*
  * Task constructor.
  * Initialise system task object and store parameters in private members.
@@ -30,9 +32,7 @@ TaskStress::TaskStress(const char *pName, unsigned int minMicros,
 
 /*
  * Task main code.
- * Initialise led and toggle it using the rate.
- *
- * The toggle rate is done with busy wait, the loop being interrupted by yields.
+ * Simulate a typical activity, a busy wait followed by a sleep.
  */
 
 void
@@ -40,21 +40,21 @@ TaskStress::taskMain(void)
 {
   if (os.isDebug())
     {
-      os.sched.lock();
+      os.sched.lock.enter();
         {
           debug.putString("Task '");
           debug.putString(getName());
           debug.putString("', micros=");
-          debug.putDec(m_minMicros);
+          debug.putDec((unsigned short) m_minMicros);
           debug.putString("..");
-          debug.putDec(m_maxMicros);
+          debug.putDec((unsigned short) m_maxMicros);
           debug.putString(", ticks=");
-          debug.putDec(m_minTicks);
+          debug.putDec((unsigned short) m_minTicks);
           debug.putString("..");
-          debug.putDec(m_maxTicks);
+          debug.putDec((unsigned short) m_maxTicks);
           debug.putNewLine();
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
     }
 
   int nBusy, nSleep;
@@ -82,10 +82,16 @@ TaskStress::taskMain(void)
 unsigned int
 TaskStress::rand(void)
 {
-  ms_rand = ms_rand * 214013L + 2531011L;
+  unsigned int ret;
+  os.sched.lock.enter();
+    {
+      ms_rand = ms_rand * 214013L + 2531011L;
 #if (__SIZEOF_INT__ == 2)
-  return (ms_rand & 0x7fff);
+      ret = (ms_rand & 0x7fff);
 #else
-  return ((ms_rand >> 16) & 0x7fff);
+      ret = ((ms_rand >> 16) & 0x7fff);
 #endif
+    }
+  os.sched.lock.exit();
+  return ret;
 }

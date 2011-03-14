@@ -28,7 +28,7 @@ TaskDbgIn::taskMain(void)
 
   OSDeviceCharacter *inDev;
 
-  os.sched.lock();
+  os.sched.lock.enter();
     {
       if (os.isDebug())
         {
@@ -57,7 +57,7 @@ TaskDbgIn::taskMain(void)
 
       //m_taskCli.resume();
     }
-  os.sched.unlock();
+  os.sched.lock.exit();
 
   // task endless loop
   for (;;)

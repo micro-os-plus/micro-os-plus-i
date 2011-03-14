@@ -48,12 +48,12 @@ TaskCli::taskMain(void)
 {
   if (os.isDebug())
     {
-      os.sched.lock();
+      os.sched.lock.enter();
         {
           clog << "TaskCli::taskMain(" << showbase << hex << this << ") SP="
               << hex << (unsigned short) SP << endl;
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
     }
 
   OSDeviceCharacter& dev = m_dev;
@@ -76,7 +76,7 @@ TaskCli::taskMain(void)
       SignalIMUXEN::enable();
 #endif
 
-      os.sched.lock();
+      os.sched.lock.enter();
         {
           cout << endl << endl << greeting << endl;
 
@@ -88,7 +88,7 @@ TaskCli::taskMain(void)
 #endif
 
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
 
       for (; dev.isConnected();)
         {
