@@ -126,6 +126,9 @@ public:
   inline static void interruptsClearMask(void) __attribute__((always_inline));
   inline static void interruptsSetMask(void) __attribute__((always_inline));
 
+  inline static void stackPush(OSStack_t) __attribute__((always_inline));
+  inline static OSStack_t stackPop(void) __attribute__((always_inline));
+
 private:
 
   };
@@ -159,6 +162,8 @@ public:
 
 extern "C" OSStack_t **g_ppCurrentStack;
 
+#include "portable/devices/debug/include/OSDeviceDebug.h"
+
 #include "portable/kernel/include/OSScheduler.h"
 
 #include "portable/kernel/include/OSTask.h"
@@ -173,7 +178,7 @@ extern "C" OSStack_t **g_ppCurrentStack;
 
 #include "portable/kernel/include/Timer.h"
 
-#include "portable/devices/debug/include/OSDeviceDebug.h"
+//#include "portable/devices/debug/include/OSDeviceDebug.h"
 
 // ----------------------------------------------------------------------------
 
@@ -268,7 +273,12 @@ public:
   static void busyWaitMicros(unsigned int n);
 #endif
 
+  static void resetHandler(void) __attribute__((naked, noreturn));
+
 private:
+  static void dataInit(void);
+  static void bssInit(void);
+  static void staticConstructorsInit(void);
   };
 
 #if defined(OS_CONFIG_ARCH_AVR8)
