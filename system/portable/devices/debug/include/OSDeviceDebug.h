@@ -9,13 +9,13 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
+#if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
 #include "portable/stdlib/include/streambuf"
 #endif
 
 // The parent class of all debug classes used for displaying trace messages.
 class OSDeviceDebug
-#if defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
+#if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
     : public streambuf
 #endif
 
