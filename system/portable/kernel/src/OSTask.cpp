@@ -465,7 +465,7 @@ OSTask::eventWaitPrepare(OSEvent_t event)
       return false;
     }
 #endif
-  if (OSScheduler::isLocked())
+  if (OSSchedulerLock::isSet())
     {
       setEventWaitReturn(OSEventWaitReturn::OS_LOCKED);
       return false;
