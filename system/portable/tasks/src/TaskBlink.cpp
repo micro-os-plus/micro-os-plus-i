@@ -22,13 +22,13 @@ TaskBlink::TaskBlink(const char *pName, schedTicks_t rate) :
       &OSScheduler::timerSeconds)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSScheduler::lock();
+    OSSchedulerLock::enter();
       {
         OSDeviceDebug::putString("TaskBlink()=");
         OSDeviceDebug::putPtr(this);
         OSDeviceDebug::putNewLine();
       }
-    OSScheduler::unlock();
+    OSSchedulerLock::exit();
 #endif
 
     m_rate = rate;
@@ -46,12 +46,12 @@ TaskBlink::TaskBlink(const char *pName, schedTicks_t rate) :
 void TaskBlink::taskMain(void)
   {
 #if defined(DEBUG)
-    OSScheduler::lock();
+    OSSchedulerLock::enter();
       {
         OSDeviceDebug::putString("TaskBlink::TaskMain()");
         OSDeviceDebug::putNewLine();
       }
-    OSScheduler::unlock();
+    OSSchedulerLock::exit();
 #endif
     // initialise led port as output, turn led off
     ledInit();

@@ -22,13 +22,13 @@ TaskPitpalac::TaskPitpalac(const char *pName, schedTicks_t rate) :
   OSTask(pName, m_stack, sizeof(m_stack))
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSScheduler::lock();
+    OSSchedulerLock::enter();
       {
         OSDeviceDebug::putString_P(PSTR("TaskPitpalac()="));
         OSDeviceDebug::putPtr(this);
         OSDeviceDebug::putNewLine();
       }
-    OSScheduler::unlock();
+    OSSchedulerLock::exit();
 #endif
 
     m_rate = OS_CFGINT_TICK_RATE_HZ * 2* rate;
@@ -47,12 +47,12 @@ void TaskPitpalac::taskMain(void)
   {
 
 #if defined(DEBUG)
-    OSScheduler::lock();
+    OSSchedulerLock::enter();
       {
         OSDeviceDebug::putString_P(PSTR("TaskPitpalac::TaskMain()"));
         OSDeviceDebug::putNewLine();
       }
-    OSScheduler::unlock();
+    OSSchedulerLock::exit();
 #endif
     // initialise led port as output
     ledInit();

@@ -229,12 +229,12 @@ void CANLedRed::update(bool last)
 void CANLeds::taskMain(void)
   {
 #if defined(DEBUG)
-    OSScheduler::lock();
+    OSSchedulerLock::enter();
       {
         OSDeviceDebug::putString_P(PSTR("CANLeds::taskMain()"));
         OSDeviceDebug::putNewLine();
       }
-      OSScheduler::unlock();
+      OSSchedulerLock::exit();
 #endif
 
     m_semiperiods = 1;
