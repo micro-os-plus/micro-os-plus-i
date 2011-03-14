@@ -8,6 +8,36 @@
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
 
+#include "hal/arch/avr32/uc3/lib/include/conf_isp.h"
+
+// In order to be able to program a project with both BatchISP and JTAGICE mkII
+// without having to take the general-purpose fuses into consideration, add this
+// function to the project and change the program entry point to _trampoline.
+
+// the C equivalent of OS::resetHandler()
+//extern "C"  void _ZN2OS12resetHandlerEv(void) __attribute__((naked, noreturn));
+
+extern "C" void _trampoline(void) __attribute__((naked, noreturn, section(".reset")));
+
+void
+_trampoline(void)
+{
+  // This must be linked @ 0x80000000 if it is to be run upon reset.
+  asm (
+      " rjmp    _after_trampoline \n" // Jump after trampoline
+
+      " .org  %[ORG] \n"
+      "_after_trampoline: \n"
+      " lda.w   pc, %[START] \n" // Jump to the uOS++ startup routine.
+
+      :
+      : [ORG] "i" (PROGRAM_START_OFFSET), [START] "i" (OS::resetHandler)
+      :
+  );
+  for (;;)
+    ; // noreturn
+}
+
 void
 OSImpl::familyEarlyInit(void)
 {
@@ -61,6 +91,7 @@ os_exception_handler(unsigned short n, const char *s = NULL)
 #else
 
   n = n; // avoid 'unused parameter' warning
+  s = s;
 
 #endif
 
