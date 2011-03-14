@@ -20,7 +20,6 @@ OS::OS()
 #endif /* defined(DEBUG) */
   }
 
-#endif /* defined(DEBUG) */
 
 OSCPU::OSCPU()
 {
@@ -30,6 +29,8 @@ OSCPU::OSCPU()
     OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
 }
+
+#endif /* defined(DEBUG) */
 
 void
 OSCPU::saveResetBits(void)
@@ -43,20 +44,13 @@ int  main( void ) __attribute__( ( weak ) );
 
 #if !defined(OS_EXCLUDE_RESET_HANDLER)
 
-extern "C" void
-os_reset_handler(void) __attribute__( ( naked, noreturn ));
+#define OS_CFGLONG_CONSTANT_MARKER (0x12345678)
+#if defined(DEBUG)
+int g_constantMarker = OS_CFGLONG_CONSTANT_MARKER;
+#endif /* defined(DEBUG) */
 
 void
-os_init_data_and_bss(void) __attribute__((noinline));
-
-void
-os_init_static_constructors(void) __attribute__((noinline));
-
-
-//int xx = 0x12345678;
-
-void
-os_reset_handler(void)
+OS::resetHandler(void)
 {
   // Mandatory in the top position, before any C call
   OSCPU::stackInit();
@@ -73,15 +67,16 @@ os_reset_handler(void)
   OSScheduler::ledActiveInit();
   OSScheduler::ISR_ledActiveOn();
 
-  os_init_data_and_bss();
+  dataInit();
+  bssInit();
 
-#if false
-  if (xx != 0x12345678)
+#if defined(DEBUG)
+  if (g_constantMarker != OS_CFGLONG_CONSTANT_MARKER)
     {
       OSDeviceDebug::putString("dataInit() failed");
       OSDeviceDebug::putNewLine();
     }
-#endif
+#endif /* defined(DEBUG) */
 
 #if defined(DEBUG)
   // WARNING: No debug output before this point!
@@ -90,7 +85,7 @@ os_reset_handler(void)
 
   OS::earlyInit();
 
-  os_init_static_constructors();
+  OS::staticConstructorsInit();
 
   main(); // call standard main()
 
@@ -118,7 +113,7 @@ extern unsigned long __os_bss_start;
 /* end address for the .bss section. defined in linker script */
 extern unsigned long __os_bss_end;
 
-void os_init_data_and_bss(void)
+void OS::dataInit(void)
   {
     unsigned long *pSrc, *pDest;
 
@@ -129,6 +124,12 @@ void os_init_data_and_bss(void)
       {
         *(pDest++) = *(pSrc++);
       }
+  }
+
+void OS::bssInit(void)
+  {
+    unsigned long *pDest;
+
     /* Zero fill the bss segment. */
     for (pDest = &__os_bss_start; pDest < &__os_bss_end;)
       {
@@ -144,7 +145,7 @@ extern unsigned long __os_ctors_array_end;
 
 typedef void (*pFunc_t)(void);
 
-void os_init_static_constructors(void)
+void OS::staticConstructorsInit(void)
   {
     unsigned long *p;
     void (*pFunc)(void);
