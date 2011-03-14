@@ -10,7 +10,7 @@
 #include "TaskReport.h"
 #include "TaskStress.h"
 
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 /*
  * This project is intended to stress test the mutex synchronisation mechanism.
@@ -74,7 +74,7 @@ TaskStress task7("7", 7);
 TaskStress task8("8", 8);
 TaskStress task9("9", 9);
 
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // global variables shared by all tasks and protected by the mutex
 
 // the global counter
@@ -84,5 +84,5 @@ int resourceValue;
 // it is used for debugging and live statistics
 int resourceAccessNum[APP_CONFIG_RESOURCES_ARRAY_SIZE];
 
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
