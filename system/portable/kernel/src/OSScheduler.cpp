@@ -15,18 +15,25 @@
 // Global pointer, used in contextSave/Restore.
 // It points to the address of the m_pStack field of the current running task.
 // This approach is used in order to make code faster.
-OSStack_t **g_ppCurrentStack;
+OSStack_t** g_ppCurrentStack;
 
-OSTask *OSScheduler::ms_pTaskIdle;
-OSTask *OSScheduler::ms_pTaskRunning;
+// ----- OSSchedulerLock static variables -------------------------------------
+
+bool volatile OSSchedulerLock::ms_isLocked;
+
+// ----- OSScheduler static variables -----------------------------------------
+
+OSTask* OSScheduler::ms_pTaskIdle;
+OSTask* OSScheduler::ms_pTaskRunning;
 
 bool OSScheduler::ms_isRunning;
-bool OSScheduler::ms_isLocked;
 bool OSScheduler::ms_isPreemptive;
 
 unsigned char OSScheduler::ms_tasksCount;
 // The +1 is here to reserve space for the idle task.
 OSTask *OSScheduler::ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
+
+OSSchedulerLock OSScheduler::lock;
 
 #if !defined(OS_EXCLUDE_OSTIMER)
 OSTimerTicks OSScheduler::timerTicks;
@@ -40,12 +47,27 @@ OSTimerSeconds OSScheduler::timerSeconds;
 bool OSScheduler::ms_allowDeepSleep;
 #endif
 
+// ----- OSActiveTasks static variables ---------------------------------------
+
 unsigned char OSActiveTasks::ms_count;
 OSTask *OSActiveTasks::ms_array[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 
-// runs before all constructors
+#if defined(DEBUG)
+OSSchedulerLock::OSSchedulerLock()
+{
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+  OSDeviceDebug::putString_P(PSTR("OSSchedulerLock()="));
+  OSDeviceDebug::putPtr(this);
+  OSDeviceDebug::putNewLine();
+#endif
+}
+#endif
+
+// ============================================================================
+
+// Runs before all constructors
 void
 OSScheduler::earlyInit(void)
 {
@@ -55,7 +77,6 @@ OSScheduler::earlyInit(void)
 #endif
 
   ms_isRunning = false;
-  ms_isLocked = false;
 
 #if !defined(OS_EXCLUDE_PREEMPTION)
   ms_isPreemptive = true;
@@ -139,6 +160,9 @@ OSScheduler::start(void)
 
       ms_isRunning = true;
 
+      // Be sure we start with scheduler unlocked
+      OSSchedulerLock::clear();
+
       // Interrupts will be enabled during context restore,
       // after popping the flags/status register,
       OSSchedulerImpl::start();
@@ -197,41 +221,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 
   int cnt;
   cnt = 0;
-#if false
-  OSScheduler::criticalEnter();
-    {
-      int i;
-      for (i = 0; i < ms_tasksCount; ++i)
-        {
-          OSTask *pt;
-          pt = ms_tasks[i];
-          if (pt != 0)
-            {
-              // not-suspended waiting tasks are notified
-              if ((pt->m_isWaiting) && (!pt->m_isSuspended))
-                {
-                  OSEvent_t ev;
-                  ev = pt->m_event;
-                  if (ev == OSEvent::OS_ALL || ev == event)
-                    {
-                      // wakeup tasks waiting for event or for 0
-                      pt->m_isWaiting = false;
-                      pt->m_event = OSEvent::OS_NONE; // no longer wait for it
-                      pt->m_eventWaitReturn = ret;
-#if defined(DEBUG)
-                      if (ret == OSEventWaitReturn::OS_NONE)
-                      OSDeviceDebug::putChar('^');
-#endif
-                      OSActiveTasks::insert(pt);
 
-                      ++cnt;
-                    }
-                }
-            }
-        }
-    }
-  OSScheduler::criticalExit();
-#else
   int i;
   for (i = 0; i < ms_tasksCount; ++i)
     {
@@ -242,7 +232,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
           cnt += pt->eventNotify(event, ret);
         }
     }
-#endif
+
   // return the number of notified tasks
   return cnt;
 }
@@ -282,22 +272,22 @@ OSScheduler::performContextSwitch()
     }
 #endif
 
-  // should be used only here, in scheduler core routines!!!
+  // Should be used only here, in scheduler core routines!!!
   OSCPU::watchdogReset();
 
-  // if scheduler is not locked, perform the context switch
-  if (!ms_isLocked)
+  // If scheduler is not locked, perform the context switch
+  if (!OSSchedulerLock::isSet())
     {
       OSScheduler::criticalEnter();
         {
-          // remove the running task from the ready list
+          // Remove the running task from the ready list
           OSActiveTasks::remove(ms_pTaskRunning);
 
-          // eventually reinsert it at the end of the list (round robin)
+          // Eventually reinsert it at the end of the list (round robin)
           if (!ms_pTaskRunning->m_isSuspended && !ms_pTaskRunning->m_isWaiting)
             OSActiveTasks::insert(ms_pTaskRunning);
 
-          // select the running task from the top of the list
+          // Select the running task from the top of the list
           ms_pTaskRunning = OSActiveTasks::getTop();
           // Prepare the global value with the pointer to the m_pStack.
           g_ppCurrentStack = &ms_pTaskRunning->m_pStack;
@@ -336,7 +326,7 @@ OSScheduler::getTask(int id)
     return NULL;
 }
 
-// internal methods
+// Internal methods
 unsigned char
 OSScheduler::taskRegister(OSTask *pTask)
 {
@@ -377,7 +367,7 @@ OSScheduler::taskRegister(OSTask *pTask)
   return id;
 }
 
-// called from timer interrupt
+// Called from timer interrupt
 // Warning: interrupts are enabled!
 
 void
@@ -428,7 +418,7 @@ void OSScheduler::ISRcancelTask(OSTask *pTask)
 
 #endif
 
-// ==========================================================================
+// ============================================================================
 
 OSActiveTasks::OSActiveTasks()
 {
@@ -519,6 +509,8 @@ OSActiveTasks::remove(OSTask * pTask)
 #endif
 }
 
+
+// Return index of given task, or -1
 int
 OSActiveTasks::find(OSTask *pTask)
 {
@@ -548,6 +540,8 @@ OSActiveTasks::dump(void)
   OSDeviceDebug::putNewLine();
 }
 #endif
+
+// ----------------------------------------------------------------------------
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 

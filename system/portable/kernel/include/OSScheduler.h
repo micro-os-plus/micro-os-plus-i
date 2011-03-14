@@ -22,7 +22,40 @@ class OSTimerSeconds;
 class OSTimerTicks;
 class OSTask;
 
-// ----------------------------------------------------------------------------
+// ============================================================================
+
+class OSSchedulerLock
+{
+public:
+#if defined(DEBUG)
+  OSSchedulerLock();
+#endif
+
+  // Pair of functions, using a stack to save/restore value
+  static void
+  enter(void) __attribute__((always_inline));
+  static void
+  exit(void) __attribute__((always_inline));
+
+  // Lock the scheduler if the flag is true, clear otherwise.
+  static bool
+  set(bool flag = true);
+
+  static bool
+  clear(void);
+
+  // Check if the scheduler was locked
+  static bool
+  isSet(void) __attribute__((always_inline));
+
+private:
+  // true if the scheduler is locked, i.e. yield will return to same task
+  static bool volatile ms_isLocked;
+
+  char m_dummy;
+};
+
+// ============================================================================
 
 class OSScheduler
 {
@@ -47,6 +80,7 @@ public:
   static bool
   isRunning(void);
 
+#if false
   // disable preemption.
   // yield() will immediately return to the same task,
   // and eventWait() will immediately return with OS_EVENT_WAIT_RETURN_LOCKED.
@@ -61,9 +95,10 @@ public:
   static bool
   isLocked(void);
 
-  // Lock the scheduler if the flag is true, unlock otherwise.
+  // Lock the scheduler if the flag is true, clear otherwise.
   static void
   setLock(bool flag);
+#endif
 
   // Return true if the scheduler runs in preemptive mode.
   inline static bool
@@ -191,6 +226,9 @@ public:
 
 #endif
 
+  // flag to store lock/unlock
+  static OSSchedulerLock lock;
+
   // timer used by scheduler to schedule the next task
   static OSTimerTicks timerTicks;
 
@@ -232,8 +270,8 @@ private:
 
   // true if the scheduler was started
   static bool ms_isRunning;
-  // true if the scheduler is locked, i.e. preemption is disabled
-  static bool ms_isLocked;
+  // true if the scheduler is locked, i.e. yield will return to same task
+  //static bool ms_isLocked;
 
   // list of tasks registered to the scheduler
   static OSTask *ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
@@ -256,7 +294,7 @@ private:
   char m_dummy;
 };
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 
 class OSSchedulerImpl
 {
@@ -326,7 +364,7 @@ public:
 
 };
 
-//-----------------------------------------------------------------------------
+// ============================================================================
 
 class OSActiveTasks
 {
@@ -370,33 +408,56 @@ private:
 //-----------------------------------------------------------------------------
 
 inline bool
-OSScheduler::isRunning(void)
+OSSchedulerLock::set(bool flag)
 {
-  return ms_isRunning;
-}
-
-inline void
-OSScheduler::lock(void)
-{
-  ms_isLocked = true;
-}
-
-inline void
-OSScheduler::unlock(void)
-{
-  ms_isLocked = false;
+  bool b;
+  b = ms_isLocked;
+#if defined(DEBUG) && false
+  OSDeviceDebug::putString("lock set(");
+  OSDeviceDebug::putString(flag? "T": "F");
+  OSDeviceDebug::putString(") ");
+#endif
+  ms_isLocked = flag;
+  return b;
 }
 
 inline bool
-OSScheduler::isLocked(void)
+OSSchedulerLock::clear(void)
+{
+  bool b;
+  b = ms_isLocked;
+#if defined(DEBUG) && false
+  OSDeviceDebug::putString("lock clear() ");
+#endif
+  ms_isLocked = false;
+  return b;
+}
+
+inline bool
+OSSchedulerLock::isSet(void)
 {
   return ms_isLocked;
 }
 
 inline void
-OSScheduler::setLock(bool flag)
+OSSchedulerLock::enter(void)
 {
-  ms_isLocked = flag;
+  OSCPUImpl::stackPush(ms_isLocked);
+  ms_isLocked = true;
+}
+
+inline void
+OSSchedulerLock::exit(void)
+{
+  ms_isLocked = OSCPUImpl::stackPop();
+}
+
+// ============================================================================
+
+inline bool
+OSScheduler::isRunning(void)
+{
+  return ms_isRunning;
 }
 
 inline void
@@ -472,7 +533,6 @@ OSScheduler::setEventWaitReturn(OSEventWaitReturn_t ret)
 {
   ms_pTaskRunning->setEventWaitReturn(ret);
 }
-
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
 
@@ -615,7 +675,7 @@ OSScheduler::ledActiveOff(void)
 
 #endif /* ! OS_EXCLUDE_OSSCHEDULER_LED_ACTIVE */
 
-//-----------------------------------------------------------------------------
+// ============================================================================
 
 inline OSTask *
 OSActiveTasks::getTop(void)
@@ -629,7 +689,7 @@ OSActiveTasks::getCount(void)
   return ms_count;
 }
 
-//-----------------------------------------------------------------------------
+// ============================================================================
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/include/OSScheduler_Arch_Inlines.h"
@@ -665,4 +725,6 @@ OSActiveTasks::getCount(void)
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*OSSCHEDULER_H_ */
+// ----------------------------------------------------------------------------
+
+#endif /* OSSCHEDULER_H_ */
