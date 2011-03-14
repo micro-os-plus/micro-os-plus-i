@@ -28,4 +28,4 @@ private:
   schedTicks_t m_rate;
   };
 
-#endif /*TASKBLINK_H_*/
+#endif /* TASKBLINK_H_ */
