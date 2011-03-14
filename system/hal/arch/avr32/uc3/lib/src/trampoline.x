@@ -45,6 +45,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#if false
 
 #define OS_BUILD_ASSEMBLY_CODE       (1)
 #include "portable/kernel/include/OS_Defines.h"
@@ -75,5 +76,6 @@ program_start:
 
 //! \endverbatim
 //! @}
+#endif
 
 #endif /* defined(OS_CONFIG_ARCH_AVR32) */
