@@ -32,7 +32,7 @@ TaskReport::TaskReport(const char *pName, schedTicks_t seconds) :
  * Task main code.
  * Report mutex usage counters.
  *
- * The reporting rate is done with sleep().
+ * The reporting rate is done with sleep(seconds).
  */
 
 void
@@ -40,7 +40,7 @@ TaskReport::taskMain(void)
 {
   if (os.isDebug())
     {
-      os.sched.lock();
+      os.sched.lock.enter();
         {
           debug.putString("Task '");
           debug.putString(getName());
@@ -48,20 +48,22 @@ TaskReport::taskMain(void)
           debug.putDec(m_rate);
           debug.putNewLine();
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
     }
 
-  // task endless loop
+  // Task endless loop
   for (;;)
     {
+      // This test requires the debug device to be present,
+      // it makes no sense to run the Release build.
       if (os.isDebug())
         {
-          // block this task until the mutex is acquired
+          // Block this task until the mutex is acquired
           mutex.acquire();
             {
               // Disable all other tasks to write during the display.
               // Only the interrupts may write something
-              os.sched.lock();
+              os.sched.lock.enter();
                 {
                   int sum;
                   sum = 0;
@@ -78,12 +80,12 @@ TaskReport::taskMain(void)
                   clog << sum;
                   clog << endl;
                 }
-              os.sched.unlock();
+              os.sched.lock.exit();
             }
           mutex.release();
         }
 
-      // finally wait several seconds
+      // Finally wait several seconds
       os.sched.timerSeconds.sleep(m_rate);
     }
 }

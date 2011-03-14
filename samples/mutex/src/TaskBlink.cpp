@@ -25,9 +25,9 @@ TaskBlink::TaskBlink(const char *pName, unsigned char iLed, schedTicks_t rate) :
 
 /*
  * Task main code.
- * Initialise led and toggle it using the rate.
+ * Initialise led and toggle it using the given rate.
  *
- * The toggle rate is done with sleep().
+ * The toggle rate is done with sleep(ticks).
  */
 
 void
@@ -35,7 +35,7 @@ TaskBlink::taskMain(void)
 {
   if (os.isDebug())
     {
-      os.sched.lock();
+      os.sched.lock.enter();
         {
           debug.putString("Task '");
           debug.putString(getName());
@@ -45,17 +45,19 @@ TaskBlink::taskMain(void)
           debug.putDec(m_rate);
           debug.putNewLine();
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
     }
 
-  // initialise led port as output
+  // Initialise led port as output
   m_oLed.init();
 
-  // task endless loop
+  // Task endless loop
   for (;;)
     {
+      // Sleep for a programmable interval, given in ticks
       os.sched.timerTicks.sleep(m_rate);
 
+      // Finally toggle led
       m_oLed.toggle();
     }
 }

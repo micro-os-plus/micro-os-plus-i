@@ -1,8 +1,7 @@
 /*
- * TaskStress.cpp
+ *      Copyright (C) 2011 Liviu Ionescu.
  *
- *  Created on: Feb 17, 2011
- *      Author: alex
+ *      This file is part of the uOS++ distribution.
  */
 
 #include "TaskStress.h"
@@ -41,39 +40,48 @@ TaskStress::TaskStress(const char *pName, int taskId) :
 void
 TaskStress::taskMain(void)
 {
-  if (os.isDebug())
+  if (true && os.isDebug())
     {
-      os.sched.lock();
+      os.sched.lock.enter();
         {
           debug.putString("Task '");
           debug.putString(getName());
           debug.putString("', id=");
-          debug.putDec((unsigned short)m_taskId);
+          debug.putDec((unsigned short) m_taskId);
           debug.putNewLine();
         }
-      os.sched.unlock();
+      os.sched.lock.exit();
     }
 
-  int sleepTicks; // sleep interval in OS ticks
+  os.sched.lock.isSet();
+
+  // The sleep interval, in OS ticks, randomly computed
+  schedTicks_t sleepTicks;
 
   // task endless loop
   for (;;)
     {
-      // sleep for a random number of ticks
+      // Compute a random value in the given range
       sleepTicks = (rand() % (m_maxSleepTicks - m_minSleepTicks))
           + m_minSleepTicks;
+
+      // Sleep for a random number of ticks
       os.sched.timerTicks.sleep(sleepTicks);
 
-      // block task until the mutex is acquired
+      // Block task until the mutex is acquired
       mutex.acquire();
         {
-          resourceValue++; //access the resource
-          resourceAccessNum[m_taskId]++; // increment the number of access
+          // We have exclusive access to the shared resource
 
-          // simulate some activity done by the task
+          // Increment the global counter
+          resourceValue++;
+          // Increment the task specific counter
+          resourceAccessNum[m_taskId]++;
+
+          // Simulate some activity done by the task
           os.sched.timerTicks.sleep(rand() % m_maxActivityTicks);
 
-          // check if the task is the current owner of the mutex
+          // Check if the task is the current owner of the mutex
           if (this != mutex.getOwnerTask())
             resourceAccessNum[m_taskId] = APP_CONFIG_ERROR_CODE;
         }
@@ -86,7 +94,7 @@ TaskStress::rand(void)
 {
   unsigned int ret;
 
-  os.sched.lock();
+  os.sched.lock.enter();
     {
       ms_rand = ms_rand * 214013L + 2531011L;
 #if (__SIZEOF_INT__ == 2)
@@ -95,7 +103,18 @@ TaskStress::rand(void)
       ret = ((ms_rand >> 16) & 0x7fff);
 #endif
     }
-  os.sched.unlock();
+  os.sched.lock.exit();
+
+  if (os.isDebug() && false)
+    {
+      os.sched.lock.enter();
+        {
+          debug.putString("rand()=");
+          debug.putDec((unsigned short) ret);
+          debug.putNewLine();
+        }
+      os.sched.lock.exit();
+    }
 
   return ret;
 }
