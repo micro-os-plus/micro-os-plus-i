@@ -34,7 +34,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
   if (ticks != 0)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_SLEEP)
-      OSDeviceDebug::putString_P(PSTR("sleep("));
+      OSDeviceDebug::putString_P(PSTR("OSTimer::sleep("));
       OSDeviceDebug::putDec((unsigned short) ticks);
       OSDeviceDebug::putChar(')');
       //OSDeviceDebug::putNewLine();
@@ -85,7 +85,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
     ret = OSEventWaitReturn::OS_IMMEDIATELY;
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_SLEEP)
-  OSDeviceDebug::putString_P(PSTR(" ret="));
+  OSDeviceDebug::putString_P(PSTR("OSTimer::sleep() ret="));
   OSDeviceDebug::putHex(ret);
   OSDeviceDebug::putNewLine();
 #endif
@@ -159,7 +159,7 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
   if (ticks == 0)
     {
 #if defined(DEBUG)
-      OSDeviceDebug::putString_P(PSTR("insert() ticks=0"));
+      OSDeviceDebug::putString_P(PSTR("OSTimer::insert(0)"));
       OSDeviceDebug::putNewLine();
 #endif
       return false;
@@ -171,7 +171,7 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
   if (cnt == m_size)
     {
 #if defined(DEBUG)
-      OSDeviceDebug::putString_P(PSTR("insert() full"));
+      OSDeviceDebug::putString_P(PSTR("OSTimer::insert() full"));
       OSDeviceDebug::putNewLine();
 #endif
       return false;
@@ -214,7 +214,7 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
   m_count++;
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INSERT)
-  OSDeviceDebug::putString_P(PSTR("timer insert() "));
+  OSDeviceDebug::putString_P(PSTR("OSTimer::insert() "));
   OSDeviceDebug::putPtr(p);
   OSDeviceDebug::putNewLine();
 #endif
