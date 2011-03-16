@@ -122,9 +122,14 @@ public:
   inline static void interruptsDisable(void);
 #endif
 
+#if false
   // Used for ARM architecture.
   inline static void interruptsClearMask(void) __attribute__((always_inline));
-  inline static void interruptsSetMask(void) __attribute__((always_inline));
+#endif
+
+  // support for critical sections
+  inline static void setInterruptsMask(OSInterruptsMask_t) __attribute__((always_inline));
+  inline static OSInterruptsMask_t getInterruptsMask(void) __attribute__((always_inline));
 
   inline static void stackPush(OSStack_t) __attribute__((always_inline));
   inline static OSStack_t stackPop(void) __attribute__((always_inline));
