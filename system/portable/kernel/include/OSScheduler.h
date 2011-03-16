@@ -57,6 +57,25 @@ private:
 
 // ============================================================================
 
+class OSCriticalSection
+{
+public:
+#if defined(DEBUG)
+  OSCriticalSection();
+#endif
+
+  // Pair of functions, using a stack to save/restore value
+  static void
+  enter(void) __attribute__((always_inline));
+  static void
+  exit(void) __attribute__((always_inline));
+
+private:
+  char m_dummy;
+};
+
+// ============================================================================
+
 class OSScheduler
 {
 public:
@@ -228,6 +247,9 @@ public:
 
   // flag to store lock/unlock
   static OSSchedulerLock lock;
+
+  // critical section support
+  static OSCriticalSection critical;
 
   // timer used by scheduler to schedule the next task
   static OSTimerTicks timerTicks;
@@ -450,6 +472,32 @@ inline void
 OSSchedulerLock::exit(void)
 {
   ms_isLocked = OSCPUImpl::stackPop();
+}
+
+// ============================================================================
+
+inline void
+OSCriticalSection::enter(void)
+{
+  register OSStack_t tmp;
+
+  tmp = OSCPUImpl::getInterruptsMask();
+  OSCPUImpl::stackPush(tmp);
+#if defined(OS_INCLUDE_OSCRITICALSECTION_ENTER_WITH_MASK)
+  tmp |= 0x001E;
+  OSCPUImpl::setInterruptsMask(tmp);
+#else
+  OSCPUImpl::interruptsDisable();
+#endif
+}
+
+inline void
+OSCriticalSection::exit(void)
+{
+  register OSStack_t tmp;
+
+  tmp = OSCPUImpl::stackPop();
+  OSCPUImpl::setInterruptsMask(tmp);
 }
 
 // ============================================================================
