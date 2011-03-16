@@ -611,7 +611,7 @@ OSScheduler::criticalEnter(void)
       : [R] "=r" (tmp)
       // TODO: define a configuration macro for the MASK
       : [MASK] "i" (0x001E), [SR] "i" (AVR32_SR), [GM] "i" (AVR32_SR_GM_OFFSET)
-      :
+      : "sp"
   );
 #endif
 }
@@ -631,7 +631,7 @@ OSScheduler::realTimeCriticalEnter(void)
 
       : [R] "=r" (tmp)
       : [SR] "i" (AVR32_SR), [GM] "i" (AVR32_SR_GM_OFFSET)
-      :
+      : "sp"
   );
 #endif
 }
@@ -655,7 +655,7 @@ OSScheduler::criticalExit(void)
 
       : [R] "=r" (tmp)
       : [SR] "i" (AVR32_SR)
-      : "cc" // "cc" mean configuration flags
+      : "sp", "cc" // "cc" mean configuration flags
   );
 #endif
 }
