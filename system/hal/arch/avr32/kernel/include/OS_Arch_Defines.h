@@ -18,13 +18,6 @@ typedef unsigned long OSInterruptsMask_t;
 
 #endif
 
-#if !defined(OS_CFGINT_BUSYWAIT_CALIBRATION)
-#if defined(DEBUG)
-#define OS_CFGINT_BUSYWAIT_CALIBRATION	                (9129)
-#else
-#define OS_CFGINT_BUSYWAIT_CALIBRATION                  (7074)
-#endif
-#endif
 
 #define PROGMEM
 #define PSTR(_S_) ((const char *)_S_)
