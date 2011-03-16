@@ -23622,7 +23622,7 @@
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.1539239020" name="32-bit AVR/GNU C++ Compiler" superClass="avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 								<option id="gnu.cpp.compiler.option.optimization.level.274411552" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.87851297" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
-								<option id="avr32.cpp.compiler.option.mcu.1726823071" name="Microcontroller Unit" superClass="avr32.cpp.compiler.option.mcu" value="-mpart=uc3a3256s" valueType="string"/>
+								<option id="avr32.cpp.compiler.option.mcu.1726823071" name="Microcontroller Unit" superClass="avr32.cpp.compiler.option.mcu" value="-mpart=uc3a3256" valueType="string"/>
 								<option id="avr32.cpp.compiler.option.flashvault.913458895" name="Enable FlashVault support" superClass="avr32.cpp.compiler.option.flashvault" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.839232193" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
@@ -23640,7 +23640,7 @@
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="avr32.managedbuild.tool.gnu.c.compiler.exe.debug.195045998" name="32-bit AVR/GNU C Compiler" superClass="avr32.managedbuild.tool.gnu.c.compiler.exe.debug">
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.501266517" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.844259223" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<option id="avr32.c.compiler.option.mcu.264013241" name="Microcontroller Unit" superClass="avr32.c.compiler.option.mcu" value="-mpart=uc3a3256s" valueType="string"/>
+								<option id="avr32.c.compiler.option.mcu.264013241" name="Microcontroller Unit" superClass="avr32.c.compiler.option.mcu" value="-mpart=uc3a3256" valueType="string"/>
 								<option id="avr32.c.compiler.option.flashvault.1549369453" name="Enable FlashVault support" superClass="avr32.c.compiler.option.flashvault" value="false" valueType="boolean"/>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.479199060" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
@@ -23655,14 +23655,14 @@
 								<inputType id="avr32.managedbuild.tool.gnu.c.compiler.input.1339390958" superClass="avr32.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="avr32.managedbuild.tool.gnu.c.linker.exe.debug.1847292687" name="32-bit AVR/GNU C Linker" superClass="avr32.managedbuild.tool.gnu.c.linker.exe.debug">
-								<option id="avr32.c.linker.option.mcu.59418314" name="Microcontroller Unit" superClass="avr32.c.linker.option.mcu" value="-mpart=uc3a3256s" valueType="string"/>
+								<option id="avr32.c.linker.option.mcu.59418314" name="Microcontroller Unit" superClass="avr32.c.linker.option.mcu" value="-mpart=uc3a3256" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1505447334" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
 							</tool>
 							<tool errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="avr32.managedbuild.tool.gnu.cpp.linker.exe.debug.489470372" name="32-bit AVR/GNU C++ Linker" superClass="avr32.managedbuild.tool.gnu.cpp.linker.exe.debug">
-								<option id="avr32.cpp.linker.option.mcu.1354936033" name="Microcontroller Unit" superClass="avr32.cpp.linker.option.mcu" value="-mpart=uc3a3256s" valueType="string"/>
+								<option id="avr32.cpp.linker.option.mcu.1354936033" name="Microcontroller Unit" superClass="avr32.cpp.linker.option.mcu" value="-mpart=uc3a3256" valueType="string"/>
 								<option id="gnu.cpp.link.option.paths.1425022786" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus}&quot;"/>
 								</option>
@@ -23676,7 +23676,7 @@
 							</tool>
 							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="avr32.managedbuild.tool.gnu.assembler.exe.debug.1312929719" name="32-bit AVR/GNU Assembler" superClass="avr32.managedbuild.tool.gnu.assembler.exe.debug">
 								<option id="avr32.both.asm.option.debugging.level.26584505" name="Debug Level" superClass="avr32.both.asm.option.debugging.level" value="avr32.both.asm.debugging.level.max" valueType="enumerated"/>
-								<option id="avr32.both.asm.option.mcu.1400765608" name="Microcontroller Unit" superClass="avr32.both.asm.option.mcu" value="-mpart=uc3a3256s" valueType="string"/>
+								<option id="avr32.both.asm.option.mcu.1400765608" name="Microcontroller Unit" superClass="avr32.both.asm.option.mcu" value="-mpart=uc3a3256" valueType="string"/>
 								<option id="gnu.both.asm.option.include.paths.284000249" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
@@ -23684,7 +23684,7 @@
 							</tool>
 							<tool command="avr32-gcc -x assembler-with-cpp -c -D&quot;OS_CONFIG_BOARD_ATMEL_EVK1104=1&quot;" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="avr32.managedbuild.tool.gnu.preprocessor.exe.debug.545421272" name="32-bit AVR/GNU Preprocessing Assembler" superClass="avr32.managedbuild.tool.gnu.preprocessor.exe.debug">
 								<option id="avr32.both.preprocessor.option.debugging.level.1764457683" name="Debug Level" superClass="avr32.both.preprocessor.option.debugging.level" value="avr32.both.preprocessor.debugging.level.max" valueType="enumerated"/>
-								<option id="avr32.both.preprocessor.option.mcu.1941781221" name="Microcontroller Unit" superClass="avr32.both.preprocessor.option.mcu" value="-mpart=uc3a3256s" valueType="string"/>
+								<option id="avr32.both.preprocessor.option.mcu.1941781221" name="Microcontroller Unit" superClass="avr32.both.preprocessor.option.mcu" value="-mpart=uc3a3256" valueType="string"/>
 								<option id="avr32.both.preprocessor.option.paths.1249409426" name="Include paths (-I)" superClass="avr32.both.preprocessor.option.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
@@ -23695,7 +23695,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="TaskBlinkNested.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="portable/kernel/src/OSRealTime.cpp|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block|hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="portable/tasks/src/TaskPitpalac.cpp|portable/tasks/src/TaskBlink.cpp|portable/tasks/src/CANLeds.cpp|portable/kernel/src/OSRealTime.cpp|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block|hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
