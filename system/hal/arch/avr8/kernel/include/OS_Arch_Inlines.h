@@ -103,4 +103,37 @@ OSSchedulerImpl::yield(void)
   OSCPU::returnFromSubroutine(); // necessary because it is 'naked'
 }
 
+inline void
+OSCPUImpl::stackPush(OSStack_t reg)
+{
+  register OSStack_t tmp;
+
+  tmp = reg;
+
+  asm volatile
+  (
+      " push %[R] \n" // push value onto stack
+
+      :
+      : [R] "r" (tmp)
+      :
+  );
+}
+
+inline OSStack_t
+OSCPUImpl::stackPop(void)
+{
+  register OSStack_t tmp;
+
+  asm volatile
+  (
+      " pop %[R] \n"  // pop value from stack
+
+      : [R] "=r" (tmp)
+      :
+      :
+  );
+  return tmp;
+}
+
 #endif /* HAL_OS_ARCH_INLINES_H_ */
