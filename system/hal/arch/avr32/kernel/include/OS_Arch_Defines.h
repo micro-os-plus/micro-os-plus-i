@@ -13,6 +13,9 @@ typedef unsigned long *pfnVector_t;
 
 typedef unsigned long OSResetBits_t;
 typedef void *OSProgramPtr_t;
+
+typedef unsigned long OSInterruptsMask_t;
+
 #endif
 
 #if !defined(OS_CFGINT_BUSYWAIT_CALIBRATION)
