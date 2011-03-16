@@ -51,6 +51,20 @@ TaskBlink::taskMain(void)
   // initialise led port as output
   m_oLed.init();
 
+#if false
+  os.sched.critical.enter();
+    {
+      os.sched.timerTicks.sleep(1);
+    }
+  os.sched.critical.exit();
+
+  OSScheduler::criticalEnter();
+    {
+      os.sched.timerTicks.sleep(2);
+    }
+  OSScheduler::criticalExit();
+#endif
+
   // task endless loop
   for (;;)
     {
