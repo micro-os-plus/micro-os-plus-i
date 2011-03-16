@@ -56,4 +56,4 @@ inline unsigned char LedVar::bitNumber(void)
     return m_iBit;
   }
 
-#endif /*LEDVAR_H_*/
+#endif /* LEDVAR_H_ */
