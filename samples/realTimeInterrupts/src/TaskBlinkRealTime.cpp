@@ -77,7 +77,6 @@ TaskBlinkRealTime::taskMain(void)
       os.sched.yield();
 #endif
 
-      //os.sched.realTimeCriticalEnter();
       os.rt.critical.enter();
         {
           if (m_count >= m_rate)
@@ -87,7 +86,6 @@ TaskBlinkRealTime::taskMain(void)
             }
         }
       os.rt.critical.exit();
-      //os.sched.criticalExit();
 
       if (bSecond)
         {
@@ -133,7 +131,7 @@ TaskBlinkRealTime::interruptInit(void)
   tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].idr = 0xFFFFFFFF;
 
   //register the interrupt
-  INTC_register_interrupt(RealTimeInterrupt_contextHandler,
+  INTC_register_interrupt(TaskBlinkRealTime::contextHandler,
       APP_CFGINT_TASKBLINKREALTIME_TIMERIRQID,
       APP_CFGINT_TASKBLINKREALTIME_TIMERIRQLEVEL);
 
@@ -157,23 +155,28 @@ TaskBlinkRealTime::interruptInit(void)
   tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CCR.swtrg = 1;
 
 #define T_DIVIDER (1 << ((APP_CFGINT_TASKBLINKREALTIME_TIMERCLOCKSELECT-2)*2+1))
-#define T_COUNTER (OS_CFGLONG_OSCILLATOR_HZ/APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER/T_DIVIDER/TSKBLKNEST_CFGINT_TICK_RATE_HZ)
 
   unsigned int nCounter;
   nCounter = (OS_CFGLONG_OSCILLATOR_HZ
       / APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER / T_DIVIDER / m_rate);
 
-#if defined(DEBUG)
-
-  OSDeviceDebug::putDec(
-      (unsigned short) APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER);
-  OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putDec((unsigned short) T_DIVIDER);
-  OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putDec((unsigned short) nCounter);
-  OSDeviceDebug::putNewLine();
-
-#endif
+  if (os.isDebug())
+    {
+      os.sched.lock.enter();
+        {
+          OSDeviceDebug::putString("TC=");
+          OSDeviceDebug::putDec(m_rate);
+          OSDeviceDebug::putString("Hz; ");
+          OSDeviceDebug::putDec(
+              (unsigned short) APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER);
+          OSDeviceDebug::putChar(',');
+          OSDeviceDebug::putDec((unsigned short) T_DIVIDER);
+          OSDeviceDebug::putChar(',');
+          OSDeviceDebug::putDec((unsigned short) nCounter);
+          OSDeviceDebug::putNewLine();
+        }
+      os.sched.lock.exit();
+    }
 
   // set RC value
   tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].RC.rc = nCounter;
@@ -223,19 +226,20 @@ TaskBlinkRealTime::interruptServiceRoutine(void)
 #else
   OS::busyWaitMicros(100);
   g_flagNotify = true;
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
 
-#endif
+#endif /* defined(APP_INCLUDE_TASKBLINKREALTIME_ISRACTIONBUSYWAIT) */
 
 #if defined(APP_CFGINT_TASKBLINKREALTIME_ISRLEDBIT)
   OS_GPIO_PIN_LOW(APP_CFGREG_TASKBLINKREALTIME_ISRLEDPORTCONFIG, APP_CFGINT_TASKBLINKREALTIME_ISRLEDBIT);
 #endif
 
-#endif /* APP_EXCLUDE_TASKBLINKREALTIME_ISRACTION */
+#endif /* !defined(APP_EXCLUDE_TASKBLINKREALTIME_ISRACTION) */
 }
 
+// The real time routine should have no context switch support
 void
-RealTimeInterrupt_contextHandler(void)
+TaskBlinkRealTime::contextHandler(void)
 {
 #if !defined(APP_EXCLUDE_TASKBLINKREALTIME_ISRACTION)
   pTaskBlinkRealTime->interruptServiceRoutine();
