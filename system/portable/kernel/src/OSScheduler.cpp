@@ -34,6 +34,7 @@ unsigned char OSScheduler::ms_tasksCount;
 OSTask *OSScheduler::ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 
 OSSchedulerLock OSScheduler::lock;
+OSCriticalSection OSScheduler::critical;
 
 #if !defined(OS_EXCLUDE_OSTIMER)
 OSTimerTicks OSScheduler::timerTicks;
@@ -59,6 +60,19 @@ OSSchedulerLock::OSSchedulerLock()
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   OSDeviceDebug::putString_P(PSTR("OSSchedulerLock()="));
+  OSDeviceDebug::putPtr(this);
+  OSDeviceDebug::putNewLine();
+#endif
+}
+#endif
+
+// ============================================================================
+
+#if defined(DEBUG)
+OSCriticalSection::OSCriticalSection()
+{
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+  OSDeviceDebug::putString_P(PSTR("OSCriticalSection()="));
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
@@ -508,7 +522,6 @@ OSActiveTasks::remove(OSTask * pTask)
     }
 #endif
 }
-
 
 // Return index of given task, or -1
 int
