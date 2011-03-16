@@ -241,7 +241,7 @@ void OS::busyWaitMillis(unsigned int n)
       {
         int i;
         // calibrate from OSC
-        for (i = (OS_CFGLONG_CPU_FREQUENCY_HZ / OS_CFGINT_BUSYWAIT_CALIBRATION ); i--;)
+        for (i = (OS_CFGLONG_CPU_FREQUENCY_HZ / 10000 * OS_CFGINT_BUSYWAIT_CALIBRATION / 10000); i--;)
           {
             OSCPU::nop();
           }
@@ -257,7 +257,7 @@ OS::busyWaitMicros(unsigned int n)
 {
   int i;
   // calibrate from OSC
-  for (i = (OS_CFGLONG_CPU_FREQUENCY_HZ / 1000 * n / OS_CFGINT_BUSYWAIT_CALIBRATION); i--;)
+  for (i = (OS_CFGLONG_CPU_FREQUENCY_HZ / 10000 * OS_CFGINT_BUSYWAIT_CALIBRATION / 10000 * n / 1000); i--;)
     {
       OSCPU::nop();
     }
