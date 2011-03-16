@@ -10,7 +10,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-#include "TaskReportStacks.h"
+#include "portable/tasks/include/TaskReportStacks.h"
 
 /*
  * Task constructor.
