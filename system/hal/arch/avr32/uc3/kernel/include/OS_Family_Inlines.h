@@ -148,11 +148,13 @@ OSCPUImpl::interruptsClearMask(void)
   ; // TODO: implement it
 }
 
+#if false
 inline void
 OSCPUImpl::interruptsSetMask(void)
 {
   ; // TODO: implement it
 }
+#endif
 
 inline void
 OSCPUImpl::idle(void)
@@ -243,6 +245,40 @@ OSCPUImpl::stackPop(void)
       : "sp"
   );
   return tmp;
+}
+
+inline OSInterruptsMask_t
+OSCPUImpl::getInterruptsMask(void)
+{
+  register unsigned int tmp; //asm("r8");
+
+  asm volatile
+  (
+      " mfsr    %[R], %[SR] \n"
+
+      : [R] "=r" (tmp)
+      : [SR] "i" (AVR32_SR)
+      :
+  );
+
+  return tmp;
+}
+
+inline void
+OSCPUImpl::setInterruptsMask(OSInterruptsMask_t mask)
+{
+  register unsigned int tmp; //asm("r8");
+
+  tmp = mask;
+
+  asm volatile
+  (
+      " mtsr    %[SR], %[R] \n"
+
+      :
+      : [SR] "i" (AVR32_SR), [R] "r" (tmp)
+      :
+  );
 }
 
 #endif /* HAL_FAMILY_OS_INLINES_H_ */
