@@ -27,7 +27,7 @@ TaskBlink::TaskBlink(const char *pName, unsigned char iLed, schedTicks_t rate) :
  * Task main code.
  * Initialise led and toggle it using the rate.
  *
- * The toggle rate is done with busy wait, the loop being interrupted by yields.
+ * The toggle rate is done with sleep(ticks).
  */
 
 void
@@ -64,7 +64,6 @@ TaskBlink::taskMain(void)
       // finally toggle led
       m_oLed.toggle();
 #endif
-
     }
 }
 
