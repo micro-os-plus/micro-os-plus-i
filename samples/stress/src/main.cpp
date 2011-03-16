@@ -34,7 +34,7 @@ TaskStress task9("9", 10, 90, 1, 800);
 #endif
 
 #if defined(APP_INCLUDE_TASKBLINKREALTIME)
-TaskBlinkRealTime taskRt("B", APP_CFGINT_TASKBLINKREALTIME_LEDBIT,
+TaskBlinkRealTime taskRT("RT", APP_CFGINT_TASKBLINKREALTIME_LEDBIT,
     APP_CFGINT_TASKBLINKREALTIME_TICKS);
 bool g_flagNotify;
 #endif
