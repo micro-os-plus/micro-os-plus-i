@@ -6,7 +6,6 @@
 
 #include "TaskBlinkRealTime.h"
 
-
 __attribute__((interrupt)) void
 RealTimeInterrupt_contextHandler(void);
 
@@ -50,7 +49,7 @@ TaskBlinkRealTime::taskMain(void)
           debug.putString("Task '");
           debug.putString(getName());
           debug.putString("', led=");
-          debug.putDec(m_oLed.bitNumber());
+          debug.putDec((unsigned short) m_oLed.bitNumber());
           debug.putString(", divider=");
           debug.putDec(m_rate);
           debug.putNewLine();
@@ -78,7 +77,8 @@ TaskBlinkRealTime::taskMain(void)
       os.sched.yield();
 #endif
 
-      os.sched.realTimeCriticalEnter();
+      //os.sched.realTimeCriticalEnter();
+      os.rt.critical.enter();
         {
           if (m_count >= m_rate)
             {
@@ -86,7 +86,8 @@ TaskBlinkRealTime::taskMain(void)
               bSecond = true;
             }
         }
-      os.sched.criticalExit();
+      os.rt.critical.exit();
+      //os.sched.criticalExit();
 
       if (bSecond)
         {
@@ -122,27 +123,33 @@ TaskBlinkRealTime::interruptInit(void)
   tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].cmr = 0;
 
   // set waveform mode as default
-  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.wave = 1;
+  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.wave
+      = 1;
 
   // for waveform mode the TIOB must not be input
-  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.eevt = 2;
+  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.eevt
+      = 2;
   //disable all interrupt sources
   tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].idr = 0xFFFFFFFF;
 
   //register the interrupt
   INTC_register_interrupt(RealTimeInterrupt_contextHandler,
-      APP_CFGINT_TASKBLINKREALTIME_TIMERIRQID, APP_CFGINT_TASKBLINKREALTIME_TIMERIRQLEVEL);
+      APP_CFGINT_TASKBLINKREALTIME_TIMERIRQID,
+      APP_CFGINT_TASKBLINKREALTIME_TIMERIRQLEVEL);
 
   //clock source
   tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.tcclks
       = APP_CFGINT_TASKBLINKREALTIME_TIMERCLOCKSELECT;
 
   // counter UP mode with automatic trigger on RC Compare
-  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.wavsel = 2;
+  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.wavsel
+      = 2;
   // no event on TIOA when RC compare
-  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.acpc = 0;
+  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.acpc
+      = 0;
   // no event on TIOB when RC compare
-  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.bcpc = 0;
+  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.bcpc
+      = 0;
   // enable channel, as it might be disabled
   tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CCR.clken = 1;
 
@@ -153,16 +160,17 @@ TaskBlinkRealTime::interruptInit(void)
 #define T_COUNTER (OS_CFGLONG_OSCILLATOR_HZ/APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER/T_DIVIDER/TSKBLKNEST_CFGINT_TICK_RATE_HZ)
 
   unsigned int nCounter;
-  nCounter = (OS_CFGLONG_OSCILLATOR_HZ / APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER
-      /T_DIVIDER / m_rate);
+  nCounter = (OS_CFGLONG_OSCILLATOR_HZ
+      / APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER / T_DIVIDER / m_rate);
 
 #if defined(DEBUG)
 
-  OSDeviceDebug::putDec(APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER);
+  OSDeviceDebug::putDec(
+      (unsigned short) APP_CFGINT_TASKBLINKREALTIME_TIMERPRESCALLER);
   OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putDec(T_DIVIDER);
+  OSDeviceDebug::putDec((unsigned short) T_DIVIDER);
   OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putDec(nCounter);
+  OSDeviceDebug::putDec((unsigned short) nCounter);
   OSDeviceDebug::putNewLine();
 
 #endif
@@ -171,7 +179,8 @@ TaskBlinkRealTime::interruptInit(void)
   tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].RC.rc = nCounter;
 
   // counter UP mode with automatic trigger on RC Compare
-  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.wavsel = 2;
+  tc_reg->channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].CMR.waveform.wavsel
+      = 2;
 
 #if true
   // set interrupt source RC Compare
@@ -229,9 +238,9 @@ void
 RealTimeInterrupt_contextHandler(void)
 {
 #if !defined(APP_EXCLUDE_TASKBLINKREALTIME_ISRACTION)
-      pTaskBlinkRealTime->interruptServiceRoutine();
+  pTaskBlinkRealTime->interruptServiceRoutine();
 #else
-      APP_CFGVAR_TASKBLINKREALTIME_TIMER.channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].sr;
+  APP_CFGVAR_TASKBLINKREALTIME_TIMER.channel[APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL].sr;
 #endif
 }
 
