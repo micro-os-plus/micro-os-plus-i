@@ -38,34 +38,34 @@ SignalIMUX::init(void)
 inline void
 SignalIMUX::i2c(void)
 {
-  os.sched.criticalEnter();
+  os.sched.critical.enter();
     {
       // set bit to 1
       APP_CONFIG_IMUX_PORT |= _BV(APP_CONFIG_IMUX_BIT);
     }
-  os.sched.criticalExit();
+  os.sched.critical.exit();
 }
 
 inline void
 SignalIMUX::usart(void)
 {
-  os.sched.criticalEnter();
+  os.sched.critical.enter();
     {
       // set bit to 0
       APP_CONFIG_IMUX_PORT &= ~_BV(APP_CONFIG_IMUX_BIT);
     }
-  os.sched.criticalExit();
+  os.sched.critical.exit();
 }
 
 inline bool
 SignalIMUX::isI2C(void)
 {
   bool ret;
-  os.sched.criticalEnter();
+  os.sched.critical.enter();
     {
       ret = (APP_CONFIG_IMUX_PORT & _BV(APP_CONFIG_IMUX_BIT)) != 0;
     }
-  os.sched.criticalExit();
+  os.sched.critical.exit();
   return ret;
 }
 

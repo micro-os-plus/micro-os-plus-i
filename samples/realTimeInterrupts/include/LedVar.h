@@ -43,12 +43,12 @@ inline void LedVar::init(void)
 
 inline void LedVar::toggle(void)
   {
-    os.sched.criticalEnter();
+    os.sched.critical.enter();
       {
         // toggle led
         OS_GPIO_PIN_TOGGLE(APP_CONFIG_LED_PORT, m_iBit);
       }
-    os.sched.criticalExit();
+    os.sched.critical.exit();
   }
 
 inline unsigned char LedVar::bitNumber(void)

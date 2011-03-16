@@ -36,23 +36,23 @@ SignalIMUXEN::init(void)
 inline void
 SignalIMUXEN::enable(void)
 {
-  os.sched.criticalEnter();
+  os.sched.critical.enter();
     {
       // set bit to 1
       APP_CONFIG_IMUXEN_PORT |= _BV(APP_CONFIG_IMUXEN_BIT);
     }
-  os.sched.criticalExit();
+  os.sched.critical.exit();
 }
 
 inline void
 SignalIMUXEN::disable(void)
 {
-  os.sched.criticalEnter();
+  os.sched.critical.enter();
     {
       // set bit to 0
       APP_CONFIG_IMUXEN_PORT &= ~_BV(APP_CONFIG_IMUXEN_BIT);
     }
-  os.sched.criticalExit();
+  os.sched.critical.exit();
 }
 
 #endif /* defined(OS_CONFIG_BOARD_A0739) */

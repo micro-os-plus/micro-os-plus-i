@@ -81,7 +81,7 @@ TaskBlinkRealTime::taskMain(void)
       os.sched.yield();
 #endif
 
-      os.sched.realTimeCriticalEnter();
+      os.rt.critical.enter();
         {
           if (m_count >= m_rate)
             {
@@ -89,7 +89,7 @@ TaskBlinkRealTime::taskMain(void)
               bSecond = true;
             }
         }
-      os.sched.criticalExit();
+      os.rt.critical.exit();
 
       if (bSecond)
         {

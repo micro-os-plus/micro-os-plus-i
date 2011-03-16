@@ -39,7 +39,7 @@ LedVar::LedVar(unsigned char iBit)
 inline void
 LedVar::init(void)
 {
-  os.sched.criticalEnter();
+  os.sched.critical.enter();
     {
       // init led port as output
       OS_GPIO_PIN_CONFIG_OUTPUT(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
@@ -50,18 +50,18 @@ LedVar::init(void)
       OS_GPIO_PIN_LOW(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
 #endif
     }
-  os.sched.criticalExit();
+  os.sched.critical.exit();
 }
 
 inline void
 LedVar::toggle(void)
 {
-  os.sched.criticalEnter();
+  os.sched.critical.enter();
     {
       // toggle led
       OS_GPIO_PIN_TOGGLE(APP_CONFIG_LED_PORT, m_iBit);
     }
-  os.sched.criticalExit();
+  os.sched.critical.exit();
 }
 
 inline unsigned char

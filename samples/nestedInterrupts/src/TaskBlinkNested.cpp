@@ -81,7 +81,7 @@ TaskBlinkNested::taskMain(void)
       os.sched.yield();
 #endif
 
-      os.sched.criticalEnter();
+      os.sched.critical.enter();
         {
           if (m_count >= m_rate)
             {
@@ -89,7 +89,7 @@ TaskBlinkNested::taskMain(void)
               bSecond = true;
             }
         }
-      os.sched.criticalExit();
+      os.sched.critical.exit();
 
       if (bSecond)
         {
