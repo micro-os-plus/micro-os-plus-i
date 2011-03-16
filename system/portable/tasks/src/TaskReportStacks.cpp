@@ -52,18 +52,17 @@ TaskReportStacks::taskMain(void)
           debug.putString(", max=");
           debug.putDec(m_maxSeconds);
           debug.putString(", increase%=");
-          debug.putDec((unsigned short)m_increaseRate);
+          debug.putDec((unsigned short) m_increaseRate);
           debug.putNewLine();
         }
       os.sched.lock.exit();
     }
 
-
   unsigned int i;
   i = 0;
 
   unsigned int n;
-  n = m_rateSeconds; //APP_CFGINT_DUMP_INTERVAL_SECONDS;
+  n = m_rateSeconds;
 
   // task endless loop
   for (;;)
@@ -80,8 +79,7 @@ TaskReportStacks::taskMain(void)
                     {
                       // if max limit not reached,
                       // increase the limit with given rate
-                      n = n * (100 + m_increaseRate)
-                          / 100;
+                      n = n * (100 + m_increaseRate) / 100;
                     }
                   i = 0;
                 }
@@ -95,8 +93,12 @@ TaskReportStacks::taskMain(void)
                       pt = os.sched.getTask(j);
                       clog << endl;
                       clog << ((pt == this) ? '*' : ' ');
-
+#if false
                       clog << *pt; // print task info
+#else
+                      clog << pt->getName() << ' ' << pt->getStackUsed() << '/'
+                          << pt->getStackSize();
+#endif
                     }
                   clog << endl;
                 }
@@ -105,7 +107,11 @@ TaskReportStacks::taskMain(void)
           os.sched.lock.exit();
         }
 
+#if defined(OS_INCLUDE_OSTIMERSECONDS)
       os.sched.timerSeconds.sleep(1);
+#else
+      os.sched.timerTicks.sleep(OS_CFGINT_TICK_RATE_HZ);
+#endif
     }
 }
 
