@@ -9,7 +9,7 @@
 #include "TaskBlink.h"
 #include "TaskBlinkRealTime.h"
 
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 //#define TICKS  (OS_CFGINT_TICK_RATE_HZ)
 
@@ -18,7 +18,7 @@ TaskBlink task1("A", APP_CFGINT_TASKBLINK_LEDBIT, APP_CFGINT_TASKBLINK_TICKS);
 TaskBlinkRealTime task2("B", APP_CFGINT_TASKBLINKREALTIME_LEDBIT, APP_CFGINT_TASKBLINKREALTIME_TICKS);
 
 bool g_flagNotify;
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
 
@@ -45,10 +45,4 @@ OSApplicationImpl::interruptTick(void)
 
 #endif /* defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK) */
 
-// ---------------------------------------------------------------------------
-
-// message to be displayed on the debugging device at startup
-#if defined(DEBUG)
-const char greeting[] = "AVI realTimeInterrupts v1.1";
-const char buildDateTime[] = "(" __DATE__ " " __TIME__ ")";
-#endif
+// ----------------------------------------------------------------------------
