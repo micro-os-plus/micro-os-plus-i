@@ -23695,7 +23695,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="TaskBlinkNested.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="portable/kernel/src/OSRealTime.cpp|portable/tasks|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block|hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="portable/kernel/src/OSRealTime.cpp|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block|hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
