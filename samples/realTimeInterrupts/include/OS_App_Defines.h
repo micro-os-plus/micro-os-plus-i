@@ -60,12 +60,10 @@
 //#define OS_INCLUDE_OSSCHEDULER_YIELD_UNDER_CONSTRUCTION (1)
 
 #if defined(DEBUG)
-// One of the following must be defined in Eclipse project or Makefile
-//#define OS_CONFIG_DEBUG_DEVICE_I2C                    1
-//#define OS_CONFIG_DEBUG_DEVICE_USART			1
 
-#define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS       (1)
+#define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS          (1)
 
+#define OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG            (1)
 //#define OS_DEBUG_OSSCHEDULER_STACKINITIALIZE            (1)
 #define OS_DEBUG_CONSTRUCTORS                           (1)
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
