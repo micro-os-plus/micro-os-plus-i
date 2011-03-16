@@ -14,7 +14,7 @@
 #define OS_CFGINT_TIMER_PRESCALLER                      (4)
 #define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
 
-#define OS_CFGINT_TASKS_TABLE_SIZE                      (3)
+#define OS_CFGINT_TASKS_TABLE_SIZE                      (4)
 
 #define OS_INCLUDE_OSTIMERSECONDS                       (1)
 #define OS_INCLUDE_TASKREPORTSTACKS                     (1)
@@ -37,6 +37,8 @@
 #define OS_CFGINT_IDLE_TASK_STACK_SIZE                  (800)
 
 #define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
+#define OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG            (1)
+
 #define OS_INCLUDE_OSTASK_GETSTACKUSED                  1
 //#define OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER             1
 #define OS_INCLUDE_CLOG                                 1
@@ -66,7 +68,6 @@
 
 #define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS          (1)
 
-#define OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG            (1)
 //#define OS_DEBUG_OSSCHEDULER_STACKINITIALIZE            (1)
 #define OS_DEBUG_CONSTRUCTORS                           (1)
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
@@ -78,7 +79,8 @@
 //#define OS_DEBUG_OSREADYLIST_REMOVE                     (1)
 //#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
 //#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
+//#define OS_DEBUG_OSTIMER_INTERRUPTTICK                  (1)
 
-#endif /*DEBUG*/
+#endif /* defined(DEBUG) */
 
-#endif /*OS_APP_DEFINES_H_ */
+#endif /* OS_APP_DEFINES_H_ */
