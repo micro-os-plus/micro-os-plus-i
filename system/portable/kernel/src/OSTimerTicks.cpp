@@ -97,8 +97,11 @@ OSTimerTicks::interruptServiceRoutine(void)
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
 
   if ((i++ % OS_CFGINT_TICK_RATE_HZ) == 0)
-    OSDeviceDebug::putChar('!');
-
+    {
+      OSDeviceDebug::putChar('!');
+      if (OSSchedulerLock::isSet())
+        OSDeviceDebug::putChar('L');
+    }
 #endif
 
 #if defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED)
