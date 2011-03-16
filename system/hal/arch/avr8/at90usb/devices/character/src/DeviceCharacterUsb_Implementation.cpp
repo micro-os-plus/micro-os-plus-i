@@ -86,7 +86,7 @@ int DeviceCharacterUsb::implWriteByte(unsigned char b)
     if (!m_opened)
       return OSReturn::OS_DISCONNECTED;
 
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
     while ( !OSUsbDevice::Is_usb_tx_ready() )
       {
@@ -116,7 +116,7 @@ int DeviceCharacterUsb::implWriteByte(unsigned char b)
         m_txCounter = 0;
       }
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
     return b;
   }
 
@@ -126,7 +126,7 @@ int DeviceCharacterUsb::implFlush(void)
     if (!m_opened)
       return OSReturn::OS_DISCONNECTED;
 
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
     if (m_txCounter != 0)
       {
@@ -136,7 +136,7 @@ int DeviceCharacterUsb::implFlush(void)
         m_txCounter = 0;
       }
   }
-OSScheduler::criticalExit();
+OSCriticalSection::exit();
     return 0;
   }
 
@@ -147,12 +147,12 @@ bool DeviceCharacterUsb::implCanRead()
 
 int DeviceCharacterUsb::implAvailableRead(void)
   {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
     OSUsbDevice::endpointSelect(m_rx_ep);
     m_rxCounter = OSUsbDevice::Usb_byte_counter();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
     return m_rxCounter;
   }
 
@@ -164,7 +164,7 @@ OSEvent_t DeviceCharacterUsb::implGetReadEvent(void)
 int DeviceCharacterUsb::implReadByte(void)
   {
     int c;
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
     OSUsbDevice::endpointSelect(m_rx_ep);
     c = OSUsbDevice::readByte();
@@ -186,7 +186,7 @@ int DeviceCharacterUsb::implReadByte(void)
 #endif
 
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
     // OS_CONFIG_USBINT_LED_PORT &= ~_BV( PORTD0 );
     return c;
   }

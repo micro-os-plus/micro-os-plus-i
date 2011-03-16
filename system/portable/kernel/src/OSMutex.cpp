@@ -61,7 +61,7 @@ OSMutex::acquire(bool doNotBlock)
       OSEventWaitReturn_t ret;
       bool doWait;
       doWait = false;
-      OSScheduler::criticalEnter();
+      OSCriticalSection::enter();
         {
           isAcquired = m_isAcquired;
           m_isAcquired = true;
@@ -86,7 +86,7 @@ OSMutex::acquire(bool doNotBlock)
                 }
             }
         }
-      OSScheduler::criticalExit();
+      OSCriticalSection::exit();
 
       if (!isAcquired)
         {
@@ -103,13 +103,13 @@ OSMutex::acquire(bool doNotBlock)
       if (doWait)
         {
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
-          OSScheduler::criticalEnter();
+          OSCriticalSection::enter();
             {
               OSScheduler::eventWaitPerform();
               // remove current task from waiting list
               m_waitingTasks.remove(OSScheduler::getTaskCurrent());
             }
-          OSScheduler::criticalExit();
+          OSCriticalSection::exit();
 #else
           OSScheduler::eventWaitPerform();
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
@@ -146,13 +146,13 @@ OSMutex::release(OSTask * pTask)
     }
 
   bool isAcquired;
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       isAcquired = m_isAcquired;
       m_isAcquired = false;
       m_pOwnerTask = 0;
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   if (!isAcquired)
     {

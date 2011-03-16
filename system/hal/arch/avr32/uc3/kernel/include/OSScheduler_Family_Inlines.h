@@ -451,7 +451,7 @@ SCALL_contextSave(void)
   );
 
   // Enter critical section to protect the global g_ppCurrentStack
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
 
   register unsigned int tmp1 asm("r8");
   register unsigned int tmp2 asm("r9");
@@ -519,7 +519,7 @@ SCALL_contextRestore(void)
   );
 
   // Exit the critical section used to protect the global g_ppCurrentStack
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   asm volatile
   (

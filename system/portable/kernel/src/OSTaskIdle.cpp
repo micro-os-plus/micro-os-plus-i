@@ -26,12 +26,12 @@ void OSTaskIdle::taskMain(void)
   {
 #if defined(DEBUG)
     // TODO : eventually define and use lockEnter()/lockExit()
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         OSDeviceDebug::putString_P(PSTR("OSTaskIdle::taskMain()"));
         OSDeviceDebug::putNewLine();
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
 #endif
 
     for (;;)

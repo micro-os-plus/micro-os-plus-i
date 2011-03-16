@@ -30,11 +30,11 @@ OSEventFlags::OSEventFlags()
 OSEventFlagsBits_t
 OSEventFlags::notify(OSEventFlagsBits_t bits)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       m_flags |= bits;
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
   OSScheduler::eventNotify((OSEvent_t) this, (OSEventWaitReturn_t) this);
 
   return m_flags;
@@ -48,11 +48,11 @@ OSEventFlags::notify(OSEventFlagsBits_t bits)
 OSEventFlagsBits_t
 OSEventFlags::clear(OSEventFlagsBits_t bits)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       m_flags &= ~bits;
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return m_flags;
 }
@@ -69,11 +69,11 @@ OSReturn_t
 OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
 {
   OSEventFlagsBits_t flags;
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       flags = m_flags;
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   // if requested bits are already set, return immediately
   if (((flags & bits) != 0))
@@ -84,7 +84,7 @@ OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
     {
 #if true
       ret = (OSEvent_t) this;
-      OSScheduler::criticalEnter();
+      OSCriticalSection::enter();
         {
           flags = m_flags;
           if (((flags & bits) == 0))
@@ -93,15 +93,15 @@ OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
               flags = m_flags;
             }
         }
-      OSScheduler::criticalExit();
+      OSCriticalSection::exit();
 #else
       ret = OSScheduler::eventWait((OSEvent_t)this);
 
-      OSScheduler::criticalEnter();
+      OSCriticalSection::enter();
         {
           flags = m_flags;
         }
-      OSScheduler::criticalExit();
+      OSCriticalSection::exit();
 #endif
       // Event could be notified by task interruption
       // in this case the event return is OS_CANCELED

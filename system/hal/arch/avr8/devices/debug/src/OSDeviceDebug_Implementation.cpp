@@ -16,7 +16,7 @@ void OSDeviceDebug::putString_P(const char * PROGMEM pc)
     if (pc == 0)
       return;
 
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         unsigned char buff[10];
         unsigned short i;
@@ -36,7 +36,7 @@ void OSDeviceDebug::putString_P(const char * PROGMEM pc)
             commonPutBytes((const char *)buff, i);
           }
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
   }
 
 #endif /*DEBUG*/

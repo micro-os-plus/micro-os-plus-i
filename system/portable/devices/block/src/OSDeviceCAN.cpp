@@ -56,11 +56,11 @@ int OSDeviceCAN::readPacket(CANPacket *p)
     bool flag;
     for (;;)
       {
-        OSScheduler::criticalEnter();
+        OSCriticalSection::enter();
           {
             flag = implCanRead() || !isConnected();
           }
-        OSScheduler::criticalExit();
+        OSCriticalSection::exit();
         if (flag)
         break;
 
@@ -94,11 +94,11 @@ int OSDeviceCAN::readPacket(CANPacket *p)
     return OSReturn::OS_DISCONNECTED;
 
     int c;
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         c = implReadPacket(p);
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
     return c;
   }
 
@@ -118,7 +118,7 @@ int OSDeviceCAN::writePacket(CANPacket *p)
     OSScheduler::timerTicks.sleep(1);
 #endif
 
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         // TODO: if needed, make it block
 
@@ -128,7 +128,7 @@ int OSDeviceCAN::writePacket(CANPacket *p)
 
         c = implWritePacket(p);
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
 
     return c;
   }

@@ -17,32 +17,32 @@ inline void OSDebugLed2::init(void)
 
 inline void OSDebugLed2::toggle(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         // toggle led
         OS_GPIO_PIN_TOGGLE(OS_CONFIG_DEBUG_LED2_PORT, OS_CONFIG_DEBUG_LED2_BIT);
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
   }
 
 inline void OSDebugLed2::on(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         // toggle led
         OS_GPIO_PIN_HIGH(OS_CONFIG_DEBUG_LED2_PORT, OS_CONFIG_DEBUG_LED2_BIT);
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
   }
 
 inline void OSDebugLed2::off(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         // toggle led
         OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_LED2_PORT, OS_CONFIG_DEBUG_LED2_BIT);
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
   }
 
 inline unsigned char OSDebugLed2::bitNumber(void)

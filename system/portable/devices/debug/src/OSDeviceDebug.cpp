@@ -82,22 +82,22 @@ OSDeviceDebug::commonPutBytes(const char *s, unsigned int n)
 void
 OSDeviceDebug::putChar(unsigned char c)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       commonPutByte(c);
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 void
 OSDeviceDebug::putNewLine(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       commonPutByte('\r');
       commonPutByte('\n');
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 void
@@ -106,11 +106,11 @@ OSDeviceDebug::putString(const char *pc)
   if (pc == 0)
     return;
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       commonPutBytes(pc, strlen(pc));
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 void
@@ -125,11 +125,11 @@ OSDeviceDebug::putHex(unsigned char b)
   c = (b & 0x0F);
   buff[1] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 void
@@ -153,11 +153,11 @@ OSDeviceDebug::putHex(unsigned short w)
   c = (b & 0x0F);
   buff[3] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG)
@@ -196,11 +196,11 @@ OSDeviceDebug::putHex(unsigned long l)
   c = (b & 0x0F);
   buff[7] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 #endif
@@ -242,11 +242,11 @@ OSDeviceDebug::putHex(unsigned int l)
   c = (b & 0x0F);
   buff[7] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 #endif
@@ -303,11 +303,11 @@ OSDeviceDebug::putPC(const char * PROGMEM pc)
   c = (b & 0x0F);
   buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 void
@@ -358,11 +358,11 @@ OSDeviceDebug::putPtr(const void *p)
   c = (b & 0x0F);
   buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 void
@@ -387,11 +387,11 @@ OSDeviceDebug::putDec(unsigned short w, unsigned short n)
     }
   if (i < (int) sizeof(buff))
     {
-      OSScheduler::criticalEnter();
+      OSCriticalSection::enter();
         {
           commonPutBytes((const char*) &buff[i], (int) sizeof(buff) - i);
         }
-      OSScheduler::criticalExit();
+      OSCriticalSection::exit();
     }
 }
 
@@ -418,11 +418,11 @@ void OSDeviceDebug::putDec(unsigned long w, unsigned short n)
       }
     if (i < ( int ) sizeof(buff ))
       {
-        OSScheduler::criticalEnter();
+        OSCriticalSection::enter();
           {
             commonPutBytes( (const char*)&buff[ i ], ( int ) sizeof(buff ) - i);
           }
-        OSScheduler::criticalExit();
+        OSCriticalSection::exit();
       }
   }
 #endif /*OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG*/
@@ -431,7 +431,7 @@ void
 OSDeviceDebug::__assert(const char *func, const char *file, int lineno,
     const char *sexp)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       putString_P(PSTR("assertion '"));
       putString(sexp);
@@ -446,7 +446,7 @@ OSDeviceDebug::__assert(const char *func, const char *file, int lineno,
       for (;;)
         implWDReset();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 // streambuf methods
@@ -456,11 +456,11 @@ int
 OSDeviceDebug::overflow(int c)
 {
   int r;
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       r = commonPutByte(c);
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return r;
 }
@@ -471,11 +471,11 @@ OSDeviceDebug::xsputn(const char* s, streamsize n)
 #if defined(DEBUG)
 
   int r;
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       r = commonPutBytes(s, n);
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return r;
 #else

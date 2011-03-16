@@ -70,12 +70,12 @@ OSTimerTicks::interruptServiceRoutine(void)
 
   implAcknowledgeInterrupt();
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       interruptTick();
       incrementTicks();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   OSScheduler::interruptTick();
 

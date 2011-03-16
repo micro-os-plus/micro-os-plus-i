@@ -106,7 +106,7 @@ OSDeviceCharacter::open(void)
       bool isConnected;
       bool doWait;
       doWait = false;
-      OSScheduler::criticalEnter();
+      OSCriticalSection::enter();
         {
           isConnected = implIsConnected();
           if (!isConnected)
@@ -116,7 +116,7 @@ OSDeviceCharacter::open(void)
               doWait = OSScheduler::eventWaitPrepare(event);
             }
         }
-      OSScheduler::criticalExit();
+      OSCriticalSection::exit();
       if (isConnected)
         break;
 
@@ -233,7 +233,7 @@ OSDeviceCharacter::writeByte(unsigned char b)
       bool doWait;
       doWait = false;
       OSEvent_t event;
-      OSScheduler::criticalEnter();
+      OSCriticalSection::enter();
         {
           canWrite = implCanWrite() || !implIsConnected();
           if (!canWrite)
@@ -243,7 +243,7 @@ OSDeviceCharacter::writeByte(unsigned char b)
               doWait = OSScheduler::eventWaitPrepare(event);
             }
         }
-      OSScheduler::criticalExit();
+      OSCriticalSection::exit();
 
       if (canWrite)
         break;
@@ -348,7 +348,7 @@ OSDeviceCharacter::readByte(void)
       bool doWait;
       doWait = false;
       OSEvent_t event;
-      OSScheduler::criticalEnter();
+      OSCriticalSection::enter();
         {
           canRead = implCanRead() || !implIsConnected();
           if (!canRead)
@@ -358,7 +358,7 @@ OSDeviceCharacter::readByte(void)
               doWait = OSScheduler::eventWaitPrepare(event);
             }
         }
-      OSScheduler::criticalExit();
+      OSCriticalSection::exit();
 
       if (canRead)
         break;

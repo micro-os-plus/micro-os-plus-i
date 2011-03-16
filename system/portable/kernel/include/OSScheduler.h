@@ -692,11 +692,11 @@ OSScheduler::ISR_ledActiveOn(void)
 inline void
 OSScheduler::ledActiveOn(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       ISR_ledActiveOn();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 /* Turn LED off (on interrupts) */
@@ -714,11 +714,11 @@ OSScheduler::ISR_ledActiveOff(void)
 inline void
 OSScheduler::ledActiveOff(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       ISR_ledActiveOff();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 #endif /* ! OS_EXCLUDE_OSSCHEDULER_LED_ACTIVE */

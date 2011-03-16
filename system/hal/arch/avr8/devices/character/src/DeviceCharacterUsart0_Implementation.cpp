@@ -31,14 +31,14 @@
 
 int DeviceCharacterUsart0::implPortInit(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         OSDeviceDebug::putString_P(PSTR("Baud constant="));
         OSDeviceDebug::putDec(
             ( unsigned short ) DEVICECHARACTERUSART0_BAUD_CONSTANT, 0);
         OSDeviceDebug::putNewLine();
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
 
     /* Set the baud rate. */
     UBRR0 = DEVICECHARACTERUSART0_BAUD_CONSTANT;

@@ -20,34 +20,34 @@ OSDebugLed1::init(void)
 inline void
 OSDebugLed1::toggle(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       // toggle led
       OS_GPIO_PIN_TOGGLE(OS_CONFIG_DEBUG_LED1_PORT, OS_CONFIG_DEBUG_LED1_BIT);
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 inline void
 OSDebugLed1::on(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       // toggle led
       OS_GPIO_PIN_HIGH(OS_CONFIG_DEBUG_LED1_PORT, OS_CONFIG_DEBUG_LED1_BIT);
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 inline void
 OSDebugLed1::off(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       // toggle led
       OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_LED1_PORT, OS_CONFIG_DEBUG_LED1_BIT);
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 inline unsigned char

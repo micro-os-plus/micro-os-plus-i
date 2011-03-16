@@ -164,24 +164,24 @@ OSTask::taskMain(void)
 void
 OSTask::suspend(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       m_isSuspended = true;
       OSActiveTasks::remove(this);
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 // Resume the task and insert into ready list.
 void
 OSTask::resume(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       m_isSuspended = false;
       OSActiveTasks::insert(this);
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 }
 
 char const *
@@ -377,11 +377,11 @@ void OSTask::requestInterruption(void)
   {
     setInterruption(true);
 
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         OSScheduler::ISRcancelTask(this);
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
 
 #if defined(DEBUG)
     OSDeviceDebug::putChar('>');
@@ -417,7 +417,7 @@ OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
 #if defined (OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL)
   OSScheduler::realTimeCriticalEnter();
 #else
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
 #endif
     {
       // not-suspended waiting tasks are notified
@@ -444,7 +444,7 @@ OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
             }
         }
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
 #if defined (OSTASK_NOTIFY_MEASURE)
   OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_APP_CONFIG_LED3);

@@ -58,26 +58,26 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
 
 #if false
           bool doYield;
-          OSScheduler::criticalEnter();
+          OSCriticalSection::enter();
             {
               doYield = insert(ticks, event, OSEventWaitReturn::OS_VOID)
                   && OSScheduler::eventWaitPrepare(event);
             }
-          OSScheduler::criticalExit();
+          OSCriticalSection::exit();
           if (doYield)
             {
               OSSchedulerImpl::yield();
             }
           ret = OSScheduler::getEventWaitReturn();
 #else
-          OSScheduler::criticalEnter();
+          OSCriticalSection::enter();
             {
               if ( insert(ticks, event, OSEventWaitReturn::OS_VOID))
                 ret = OSScheduler::eventWait(event);
               else
                 ret = OSEventWaitReturn::OS_FAILED;
             }
-          OSScheduler::criticalExit();
+          OSCriticalSection::exit();
 #endif
         }
     }
@@ -100,11 +100,11 @@ OSTimer::eventNotify(OSTimerTicks_t ticks, OSEvent_t event,
 {
   if (ticks != 0)
     {
-      OSScheduler::criticalEnter();
+      OSCriticalSection::enter();
         {
           insert(ticks, event, ret);
         }
-      OSScheduler::criticalExit();
+      OSCriticalSection::exit();
     }
 }
 
@@ -114,7 +114,7 @@ OSTimer::eventRemove(OSEvent_t event)
   int ret;
   ret = 0;
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       int cnt;
       cnt = m_count;
@@ -146,7 +146,7 @@ OSTimer::eventRemove(OSEvent_t event)
             }
         }
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return ret;
 }

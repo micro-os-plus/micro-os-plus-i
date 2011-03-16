@@ -36,32 +36,32 @@ inline void BlinkLed::init(void)
 
 inline void BlinkLed::toggle(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         // toggle led
         OS_CONFIG_BLINK_LED_PORT ^= _BV(OS_CONFIG_BLINK_LED_BIT);
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
   }
 
 inline void BlinkLed::on(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         // toggle led
         OS_CONFIG_BLINK_LED_PORT |= _BV(OS_CONFIG_BLINK_LED_BIT);
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
   }
 
 inline void BlinkLed::off(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         // toggle led
         OS_CONFIG_BLINK_LED_PORT &= ~_BV(OS_CONFIG_BLINK_LED_BIT);
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
   }
 
 inline unsigned char BlinkLed::bitNumber(void)

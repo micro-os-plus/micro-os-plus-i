@@ -35,11 +35,11 @@ inline void OSScheduler::ISRledActiveOn(void)
 
 inline void OSScheduler::ledActiveOn(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         ISRledActiveOn();
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
   }
 
 /* Turn LED off (on interrupts) */
@@ -51,11 +51,11 @@ inline void OSScheduler::ISRledActiveOff(void)
 /* Turn LED off (at sleep) */
 inline void OSScheduler::ledActiveOff(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         ISRledActiveOff();
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
     }
 
 #endif /*HAL_FAMILY_OSSCHEDULER_INLINES_H_*/

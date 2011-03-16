@@ -36,7 +36,7 @@
 int
 DeviceCharacterBufferedUsart1::implPortInit(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
     OSDeviceDebug::putString("Baud rate=");
     OSDeviceDebug::putDec(
@@ -51,7 +51,7 @@ DeviceCharacterBufferedUsart1::implPortInit(void)
           (unsigned short) CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_CONSTANT, 0);
       OSDeviceDebug::putNewLine();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   /* Set the baud rate. */
   UBRR1 = CFGINT_DEVICECHARACTERBUFFEREDUSART_BAUD_CONSTANT;

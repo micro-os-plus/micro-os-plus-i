@@ -60,13 +60,13 @@ int
 OSDeviceCharacterBuffered::implOpen(void)
 {
 #if defined(DEBUG)
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       // TODO : eventually define and use lockEnter()/lockExit()
       OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered::implOpen()"));
       OSDeviceDebug::putNewLine();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 #endif /* defined(DEBUG) */
 
   //assert(ms_pThis == this);
@@ -81,12 +81,12 @@ OSDeviceCharacterBuffered::implClose(void)
 {
 #if defined(DEBUG)
   // TODO : eventually define and use lockEnter()/lockExit()
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered::implClose()"));
       OSDeviceDebug::putNewLine();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 #endif /* defined(DEBUG) */
 
   // TODO: probably should wait queue to drain and disable port
@@ -114,11 +114,11 @@ bool
 OSDeviceCharacterBuffered::implCanRead()
 {
   bool f;
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       f = m_rxBuf.isEmpty();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return !f;
 }
@@ -127,11 +127,11 @@ int
 OSDeviceCharacterBuffered::implAvailableRead()
 {
   int r;
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       r = m_rxBuf.length();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return r;
 }
@@ -140,11 +140,11 @@ int
 OSDeviceCharacterBuffered::implReadByte(void)
 {
   int r;
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       r = m_rxBuf.get();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return r;
 }
@@ -189,11 +189,11 @@ OSDeviceCharacterBuffered::implCanWrite(void)
   //OSDeviceDebug::putString("OSDeviceCharacterBuffered::implCanWrite() ");
   //OSDeviceDebug::putNewLine();
   bool f;
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       f = !m_txBuf.isFull();
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return f;
 }
@@ -201,7 +201,7 @@ OSDeviceCharacterBuffered::implCanWrite(void)
 int
 OSDeviceCharacterBuffered::implWriteByte(unsigned char b)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       m_txBuf.put(b);
 
@@ -210,7 +210,7 @@ OSDeviceCharacterBuffered::implWriteByte(unsigned char b)
           implInterruptTxEnable(); // start transmission
         }
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return b;
 }
@@ -221,14 +221,14 @@ OSDeviceCharacterBuffered::implFlush(void)
 #if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_IMPLFLUSH)
   OSDeviceDebug::putChar('f');
 #endif
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       if (!m_txBuf.isEmpty())
         {
           implInterruptTxEnable();
         }
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
   return 0;
 }

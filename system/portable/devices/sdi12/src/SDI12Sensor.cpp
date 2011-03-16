@@ -194,7 +194,7 @@ void SDI12Sensor::disableMarking(void)
 // critical section moved here from OSTimerTicks::interruptServiceRoutine
 void SDI12Sensor::interruptTick(void)
   {
-    OSScheduler::criticalEnter();
+    OSCriticalSection::enter();
       {
         //OSDeviceDebug::putString(".");
         if (ms_timerTimeout != 0)
@@ -242,7 +242,7 @@ void SDI12Sensor::interruptTick(void)
               }
           }
       }
-    OSScheduler::criticalExit();
+    OSCriticalSection::exit();
   }
 
 // ---------------------------------------------------------------------------

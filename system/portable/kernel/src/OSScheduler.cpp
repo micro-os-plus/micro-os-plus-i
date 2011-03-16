@@ -292,7 +292,7 @@ OSScheduler::performContextSwitch()
   // If scheduler is not locked, perform the context switch
   if (!OSSchedulerLock::isSet())
     {
-      OSScheduler::criticalEnter();
+      OSCriticalSection::enter();
         {
           // Remove the running task from the ready list
           OSActiveTasks::remove(ms_pTaskRunning);
@@ -306,7 +306,7 @@ OSScheduler::performContextSwitch()
           // Prepare the global value with the pointer to the m_pStack.
           g_ppCurrentStack = &ms_pTaskRunning->m_pStack;
         }
-      OSScheduler::criticalExit();
+      OSCriticalSection::exit();
     }
   else
     {
@@ -347,7 +347,7 @@ OSScheduler::taskRegister(OSTask *pTask)
   unsigned char id;
   id = 0xFF;
 
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
     {
       if (ms_tasksCount < (sizeof(ms_tasks) / sizeof(ms_tasks[0])))
         {
@@ -367,7 +367,7 @@ OSScheduler::taskRegister(OSTask *pTask)
       if (id != 0xFF && ms_isRunning)
         OSActiveTasks::insert(pTask); // insert task in ready list
     }
-  OSScheduler::criticalExit();
+  OSCriticalSection::exit();
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_TASKREGISTER)
   if (false)
