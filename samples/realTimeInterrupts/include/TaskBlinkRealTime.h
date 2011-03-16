@@ -34,8 +34,11 @@ public:
   void
   interruptAcknowledge(void);
 
+  static void
+  contextHandler(void) __attribute__((interrupt));
+
   void
-  interruptServiceRoutine(void) __attribute__ ((noinline));
+  interruptServiceRoutine(void) __attribute__((noinline));
 
 private:
   // members
