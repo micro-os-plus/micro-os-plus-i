@@ -13,8 +13,10 @@
 
 // ----------------------------------------------------------------------------
 
-TaskBlink task1("A", APP_CFGINT_TASKBLINK_LEDBIT, APP_CFGINT_TASKBLINK_TICKS);
-TaskBlinkRealTime task2("B", APP_CFGINT_TASKBLINKREALTIME_LEDBIT, APP_CFGINT_TASKBLINKREALTIME_TICKS);
+TaskBlink taskA("A", APP_CFGINT_TASKBLINK_LEDBIT, APP_CFGINT_TASKBLINK_TICKS);
+
+TaskBlinkRealTime taskB("B", APP_CFGINT_TASKBLINKREALTIME_LEDBIT,
+    APP_CFGINT_TASKBLINKREALTIME_TICKS);
 
 TaskReportStacks taskR("R", APP_CFGINT_DUMP_INTERVAL_SECONDS,
     APP_CFGINT_DUMP_MAX_INTERVAL_SECONDS,
@@ -42,7 +44,7 @@ OSApplicationImpl::interruptTick(void)
     os.sched.eventNotify(APP_EVENT_DUMMY);
 #endif
 #endif
-  if(g_flagNotify)
+  if (g_flagNotify)
     {
       g_flagNotify = false;
       os.sched.eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
