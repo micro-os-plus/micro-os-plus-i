@@ -48,10 +48,10 @@ TaskReportStacks::taskMain(void)
     }
 
 
-  int i;
+  unsigned int i;
   i = 0;
 
-  int n;
+  unsigned int n;
   n = m_rateSeconds; //APP_CFGINT_DUMP_INTERVAL_SECONDS;
 
   // task endless loop
