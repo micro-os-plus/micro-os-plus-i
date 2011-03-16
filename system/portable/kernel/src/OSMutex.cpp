@@ -113,7 +113,7 @@ OSMutex::acquire(bool doNotBlock)
 #else
           OSScheduler::eventWaitPerform();
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
-          }
+        }
       ret = OSScheduler::getEventWaitReturn();
 
       if (ret != (OSEventWaitReturn_t) m_event && ret
@@ -186,7 +186,7 @@ OSMutex::release(OSTask * pTask)
   OSDeviceDebug::putString("OSMutex::release() OK");
   OSDeviceDebug::putNewLine();
 #endif
-  return OK;
+  return OS_OK;
 }
 
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
@@ -236,7 +236,7 @@ OSMutexWaitingTasks::remove(OSTask* pTask)
 {
   int j;
   j = -1;
-  for (int i = 0; i < m_waitingTasksCount; ++i)
+  for (int i = 0; i < (int)m_waitingTasksCount; ++i)
     if (m_pWaitingTasksArray[i] == pTask)
       j = i;
 
@@ -250,7 +250,7 @@ OSMutexWaitingTasks::remove(OSTask* pTask)
       return OSReturn::OS_ITEM_NOT_FOUND;
     }
 
-  for (; j < m_waitingTasksCount - 1; ++j)
+  for (; j < (int)m_waitingTasksCount - 1; ++j)
     m_pWaitingTasksArray[j] = m_pWaitingTasksArray[j + 1];
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSMUTEXWAITINGTASKS_REMOVE)
