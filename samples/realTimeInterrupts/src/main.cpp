@@ -11,7 +11,7 @@
 
 // ---------------------------------------------------------------------------
 
-#define TICKS  (OS_CFGINT_TICK_RATE_HZ)
+//#define TICKS  (OS_CFGINT_TICK_RATE_HZ)
 
 // tasks allocated on static storage
 TaskBlink task1("A", APP_CFGINT_TASKBLINK_LEDBIT, APP_CFGINT_TASKBLINK_TICKS);
