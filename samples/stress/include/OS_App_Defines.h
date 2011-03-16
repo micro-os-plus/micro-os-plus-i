@@ -16,6 +16,8 @@
 
 #define OS_CFGINT_TASKS_TABLE_SIZE                      (13)
 
+#define OS_INCLUDE_TASKREPORTSTACKS                     (1)
+
 #define OS_INCLUDE_OSTIMERSECONDS                       (1)
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
