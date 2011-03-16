@@ -6,18 +6,24 @@
 
 #include "portable/kernel/include/uOS.h"
 
+#include "portable/tasks/include/TaskReportStacks.h"
+
 #include "TaskBlink.h"
 #include "TaskBlinkRealTime.h"
 
 // ----------------------------------------------------------------------------
 
-//#define TICKS  (OS_CFGINT_TICK_RATE_HZ)
-
-// tasks allocated on static storage
 TaskBlink task1("A", APP_CFGINT_TASKBLINK_LEDBIT, APP_CFGINT_TASKBLINK_TICKS);
 TaskBlinkRealTime task2("B", APP_CFGINT_TASKBLINKREALTIME_LEDBIT, APP_CFGINT_TASKBLINKREALTIME_TICKS);
 
+TaskReportStacks taskR("R", APP_CFGINT_DUMP_INTERVAL_SECONDS,
+    APP_CFGINT_DUMP_MAX_INTERVAL_SECONDS,
+    APP_CFGINT_DUMP_INCREASE_RATE_PROCENTS);
+
+// ----------------------------------------------------------------------------
+
 bool g_flagNotify;
+
 // ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
