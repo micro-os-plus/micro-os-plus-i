@@ -165,6 +165,31 @@ public:
 
 // ----------------------------------------------------------------------------
 
+class OSRealTimeCriticalSection
+{
+public:
+  // Pair of functions, using a stack to save/restore value
+  static void
+  enter(void) __attribute__((always_inline));
+  static void
+  exit(void) __attribute__((always_inline));
+
+private:
+  char m_dummy;
+};
+
+class OSRealTime
+{
+public:
+  // critical section support
+  static OSRealTimeCriticalSection critical;
+
+private:
+  char m_dummy;
+};
+
+// ----------------------------------------------------------------------------
+
 extern "C" OSStack_t **g_ppCurrentStack;
 
 #include "portable/devices/debug/include/OSDeviceDebug.h"
@@ -228,6 +253,10 @@ public:
 
   // Scheduler object used by this class.
   OSScheduler sched;
+
+  // Real time support
+  OSRealTime rt;
+
 #endif
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
@@ -286,6 +315,8 @@ private:
   static void staticConstructorsInit(void);
   };
 
+// ----------------------------------------------------------------------------
+
 #if defined(OS_CONFIG_ARCH_AVR8)
 #include "hal/arch/avr8/kernel/include/OS_Arch_Inlines.h"
 
@@ -316,5 +347,28 @@ private:
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
+
+// ----------------------------------------------------------------------------
+
+inline void
+OSRealTimeCriticalSection::enter(void)
+{
+  register OSStack_t tmp;
+
+  tmp = OSCPUImpl::getInterruptsMask();
+  OSCPUImpl::stackPush(tmp);
+  OSCPUImpl::interruptsDisable();
+}
+
+inline void
+OSRealTimeCriticalSection::exit(void)
+{
+  register OSStack_t tmp;
+
+  tmp = OSCPUImpl::stackPop();
+  OSCPUImpl::setInterruptsMask(tmp);
+}
+
+// ----------------------------------------------------------------------------
 
 #endif /*OS_H_ */

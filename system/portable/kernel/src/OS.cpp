@@ -6,8 +6,13 @@
 
 #include "portable/kernel/include/OS.h"
 
-// static members
+// ----- Static Data ----------------------------------------------------------
+
 OSResetBits_t OSCPU::ms_resetBits;
+
+OSRealTimeCriticalSection OSRealTime::critical;
+
+// ----------------------------------------------------------------------------
 
 #if defined(DEBUG) && !defined(OS_EXCLUDE_MULTITASKING)
 
