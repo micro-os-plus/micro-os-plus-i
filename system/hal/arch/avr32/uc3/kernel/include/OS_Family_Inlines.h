@@ -143,20 +143,6 @@ OSCPUImpl::interruptsDisable(void)
 }
 
 inline void
-OSCPUImpl::interruptsClearMask(void)
-{
-  ; // TODO: implement it
-}
-
-#if false
-inline void
-OSCPUImpl::interruptsSetMask(void)
-{
-  ; // TODO: implement it
-}
-#endif
-
-inline void
 OSCPUImpl::idle(void)
 {
   asm volatile
@@ -238,7 +224,7 @@ OSCPUImpl::stackPop(void)
 
   asm volatile
   (
-      " ld.w    %[R], sp++ \n"  // pop value from stack
+      " ld.w    %[R], sp++ \n" // pop value from stack
 
       : [R] "=r" (tmp)
       :
