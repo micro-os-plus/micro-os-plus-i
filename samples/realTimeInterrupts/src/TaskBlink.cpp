@@ -40,7 +40,7 @@ TaskBlink::taskMain(void)
           debug.putString("Task '");
           debug.putString(getName());
           debug.putString("', led=");
-          debug.putDec(m_oLed.bitNumber());
+          debug.putDec((unsigned short)m_oLed.bitNumber());
           debug.putString(", ticks=");
           debug.putDec(m_rate);
           debug.putNewLine();
