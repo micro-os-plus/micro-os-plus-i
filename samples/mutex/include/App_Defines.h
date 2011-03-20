@@ -59,15 +59,21 @@
 #error "Missing OS_CONFIG_BOARD_* board definition"
 #endif
 
-#define APP_CFGINT_TASKBLINK_TICKS      (OS_CFGINT_TICK_RATE_HZ)
+// ----------------------------------------------------------------------------
 
-#define APP_CFGINT_TASKREPORT_SECONDS   (4)
-#define APP_CFGINT_TASKBLINK_LEDBIT     APP_CONFIG_LED1
+#define APP_CFGINT_TASKBLINK_TICKS              (OS_CFGINT_TICK_RATE_HZ)
+
+#define APP_CFGINT_TASKREPORT_SECONDS           (4)
+#define APP_CFGINT_TASKBLINK_LEDBIT             APP_CONFIG_LED1
 
 #define APP_INCLUDE_OSMUTEX_WAITING_TASKS (1)
 
 // The maximum number of mutex stress tasks
-#define APP_CONFIG_RESOURCES_ARRAY_SIZE (10)
-#define APP_CONFIG_ERROR_CODE           (-1)
+#define APP_CONFIG_RESOURCES_ARRAY_SIZE         (10)
+#define APP_CONFIG_ERROR_CODE                   (-1)
+
+//#define APP_CFGINT_TASKSTRESS_RAND_CONST        (1)
+
+// ----------------------------------------------------------------------------
 
 #endif /* APP_DEFINES_H_ */
