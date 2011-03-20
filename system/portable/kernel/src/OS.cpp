@@ -88,6 +88,7 @@ OS::resetHandler(void)
   OSDeviceDebug::earlyInit();
 #endif /* defined(DEBUG) */
 
+  // will call OSScheduler::earlyInit() to init registered tasks count
   OS::earlyInit();
 
   OS::staticConstructorsInit();
