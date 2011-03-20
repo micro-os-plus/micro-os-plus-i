@@ -41,7 +41,8 @@
 
 // used for activating the mutex mechanism
 #define OS_INCLUDE_OSMUTEX                              (1)
-#define OS_INCLUDE_OSMUTEX_WAITING_TASKS                (1)
+//#define OS_INCLUDE_OSMUTEX_WAITING_TASKS                (1)
+#define OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY       (1)
 
 #if defined(DEBUG)
 
