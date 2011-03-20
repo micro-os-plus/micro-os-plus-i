@@ -231,6 +231,10 @@
 #define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          (1)
 #endif
 
+#if !defined(OS_INCLUDE_OSTREAM_LONG) && (__SIZEOF_INT__ == 4)
+#define OS_INCLUDE_OSTREAM_LONG                         (1)
+#endif
+
 // ----- PROGMEM --------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_SEPARATE_PROGMEM)
