@@ -94,6 +94,9 @@ TaskStress::rand(void)
 {
   unsigned int ret;
 
+#if defined(APP_CFGINT_TASKSTRESS_RAND_CONST)
+  ret = APP_CFGINT_TASKSTRESS_RAND_CONST;
+#else
   os.sched.lock.enter();
     {
       ms_rand = ms_rand * 214013L + 2531011L;
@@ -115,6 +118,7 @@ TaskStress::rand(void)
         }
       os.sched.lock.exit();
     }
+#endif /* defined(APP_CFGINT_TASKSTRESS_RAND_CONST) */
 
   return ret;
 }
