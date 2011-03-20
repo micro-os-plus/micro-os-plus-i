@@ -30,6 +30,10 @@ bool OSScheduler::ms_isRunning;
 bool OSScheduler::ms_isPreemptive;
 
 unsigned char OSScheduler::ms_tasksCount;
+#if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
+unsigned char OSScheduler::ms_notifyIndex;
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
+
 // The +1 is here to reserve space for the idle task.
 OSTask *OSScheduler::ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 
@@ -107,6 +111,10 @@ OSScheduler::earlyInit(void)
   // do not reset if not run before any constructor (<=.init6)
   // since task constructors can increment it
   ms_tasksCount = 0;
+
+#if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
+  ms_notifyIndex = 0;
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 }
 
 #if defined(DEBUG)
@@ -237,23 +245,70 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
   cnt = 0;
 
   int i;
+
+#if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
+
+// Instead of always starting the notification from the first registered task,
+// the round-robin notification mechanism remembers the first notified task
+// and next time starts from the next one.
+
+  int notifyIndex;
+  int firstNotified = -1;
+  notifyIndex = ms_notifyIndex;
+  
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
+
   for (i = 0; i < ms_tasksCount; ++i)
     {
       OSTask *pt;
+#if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
+      pt = ms_tasks[notifyIndex];
+#else
       pt = ms_tasks[i];
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
+
       if (pt != 0)
         {
-          cnt += pt->eventNotify(event, ret);
+          int r;
+          r = pt->eventNotify(event, ret);
+#if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
+          // Remember the first notified task index
+          if (firstNotified == -1 && r != 0)
+            firstNotified = notifyIndex;
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
+
+          cnt += r;
         }
+
+#if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
+      notifyIndex++;
+      if (notifyIndex >= ms_tasksCount)
+        notifyIndex = 0;
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
     }
 
-  // return the number of notified tasks
+#if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
+  OSCriticalSection::enter();
+    {
+      if (firstNotified > 0)
+        ms_notifyIndex = firstNotified;
+
+      ms_notifyIndex++;
+      if (ms_notifyIndex >= ms_tasksCount)
+        {
+          ms_notifyIndex = 0;
+        }
+    }
+  OSCriticalSection::exit();
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
+
+  // Return the number of notified tasks
   return cnt;
 }
 
-// quick check if a context switch is necessary
-// executed on interrupts to save a few cycles by not entering the
-// context switch routine
+// Quick check if a context switch is necessary.
+// It is executed on interrupts to save a few cycles by not entering the
+// context switch routine.
 
 bool
 OSScheduler::isContextSwitchRequired()

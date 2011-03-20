@@ -301,6 +301,10 @@ private:
   static unsigned char ms_tasksCount;
   //static unsigned char tasksIdx;
 
+#if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
+  static unsigned char ms_notifyIndex;
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
+
   // the Idle task
   static OSTask *ms_pTaskIdle;
 
