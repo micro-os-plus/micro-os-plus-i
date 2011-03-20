@@ -14,13 +14,13 @@
 
 ostream::ostream(streambuf * sb) :
   ios(sb)
-  {
+{
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("ostream()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString("ostream()=");
+  OSDeviceDebug::putPtr(this);
+  OSDeviceDebug::putNewLine();
 #endif
-  }
+}
 
 #if 0
 ostream::ostream( OSDeviceCharacter * dev ) : ios( dev )
@@ -42,124 +42,45 @@ ostream::ostream( OSDeviceCharacter * dev ) : ios( dev )
  */
 
 ostream::~ostream()
-  {
-    ;
-  }
+{
+  ;
+}
 
-ostream & ostream::operator <<( bool n )
-  {
-    //sentry s( *this );
-    if ( ios::flags() & ios_base::boolalpha )
-      {
-        if ( n )
-          {
-            write( "true", 4 );
-          }
-        else
-          {
-            write( "false", 5 );
-          }
-      }
-    else
-      {
-        if ( n )
-          {
-            put( '1' );
-          }
-        else
-          {
-            put( '0' );
-          }
-      }
+ostream &
+ostream::operator <<(bool n)
+{
+  //sentry s( *this );
+  if (ios::flags() & ios_base::boolalpha)
+    {
+      if (n)
+        {
+          write("true", 4);
+        }
+      else
+        {
+          write("false", 5);
+        }
+    }
+  else
+    {
+      if (n)
+        {
+          put('1');
+        }
+      else
+        {
+          put('0');
+        }
+    }
 
-    if ( ios::flags() & ios_base::unitbuf )
-      {
-        flush();
-      }
-    return *this;
-  }
+  if (ios::flags() & ios_base::unitbuf)
+    {
+      flush();
+    }
+  return *this;
+}
 
-void print16(ostream& out, unsigned short w, bool sign = false);
-
-void print16(ostream& out, unsigned short w, bool sign)
-  {
-    streamsize width;
-    width = out.width();
-    if ( (out.flags() & ios_base::basefield ) == ios_base::hex)
-      {
-        unsigned char upp;
-        upp = 0;
-        if ( !(out.flags() & ios_base::uppercase ))
-          upp = 'a' - 'A';
-
-        if (out.flags() & ios_base::showbase)
-          {
-            out.put( '0');
-            out.put( 'X' + upp);
-          }
-
-        upp = 0; // ! explicitly set all hex to upper case
-
-        unsigned char c;
-        unsigned char b;
-        b = (w >> 8);
-        if (width == 0|| width > 3)
-          {
-            c = ( (b >> 4) & 0x0F);
-            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
-          }
-        if (width == 0|| width > 2)
-          {
-            c = (b & 0x0F);
-            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
-          }
-        b = (w & 0xFF);
-        if (width == 0|| width > 1)
-          {
-            c = ( (b >> 4) & 0x0F);
-            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
-          }
-        c = (b & 0x0F);
-        out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
-      }
-    else if ( (out.flags() & ios_base::basefield ) == ios_base::oct)
-      {
-        ; // not yet implemented
-      }
-    else // decimal
-      {
-        if (sign)
-          {
-            int n;
-            n = w;
-            if (n < 0)
-              {
-                out.put( '-');
-                w = -n;
-              }
-          }
-        int i;
-        unsigned char buff[ 5 ];
-
-        for (i = sizeof(buff ) - 1; i >= 0; i--)
-          {
-            buff[ i ] = (w % 10) + '0';
-            w /= 10;
-          }
-
-        if ( 0 < width && width <= ( int ) sizeof(buff ) )
-          i = ( int ) sizeof(buff ) - width;
-        else
-          {
-            for (i = 0; i < ( int ) sizeof(buff ) - 1; ++i)
-              if (buff[ i ] != '0')
-                break;
-          }
-        for (; i < ( int ) sizeof(buff ); ++i)
-          out.put(buff[ i ]);
-      }
-    out.width( 0);
-  }
+#if defined(OS_INCLUDE_OSTREAM_LONG)
 
 void print32(ostream& out, unsigned long l, bool sign = false);
 
@@ -172,7 +93,7 @@ void print32(ostream& out, unsigned long l, bool sign)
         unsigned char upp;
         upp = 0;
         if ( !(out.flags() & ios_base::uppercase ))
-          upp = 'a' - 'A';
+        upp = 'a' - 'A';
 
         if (out.flags() & ios_base::showbase)
           {
@@ -231,6 +152,7 @@ void print32(ostream& out, unsigned long l, bool sign)
         ; // not yet implemented
       }
     else // decimal
+
       {
         if (sign)
           {
@@ -252,52 +174,26 @@ void print32(ostream& out, unsigned long l, bool sign)
           }
 
         if ( 0 < width && width <= ( int ) sizeof(buff ) )
-          i = ( int ) sizeof(buff ) - width;
+        i = ( int ) sizeof(buff ) - width;
         else
           {
             for (i = 0; i < ( int ) sizeof(buff ) - 1; ++i)
-              if (buff[ i ] != '0')
-                break;
+            if (buff[ i ] != '0')
+            break;
           }
         for (; i < ( int ) sizeof(buff ); ++i)
-          out.put(buff[ i ]);
+        out.put(buff[ i ]);
       }
     out.width( 0);
   }
 
-ostream& ostream::operator <<( unsigned short n )
-  {
-    //sentry s( *this );
-    print16( *this, n );
-    return *this;
-  }
+#endif
 
-ostream& ostream::operator <<( short n )
-  {
-    //sentry s( *this );
-    print16( *this, ( unsigned short ) n, true );
-    return *this;
-  }
+#if (__SIZEOF_INT__ == 2)
 
-ostream& ostream::operator <<( int n )
-  {
-    //sentry s( *this );
-    print16( *this, ( unsigned short ) n, true );
-    return *this;
-  }
+void print16(ostream& out, unsigned short w, bool sign = false);
 
-ostream& ostream::operator <<( unsigned int n )
-  {
-    //sentry s( *this );
-    print16( *this, ( unsigned short ) n );
-    return *this;
-  }
-
-#if defined(OS_INCLUDE_OSTREAM_LONG)
-
-void print32(ostream& out, unsigned long w, bool sign = false);
-
-void print32(ostream& out, unsigned long w, bool sign)
+void print16(ostream& out, unsigned short w, bool sign)
   {
     streamsize width;
     width = out.width();
@@ -306,7 +202,7 @@ void print32(ostream& out, unsigned long w, bool sign)
         unsigned char upp;
         upp = 0;
         if ( !(out.flags() & ios_base::uppercase ))
-          upp = 'a' - 'A';
+        upp = 'a' - 'A';
 
         if (out.flags() & ios_base::showbase)
           {
@@ -318,21 +214,25 @@ void print32(ostream& out, unsigned long w, bool sign)
 
         unsigned char c;
         unsigned char b;
-        int i;
-        for (i = 3; i > 0; --i)
+        b = (w >> 8);
+        if (width == 0|| width > 3)
           {
-            b = (w >> i );
-            if (width == 0 || width > (2*i+1))
-              {
-                c = ( (b >> 4 ) & 0x0F );
-                out.put(c < 10 ? c + '0' : c + 'A' + upp - 10);
-              }
-            if (width == 0 || width > (2*i))
-              {
-                c = (b & 0x0F );
-                out.put(c < 10 ? c + '0' : c + 'A' + upp - 10);
-              }
+            c = ( (b >> 4) & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
           }
+        if (width == 0|| width > 2)
+          {
+            c = (b & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+          }
+        b = (w & 0xFF);
+        if (width == 0|| width > 1)
+          {
+            c = ( (b >> 4) & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
+          }
+        c = (b & 0x0F);
+        out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
       }
     else if ( (out.flags() & ios_base::basefield ) == ios_base::oct)
       {
@@ -343,7 +243,7 @@ void print32(ostream& out, unsigned long w, bool sign)
       {
         if (sign)
           {
-            long n;
+            int n;
             n = w;
             if (n < 0)
               {
@@ -352,27 +252,79 @@ void print32(ostream& out, unsigned long w, bool sign)
               }
           }
         int i;
-        unsigned char buff[ 10 ];
+        unsigned char buff[ 5 ];
 
         for (i = sizeof(buff ) - 1; i >= 0; i--)
           {
-            buff[ i ] = (w % 10 ) + '0';
+            buff[ i ] = (w % 10) + '0';
             w /= 10;
           }
 
         if ( 0 < width && width <= ( int ) sizeof(buff ) )
-          i = ( int ) sizeof(buff ) - width;
+        i = ( int ) sizeof(buff ) - width;
         else
           {
             for (i = 0; i < ( int ) sizeof(buff ) - 1; ++i)
-              if (buff[ i ] != '0')
-                break;
+            if (buff[ i ] != '0')
+            break;
           }
         for (; i < ( int ) sizeof(buff ); ++i)
-          out.put(buff[ i ]);
+        out.put(buff[ i ]);
       }
     out.width( 0);
   }
+#endif
+
+ostream&
+ostream::operator <<(unsigned short n)
+{
+  //sentry s( *this );
+#if (__SIZEOF_INT__ == 2)
+  print16( *this, n );
+#else
+  print32(*this, (unsigned long) n);
+#endif /* (__SIZEOF_INT__ == 2) */
+  return *this;
+}
+
+ostream&
+ostream::operator <<(short n)
+{
+  //sentry s( *this );
+#if (__SIZEOF_INT__ == 2)
+  print16( *this, ( unsigned short ) n, true );
+  print32( *this, ( unsigned long ) n, true );
+#else
+  print32(*this, (unsigned long) n, true);
+#endif /* (__SIZEOF_INT__ == 2) */
+  return *this;
+}
+
+ostream&
+ostream::operator <<(int n)
+{
+  //sentry s( *this );
+#if (__SIZEOF_INT__ == 2)
+  print16( *this, ( unsigned short ) n, true );
+#else
+  print32(*this, (unsigned long) n, true);
+#endif /* (__SIZEOF_INT__ == 2) */
+  return *this;
+}
+
+ostream&
+ostream::operator <<(unsigned int n)
+{
+  //sentry s( *this );
+#if (__SIZEOF_INT__ == 2)
+  print16(*this, (unsigned short) n);
+#else
+  print32( *this, ( unsigned long ) n );
+#endif /* (__SIZEOF_INT__ == 2) */
+  return *this;
+}
+
+#if defined(OS_INCLUDE_OSTREAM_LONG)
 
 ostream& ostream::operator <<( long n )
   {
@@ -388,7 +340,7 @@ ostream& ostream::operator <<( unsigned long n )
     return *this;
   }
 
-#endif
+#endif /* defined(OS_INCLUDE_OSTREAM_LONG) */
 
 #if defined(OS_INCLUDE_OSTREAM_FLOAT)
 
@@ -418,24 +370,24 @@ ostream::operator <<( long double f )
     //-- __ostream_printout::printout( *this, f );
     return *this;
   }
-#endif
+#endif /* defined(OS_INCLUDE_OSTREAM_FLOAT) */
 
 #if true
 ostream&
-ostream::operator <<( void *p )
-  {
-    //sentry s( *this );
-    p = p;
-    //-- char buffer[ 20 ];
-    //-- write( buffer, snprintf( buffer, 20, "%p", p ));
-    print32( *this, ( unsigned int ) p );
+ostream::operator <<(void *p)
+{
+  //sentry s( *this );
+  p = p;
+  //-- char buffer[ 20 ];
+  //-- write( buffer, snprintf( buffer, 20, "%p", p ));
+  print32(*this, (unsigned int) p);
 
-    if ( ios::flags() & ios_base::unitbuf )
-      {
-        flush();
-      }
-    return *this;
-  }
+  if (ios::flags() & ios_base::unitbuf)
+    {
+      flush();
+    }
+  return *this;
+}
 #endif
 
 #if 0
@@ -464,77 +416,80 @@ ostream::operator <<( streambuf * sb )
   }
 #endif
 
-ostream& ostream::flush()
-  {
-    /* if ( ios::m_device != 0 )
-     {
-     if ( ios::m_device->flush() < 0 )
-     ios::setstate( ios_base::badbit );
-     }
-     else */if (ios::m_streambuf != 0)
-      {
-        if (ios::m_streambuf->pubsync() == -1)
-          {
-            ios::setstate(ios_base::badbit);
-          }
-      }
-    return *this;
-  }
+ostream&
+ostream::flush()
+{
+  /* if ( ios::m_device != 0 )
+   {
+   if ( ios::m_device->flush() < 0 )
+   ios::setstate( ios_base::badbit );
+   }
+   else */if (ios::m_streambuf != 0)
+    {
+      if (ios::m_streambuf->pubsync() == -1)
+        {
+          ios::setstate(ios_base::badbit);
+        }
+    }
+  return *this;
+}
 
-ostream& ostream::put(char c)
-  {
-    /* if ( ios::m_debug != 0 )
-     {
-     if ( ios::m_debug->writeByte( ( unsigned char ) c ) < 0 )
-     ios::setstate( ios_base::eofbit );
-     }
-     else if ( ios::m_device != 0 )
-     {
-     if ( ios::m_device->writeByte( ( unsigned char ) c ) < 0 )
-     ios::setstate( ios_base::eofbit );
-     }
+ostream&
+ostream::put(char c)
+{
+  /* if ( ios::m_debug != 0 )
+   {
+   if ( ios::m_debug->writeByte( ( unsigned char ) c ) < 0 )
+   ios::setstate( ios_base::eofbit );
+   }
+   else if ( ios::m_device != 0 )
+   {
+   if ( ios::m_device->writeByte( ( unsigned char ) c ) < 0 )
+   ios::setstate( ios_base::eofbit );
+   }
 
-     else */if (ios::m_streambuf != 0)
-      {
-        if (traits::eq_int(ios::m_streambuf->sputc(c), traits::eof() ) )
-          {
-            ios::setstate(ios_base::eofbit);
-          }
-      }
+   else */if (ios::m_streambuf != 0)
+    {
+      if (traits::eq_int(ios::m_streambuf->sputc(c), traits::eof()))
+        {
+          ios::setstate(ios_base::eofbit);
+        }
+    }
 
-    return *this;
-  }
+  return *this;
+}
 
-ostream& ostream::write(const char* s, streamsize n)
-  {
-    /* f ( ios::m_debug != 0 )
-     {
-     for ( int i = 0; i < n; ++i )
-     if ( ios::m_debug->writeByte( ( unsigned char ) *s++ ) < 0 )
-     {
-     ios::setstate( ios_base::eofbit );
-     break;
-     }
-     }
-     else if ( ios::m_device != 0 )
-     {
-     for ( int i = 0; i < n; ++i )
-     if ( ios::m_device->writeByte( ( unsigned char ) *s++ ) < 0 )
-     {
-     ios::setstate( ios_base::eofbit );
-     break;
-     }
-     }
-     else */if (ios::m_streambuf != 0)
-      {
-        if (traits::eq_int(ios::m_streambuf->sputn(s, n), traits::eof() ) )
-          {
-            ios::setstate(ios_base::eofbit);
-          }
-      }
+ostream&
+ostream::write(const char* s, streamsize n)
+{
+  /* f ( ios::m_debug != 0 )
+   {
+   for ( int i = 0; i < n; ++i )
+   if ( ios::m_debug->writeByte( ( unsigned char ) *s++ ) < 0 )
+   {
+   ios::setstate( ios_base::eofbit );
+   break;
+   }
+   }
+   else if ( ios::m_device != 0 )
+   {
+   for ( int i = 0; i < n; ++i )
+   if ( ios::m_device->writeByte( ( unsigned char ) *s++ ) < 0 )
+   {
+   ios::setstate( ios_base::eofbit );
+   break;
+   }
+   }
+   else */if (ios::m_streambuf != 0)
+    {
+      if (traits::eq_int(ios::m_streambuf->sputn(s, n), traits::eof()))
+        {
+          ios::setstate(ios_base::eofbit);
+        }
+    }
 
-    return *this;
-  }
+  return *this;
+}
 
 //----------------------------------------------------------------------------
 
@@ -564,73 +519,82 @@ ostream::sentry::~sentry()
 //----------------------------------------------------------------------------
 // Non - class functions
 
-ostream& operator <<(ostream & out, char c)
-  {
-    //ostream::sentry s( out );
-    out.put(c);
-    return out;
-  }
+ostream&
+operator <<(ostream & out, char c)
+{
+  //ostream::sentry s( out );
+  out.put(c);
+  return out;
+}
 
 // signed and unsigned
-ostream& operator <<(ostream & out, signed char c)
-  {
-    //ostream::sentry s( out );
-    out.put(c);
-    return out;
-  }
+ostream&
+operator <<(ostream & out, signed char c)
+{
+  //ostream::sentry s( out );
+  out.put(c);
+  return out;
+}
 
-ostream& operator <<(ostream & out, unsigned char c)
-  {
-    //ostream::sentry s( out );
-    out.put(c);
-    return out;
-  }
+ostream&
+operator <<(ostream & out, unsigned char c)
+{
+  //ostream::sentry s( out );
+  out.put(c);
+  return out;
+}
 
 // partial specializations
-ostream& operator <<(ostream & out, const char *c)
-  {
-    //ostream::sentry s( out );
-    out.write(c, traits::length(c) );
-    return out;
-  }
+ostream&
+operator <<(ostream & out, const char *c)
+{
+  //ostream::sentry s( out );
+  out.write(c, traits::length(c));
+  return out;
+}
 
 //  signed and unsigned
-ostream& operator <<(ostream & out, const signed char *c)
-  {
-    //ostream::sentry s( out );
-    out.write( reinterpret_cast < const char *>(c ),
-        traits::length( reinterpret_cast < const char *>(c ) ) );
-    return out;
-  }
+ostream&
+operator <<(ostream & out, const signed char *c)
+{
+  //ostream::sentry s( out );
+  out.write(reinterpret_cast<const char *> (c), traits::length(
+      reinterpret_cast<const char *> (c)));
+  return out;
+}
 
-ostream& operator <<(ostream & out, const unsigned char *c)
-  {
-    out.write( reinterpret_cast < const char *>(c ),
-        traits::length( reinterpret_cast < const char *>(c ) ) );
-    return out;
-  }
+ostream&
+operator <<(ostream & out, const unsigned char *c)
+{
+  out.write(reinterpret_cast<const char *> (c), traits::length(
+      reinterpret_cast<const char *> (c)));
+  return out;
+}
 
-ostream& endl(ostream & os)
-  {
-    //ostream::sentry s( os );
-    os.put( '\r');
-    os.put( '\n');
-    os.flush();
-    return os;
-  }
+ostream&
+endl(ostream & os)
+{
+  //ostream::sentry s( os );
+  os.put('\r');
+  os.put('\n');
+  os.flush();
+  return os;
+}
 
-ostream& ends(ostream & os)
-  {
-    //ostream::sentry s( os );
-    os.put(traits::eos() );
-    return os;
-  }
+ostream&
+ends(ostream & os)
+{
+  //ostream::sentry s( os );
+  os.put(traits::eos());
+  return os;
+}
 
-ostream& flush(ostream & os)
-  {
-    //ostream::sentry s( os );
-    os.flush();
-    return os;
-  }
+ostream&
+flush(ostream & os)
+{
+  //ostream::sentry s( os );
+  os.flush();
+  return os;
+}
 
 #endif
