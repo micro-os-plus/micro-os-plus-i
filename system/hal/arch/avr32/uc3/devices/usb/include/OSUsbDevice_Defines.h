@@ -12,7 +12,9 @@
 // ----------------------------------------------------------------------------
 
 #define MSK_UADD              0x7F
-#define MSK_EP_DIR            0x7F
+#define MSK_EP_NBR                            0x0F
+#define MSK_EP_DIR                            0x80
+
 
 // Parameters for endpoint configuration
 // These define are the values used to enable and configure an endpoint.
@@ -36,6 +38,14 @@
 #define SIZE_1024                7
 //typedef enum ep_size {SIZE_8,   SIZE_16,  SIZE_32,  SIZE_64,
 //                      SIZE_128, SIZE_256, SIZE_512, SIZE_1024} e_ep_size;
+
+#define AVR32_USBB_UECFGX_EPBK_SINGLE                       AVR32_USBB_UECFG0_EPBK_SINGLE
+#define AVR32_USBB_UECFGX_EPBK_DOUBLE                       AVR32_USBB_UECFG0_EPBK_DOUBLE
+#define AVR32_USBB_UECFGX_EPBK_TRIPLE                       AVR32_USBB_UECFG0_EPBK_TRIPLE
+
+#define SINGLE_BANK              AVR32_USBB_UECFGX_EPBK_SINGLE
+#define DOUBLE_BANK              AVR32_USBB_UECFGX_EPBK_DOUBLE
+#define TRIPLE_BANK              AVR32_USBB_UECFGX_EPBK_TRIPLE
 
 #define ONE_BANK                 0
 #define TWO_BANKS                1
@@ -65,7 +75,7 @@
 // from AVR32 framework
 ///////////////////////
 
-extern UnionVPtr pep_fifo[AVR32_USBB_EPT_NUM];
+//extern UnionVPtr pep_fifo[AVR32_USBB_EPT_NUM];
 
 #define AVR32_USBB_UESTAX_TXINI_MASK                        AVR32_USBB_UESTA0_TXINI_MASK
 #define AVR32_USBB_UESTAX_RXSTPI_MASK                       AVR32_USBB_UESTA0_RXSTPI_MASK
@@ -87,6 +97,18 @@ extern UnionVPtr pep_fifo[AVR32_USBB_EPT_NUM];
 #define AVR32_USBB_UECONXCLR_STALLRQC_MASK                  AVR32_USBB_UECON0CLR_STALLRQC_MASK
 #define AVR32_USBB_UECFGX_ALLOC_MASK                        AVR32_USBB_UECFG0_ALLOC_MASK
 #define AVR32_USBB_UESTAX_CFGOK_MASK                        AVR32_USBB_UESTA0_CFGOK_MASK
+#define AVR32_USBB_UECFGX_EPTYPE_MASK                       AVR32_USBB_UECFG0_EPTYPE_MASK
+#define AVR32_USBB_UECFGX_EPDIR_MASK                        AVR32_USBB_UECFG0_EPDIR_MASK
+#define AVR32_USBB_UECFGX_EPSIZE_MASK                       AVR32_USBB_UECFG0_EPSIZE_MASK
+#define AVR32_USBB_UECFGX_EPBK_MASK                         AVR32_USBB_UECFG0_EPBK_MASK
+#define AVR32_USBB_UECFGX_EPTYPE_OFFSET                     AVR32_USBB_UECFG0_EPTYPE_OFFSET
+#define AVR32_USBB_UECFGX_EPDIR_OFFSET                      AVR32_USBB_UECFG0_EPDIR_OFFSET
+#define AVR32_USBB_UECFGX_EPSIZE_OFFSET                     AVR32_USBB_UECFG0_EPSIZE_OFFSET
+#define AVR32_USBB_UECFGX_EPBK_OFFSET                       AVR32_USBB_UECFG0_EPBK_OFFSET
+#define AVR32_USBB_UESTAXCLR_NAKOUTIC_MASK                  AVR32_USBB_UESTA0CLR_NAKOUTIC_MASK
+#define AVR32_USBB_UESTAX_NAKOUTI_MASK                      AVR32_USBB_UESTA0_NAKOUTI_MASK
+#define AVR32_USBB_UECONX_STALLRQ_MASK                      AVR32_USBB_UECON0_STALLRQ_MASK
+#define AVR32_USBB_UDINTESET_EP0INTES_MASK                  0x00001000
 
 #define AVR32_USBB_uerst                  (AVR32_USBB.uerst)
 #define AVR32_USBB_uestax(x)              ((&AVR32_USBB.uesta0)[(x)])
@@ -230,8 +252,48 @@ extern UnionVPtr pep_fifo[AVR32_USBB_EPT_NUM];
 #define AVR32_is_usb_endpoint_configured(ep)            (Tst_bits(AVR32_USBB_uestax(ep), AVR32_USBB_UESTAX_CFGOK_MASK))
 //! enables suspend state interrupt
 #define AVR32_usb_enable_suspend_interrupt()            (AVR32_USBB_udinteset = AVR32_USBB_UDINTESET_SUSPES_MASK)
+#define AVR32_is_usb_enabled()              (Tst_bits(AVR32_USBB_usbcon, AVR32_USBB_USBCON_USBE_MASK))
+//! Disable OTG pad
+#define AVR32_usb_disable_otg_pad()         (Clr_bits(AVR32_USBB_usbcon, AVR32_USBB_USBCON_OTGPADE_MASK))
+//! Enable OTG pad
+#define AVR32_usb_enable_otg_pad()          (Set_bits(AVR32_USBB_usbcon, AVR32_USBB_USBCON_OTGPADE_MASK))
+//! enables Start-of-Frame Interrupt
+#define AVR32_usb_enable_sof_interrupt()                (AVR32_USBB_udinteset = AVR32_USBB_UDINTESET_SOFES_MASK)
+//! Force device full speed mode (i.e. disable high speed)
+#define AVR32_usb_force_full_speed_mode()     (Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 3))
+//! Enable dual speed mode (full speed and high speed; default)
+#define AVR32_usb_use_dual_speed_mode()       (Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 0))
+//! detaches from USB bus
+#define AVR32_usb_detach()                              (Set_bits(AVR32_USBB_udcon, AVR32_USBB_UDCON_DETACH_MASK))
+//! Bounds given integer size to allowed range and rounds it up to the nearest
+//! available greater size, then applies register format of USBB controller
+//! for endpoint size bit-field.
+#define AVR32_usb_format_endpoint_size(size)            (32 - clz(((U32)min(max(size, 8), 1024) << 1) - 1) - 1 - 3)
+//! acks NAK OUT received
+#define AVR32_usb_ack_nak_out(ep)                       (AVR32_USBB_uestaxclr(ep) = AVR32_USBB_UESTAXCLR_NAKOUTIC_MASK)
+//! tests if NAK OUT received
+#define AVR32_is_usb_nak_out(ep)                        (Tst_bits(AVR32_USBB_uestax(ep), AVR32_USBB_UESTAX_NAKOUTI_MASK))
+//! tests if STALL handshake request is running
+#define AVR32_is_usb_endpoint_stall_requested(ep)       (Tst_bits(AVR32_USBB_ueconx(ep), AVR32_USBB_UECONX_STALLRQ_MASK))
+//! enables the selected endpoint interrupt
+#define AVR32_usb_enable_endpoint_interrupt(ep)         (AVR32_USBB_udinteset = AVR32_USBB_UDINTESET_EP0INTES_MASK << (ep))
 
-
+//! configures selected endpoint in one step
+#define AVR32_usb_configure_endpoint(ep, type, dir, size, bank) \
+(\
+AVR32_usb_enable_endpoint(ep),\
+Wr_bits(AVR32_USBB_uecfgx(ep), AVR32_USBB_UECFGX_EPTYPE_MASK |\
+                               AVR32_USBB_UECFGX_EPDIR_MASK  |\
+                               AVR32_USBB_UECFGX_EPSIZE_MASK |\
+                               AVR32_USBB_UECFGX_EPBK_MASK,   \
+        (((U32)(type) << AVR32_USBB_UECFGX_EPTYPE_OFFSET) & AVR32_USBB_UECFGX_EPTYPE_MASK) |\
+        (((U32)(dir ) << AVR32_USBB_UECFGX_EPDIR_OFFSET ) & AVR32_USBB_UECFGX_EPDIR_MASK ) |\
+        ( (U32)AVR32_usb_format_endpoint_size(size) << AVR32_USBB_UECFGX_EPSIZE_OFFSET         ) |\
+        (((U32)(bank) << AVR32_USBB_UECFGX_EPBK_OFFSET  ) & AVR32_USBB_UECFGX_EPBK_MASK  )),\
+AVR32_usb_allocate_memory(ep),\
+\
+AVR32_is_usb_endpoint_configured(ep)\
+)
 
   // Access point to the FIFO data registers of pipes/endpoints
   // @param x      Pipe/endpoint of which to access FIFO data register
@@ -255,8 +317,64 @@ extern UnionVPtr pep_fifo[AVR32_USBB_EPT_NUM];
   // @warning Always call this macro before any read/write macro/function
   // when at FIFO beginning.
 #define AVR32_usb_reset_endpoint_fifo_access(ep) \
-          (pep_fifo[(ep)].u64ptr = Usb_get_endpoint_fifo_access(ep, 64))
+          (OSUsbDevice::pep_fifo[(ep)].u64ptr = Usb_get_endpoint_fifo_access(ep, 64))
 
+//! Post-increment operations associated with 64-, 32-, 16- and 8-bit accesses to
+//! the FIFO data registers of pipes/endpoints
+//! @note 64- and 32-bit accesses to FIFO data registers do not require pointer
+//! post-increment while 16- and 8-bit ones do.
+//! @note Only for internal use.
+//! @{
+#define Pep_fifo_access_64_post_inc()
+#define Pep_fifo_access_32_post_inc()
+#define Pep_fifo_access_16_post_inc()   ++
+#define Pep_fifo_access_8_post_inc()    ++
+
+//! Read 64-, 32-, 16- or 8-bit data from FIFO data register of selected endpoint.
+//! @param ep     Endpoint of which to access FIFO data register
+//! @param scale  Data scale in bits: 64, 32, 16 or 8
+//! @return       64-, 32-, 16- or 8-bit data read
+//! @warning It is up to the user of this macro to make sure that all accesses
+//! are aligned with their natural boundaries except 64-bit accesses which
+//! require only 32-bit alignment.
+//! @note This macro assures that used HSB addresses are identical to the
+//! DPRAM internal pointer modulo 32 bits.
+//! @warning Always call Usb_reset_endpoint_fifo_access before this macro when
+//! at FIFO beginning.
+//! @warning Do not mix calls to this macro with calls to indexed macros below.
+#define AVR32_usb_read_endpoint_data(ep, scale) \
+        (*OSUsbDevice::pep_fifo[(ep)].TPASTE3(u, scale, ptr)\
+         TPASTE3(Pep_fifo_access_, scale, _post_inc)())
+
+//! Write 64-, 32-, 16- or 8-bit data to FIFO data register of selected endpoint.
+//! @param ep     Endpoint of which to access FIFO data register
+//! @param scale  Data scale in bits: 64, 32, 16 or 8
+//! @param data   64-, 32-, 16- or 8-bit data to write
+//! @return       64-, 32-, 16- or 8-bit data written
+//! @warning It is up to the user of this macro to make sure that all accesses
+//! are aligned with their natural boundaries except 64-bit accesses which
+//! require only 32-bit alignment.
+//! @note This macro assures that used HSB addresses are identical to the
+//! DPRAM internal pointer modulo 32 bits.
+//! @warning Always call Usb_reset_endpoint_fifo_access before this macro when
+//! at FIFO beginning.
+//! @warning Do not mix calls to this macro with calls to indexed macros below.
+#define AVR32_usb_write_endpoint_data(ep, scale, data) \
+        (*OSUsbDevice::pep_fifo[(ep)].TPASTE3(u, scale, ptr)\
+         TPASTE3(Pep_fifo_access_, scale, _post_inc)() = (data))
+
+// utils
+#if LITTLE_ENDIAN_MCU
+  #define Usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
+  #define Usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
+  #define usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
+  #define usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
+#else // BIG_ENDIAN_MCU
+  #define Usb_format_mcu_to_usb_data(width, data) (TPASTE2(Swap, width)(data))
+  #define Usb_format_usb_to_mcu_data(width, data) (TPASTE2(Swap, width)(data))
+  #define usb_format_mcu_to_usb_data(width, data) (TPASTE2(swap, width)(data))
+  #define usb_format_usb_to_mcu_data(width, data) (TPASTE2(swap, width)(data))
+#endif
 
 
 #endif /* HAL_OSUSBDEVICEDEFINES_H_ */

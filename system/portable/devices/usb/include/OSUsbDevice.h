@@ -71,8 +71,6 @@
 #define INTERFACE_TYPE                  0x01
 #define ENDPOINT_TYPE                   0x02
 
-#define FEATURE_ENDPOINT_HALT           0x00
-
 #define REQUEST_DEVICE_STATUS           0x80
 #define REQUEST_INTERFACE_STATUS        0x81
 #define REQUEST_ENDPOINT_STATUS         0x82
@@ -84,6 +82,14 @@
 #define USB_ACM_TYPE                    0x02
 #define USB_CDC_UNION_TYPE              0x06
 
+// Standard Features
+#define FEATURE_DEVICE_REMOTE_WAKEUP          0x01
+#define FEATURE_ENDPOINT_HALT                 0x00
+#define FEATURE_TEST_MODE                     0x02
+
+#define ZERO_TYPE                           0x00 // DEVICE_TYPE
+#define INTERFACE_TYPE                  0x01
+
 class OSUsbDevice
 {
 public:
@@ -94,6 +100,10 @@ public:
   interruptComServiceRoutine(void);
   static void
   interruptGenServiceRoutine(void);
+
+  // initialize USB driver
+  static bool
+  usbDriverInit(void);
 
   // read/write methods
   static unsigned char
@@ -108,6 +118,12 @@ public:
   writeWord(unsigned short w);
   static void
   writeLong(unsigned long l);
+  static int
+  readBuffer(void *buf, int count);
+  static int
+  writeBuffer(void *buf, int count);
+  static void
+  Usb_reset_endpoint_fifo_access(unsigned char ep);
 
   static void
   standardProcessRequest(void);
@@ -118,6 +134,10 @@ public:
 
   static void
   specificEndpointInit(unsigned char conf_nb);
+  static void
+  UsbEnableEndpointInterrupt(unsigned char ep);
+  static int
+  UsbGetEndpointSize(unsigned char ep);
 
   static bool
   usb_configure_endpoint(unsigned char num, unsigned char type,
@@ -141,7 +161,7 @@ public:
   usb_set_feature(void);
   static void
   usb_get_status(void);
-  static void
+  static Bool
   usb_get_interface(void);
   static void
   usb_set_interface(void);
@@ -192,6 +212,13 @@ public:
   Usb_disable(void);
   static void
   Usb_enable(void);
+  static bool
+  isUsbEnabled();
+
+  static void
+  disableOtgPad(void);
+  static void
+  enableOtgPad(void);
 
   static void
   Usb_select_device(void);
@@ -266,6 +293,8 @@ public:
 
   static void
   Usb_attach(void);
+  static void
+  Usb_detach(void);
   static bool
   Is_usb_sof(void);
   static bool
@@ -290,6 +319,8 @@ public:
   Usb_freeze_clock(void);
   static void
   Usb_unfreeze_clock(void);
+  static bool
+  Is_usb_clock_frozen(void);
 
   static void
   Usb_disable_wake_up_interrupt(void);
@@ -333,6 +364,17 @@ public:
   static bool
   Is_pll_ready(void);
 
+  static void
+  Usb_ack_nak_out(void);
+  static bool
+  Is_usb_nak_out(void);
+
+  static U8
+  Get_desc_ep_nbr(U8);
+
+  static U8
+  Is_usb_endpoint_stall_requested(U8 ep);
+
   // members
   static unsigned char data_to_transfer;
   static PGM_VOID_P pbuffer;
@@ -343,7 +385,8 @@ public:
   static bool usb_connected;
   static unsigned char usb_configuration_nb;
   static unsigned char m_selectedEndpoint;
-
+  static unsigned char usb_interface_status[NB_INTERFACE];  // All interface with default setting
+  static UnionVPtr pep_fifo[AVR32_USBB_EPT_NUM];
 };
 
 #if defined(OS_CONFIG_ARCH_AVR8)

@@ -158,8 +158,38 @@ OSUsbDevice::interruptReceiveOutAck(void)
 #if TO_BE_PORTED
   UEINTX &= ~_BV(RXOUTI);
 #else
-  AVR32_usb_ack_out_received(m_selectedEndpoint);
+  AVR32_usb_ack_out_received_free(m_selectedEndpoint);
 #endif
+}
+
+inline void
+OSUsbDevice::Usb_ack_nak_out(void)
+{
+  AVR32_usb_ack_nak_out(m_selectedEndpoint);
+}
+
+inline bool
+OSUsbDevice::Is_usb_nak_out()
+{
+  return AVR32_is_usb_nak_out(m_selectedEndpoint);
+}
+
+// Extract endpoint number from endpoint address in endpoint descriptor
+// param ep_addr U8: Endpoint address
+// return U8: Endpoint number
+
+#define MSK_EP_NBR                            0x0F
+
+inline U8
+OSUsbDevice::Get_desc_ep_nbr(U8 ep_addr)
+{
+  return (Rd_bitfield(ep_addr, MSK_EP_NBR));
+}
+
+inline U8
+OSUsbDevice::Is_usb_endpoint_stall_requested(U8 ep)
+{
+  return AVR32_is_usb_endpoint_stall_requested(ep);
 }
 
 // enables OUT received interrupt on selected endpoint
@@ -173,8 +203,6 @@ OSUsbDevice::interruptReceiveOutEnable(void)
 #endif
 }
 
-extern U32 usb_read_ep_rxpacket(U8 ep, void *rxbuf, U32 data_length, void **prxbuf);
-
 // return FIFO byte for current endpoint
 inline unsigned char
 OSUsbDevice::readByte(void)
@@ -182,39 +210,9 @@ OSUsbDevice::readByte(void)
 #if TO_BE_PORTED
   return UEDATX;
 #else
-  int availableSize;
-  int status;
-  unsigned char ret;
-
-  // tests if OUT received
-  status = AVR32_is_usb_out_received(RX_EP);
-
-  if( !status )
-  {
-      return 0;
-  }
-
-  // returns the byte count
-  availableSize = AVR32_usb_byte_count(RX_EP);
-
-  // Reset known position inside FIFO
-  // data register of selected endpoint
-  AVR32_usb_reset_endpoint_fifo_access(RX_EP);
-
-  // read min bytes into pBuf
-  usb_read_ep_rxpacket(RX_EP, &ret, 1, NULL);
-
-  // acknowledge OUT received and frees current bank
-  if(availableSize == 1)
-    {
-      AVR32_usb_ack_out_received_free(RX_EP);
-    }
-
-  return ret;
+  return AVR32_usb_read_endpoint_data(m_selectedEndpoint, 8);
 #endif
 }
-
-extern U32 usb_write_ep_txpacket(U8 ep, const void *txbuf, U32 data_length, const void **ptxbuf);
 
 // write byte in FIFO for current endpoint
 inline void
@@ -223,27 +221,8 @@ OSUsbDevice::writeByte(unsigned char b)
 #if TO_BE_PORTED
   UEDATX = b;
 #else
-  int status;
 
-  status = AVR32_is_usb_in_ready(TX_EP);
-
-  if( !status )
-  {
-      return;
-  }
-
-  // Reset known position inside FIFO
-  // data register of selected endpoint
-  AVR32_usb_reset_endpoint_fifo_access(TX_EP);
-
-  // write 1 byte
-  usb_write_ep_txpacket(TX_EP, &b, 1, NULL);
-
-  // acknowledge IN ready and sends current bank
-  AVR32_usb_ack_in_ready_send(TX_EP);
-
-  // wait for previous data to be sent
-  while (!AVR32_is_usb_in_ready(TX_EP)) ;
+  AVR32_usb_write_endpoint_data(m_selectedEndpoint, 8, b);
 
 #endif
 }
@@ -325,6 +304,27 @@ OSUsbDevice::Usb_enable(void)
 #endif
 }
 
+// check if usb is enabled
+inline bool
+OSUsbDevice::isUsbEnabled(void)
+{
+  return AVR32_is_usb_enabled();
+}
+
+// disable OTG pad
+inline void
+OSUsbDevice::disableOtgPad(void)
+{
+  AVR32_usb_disable_otg_pad();
+}
+
+// enable OTG pad
+inline void
+OSUsbDevice::enableOtgPad(void)
+{
+  AVR32_usb_enable_otg_pad();
+}
+
 // select device mode
 inline void
 OSUsbDevice::Usb_select_device(void)
@@ -365,7 +365,7 @@ OSUsbDevice::Is_usb_tx_ready(void)
 #if TO_BE_PORTED
   return ((UEINTX & _BV(RWAL)) != 0) ? true : false;
 #else
-  return AVR32_is_usb_in_ready(TX_EP);
+  return AVR32_is_usb_in_ready(m_selectedEndpoint);
 #endif
 }
 
@@ -578,6 +578,13 @@ OSUsbDevice::Usb_attach(void)
 #endif
 }
 
+// attache to USB bus
+inline void
+OSUsbDevice::Usb_detach(void)
+{
+  AVR32_usb_detach();
+}
+
 // test if Start Of Frame occurs
 inline bool
 OSUsbDevice::Is_usb_sof(void)
@@ -673,6 +680,13 @@ OSUsbDevice::Usb_freeze_clock(void)
 #else
   AVR32_usb_freeze_clock();
 #endif
+}
+
+// Stop internal USB clock in interface(freeze the interface register)
+inline bool
+OSUsbDevice::Is_usb_clock_frozen(void)
+{
+  return AVR32_is_usb_clock_frozen();
 }
 
 inline void
@@ -833,6 +847,19 @@ OSUsbDevice::Is_endpoint_configured(void)
 #else
   return AVR32_is_usb_endpoint_configured(m_selectedEndpoint);
 #endif
+}
+
+// return the size of the specified endpoint
+inline int
+OSUsbDevice::UsbGetEndpointSize(unsigned char ep)
+{
+  return AVR32_usb_get_endpoint_size(ep);
+}
+
+inline void
+OSUsbDevice::UsbEnableEndpointInterrupt(unsigned char ep)
+{
+  AVR32_usb_enable_endpoint_interrupt(ep);
 }
 
 // enable suspend state interrupt

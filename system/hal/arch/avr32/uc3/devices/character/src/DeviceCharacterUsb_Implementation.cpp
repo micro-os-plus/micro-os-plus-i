@@ -12,12 +12,8 @@
 
 #include "portable/devices/character/include/DeviceCharacterUsb.h"
 #include "portable/devices/usb/include/OSUsbDevice.h"
-#include "hal/arch/avr32/uc3/lib/include/intc.h"
 
 // ----- implementation code -------------------------------------------------
-
-extern void
-USB_contextHandler(void) __attribute__((interrupt));
 
 int
 DeviceCharacterUsb::implOpen()
@@ -25,34 +21,15 @@ DeviceCharacterUsb::implOpen()
     OSDeviceDebug::putString("DeviceCharacterUsb::open()");
     OSDeviceDebug::putNewLine();
 
-    // Register interrupt.
-    // TODO: check if is ok to put it here!
-    INTC_register_interrupt(USB_contextHandler, AVR32_USBB_IRQ,
-        OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY);
-
     static bool flagShouldNotInit;
 
     if (!flagShouldNotInit)
       {
-#if !defined(USE_USB_PADS_REGULATOR_ENABLE)	// Otherwise assume USB PADs regulator is not used
-        OSUsbDevice::Usb_enable_regulator();
-#endif
-
-        OSUsbDevice::Usb_force_device_mode();
-
-        //Enable_interrupt();
-        OSUsbDevice::Usb_disable();
-        OSUsbDevice::Usb_enable();
-        OSUsbDevice::Usb_select_device();
-        OSUsbDevice::Usb_enable_vbus_interrupt();
-        //Enable_interrupt();
-
-        flagShouldNotInit = true;
-
-        OSUsbLed::init();
-        //DDRD |= _BV(DDD6);
-        //DDRD |= _BV(DDD7);
+        // TODO: check if is ok to put it here!
+        OSUsbDevice::usbDriverInit();
       }
+
+    OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
 
     m_txCounter = 0;
     m_rxCounter = 0;
@@ -86,6 +63,9 @@ DeviceCharacterUsb::implClose()
 bool
 DeviceCharacterUsb::implCanWrite(void)
   {
+  // TODO: change this to work in inteerrupt mode
+    OSUsbDevice::endpointSelect(m_tx_ep);
+    while( !OSUsbDevice::Is_usb_write_enabled() ) ;
     return true;
   }
 
@@ -102,14 +82,21 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
     if (!m_opened)
     return OSReturn::OS_DISCONNECTED;
 
-    while (!OSUsbDevice::Is_usb_tx_ready())
+    OSCriticalSection::enter();
+
+    OSUsbDevice::endpointSelect(m_tx_ep);
+
+    while (!OSUsbDevice::Is_usb_write_enabled())
       {
         //OSDeviceDebug::putChar('>');
         //os.sched.eventWait(&m_txCounter);       // Wait Endpoint ready
-        OSUsbDevice::endpointSelect(m_tx_ep);
+        //OSUsbDevice::endpointSelect(m_tx_ep);
       }
 
-    OSUsbDevice::endpointSelect(m_tx_ep);
+    if(m_txCounter == 0)
+      {
+        OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
+      }
     OSUsbDevice::writeByte(b);
     m_txCounter++;
 
@@ -123,30 +110,50 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
 
 #endif
 
-    if (!OSUsbDevice::Is_usb_tx_ready()) //If Endpoint full -> flush
-
+    if (!OSUsbDevice::Is_usb_write_enabled()) //If Endpoint full -> flush
       {
-        OSUsbDevice::Usb_send_in();
-        //OSDeviceDebug::putChar('^');
-        m_txCounter = 0;
+        implFlush();
       }
+
+    OSCriticalSection::exit();
+
     return b;
   }
 
 int
 DeviceCharacterUsb::implFlush(void)
   {
+    bool zlp = false;
+
     // if closed return -1
     if (!m_opened)
-    return OSReturn::OS_DISCONNECTED;
+      return OSReturn::OS_DISCONNECTED;
+
+    OSCriticalSection::enter();
 
     if (m_txCounter != 0)
       {
         OSUsbDevice::endpointSelect(m_tx_ep);
+
+        if (!OSUsbDevice::Is_usb_write_enabled()) //If Endpoint full -> flush
+          {
+            zlp = true;
+          }
+
         OSUsbDevice::Usb_send_in();
         //OSDeviceDebug::putChar('^');
+
+        if( zlp==TRUE )
+        {
+           while( !OSUsbDevice::Is_usb_write_enabled() ) ;     // Wait Endpoint ready...
+           OSUsbDevice::Usb_send_in();             // ...and Send ZLP
+        }
+
         m_txCounter = 0;
       }
+
+    OSCriticalSection::exit();
+
     return 0;
   }
 
@@ -159,8 +166,6 @@ DeviceCharacterUsb::implCanRead()
 int
 DeviceCharacterUsb::implAvailableRead(void)
   {
-    OSUsbDevice::endpointSelect(m_rx_ep);
-    m_rxCounter = OSUsbDevice::Usb_byte_counter();
     return m_rxCounter;
   }
 
@@ -174,9 +179,12 @@ int
 DeviceCharacterUsb::implReadByte(void)
   {
     int c;
+
+    OSCriticalSection::enter();
+
     OSUsbDevice::endpointSelect(m_rx_ep);
     c = OSUsbDevice::readByte();
-    m_rxCounter = OSUsbDevice::Usb_byte_counter();
+    m_rxCounter--;
     if (m_rxCounter == 0)
       {
         //OSUsbDevice::Usb_ack_receive_out();
@@ -193,6 +201,8 @@ DeviceCharacterUsb::implReadByte(void)
 
 #endif
 
+    OSCriticalSection::exit();
+
     // OS_CONFIG_USBINT_LED_PORT &= ~_BV( PORTD0 );
     return c;
   }
@@ -202,6 +212,7 @@ DeviceCharacterUsb::implReadByte(void)
 void
 DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
   {
+
 #if TO_BE_PORTED
     if (UEINT & _BV(RX_EP))
 #endif
@@ -217,7 +228,12 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
             OSDeviceDebug::putString("Vo");
             OSDeviceDebug::putNewLine();
 
-            OSUsbDevice::interruptReceiveOutAck();
+            // TODO: remove the next line - checks if m_rxCounter is 0
+            while(g_usb0->m_rxCounter != 0) ;
+
+            g_usb0->m_rxCounter = OSUsbDevice::Usb_byte_counter();
+            OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
+            OSUsbDevice::Usb_ack_receive_out();
             OSScheduler::eventNotify(g_usb0->getReadEvent());
           }
       }
@@ -239,19 +255,22 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
           }
       }
 #endif
+
   }
 
 /*
  *  This function is called by the standard usb read request function to 
  * process specific requests. Return TRUE when the request is processed. 
  */
-
 bool
 DeviceCharacterUsb::specificCdcProcessReadRequest(
     unsigned char __attribute__( ( unused ) ) type, unsigned char request)
   {
+
     // TODO: for multi-interface devices, determine pointer
     DeviceCharacterUsb *pDev = g_usb0;
+
+    OSUsbDevice::endpointSelect(EP_CONTROL);
 
     switch (request)
       {
@@ -280,6 +299,7 @@ DeviceCharacterUsb::specificCdcProcessReadRequest(
         return false;
 
       }
+
     return false;
   }
 
@@ -292,6 +312,9 @@ bool
 DeviceCharacterUsb::specificCdcGetDescriptor(unsigned char type,
     unsigned char index)
   {
+  type = type;
+  index = index;
+  /*
     switch (type)
       {
         case STRING_DESCRIPTOR:
@@ -335,7 +358,7 @@ DeviceCharacterUsb::specificCdcGetDescriptor(unsigned char type,
         default:
         return false;
       }
-
+*/
     return false;
   }
 
@@ -348,21 +371,18 @@ DeviceCharacterUsb::cdcGetLineCoding(void)
   {
     OSUsbDevice::Usb_ack_receive_setup();
 
-    OSUsbDevice::writeLong(m_lineCoding.baudRate);
-    OSUsbDevice::writeByte(m_lineCoding.charFormat);
-    OSUsbDevice::writeByte(m_lineCoding.parityType);
-    OSUsbDevice::writeByte(m_lineCoding.dataBits);
+    OSUsbDevice::Usb_reset_endpoint_fifo_access(EP_CONTROL);
+    OSUsbDevice::writeLong(LSB0(m_lineCoding.baudRate));
+    OSUsbDevice::writeByte( m_lineCoding.charFormat);
+    OSUsbDevice::writeByte( m_lineCoding.parityType);
+    OSUsbDevice::writeByte( m_lineCoding.dataBits  );
 
     OSUsbDevice::Usb_send_control_in();
+    while (!OSUsbDevice::Is_usb_read_control_enabled()) ;
 
-    while (!(OSUsbDevice::Is_usb_read_control_enabled()))
-      {
-        ;
-      }
-    //Usb_clear_tx_complete();
+    while(!OSUsbDevice::isInterruptReceiveOut()) ;
+    OSUsbDevice::interruptReceiveOutAck();
 
-    while (!OSUsbDevice::isInterruptReceiveOut())
-    ;
     OSUsbDevice::Usb_ack_receive_out();
 
     OSDeviceDebug::putNewLine();
@@ -375,60 +395,21 @@ DeviceCharacterUsb::cdcGetLineCoding(void)
 void
 DeviceCharacterUsb::cdcSetLineCoding(void)
   {
-    unsigned short value;
-
-    value = OSUsbDevice::readWord();
-
-#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-    OSDeviceDebug::putString(" val=");
-    OSDeviceDebug::putHex(value);
-    OSDeviceDebug::putString(" ");
-    //OSDeviceDebug::putNewLine();
-#endif
-
-    unsigned short index;
-    index = OSUsbDevice::readWord();
-#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-    OSDeviceDebug::putString("int=");
-    OSDeviceDebug::putHex(index);
-    OSDeviceDebug::putString(" ");
-#endif
-
     OSUsbDevice::Usb_ack_receive_setup();
-    while (!(OSUsbDevice::isInterruptReceiveOut()))
-      {
-        ;
-      }
+
+    while(!OSUsbDevice::isInterruptReceiveOut()) ;
+    OSUsbDevice::Usb_reset_endpoint_fifo_access(EP_CONTROL);
 
     m_lineCoding.baudRate = OSUsbDevice::readLong();
     m_lineCoding.charFormat = OSUsbDevice::readByte();
     m_lineCoding.parityType = OSUsbDevice::readByte();
     m_lineCoding.dataBits = OSUsbDevice::readByte();
-    OSUsbDevice::Usb_ack_receive_out();
+    OSUsbDevice::interruptReceiveOutAck();
 
-#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-    OSDeviceDebug::putString("rate=");
-#if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
-    OSDeviceDebug::putDec(m_lineCoding.baudRate);
-#else
-    OSDeviceDebug::putString("0x");
-    OSDeviceDebug::putHex((unsigned short)(m_lineCoding.baudRate>>16));
-    OSDeviceDebug::putHex((unsigned short)(m_lineCoding.baudRate & 0xFFFF));
-#endif
-    OSDeviceDebug::putString(", fmt=");
-    OSDeviceDebug::putDec((unsigned short) m_lineCoding.charFormat);
-    OSDeviceDebug::putString(", par=");
-    OSDeviceDebug::putDec((unsigned short) m_lineCoding.parityType);
-    OSDeviceDebug::putString(", bits=");
-    OSDeviceDebug::putDec((unsigned short) m_lineCoding.dataBits);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSUsbDevice::Usb_ack_in_ready();
+    OSUsbDevice::Usb_send_in();
+    while (!OSUsbDevice::Is_usb_tx_ready()) ;
 
-    OSUsbDevice::Usb_send_control_in(); // send a ZLP for STATUS phase
-    while (!(OSUsbDevice::Is_usb_read_control_enabled()))
-      {
-        ;
-      }
     //Uart_set_baudrate(m_lineCoding.baudRate);
   }
 
@@ -437,10 +418,10 @@ DeviceCharacterUsb::cdcSetLineCoding(void)
  *
  * TODO: Manage hardware flow control...
  */
-
 void
 DeviceCharacterUsb::cdcSetControlLineState()
   {
+
     unsigned short value;
 
     value = OSUsbDevice::readWord();
@@ -461,7 +442,9 @@ DeviceCharacterUsb::cdcSetControlLineState()
 #endif
 
     bool opened;
-    opened = (value & 0x0001) ? true : false;
+    //opened = (value & 0x0001) ? true : false;
+    // TODO: check this
+    opened = (value) ? true : false;
 
     if (index == IF0_NB)
       {
@@ -477,6 +460,14 @@ DeviceCharacterUsb::cdcSetControlLineState()
 
     if (opened)
       {
+        // TODO: check if it's ok to be here.
+        // enable RX interrupt
+        OSUsbDevice::endpointSelect(RX_EP);
+        OSUsbDevice::UsbEnableEndpointInterrupt(RX_EP);
+        OSUsbDevice::interruptReceiveOutEnable();
+        OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
+        OSUsbDevice::endpointSelect(EP_CONTROL);
+
         OSUsbLed::off(); // will be toggled to on() at interrupt prolog
         // Note: interface numbers must start at 0 to match index!!!
         if (index == IF0_NB)
@@ -529,7 +520,6 @@ DeviceCharacterUsb::cdcSetControlLineState()
       {
         ;
       }
-
   }
 
 /*
@@ -540,22 +530,35 @@ void
 DeviceCharacterUsb::specificCdcEndpointInit(
     unsigned char __attribute__( ( unused ) ) conf_nb)
   {
+#if (USB_HIGH_SPEED_SUPPORT==ENABLED)
+
+  OSUsbDevice::usb_configure_endpoint(INT_EP, TYPE_INTERRUPT, DIRECTION_IN,
+      SIZE_32, ONE_BANK, NYET_ENABLED);
+
+  OSUsbDevice::usb_configure_endpoint(TX_EP, TYPE_BULK, DIRECTION_IN, EP_SIZE_1_HS,
+      TWO_BANKS, NYET_ENABLED);
+
+  OSUsbDevice::usb_configure_endpoint(RX_EP, TYPE_BULK, DIRECTION_OUT, EP_SIZE_2_HS,
+      TWO_BANKS, NYET_ENABLED);
+
+#else
     OSUsbDevice::usb_configure_endpoint(INT_EP, TYPE_INTERRUPT, DIRECTION_IN,
         SIZE_32, ONE_BANK, NYET_ENABLED);
 
-    OSUsbDevice::usb_configure_endpoint(TX_EP, TYPE_BULK, DIRECTION_IN, SIZE_32,
-        ONE_BANK, NYET_ENABLED);
-
-    OSUsbDevice::usb_configure_endpoint(RX_EP, TYPE_BULK, DIRECTION_OUT, SIZE_32,
+    OSUsbDevice::usb_configure_endpoint(TX_EP, TYPE_BULK, DIRECTION_IN, SIZE_64,
         TWO_BANKS, NYET_ENABLED);
 
+    OSUsbDevice::usb_configure_endpoint(RX_EP, TYPE_BULK, DIRECTION_OUT, SIZE_64,
+        TWO_BANKS, NYET_ENABLED);
+#endif
+#if TO_BE_PORTED
     OSUsbDevice::endpointSelect(RX_EP);
     OSUsbDevice::interruptReceiveOutEnable();
 
     OSUsbDevice::endpointReset(INT_EP);
     OSUsbDevice::endpointReset(TX_EP);
     OSUsbDevice::endpointReset(RX_EP);
-
+#endif
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
     OSUsbDevice::usb_configure_endpoint(INTb_EP, TYPE_INTERRUPT, DIRECTION_IN, SIZE_32,
         ONE_BANK, NYET_ENABLED);

@@ -16,10 +16,8 @@
 #include "portable/devices/character/include/DeviceCharacterUsb.h"
 #include "hal/arch/avr32/lib/include/compiler.h"
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
+#include "hal/arch/avr32/uc3/lib/include/intc.h"
 
-
-extern void
-usb_process_request(void);
 extern void
 interruptGenServiceRoutine(void);
 
@@ -32,7 +30,7 @@ USB_contextHandler(void)
     OSScheduler::ledActiveOn();
 
     // AVR32 does not have separate interrupts, so we call both
-    // routines heere
+    // routines here
     OSUsbDevice::interruptGenServiceRoutine();
     OSUsbDevice::interruptComServiceRoutine();
   }
@@ -45,7 +43,7 @@ USB_contextHandler(void)
 void
 OSUsbDevice::interruptComServiceRoutine(void)
   {
-  OSUsbLed::toggle();
+  //OSUsbLed::toggle();
   //OSDeviceDebug::putString("!");
 #if TO_BE_PORTED
       if (UEINT & _BV(EP_CONTROL))
@@ -57,13 +55,13 @@ OSUsbDevice::interruptComServiceRoutine(void)
             {
               OSDeviceDebug::putString("Vs ");
               //OSDeviceDebug::putNewLine();
-
+              //usb_process_request();
               OSUsbDevice::standardProcessRequest();
             }
         }
-      DeviceCharacterUsb::specificCdcInterruptServiceRoutine();
+        DeviceCharacterUsb::specificCdcInterruptServiceRoutine();
 
-      OSUsbLed::toggle();
+      //OSUsbLed::toggle();
   }
 #endif
 
@@ -82,11 +80,10 @@ OSUsbDevice::interruptComServiceRoutine(void)
 // Note: Only interrupts events that are enabled are processed
 
 //extern void interruptGenServiceRoutine(void);
-
 void
 OSUsbDevice::interruptGenServiceRoutine(void)
   {
-    OSUsbLed::toggle();
+    //OSUsbLed::toggle();
 
     // ---------- DEVICE events management -----------------------------------
     //- VBUS state detection
@@ -99,26 +96,24 @@ OSUsbDevice::interruptGenServiceRoutine(void)
         OSUsbDevice::Usb_ack_vbus_transition();
         if (OSUsbDevice::Is_usb_vbus_high())
           {
-            usb_connected = true;
+            usb_start_device();
+
             OSUsbDevice::Usb_vbus_on_action();
             OSUsbDevice::Usb_send_event(EVT_USB_POWERED);
-            OSUsbDevice::Usb_enable_reset_interrupt();
-            OSUsbDevice::usb_start_device();
-            OSUsbDevice::Usb_attach();
           }
         else
           {
-            OSUsbDevice::Usb_vbus_off_action();
+            Usb_unfreeze_clock();
+            Usb_detach();
             usb_connected = false;
-            OSUsbDevice::Usb_send_event(EVT_USB_UNPOWERED);
+            usb_configuration_nb = 0;
+            Usb_send_event(EVT_USB_UNPOWERED);
+            Usb_vbus_off_action();
+
+            // freeze clocks in order to save power
+            Usb_freeze_clock();
+            (void)Is_usb_clock_frozen();
           }
-      }
-    // - Device start of frame received
-    if (OSUsbDevice::Is_usb_sof() && OSUsbDevice::Is_sof_interrupt_enabled())
-      {
-        OSUsbDevice::Usb_ack_sof();
-        //debug_put_string("uf\n");
-        OSUsbDevice::Usb_sof_action();
       }
     // - Device Suspend event(no more USB activity detected)
     if (OSUsbDevice::Is_usb_suspend()
@@ -129,7 +124,7 @@ OSUsbDevice::interruptGenServiceRoutine(void)
 
         OSUsbDevice::Usb_ack_suspend();
         OSUsbDevice::Usb_enable_wake_up_interrupt();
-        OSUsbDevice::Usb_ack_wake_up(); // clear wake up to detect next event
+        (void)OSUsbDevice::Is_swake_up_interrupt_enabled();
         OSUsbDevice::Usb_freeze_clock();
         OSUsbDevice::Usb_send_event(EVT_USB_SUSPEND);
         OSUsbDevice::Usb_suspend_action();
@@ -142,6 +137,7 @@ OSUsbDevice::interruptGenServiceRoutine(void)
         OSDeviceDebug::putNewLine();
 
         OSUsbDevice::Usb_unfreeze_clock();
+        (void)Is_usb_clock_frozen();
         OSUsbDevice::Usb_ack_wake_up();
         OSUsbDevice::Usb_disable_wake_up_interrupt();
         OSUsbDevice::Usb_wake_up_action();
@@ -167,60 +163,111 @@ OSUsbDevice::interruptGenServiceRoutine(void)
         OSDeviceDebug::putNewLine();
 
         OSUsbDevice::Usb_ack_reset();
-        OSUsbDevice::usb_init_device();
+        usb_init_device();
+
+        endpointReset(EP_CONTROL);
+
+        // now the device will be enumerated
+        // enable SETUP received interrupt
+        // must be done here because the Usb_reset_endpoint
+        // clear the SETUP received interrupt
+        interruptReceiveSetupEnable();
+
         OSUsbDevice::Usb_reset_action();
         OSUsbDevice::Usb_send_event(EVT_USB_RESET);
       }
-
-#if false
-    if (OSUsbDevice::isInterruptReceiveSetup()
-        && OSUsbDevice::isInterruptReceiveSetupEnabled())
+    // - Device start of frame received
+    if (OSUsbDevice::Is_usb_sof() && OSUsbDevice::Is_sof_interrupt_enabled())
       {
-        OSDeviceDebug::putString("Vs ");
-        //OSDeviceDebug::putNewLine();
-
-        OSUsbDevice::endpointSelect(EP_CONTROL);
-
-        OSUsbDevice::standardProcessRequest();
-
+        OSUsbDevice::Usb_ack_sof();
+        //debug_put_string("uf\n");
+        OSUsbDevice::Usb_sof_action();
       }
 
-    DeviceCharacterUsb::specificCdcInterruptServiceRoutine();
-#endif
-
-    OSUsbLed::toggle();
+    //OSUsbLed::toggle();
   }
 
-// usb_init_device.
+// usbDriverInit.
 //
-// This function initialises the USB device controller and
-// configures the Default Control Endpoint.
+// This function initialises the USB driver
 //
 //
 // @param none
 //
 // @return status
-//
-unsigned char
-OSUsbDevice::usb_init_device(void)
+bool
+OSUsbDevice::usbDriverInit(void)
   {
-    OSUsbDevice::Usb_select_device();
-    if (OSUsbDevice::Is_usb_id_device())
-      {
-        OSUsbDevice::endpointSelect(EP_CONTROL);
-        if (!OSUsbDevice::Is_usb_endpoint_enabled())
-          {
-            int r;
-            r = OSUsbDevice::usb_configure_endpoint(EP_CONTROL, TYPE_CONTROL,
-                DIRECTION_OUT, SIZE_64, ONE_BANK, NYET_DISABLED);
-            if (r)
-              {
-                OSUsbDevice::interruptReceiveSetupEnable();
-              }
-            return r;
-          }
-      }
-    return false;
+  OSScheduler::criticalEnter();
+
+    ////////////////////
+    // Start USB clock.
+    ////////////////////
+
+    // Use 16MHz from OSC0 and generate 96 MHz
+    pm_pll_setup(&AVR32_PM, 0,  // pll.
+     2,   // mul.
+     0,   // div.
+     0,   // osc.
+     16); // lockcount.
+
+    pm_pll_set_option(&AVR32_PM, 0, // pll.
+     1,  // pll_freq: choose the range 80-180MHz.
+     0,  // pll_div2.
+     0); // pll_wbwdisable.
+
+    // start PLL1 and wait forl lock
+    pm_pll_enable(&AVR32_PM, 0);
+
+    // Wait for PLL1 locked.
+    pm_wait_for_pll0_locked(&AVR32_PM);
+
+    //setup the USB generic clock
+    pm_gc_setup(&AVR32_PM, AVR32_PM_GCLK_USBB,  // gc
+                 1,                            // osc_or_pll: use Osc (if 0) or PLL (if 1)
+                 0,                          // pll_osc: select Osc0/PLL0 or Osc1/PLL1
+                 1,                   // diven
+                 3);                     // div
+    // Enable USB GCLK.
+    pm_gc_enable(&AVR32_PM, AVR32_PM_GCLK_USBB);
+
+    ////////////////////
+    // configure USB module.
+    ////////////////////
+
+    // register interrupt
+    INTC_register_interrupt(USB_contextHandler, AVR32_USBB_IRQ,
+        OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY);
+
+    // force USB module into device mode
+    OSUsbDevice::Usb_force_device_mode();
+
+    /////////////////////
+    // initializes the USB device controller.
+    ////////////////////
+    usb_connected = FALSE;
+    usb_configuration_nb = 0;
+
+    OSUsbDevice::Usb_disable();
+    (void)OSUsbDevice::isUsbEnabled();
+    OSUsbDevice::disableOtgPad();
+    OSUsbDevice::enableOtgPad();
+    OSUsbDevice::Usb_enable();
+    OSUsbDevice::Usb_unfreeze_clock();
+    (void)Is_usb_clock_frozen();
+
+    OSUsbDevice::Usb_enable_vbus_interrupt();
+
+    OSUsbDevice::Usb_ack_suspend();  // A suspend condition may be detected right after enabling the USB macro
+    (void)OSUsbDevice::Is_usb_suspend();
+
+    // freeze clocks in order to save power
+    OSUsbDevice::Usb_freeze_clock();
+    //(void)Is_usb_clock_frozen();
+
+    OSScheduler::criticalExit();
+
+    return 0;
   }
 
 bool
@@ -228,9 +275,9 @@ OSUsbDevice::usb_configure_endpoint(unsigned char num, unsigned char type,
     unsigned char dir, unsigned char size, unsigned char bank,
     unsigned char nyet)
   {
-    OSUsbDevice::endpointSelect(num);
-    return OSUsbDevice::usb_config_ep((type << 6) | (nyet << 1) | (dir), (size
-            << 4) | (bank << 2));
+    nyet = nyet;
+    //OSUsbDevice::endpointSelect(num);
+    return AVR32_usb_configure_endpoint(num, type, dir, size, bank);
   }
 
 // usb_configure_endpoint.
@@ -252,6 +299,7 @@ OSUsbDevice::usb_config_ep(unsigned char config0, unsigned char config1)
     UECFG0X = config0;
     UECFG1X = (UECFG1X & _BV(ALLOC)) | config1;
 #else
+    // do nothing
     config0 = config0;
     config1 = config1;
 #endif
@@ -259,6 +307,24 @@ OSUsbDevice::usb_config_ep(unsigned char config0, unsigned char config1)
     OSUsbDevice::Usb_allocate_memory();
     return (OSUsbDevice::Is_endpoint_configured());
   }
+
+//! usb_init_device
+//!
+//!  This function initializes the USB device controller and
+//!  configures the Default Control Endpoint.
+//!
+//! @return Status
+//!
+unsigned char
+OSUsbDevice::usb_init_device(void)
+{
+  return AVR32_is_usb_id_device() && !AVR32_is_usb_endpoint_enabled(EP_CONTROL) &&
+         AVR32_usb_configure_endpoint(EP_CONTROL,
+                                TYPE_CONTROL,
+                                DIRECTION_OUT,
+                                EP_CONTROL_LENGTH,
+                                SINGLE_BANK);
+}
 
 // @brief This function initialises the USB device controller
 //
@@ -274,55 +340,83 @@ OSUsbDevice::usb_config_ep(unsigned char config0, unsigned char config1)
 //
 void
 OSUsbDevice::usb_start_device(void)
+{
+  Usb_unfreeze_clock();
+  (void)Is_usb_clock_frozen();
+  // enable Start of Frame Interrupt
+  AVR32_usb_enable_sof_interrupt();
+  // enable End of Reset Interrupt
+  Usb_enable_reset_interrupt();
+  // enable suspend state interrupt
+  Usb_enable_suspend_interrupt();
+
+#ifndef HIGH_SPEED_CAPABLE
+  AVR32_usb_force_full_speed_mode(); // if we want to use full-speed
+#else
+  //dual mode needed because the peripheral starts in full-speed mode and performs a
+  //high-speed reset to switch to the high-speed mode if the host is high-speed capable
+  AVR32_usb_use_dual_speed_mode();
+#endif
+  // attaches to USB bus
+  Usb_attach();
+
+  usb_connected = true;
+}
+
+void
+OSUsbDevice::Usb_reset_endpoint_fifo_access(unsigned char ep)
+{
+  pep_fifo[(ep)].u64ptr = Usb_get_endpoint_fifo_access(ep, 64);
+}
+
+#if 0
+
+int
+OSUsbDevice::writeBuffer(void *pBuf, int bufMaxSize)
+{
+  unsigned int availableSize, min;
+  int status;
+
+  if(bufMaxSize == 0)
   {
-  //PORTD |= _BV(PORTD7);
-
-  ////////////////////
-  // Start USB clock.
-  ////////////////////
-
-  // Use 16MHz from OSC0 and generate 96 MHz
-  pm_pll_setup(&AVR32_PM, 0,  // pll.
-   2,   // mul.
-   0,   // div.
-   0,   // osc.
-   16); // lockcount.
-
-  pm_pll_set_option(&AVR32_PM, 0, // pll.
-   1,  // pll_freq: choose the range 80-180MHz.
-   0,  // pll_div2.
-   0); // pll_wbwdisable.
-
-  // start PLL1 and wait forl lock
-  pm_pll_enable(&AVR32_PM, 0);
-
-  // Wait for PLL1 locked.
-  pm_wait_for_pll0_locked(&AVR32_PM);
-
-  //setup the USB generic clock
-  pm_gc_setup(&AVR32_PM, AVR32_PM_GCLK_USBB,  // gc
-               1,                            // osc_or_pll: use Osc (if 0) or PLL (if 1)
-               0,                          // pll_osc: select Osc0/PLL0 or Osc1/PLL1
-               1,                   // diven
-               3);                     // div
-  // Enable USB GCLK.
-  pm_gc_enable(&AVR32_PM, AVR32_PM_GCLK_USBB);
-
-//    OSUsbDevice::Pll_start_auto();
-//    while (!OSUsbDevice::Is_pll_ready())
-//    ;
-  OSUsbDevice::Usb_unfreeze_clock();
-  OSUsbDevice::Usb_enable_suspend_interrupt();
-  OSUsbDevice::Usb_enable_reset_interrupt();
-  OSUsbDevice::usb_init_device(); // configure the USB controller EP0
-  OSUsbDevice::Usb_attach();
-  usb_connected = false;
-
-  //PORTD &= ~_BV(PORTD7);
-
+      return 0;
   }
 
-UnionVPtr pep_fifo[AVR32_USBB_EPT_NUM];
+  status = AVR32_is_usb_in_ready(m_selectedEndpoint);
+
+  if( !status )
+  {
+      return 0;
+  }
+
+  availableSize = AVR32_usb_get_endpoint_size(m_selectedEndpoint);
+
+  // min will hold the number of bytes to be write
+  min = min(availableSize, bufMaxSize);
+
+  // Reset known position inside FIFO
+  // data register of selected endpoint
+  Usb_reset_endpoint_fifo_access(m_selectedEndpoint);
+
+  // write min bytes from pBuf
+  usb_write_ep_txpacket(m_selectedEndpoint, pBuf, min, NULL);
+
+  // acknowledge IN ready and sends current bank
+  AVR32_usb_ack_in_ready_send(m_selectedEndpoint);
+
+  // check if there is a need for sending a zlp
+  if(min == availableSize)
+  {
+      // wait for previous data to be sent
+      while (!AVR32_is_usb_in_ready(m_selectedEndpoint)) ;
+      // send zlp
+      AVR32_usb_ack_in_ready_send(m_selectedEndpoint);
+  }
+
+  return min;
+}
+
+
 //! usb_read_ep_rxpacket
 //!
 //!  This function reads the selected endpoint FIFO to the buffer pointed to by
@@ -355,7 +449,7 @@ U32 usb_read_ep_rxpacket(U8 ep, void *rxbuf, U32 data_length, void **prxbuf)
 #endif  // !__OPTIMIZE_SIZE__
 
   // Initialize pointers for copy loops and limit the number of bytes to copy
-  ep_fifo.u8ptr = pep_fifo[ep].u8ptr;
+  ep_fifo.u8ptr = OSUsbDevice::pep_fifo[ep].u8ptr;
   rxbuf_cur.u8ptr = (U8*)rxbuf;
   rxbuf_end.u8ptr = rxbuf_cur.u8ptr + min(data_length, (AVR32_usb_byte_count(ep)));
 #if (!defined __OPTIMIZE_SIZE__) || !__OPTIMIZE_SIZE__  // Auto-generated when GCC's -Os command option is used
@@ -435,7 +529,7 @@ U32 usb_read_ep_rxpacket(U8 ep, void *rxbuf, U32 data_length, void **prxbuf)
   }
 
   // Save current position in FIFO data register
-  pep_fifo[ep].u8ptr = (volatile U8 *)ep_fifo.u8ptr;
+  OSUsbDevice::pep_fifo[ep].u8ptr = (volatile U8 *)ep_fifo.u8ptr;
 
   // Return the updated buffer address and the number of non-copied bytes
   if (prxbuf) *prxbuf = rxbuf_cur.u8ptr;
@@ -474,7 +568,7 @@ U32 usb_write_ep_txpacket(U8 ep, const void *txbuf, U32 data_length, const void 
 #endif  // !__OPTIMIZE_SIZE__
 
   // Initialize pointers for copy loops and limit the number of bytes to copy
-  ep_fifo.u8ptr = pep_fifo[ep].u8ptr;
+  ep_fifo.u8ptr = OSUsbDevice::pep_fifo[ep].u8ptr;
   txbuf_cur.u8ptr = (const U8*)txbuf;
   txbuf_end.u8ptr = txbuf_cur.u8ptr +
                     min(data_length, AVR32_usb_get_endpoint_size(ep) - AVR32_usb_byte_count(ep));
@@ -555,12 +649,14 @@ U32 usb_write_ep_txpacket(U8 ep, const void *txbuf, U32 data_length, const void 
   }
 
   // Save current position in FIFO data register
-  pep_fifo[ep].u8ptr = ep_fifo.u8ptr;
+  OSUsbDevice::pep_fifo[ep].u8ptr = ep_fifo.u8ptr;
 
   // Return the updated buffer address and the number of non-copied bytes
   if (ptxbuf) *ptxbuf = txbuf_cur.u8ptr;
   return data_length - (txbuf_cur.u8ptr - (U8 *)txbuf);
 }
+#endif
+
 
 #endif /* defined(OS_INCLUDE_OSUSBDEVICE) */
 
