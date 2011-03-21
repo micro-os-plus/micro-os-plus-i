@@ -58,6 +58,7 @@ private:
   implReadByte(void);
 
   friend class OSUsbDevice;
+  friend class OSUsbDeviceImpl;
 
   static void
   specificCdcInterruptServiceRoutine(void);
