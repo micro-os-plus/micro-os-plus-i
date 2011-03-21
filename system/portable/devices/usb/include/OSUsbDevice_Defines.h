@@ -9,6 +9,8 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
+// ----- Endpoints ------------------------------------------------------------
+
 #define MAX_EP_NB                       7
 
 #define EP_CONTROL                      0
@@ -20,12 +22,13 @@
 #define EP_6                            6
 #define EP_7                            7
 
-// USB device standard  requests decoding module
+// ----- Standard requests ----------------------------------------------------
+
 #define GET_STATUS                      0x00
 #define GET_DEVICE                      0x01
-#define CLEAR_FEATURE                   0x01     // see FEATURES below
+#define CLEAR_FEATURE                   0x01     // see FEATURES below ?
 #define GET_STRING                      0x03
-#define SET_FEATURE                     0x03     // see FEATURES below
+#define SET_FEATURE                     0x03     // see FEATURES below ?
 #define SET_ADDRESS                     0x05
 #define GET_DESCRIPTOR                  0x06
 #define SET_DESCRIPTOR                  0x07
@@ -35,7 +38,8 @@
 #define SET_INTERFACE                   0x0B
 #define SYNCH_FRAME                     0x0C
 
-// Descriptor Types
+// ----- Descriptor Types -----------------------------------------------------
+
 #define DEVICE_DESCRIPTOR                       0x01
 #define CONFIGURATION_DESCRIPTOR                0x02
 #define STRING_DESCRIPTOR                       0x03
@@ -43,6 +47,8 @@
 #define ENDPOINT_DESCRIPTOR                     0x05
 #define DEVICE_QUALIFIER_DESCRIPTOR             0x06
 #define OTHER_SPEED_CONFIGURATION_DESCRIPTOR    0x07
+
+// ----------------------------------------------------------------------------
 
 #define ZERO_TYPE                       0x00
 #define INTERFACE_TYPE                  0x01
@@ -59,12 +65,12 @@
 #define USB_ACM_TYPE                    0x02
 #define USB_CDC_UNION_TYPE              0x06
 
-// Standard Features
+// ----- Features -------------------------------------------------------------
+
 #define FEATURE_DEVICE_REMOTE_WAKEUP          0x01
 #define FEATURE_ENDPOINT_HALT                 0x00
 #define FEATURE_TEST_MODE                     0x02
 
-#define ZERO_TYPE                           0x00 // DEVICE_TYPE
-#define INTERFACE_TYPE                  0x01
+// ----------------------------------------------------------------------------
 
 #endif /* OSUSBDEVICE_DEFINES_H_ */
