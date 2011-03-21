@@ -30,8 +30,6 @@ OSUsbDevice::OSUsbDevice()
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
-
-  OSUsbLed::init();
 }
 
 // ----------------------------------------------------------------------------
