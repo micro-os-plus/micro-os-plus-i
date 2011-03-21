@@ -15,114 +15,12 @@
 
 #include "portable/devices/usb/include/OSUsbLed.h"
 
-#include "hal/arch/avr8/at90usb/devices/usb/include/OSUsbDeviceDescriptorsConfig.h"
+#include "portable/devices/usb/include/OSUsbDevice_Defines.h"
+#include "hal/arch/avr8/at90usb/devices/usb/include/OSUsbDevice_Defines.h"
+
 #include "hal/arch/avr8/at90usb/devices/usb/include/OSUsbDeviceDescriptors.h"
 
-//-----------------------------------------------------------------------------
-
-#define MAX_EP_NB                       7
-
-#define EP_CONTROL                      0
-#define EP_1                            1
-#define EP_2                            2
-#define EP_3                            3
-#define EP_4                            4
-#define EP_5                            5
-#define EP_6                            6
-#define EP_7                            7
-
-// USB device standard  requests decoding module
-#define GET_STATUS                      0x00
-#define GET_DEVICE                      0x01
-#define CLEAR_FEATURE                   0x01     // see FEATURES below
-#define GET_STRING                      0x03
-#define SET_FEATURE                     0x03     // see FEATURES below
-#define SET_ADDRESS                     0x05
-#define GET_DESCRIPTOR                  0x06
-#define SET_DESCRIPTOR                  0x07
-#define GET_CONFIGURATION               0x08
-#define SET_CONFIGURATION               0x09
-#define GET_INTERFACE                   0x0A
-#define SET_INTERFACE                   0x0B
-#define SYNCH_FRAME                     0x0C
-
-// Descriptor Types
-#define DEVICE_DESCRIPTOR                       0x01
-#define CONFIGURATION_DESCRIPTOR                0x02
-#define STRING_DESCRIPTOR                       0x03
-#define INTERFACE_DESCRIPTOR                    0x04
-#define ENDPOINT_DESCRIPTOR                     0x05
-#define DEVICE_QUALIFIER_DESCRIPTOR             0x06
-#define OTHER_SPEED_CONFIGURATION_DESCRIPTOR    0x07
-
-#define ZERO_TYPE                       0x00
-#define INTERFACE_TYPE                  0x01
-#define ENDPOINT_TYPE                   0x02
-
-#define FEATURE_ENDPOINT_HALT           0x00
-
-#define REQUEST_DEVICE_STATUS           0x80
-#define REQUEST_INTERFACE_STATUS        0x81
-#define REQUEST_ENDPOINT_STATUS         0x82
-
-#define USB_DT_CS_INTERFACE             0x24
-
-#define USB_CDC_HEADER_TYPE             0x00
-#define USB_CDC_CALL_MANAGEMENT_TYPE    0x01
-#define USB_ACM_TYPE                    0x02
-#define USB_CDC_UNION_TYPE              0x06
-
-//-----------------------------------------------------------------------------
-
-#define MSK_UADD              0x7F
-#define MSK_EP_DIR            0x7F
-
-// Parameters for endpoint configuration
-// These define are the values used to enable and configure an endpoint.
-#define TYPE_CONTROL             0
-#define TYPE_ISOCHRONOUS         1
-#define TYPE_BULK                2
-#define TYPE_INTERRUPT           3
-//typedef enum ep_type {TYPE_CONTROL, TYPE_BULK, TYPE_ISOCHRONOUS, TYPE_INTERRUPT} e_ep_type;
-
-#define DIRECTION_OUT            0
-#define DIRECTION_IN             1
-//typedef enum ep_dir {DIRECTION_OUT, DIRECTION_IN} e_ep_dir;
-
-#define SIZE_8                   0
-#define SIZE_16                  1
-#define SIZE_32                  2
-#define SIZE_64                  3
-#define SIZE_128                 4
-#define SIZE_256                 5
-#define SIZE_512                 6
-#define SIZE_1024                7
-//typedef enum ep_size {SIZE_8,   SIZE_16,  SIZE_32,  SIZE_64,
-//                      SIZE_128, SIZE_256, SIZE_512, SIZE_1024} e_ep_size;
-
-#define ONE_BANK                 0
-#define TWO_BANKS                1
-//typedef enum ep_bank {ONE_BANK, TWO_BANKS} e_ep_bank;
-
-#define NYET_ENABLED             0
-#define NYET_DISABLED            1
-
-// TODO: check if this is architecture or usb
-#define EVT_USB_POWERED               1 // USB plugged
-#define EVT_USB_UNPOWERED             2 // USB un-plugged
-#define EVT_USB_DEVICE_FUNCTION       3 // USB in device
-#define EVT_USB_HOST_FUNCTION         4 // USB in host
-#define EVT_USB_SUSPEND               5 // USB suspend
-#define EVT_USB_WAKE_UP               6 // USB wake up
-#define EVT_USB_RESUME                7 // USB resume
-#define EVT_USB_RESET                 8 // USB reset
-#define EVT_HOST_SOF                  9 // Host start of frame sent
-#define EVT_HOST_HWUP                 10        // Host wakeup detected
-#define EVT_HOST_DISCONNECTION        11        // The target device is disconencted
-#define USB_CONFIG_ATTRIBUTES_RESERVED  0x80
-#define USB_CONFIG_BUSPOWERED           (USB_CONFIG_ATTRIBUTES_RESERVED | 0x00)
-#define USB_CONFIG_SELFPOWERED          (USB_CONFIG_ATTRIBUTES_RESERVED | 0x40)
-#define USB_CONFIG_REMOTEWAKEUP         (USB_CONFIG_ATTRIBUTES_RESERVED | 0x20)
+// ----------------------------------------------------------------------------
 
 class OSUsbDeviceImpl
 {
@@ -385,455 +283,530 @@ public:
 
 };
 
-//-----------------------------------------------------------------------------
-inline void OSUsbDeviceImpl::Usb_set_configuration_action(void)
-  {
-    ;
-  }
+// ----------------------------------------------------------------------------
 
-inline void OSUsbDeviceImpl::Usb_sof_action(void)
-  {
-    ; //sof_action();
-  }
+inline void
+OSUsbDeviceImpl::Usb_set_configuration_action(void)
+{
+  ;
+}
 
-inline void OSUsbDeviceImpl::Usb_wake_up_action(void)
-  {
-    ;
-  }
+inline void
+OSUsbDeviceImpl::Usb_sof_action(void)
+{
+  ; //sof_action();
+}
 
-inline void OSUsbDeviceImpl::Usb_resume_action(void)
-  {
-    ;
-  }
+inline void
+OSUsbDeviceImpl::Usb_wake_up_action(void)
+{
+  ;
+}
 
-inline void OSUsbDeviceImpl::Usb_suspend_action(void)
-  {
-    OSDeviceDebug::putString("zzz...");
-    OSDeviceDebug::putNewLine();
+inline void
+OSUsbDeviceImpl::Usb_resume_action(void)
+{
+  ;
+}
 
-    if (false)
-      {
-        //Enable_interrupt();
-        //Enter_power_down_mode();
-        cli();
-        set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-        sei();
-        sleep_cpu();
-        sleep_disable();
-      }
-  }
+inline void
+OSUsbDeviceImpl::Usb_suspend_action(void)
+{
+  OSDeviceDebug::putString("zzz...");
+  OSDeviceDebug::putNewLine();
 
-inline void OSUsbDeviceImpl::Usb_reset_action(void)
-  {
-    ;
-  }
+  if (false)
+    {
+      //Enable_interrupt();
+      //Enter_power_down_mode();
+      cli();
+      set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+      sei();
+      sleep_cpu();
+      sleep_disable();
+    }
+}
 
-inline void OSUsbDeviceImpl::Usb_vbus_on_action(void)
-  {
-    ;
-  }
+inline void
+OSUsbDeviceImpl::Usb_reset_action(void)
+{
+  ;
+}
 
-inline void OSUsbDeviceImpl::Usb_vbus_off_action(void)
-  {
-    ;
-  }
+inline void
+OSUsbDeviceImpl::Usb_vbus_on_action(void)
+{
+  ;
+}
 
-//-----------------------------------------------------------------------------
+inline void
+OSUsbDeviceImpl::Usb_vbus_off_action(void)
+{
+  ;
+}
 
+// ----------------------------------------------------------------------------
 
 // select the endpoint number to interface with the CPU
-inline void OSUsbDeviceImpl::endpointSelect(unsigned char ep)
-  {
-    UENUM = ep;
-  }
+inline void
+OSUsbDeviceImpl::endpointSelect(unsigned char ep)
+{
+  UENUM = ep;
+}
 
 // reset the selected endpoint
-inline void OSUsbDeviceImpl::endpointReset(unsigned char ep)
-  {
-    UERST = _BV(ep);
-    UERST = 0;
-  }
+inline void
+OSUsbDeviceImpl::endpointReset(unsigned char ep)
+{
+  UERST = _BV(ep);
+  UERST = 0;
+}
 
 // test if SETUP interrupt received
-inline bool OSUsbDeviceImpl::isInterruptReceiveSetup(void)
-  {
-    return ((UEINTX & _BV(RXSTPI)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::isInterruptReceiveSetup(void)
+{
+  return ((UEINTX & _BV(RXSTPI)) != 0) ? true : false;
+}
 
 // test if SETUP interrupt enabled
-inline bool OSUsbDeviceImpl::isInterruptReceiveSetupEnabled(void)
-  {
-    return ((UEIENX & _BV(RXSTPE)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::isInterruptReceiveSetupEnabled(void)
+{
+  return ((UEIENX & _BV(RXSTPE)) != 0) ? true : false;
+}
 
 // enable receive SETUP interrupt
-inline void OSUsbDeviceImpl::interruptReceiveSetupEnable(void)
-  {
-    UEIENX |= _BV(RXSTPE);
-  }
+inline void
+OSUsbDeviceImpl::interruptReceiveSetupEnable(void)
+{
+  UEIENX |= _BV(RXSTPE);
+}
 
 // test if receive OUT interrupt received
-inline bool OSUsbDeviceImpl::isInterruptReceiveOut(void)
-  {
-    return (((UEINTX & _BV(RXOUTI))) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::isInterruptReceiveOut(void)
+{
+  return (((UEINTX & _BV(RXOUTI))) != 0) ? true : false;
+}
 
 // test if receive OUT interrupt enabled
-inline bool OSUsbDeviceImpl::isInterruptReceiveOutEnabled(void)
-  {
-    return ((UEIENX & _BV(RXOUTE)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::isInterruptReceiveOutEnabled(void)
+{
+  return ((UEIENX & _BV(RXOUTE)) != 0) ? true : false;
+}
 
 // ack receive OUT interrupt on control endpoint
-inline void OSUsbDeviceImpl::interruptReceiveOutAck(void)
-  {
-    UEINTX &= ~_BV(RXOUTI);
-  }
+inline void
+OSUsbDeviceImpl::interruptReceiveOutAck(void)
+{
+  UEINTX &= ~_BV(RXOUTI);
+}
 
 // enable receive OUT interrupt
-inline void OSUsbDeviceImpl::interruptReceiveOutEnable(void)
-  {
-    UEIENX |= _BV(RXOUTE);
-  }
+inline void
+OSUsbDeviceImpl::interruptReceiveOutEnable(void)
+{
+  UEIENX |= _BV(RXOUTE);
+}
 
 // return FIFO byte for current endpoint
-inline unsigned char OSUsbDeviceImpl::readByte(void)
-  {
-    return UEDATX;
-  }
+inline unsigned char
+OSUsbDeviceImpl::readByte(void)
+{
+  return UEDATX;
+}
 
 // write byte in FIFO for current endpoint
-inline void OSUsbDeviceImpl::writeByte(unsigned char b)
-  {
-    UEDATX = b;
-  }
+inline void
+OSUsbDeviceImpl::writeByte(unsigned char b)
+{
+  UEDATX = b;
+}
 
 // enables the STALL handshake for the next transaction
-inline void OSUsbDeviceImpl::Usb_enable_stall_handshake(void)
-  {
-    UECONX |= _BV(STALLRQ);
-  }
+inline void
+OSUsbDeviceImpl::Usb_enable_stall_handshake(void)
+{
+  UECONX |= _BV(STALLRQ);
+}
 
 // acks receive SETUP interrupt
-inline void OSUsbDeviceImpl::Usb_ack_receive_setup(void)
-  {
-    UEINTX &= ~_BV(RXSTPI);
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_receive_setup(void)
+{
+  UEINTX &= ~_BV(RXSTPI);
+}
 
 // Enable internal USB pads regulator
-inline void OSUsbDeviceImpl::Usb_enable_regulator(void)
-  {
-    UHWCON |=_BV(UVREGE);
-  }
+inline void
+OSUsbDeviceImpl::Usb_enable_regulator(void)
+{
+  UHWCON |= _BV(UVREGE);
+}
 
 // Disable external UID pin
-inline void OSUsbDeviceImpl::Usb_disable_uid_pin(void)
-  {
-    UHWCON &= ~_BV(UIDE);
-  }
+inline void
+OSUsbDeviceImpl::Usb_disable_uid_pin(void)
+{
+  UHWCON &= ~_BV(UIDE);
+}
 
 // Disable external UID pin and force device mode
-inline void OSUsbDeviceImpl::Usb_force_device_mode(void)
-  {
+inline void
+OSUsbDeviceImpl::Usb_force_device_mode(void)
+{
   OSUsbDeviceImpl::Usb_disable_uid_pin();
-    UHWCON |= _BV(UIMOD);
-  }
+  UHWCON |= _BV(UIMOD);
+}
 
 // Disable both USB interface and Vbus pad
-inline void OSUsbDeviceImpl::Usb_disable(void)
-  {
-    USBCON &= ~(_BV(USBE) | _BV(OTGPADE));
-  }
+inline void
+OSUsbDeviceImpl::Usb_disable(void)
+{
+  USBCON &= ~(_BV(USBE) | _BV(OTGPADE));
+}
 
 // Enable both USB interface and Vbus pad
-inline void OSUsbDeviceImpl::Usb_enable(void)
-  {
-    USBCON |=(_BV(USBE) |_BV(OTGPADE));
-  }
+inline void
+OSUsbDeviceImpl::Usb_enable(void)
+{
+  USBCON |= (_BV(USBE) | _BV(OTGPADE));
+}
 
 // select device mode
-inline void OSUsbDeviceImpl::Usb_select_device(void)
-  {
-    USBCON &= ~_BV(HOST);
-  }
+inline void
+OSUsbDeviceImpl::Usb_select_device(void)
+{
+  USBCON &= ~_BV(HOST);
+}
 
 // enable VBUS interrupt
-inline void OSUsbDeviceImpl::Usb_enable_vbus_interrupt(void)
-  {
-    USBCON |= _BV(VBUSTE);
-  }
+inline void
+OSUsbDeviceImpl::Usb_enable_vbus_interrupt(void)
+{
+  USBCON |= _BV(VBUSTE);
+}
 
 // test if write endpoint enabled
-inline bool OSUsbDeviceImpl::Is_usb_write_enabled(void)
-  {
-    return ((UEINTX & _BV(RWAL)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_write_enabled(void)
+{
+  return ((UEINTX & _BV(RWAL)) != 0) ? true : false;
+}
 
 // test if transmit ready (same bit as allowed!)
-inline bool OSUsbDeviceImpl::Is_usb_tx_ready(void)
-  {
-    return ((UEINTX & _BV(RWAL)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_tx_ready(void)
+{
+  return ((UEINTX & _BV(RWAL)) != 0) ? true : false;
+}
 
 // send IN
-inline void OSUsbDeviceImpl::Usb_send_in(void)
-  {
-    UEINTX &= ~_BV(FIFOCON);
-  }
+inline void
+OSUsbDeviceImpl::Usb_send_in(void)
+{
+  UEINTX &= ~_BV(FIFOCON);
+}
 
 // return number of bytes in FIFO current endpoint (16 bits)
-inline unsigned short OSUsbDeviceImpl::Usb_byte_counter(void)
-  {
-    return UEBCX;
-  }
+inline unsigned short
+OSUsbDeviceImpl::Usb_byte_counter(void)
+{
+  return UEBCX;
+}
 
 // clear FIFOCON bit
-inline void OSUsbDeviceImpl::Usb_ack_fifocon(void)
-  {
-    UEINTX &= ~_BV(FIFOCON);
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_fifocon(void)
+{
+  UEINTX &= ~_BV(FIFOCON);
+}
 
-inline bool OSUsbDeviceImpl::Is_usb_vbus_transition(void)
-  {
-    return ((USBINT & (1<<VBUSTI)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_vbus_transition(void)
+{
+  return ((USBINT & (1 << VBUSTI)) != 0) ? true : false;
+}
 
-inline bool OSUsbDeviceImpl::Is_usb_vbus_interrupt_enabled(void)
-  {
-    return ((USBCON & (1<<VBUSTE)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_vbus_interrupt_enabled(void)
+{
+  return ((USBCON & (1 << VBUSTE)) != 0) ? true : false;
+}
 
-inline void OSUsbDeviceImpl::Usb_ack_vbus_transition(void)
-  {
-    USBINT = ~_BV(VBUSTI);
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_vbus_transition(void)
+{
+  USBINT = ~_BV(VBUSTI);
+}
 
-inline bool OSUsbDeviceImpl::Is_usb_vbus_high(void)
-  {
-    return ((USBSTA & (1<<VBUS)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_vbus_high(void)
+{
+  return ((USBSTA & (1 << VBUS)) != 0) ? true : false;
+}
 
 // enable USB reset interrupt
-inline void OSUsbDeviceImpl::Usb_enable_reset_interrupt(void)
-  {
-    UDIEN |= _BV(EORSTE);
-  }
+inline void
+OSUsbDeviceImpl::Usb_enable_reset_interrupt(void)
+{
+  UDIEN |= _BV(EORSTE);
+}
 
 // test if read allowed on control endpoint
-inline bool OSUsbDeviceImpl::Is_usb_read_control_enabled(void)
-  {
-    return ((UEINTX & _BV(TXINI)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_read_control_enabled(void)
+{
+  return ((UEINTX & _BV(TXINI)) != 0) ? true : false;
+}
 
 // send IN on control endpoint
-inline void OSUsbDeviceImpl::Usb_send_control_in(void)
-  {
-    UEINTX &= ~_BV(TXINI);
-  }
+inline void
+OSUsbDeviceImpl::Usb_send_control_in(void)
+{
+  UEINTX &= ~_BV(TXINI);
+}
 
 // ack reveive OUT
-inline void OSUsbDeviceImpl::Usb_ack_receive_out(void)
-  {
-    UEINTX &= ~_BV(RXOUTI);
-    OSUsbDeviceImpl::Usb_ack_fifocon();
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_receive_out(void)
+{
+  UEINTX &= ~_BV(RXOUTI);
+  OSUsbDeviceImpl::Usb_ack_fifocon();
+}
 
 // ack IN ready
-inline void OSUsbDeviceImpl::Usb_ack_in_ready(void)
-  {
-    UEINTX &= ~_BV(TXINI);
-    OSUsbDeviceImpl::Usb_ack_fifocon();
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_in_ready(void)
+{
+  UEINTX &= ~_BV(TXINI);
+  OSUsbDeviceImpl::Usb_ack_fifocon();
+}
 
 // test if IN ready
-inline bool OSUsbDeviceImpl::Is_usb_in_ready(void)
-  {
-    return ((UEINTX & _BV(TXINI)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_in_ready(void)
+{
+  return ((UEINTX & _BV(TXINI)) != 0) ? true : false;
+}
 
 // test if the current endpoint is enabled
-inline bool OSUsbDeviceImpl::Is_usb_endpoint_enabled(void)
-  {
-    return ((UECONX & _BV(EPEN)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_endpoint_enabled(void)
+{
+  return ((UECONX & _BV(EPEN)) != 0) ? true : false;
+}
 
 // disable the STALL handshake
-inline void OSUsbDeviceImpl::Usb_disable_stall_handshake(void)
-  {
-    UECONX |= _BV(STALLRQC);
-  }
+inline void
+OSUsbDeviceImpl::Usb_disable_stall_handshake(void)
+{
+  UECONX |= _BV(STALLRQC);
+}
 
 // reset the data toggle sequence
-inline void OSUsbDeviceImpl::Usb_reset_data_toggle(void)
-  {
-    UECONX |= _BV(RSTDT);
-  }
+inline void
+OSUsbDeviceImpl::Usb_reset_data_toggle(void)
+{
+  UECONX |= _BV(RSTDT);
+}
 
 // enable USB device address
-inline void OSUsbDeviceImpl::Usb_enable_address(void)
-  {
-    UDADDR |= _BV(ADDEN);
-  }
+inline void
+OSUsbDeviceImpl::Usb_enable_address(void)
+{
+  UDADDR |= _BV(ADDEN);
+}
 
 // set the USB device address
-inline void OSUsbDeviceImpl::Usb_configure_address(unsigned char addr)
-  {
-    UDADDR = (UDADDR & _BV(ADDEN)) |(addr & MSK_UADD);
-  }
+inline void
+OSUsbDeviceImpl::Usb_configure_address(unsigned char addr)
+{
+  UDADDR = (UDADDR & _BV(ADDEN)) | (addr & MSK_UADD);
+}
 
-inline void OSUsbDeviceImpl::Usb_send_event(unsigned char event)
-  {
-    g_usb_event |= (1<<event);
-  }
+inline void
+OSUsbDeviceImpl::Usb_send_event(unsigned char event)
+{
+  g_usb_event |= (1 << event);
+}
 
 // attache to USB bus
-inline void OSUsbDeviceImpl::Usb_attach(void)
-  {
-    UDCON &= ~_BV(DETACH);
-  }
+inline void
+OSUsbDeviceImpl::Usb_attach(void)
+{
+  UDCON &= ~_BV(DETACH);
+}
 
 // test if Start Of Frame occurs
-inline bool OSUsbDeviceImpl::Is_usb_sof(void)
-  {
-    return ((UDINT & _BV(SOFI)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_sof(void)
+{
+  return ((UDINT & _BV(SOFI)) != 0) ? true : false;
+}
 
-inline bool OSUsbDeviceImpl::Is_sof_interrupt_enabled(void)
-  {
-    return ((UDIEN & _BV(SOFE)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_sof_interrupt_enabled(void)
+{
+  return ((UDIEN & _BV(SOFE)) != 0) ? true : false;
+}
 
 // ack Start Of Frame
-inline void OSUsbDeviceImpl::Usb_ack_sof(void)
-  {
-    UDINT = ~_BV(SOFI);
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_sof(void)
+{
+  UDINT = ~_BV(SOFI);
+}
 
 // test if Suspend state detected
-inline bool OSUsbDeviceImpl::Is_usb_suspend(void)
-  {
-    return ((UDINT & _BV(SUSPI)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_suspend(void)
+{
+  return ((UDINT & _BV(SUSPI)) != 0) ? true : false;
+}
 
-inline bool OSUsbDeviceImpl::Is_suspend_interrupt_enabled(void)
-  {
-    return ((UDIEN & _BV(SUSPE)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_suspend_interrupt_enabled(void)
+{
+  return ((UDIEN & _BV(SUSPE)) != 0) ? true : false;
+}
 
 // ack Suspend
-inline void OSUsbDeviceImpl::Usb_ack_suspend(void)
-  {
-    UDINT = ~_BV(SUSPI);
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_suspend(void)
+{
+  UDINT = ~_BV(SUSPI);
+}
 
 // enable wake-up interrupt
-inline void OSUsbDeviceImpl::Usb_enable_wake_up_interrupt(void)
-  {
-    UDIEN |= _BV(WAKEUPE);
-  }
+inline void
+OSUsbDeviceImpl::Usb_enable_wake_up_interrupt(void)
+{
+  UDIEN |= _BV(WAKEUPE);
+}
 
 // ack wake-up
-inline void OSUsbDeviceImpl::Usb_ack_wake_up(void)
-  {
-    UDINT = ~_BV(WAKEUPI);
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_wake_up(void)
+{
+  UDINT = ~_BV(WAKEUPI);
+}
 
 // Stop internal USB clock in interface(freeze the interface register)
-inline void OSUsbDeviceImpl::Usb_freeze_clock(void)
-  {
-    USBCON |= _BV(FRZCLK);
-  }
+inline void
+OSUsbDeviceImpl::Usb_freeze_clock(void)
+{
+  USBCON |= _BV(FRZCLK);
+}
 
-inline void OSUsbDeviceImpl::Usb_unfreeze_clock(void)
-  {
-    USBCON &= ~_BV(FRZCLK);
-  }
+inline void
+OSUsbDeviceImpl::Usb_unfreeze_clock(void)
+{
+  USBCON &= ~_BV(FRZCLK);
+}
 
 // disable wake-up interrupt
-inline void OSUsbDeviceImpl::Usb_disable_wake_up_interrupt(void)
-  {
-    UDIEN &= ~_BV(WAKEUPE);
-  }
+inline void
+OSUsbDeviceImpl::Usb_disable_wake_up_interrupt(void)
+{
+  UDIEN &= ~_BV(WAKEUPE);
+}
 
 // ack resume
-inline void OSUsbDeviceImpl::Usb_ack_resume(void)
-  {
-    UDINT = ~_BV(EORSMI);
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_resume(void)
+{
+  UDINT = ~_BV(EORSMI);
+}
 
 // disable resume interrupt
-inline void OSUsbDeviceImpl::Usb_disable_resume_interrupt(void)
-  {
-    UDIEN &= ~_BV(EORSME);
-  }
+inline void
+OSUsbDeviceImpl::Usb_disable_resume_interrupt(void)
+{
+  UDIEN &= ~_BV(EORSME);
+}
 
 // ack USB reset
-inline void OSUsbDeviceImpl::Usb_ack_reset(void)
-  {
-    UDINT = ~_BV(EORSTI);
-  }
+inline void
+OSUsbDeviceImpl::Usb_ack_reset(void)
+{
+  UDINT = ~_BV(EORSTI);
+}
 
 // test if wake-up occurs
-inline bool OSUsbDeviceImpl::Is_usb_wake_up(void)
-  {
-    return ((UDINT & _BV(WAKEUPI)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_wake_up(void)
+{
+  return ((UDINT & _BV(WAKEUPI)) != 0) ? true : false;
+}
 
-inline bool OSUsbDeviceImpl::Is_swake_up_interrupt_enabled(void)
-  {
-    return ((UDIEN & (1<<WAKEUPE)) != 0) ? true : true;
-  }
+inline bool
+OSUsbDeviceImpl::Is_swake_up_interrupt_enabled(void)
+{
+  return ((UDIEN & (1 << WAKEUPE)) != 0) ? true : true;
+}
 
 // test if resume occurs
-inline bool OSUsbDeviceImpl::Is_usb_resume(void)
-  {
-    return ((UDINT & _BV(EORSMI)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_resume(void)
+{
+  return ((UDINT & _BV(EORSMI)) != 0) ? true : false;
+}
 
-inline bool OSUsbDeviceImpl::Is_resume_interrupt_enabled(void)
-  {
-    return ((UDIEN & _BV(EORSME)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_resume_interrupt_enabled(void)
+{
+  return ((UDIEN & _BV(EORSME)) != 0) ? true : false;
+}
 
 // test if USB reset occurs
-inline bool OSUsbDeviceImpl::Is_usb_reset(void)
-  {
-    return ((UDINT & _BV(EORSTI)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_reset(void)
+{
+  return ((UDINT & _BV(EORSTI)) != 0) ? true : false;
+}
 
-inline bool OSUsbDeviceImpl::Is_reset_interrupt_enabled(void)
-  {
-    return ((UDIEN & _BV(EORSTE)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_reset_interrupt_enabled(void)
+{
+  return ((UDIEN & _BV(EORSTE)) != 0) ? true : false;
+}
 
-inline bool OSUsbDeviceImpl::Is_usb_id_device(void)
-  {
-    return ((USBSTA & _BV(ID)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_usb_id_device(void)
+{
+  return ((USBSTA & _BV(ID)) != 0) ? true : false;
+}
 
 // enable the current endpoint
-inline void OSUsbDeviceImpl::Usb_enable_endpoint(void)
-  {
-    UECONX |= _BV(EPEN);
-  }
+inline void
+OSUsbDeviceImpl::Usb_enable_endpoint(void)
+{
+  UECONX |= _BV(EPEN);
+}
 
 // allocate the current configuration in DPRAM memory
-inline void OSUsbDeviceImpl::Usb_allocate_memory(void)
-  {
-    UECFG1X |= _BV(ALLOC);
-  }
+inline void
+OSUsbDeviceImpl::Usb_allocate_memory(void)
+{
+  UECFG1X |= _BV(ALLOC);
+}
 
 // test if current endpoint is configured
-inline bool OSUsbDeviceImpl::Is_endpoint_configured(void)
-  {
-    return ((UESTA0X & _BV(CFGOK)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_endpoint_configured(void)
+{
+  return ((UESTA0X & _BV(CFGOK)) != 0) ? true : false;
+}
 
 // enable suspend state interrupt
-inline void OSUsbDeviceImpl::Usb_enable_suspend_interrupt(void)
-  {
-    UDIEN |= _BV(SUSPE);
-  }
+inline void
+OSUsbDeviceImpl::Usb_enable_suspend_interrupt(void)
+{
+  UDIEN |= _BV(SUSPE);
+}
 
 // These functions allow to control the PLL
 
@@ -865,17 +838,19 @@ inline void OSUsbDeviceImpl::Usb_enable_suspend_interrupt(void)
 // Start the USB PLL with clockfactor
 // clockfactor can be PLLx24, PLLx12, PLLx08
 // PLLx06, PLLx04, PLLx03
-inline void OSUsbDeviceImpl::Pll_start_auto(void)
-  {
-    PLLCSR = (PLL_FACTOR | _BV(PLLE));
-  }
+inline void
+OSUsbDeviceImpl::Pll_start_auto(void)
+{
+  PLLCSR = (PLL_FACTOR | _BV(PLLE));
+}
 
-inline bool OSUsbDeviceImpl::Is_pll_ready(void)
-  {
-    return ((PLLCSR & _BV(PLOCK)) != 0) ? true : false;
-  }
+inline bool
+OSUsbDeviceImpl::Is_pll_ready(void)
+{
+  return ((PLLCSR & _BV(PLOCK)) != 0) ? true : false;
+}
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 #endif /* defined(OS_INCLUDE_OSUSBDEVICE) */
 
