@@ -10,9 +10,8 @@
 #include "portable/kernel/include/OS.h"
 
 #include "portable/devices/usb/include/OSUsbLed.h"
-#include "portable/devices/usb/include/OSUsbDeviceDescriptors.h"
-
 #include "portable/devices/usb/include/OSUsbDevice_Defines.h"
+#include "portable/devices/usb/include/OSUsbDeviceDescriptors.h"
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 
