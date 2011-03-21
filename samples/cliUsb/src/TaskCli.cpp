@@ -39,7 +39,7 @@ static const char prompt[] = "> ";
  * I/O is done via standard streams routed to the attached device.
  *
  */
- 
+
 void
 TaskCli::taskMain(void)
 {
@@ -273,7 +273,7 @@ TaskCli::lineProcess()
 
   int r;
 
-//  os.WDTreset();
+  //os.WDTreset();
 
   if (*pc == '$') // is command using checksum?
     {
