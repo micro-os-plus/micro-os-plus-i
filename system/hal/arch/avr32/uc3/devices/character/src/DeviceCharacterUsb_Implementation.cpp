@@ -13,250 +13,253 @@
 #include "portable/devices/character/include/DeviceCharacterUsb.h"
 #include "portable/devices/usb/include/OSUsbDevice.h"
 
-// ----- implementation code -------------------------------------------------
+// ----- Implementation code --------------------------------------------------
 
 int
 DeviceCharacterUsb::implOpen()
-  {
-    OSDeviceDebug::putString("DeviceCharacterUsb::open()");
-    OSDeviceDebug::putNewLine();
+{
+  OSDeviceDebug::putString("DeviceCharacterUsb::open()");
+  OSDeviceDebug::putNewLine();
 
-    static bool flagShouldNotInit;
+  static bool flagShouldNotInit;
 
-    if (!flagShouldNotInit)
-      {
-        // TODO: check if is ok to put it here!
-        OSUsbDevice::usbDriverInit();
-      }
+  if (!flagShouldNotInit)
+    {
+      // TODO: check if is ok to put it here!
+      OSUsbDevice::usbDriverInit();
+    }
 
-    OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
+  OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
 
-    m_txCounter = 0;
-    m_rxCounter = 0;
-    m_opened = false;
-    return 0;
-  }
+  m_txCounter = 0;
+  m_rxCounter = 0;
+  m_opened = false;
+  return 0;
+}
 
 OSEvent_t
 DeviceCharacterUsb::implGetOpenEvent(void)
-  {
-    return (OSEvent_t) &m_opened;
-  }
+{
+  return (OSEvent_t) &m_opened;
+}
 
 bool
 DeviceCharacterUsb::implIsConnected() const
-  {
-    //OSDeviceDebug::putString("DeviceCharacterUsb::isConnected()");
-    //    OSDeviceDebug::putNewLine();
-    return m_opened;
-  }
+{
+  //OSDeviceDebug::putString("DeviceCharacterUsb::isConnected()");
+  //    OSDeviceDebug::putNewLine();
+  return m_opened;
+}
 
 int
 DeviceCharacterUsb::implClose()
-  {
-    OSDeviceDebug::putString("DeviceCharacterUsb::close()");
-    OSDeviceDebug::putNewLine();
+{
+  OSDeviceDebug::putString("DeviceCharacterUsb::close()");
+  OSDeviceDebug::putNewLine();
 
-    return 0;
-  }
+  return 0;
+}
 
 bool
 DeviceCharacterUsb::implCanWrite(void)
-  {
+{
   // TODO: change this to work in inteerrupt mode
-    OSUsbDevice::endpointSelect(m_tx_ep);
-    while( !OSUsbDevice::Is_usb_write_enabled() ) ;
-    return true;
-  }
+  OSUsbDevice::endpointSelect(m_tx_ep);
+  while (!OSUsbDevice::Is_usb_write_enabled())
+    ;
+  return true;
+}
 
 OSEvent_t
 DeviceCharacterUsb::implGetWriteEvent(void)
-  {
-    return (OSEvent_t) &m_txCounter;
-  }
+{
+  return (OSEvent_t) &m_txCounter;
+}
 
 int
 DeviceCharacterUsb::implWriteByte(unsigned char b)
-  {
-    // if closed return -1
-    if (!m_opened)
+{
+  // if closed return -1
+  if (!m_opened)
     return OSReturn::OS_DISCONNECTED;
 
-    OSCriticalSection::enter();
+  OSCriticalSection::enter();
 
-    OSUsbDevice::endpointSelect(m_tx_ep);
+  OSUsbDevice::endpointSelect(m_tx_ep);
 
-    while (!OSUsbDevice::Is_usb_write_enabled())
-      {
-        //OSDeviceDebug::putChar('>');
-        //os.sched.eventWait(&m_txCounter);       // Wait Endpoint ready
-        //OSUsbDevice::endpointSelect(m_tx_ep);
-      }
+  while (!OSUsbDevice::Is_usb_write_enabled())
+    {
+      //OSDeviceDebug::putChar('>');
+      //os.sched.eventWait(&m_txCounter);       // Wait Endpoint ready
+      //OSUsbDevice::endpointSelect(m_tx_ep);
+    }
 
-    if(m_txCounter == 0)
-      {
-        OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
-      }
-    OSUsbDevice::writeByte(b);
-    m_txCounter++;
+  if (m_txCounter == 0)
+    {
+      OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
+    }
+  OSUsbDevice::writeByte(b);
+  m_txCounter++;
 
 #if defined(OS_DEBUG_DEVICECHARACTERUSB_WRITE)
 
-    OSDeviceDebug::putChar('}');
-    if (b >= ' ')
+  OSDeviceDebug::putChar('}');
+  if (b >= ' ')
     OSDeviceDebug::putChar(b);
-    else
+  else
     OSDeviceDebug::putHex(b);
 
 #endif
 
-    if (!OSUsbDevice::Is_usb_write_enabled()) //If Endpoint full -> flush
-      {
-        implFlush();
-      }
+  if (!OSUsbDevice::Is_usb_write_enabled()) //If Endpoint full -> flush
+    {
+      implFlush();
+    }
 
-    OSCriticalSection::exit();
+  OSCriticalSection::exit();
 
-    return b;
-  }
+  return b;
+}
 
 int
 DeviceCharacterUsb::implFlush(void)
-  {
-    bool zlp = false;
+{
+  bool zlp = false;
 
-    // if closed return -1
-    if (!m_opened)
-      return OSReturn::OS_DISCONNECTED;
+  // if closed return -1
+  if (!m_opened)
+    return OSReturn::OS_DISCONNECTED;
 
-    OSCriticalSection::enter();
+  OSCriticalSection::enter();
 
-    if (m_txCounter != 0)
-      {
-        OSUsbDevice::endpointSelect(m_tx_ep);
+  if (m_txCounter != 0)
+    {
+      OSUsbDevice::endpointSelect(m_tx_ep);
 
-        if (!OSUsbDevice::Is_usb_write_enabled()) //If Endpoint full -> flush
-          {
-            zlp = true;
-          }
-
-        OSUsbDevice::Usb_send_in();
-        //OSDeviceDebug::putChar('^');
-
-        if( zlp==TRUE )
+      if (!OSUsbDevice::Is_usb_write_enabled()) //If Endpoint full -> flush
         {
-           while( !OSUsbDevice::Is_usb_write_enabled() ) ;     // Wait Endpoint ready...
-           OSUsbDevice::Usb_send_in();             // ...and Send ZLP
+          zlp = true;
         }
 
-        m_txCounter = 0;
-      }
+      OSUsbDevice::Usb_send_in();
+      //OSDeviceDebug::putChar('^');
 
-    OSCriticalSection::exit();
+      if (zlp == TRUE)
+        {
+          while (!OSUsbDevice::Is_usb_write_enabled())
+            ; // Wait Endpoint ready...
+          OSUsbDevice::Usb_send_in(); // ...and Send ZLP
+        }
 
-    return 0;
-  }
+      m_txCounter = 0;
+    }
+
+  OSCriticalSection::exit();
+
+  return 0;
+}
 
 bool
 DeviceCharacterUsb::implCanRead()
-  {
-    return (DeviceCharacterUsb::implAvailableRead() != 0);
-  }
+{
+  return (DeviceCharacterUsb::implAvailableRead() != 0);
+}
 
 int
 DeviceCharacterUsb::implAvailableRead(void)
-  {
-    return m_rxCounter;
-  }
+{
+  return m_rxCounter;
+}
 
 OSEvent_t
 DeviceCharacterUsb::implGetReadEvent(void)
-  {
-    return (OSEvent_t) &m_rxCounter;
-  }
+{
+  return (OSEvent_t) &m_rxCounter;
+}
 
 int
 DeviceCharacterUsb::implReadByte(void)
-  {
-    int c;
+{
+  int c;
 
-    OSCriticalSection::enter();
+  OSCriticalSection::enter();
 
-    OSUsbDevice::endpointSelect(m_rx_ep);
-    c = OSUsbDevice::readByte();
-    m_rxCounter--;
-    if (m_rxCounter == 0)
-      {
-        //OSUsbDevice::Usb_ack_receive_out();
-        OSUsbDevice::Usb_ack_fifocon();
-      }
+  OSUsbDevice::endpointSelect(m_rx_ep);
+  c = OSUsbDevice::readByte();
+  m_rxCounter--;
+  if (m_rxCounter == 0)
+    {
+      //OSUsbDevice::Usb_ack_receive_out();
+      OSUsbDevice::Usb_ack_fifocon();
+    }
 
 #if defined(OS_DEBUG_DEVICECHARACTERUSB_READ)
 
-    OSDeviceDebug::putChar('{');
-    if (c >= ' ')
+  OSDeviceDebug::putChar('{');
+  if (c >= ' ')
     OSDeviceDebug::putChar(c);
-    else
+  else
     OSDeviceDebug::putHex((unsigned char) c);
 
 #endif
 
-    OSCriticalSection::exit();
+  OSCriticalSection::exit();
 
-    // OS_CONFIG_USBINT_LED_PORT &= ~_BV( PORTD0 );
-    return c;
-  }
+  // OS_CONFIG_USBINT_LED_PORT &= ~_BV( PORTD0 );
+  return c;
+}
 
 // USB CDC support functions
 
 void
 DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
-  {
+{
 
 #if TO_BE_PORTED
-    if (UEINT & _BV(RX_EP))
+  if (UEINT & _BV(RX_EP))
 #endif
-      {
+    {
 #if defined(OS_CONFIG_USBINT_LED_PORT)
-        OS_CONFIG_USBINT_LED_PORT |= _BV( OS_CONFIG_USBINT_LED_BIT );
+      OS_CONFIG_USBINT_LED_PORT |= _BV( OS_CONFIG_USBINT_LED_BIT );
 #endif
 
-        OSUsbDevice::endpointSelect(RX_EP);
-        if (OSUsbDevice::isInterruptReceiveOut()
-            && OSUsbDevice::isInterruptReceiveOutEnabled() )
-          {
-            OSDeviceDebug::putString("Vo");
-            OSDeviceDebug::putNewLine();
+      OSUsbDevice::endpointSelect(RX_EP);
+      if (OSUsbDevice::isInterruptReceiveOut()
+          && OSUsbDevice::isInterruptReceiveOutEnabled())
+        {
+          OSDeviceDebug::putString("Vo");
+          OSDeviceDebug::putNewLine();
 
-            // TODO: remove the next line - checks if m_rxCounter is 0
-            while(g_usb0->m_rxCounter != 0) ;
+          // TODO: remove the next line - checks if m_rxCounter is 0
+          while (g_usb0->m_rxCounter != 0)
+            ;
 
-            g_usb0->m_rxCounter = OSUsbDevice::Usb_byte_counter();
-            OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
-            OSUsbDevice::Usb_ack_receive_out();
-            OSScheduler::eventNotify(g_usb0->getReadEvent());
-          }
-      }
+          g_usb0->m_rxCounter = OSUsbDevice::Usb_byte_counter();
+          OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
+          OSUsbDevice::Usb_ack_receive_out();
+          OSScheduler::eventNotify(g_usb0->getReadEvent());
+        }
+    }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
-    if (UEINT & _BV(RXb_EP))
-      {
+  if (UEINT & _BV(RXb_EP))
+    {
 #if defined(OS_CONFIG_USBINT_LED_PORT)
-        OS_CONFIG_USBINT_LED_PORT |= _BV( OS_CONFIG_USBINT_LED_BIT );
+      OS_CONFIG_USBINT_LED_PORT |= _BV( OS_CONFIG_USBINT_LED_BIT );
 #endif
 
-        OSUsbDevice::endpointSelect(RXb_EP);
-        if (OSUsbDevice::isInterruptReceiveOut() && OSUsbDevice::isInterruptReceiveOutEnabled() )
-          {
-            OSDeviceDebug::putString("Vo b");
-            OSDeviceDebug::putNewLine();
+      OSUsbDevice::endpointSelect(RXb_EP);
+      if (OSUsbDevice::isInterruptReceiveOut() && OSUsbDevice::isInterruptReceiveOutEnabled() )
+        {
+          OSDeviceDebug::putString("Vo b");
+          OSDeviceDebug::putNewLine();
 
-            OSUsbDevice::interruptReceiveOutAck();
-            os.sched.eventNotify(g_usb1->getReadEvent());
-          }
-      }
+          OSUsbDevice::interruptReceiveOutAck();
+          os.sched.eventNotify(g_usb1->getReadEvent());
+        }
+    }
 #endif
 
-  }
+}
 
 /*
  *  This function is called by the standard usb read request function to 
@@ -265,43 +268,43 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
 bool
 DeviceCharacterUsb::specificCdcProcessReadRequest(
     unsigned char __attribute__( ( unused ) ) type, unsigned char request)
-  {
+{
 
-    // TODO: for multi-interface devices, determine pointer
-    DeviceCharacterUsb *pDev = g_usb0;
+  // TODO: for multi-interface devices, determine pointer
+  DeviceCharacterUsb *pDev = g_usb0;
 
-    OSUsbDevice::endpointSelect(EP_CONTROL);
+  OSUsbDevice::endpointSelect(EP_CONTROL);
 
-    switch (request)
-      {
-        case USB_CDC_GET_LINE_CODING:
+  switch (request)
+    {
+  case USB_CDC_GET_LINE_CODING:
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-        OSDeviceDebug::putString("GET_LINE_CODING");
+    OSDeviceDebug::putString("GET_LINE_CODING");
 #endif
-        pDev->cdcGetLineCoding();
-        return true;
+    pDev->cdcGetLineCoding();
+    return true;
 
-        case USB_CDC_SET_LINE_CODING:
+  case USB_CDC_SET_LINE_CODING:
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-        OSDeviceDebug::putString("SET_LINE_CODING");
+    OSDeviceDebug::putString("SET_LINE_CODING");
 #endif
-        pDev->cdcSetLineCoding();
-        return true;
+    pDev->cdcSetLineCoding();
+    return true;
 
-        case USB_CDC_SET_CONTROL_LINE_STATE:
+  case USB_CDC_SET_CONTROL_LINE_STATE:
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-        OSDeviceDebug::putString("SET_CONTROL_LINE_STATE");
+    OSDeviceDebug::putString("SET_CONTROL_LINE_STATE");
 #endif
-        pDev->cdcSetControlLineState();
-        return true;
+    pDev->cdcSetControlLineState();
+    return true;
 
-        default:
-        return false;
-
-      }
-
+  default:
     return false;
-  }
+
+    }
+
+  return false;
+}
 
 /*
  * Set the size and the pointer on a user information structure
@@ -311,56 +314,56 @@ DeviceCharacterUsb::specificCdcProcessReadRequest(
 bool
 DeviceCharacterUsb::specificCdcGetDescriptor(unsigned char type,
     unsigned char index)
-  {
+{
   type = type;
   index = index;
   /*
-    switch (type)
-      {
-        case STRING_DESCRIPTOR:
-#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-        OSDeviceDebug::putString("STRING ");
-        OSDeviceDebug::putHex(index);
-        //OSDeviceDebug::putNewLine();
-#endif
-        switch (index)
-          {
-            case LANG_ID: // zero index, return an array of suported LANGID codes
-            OSUsbDevice::usb_set_return(sizeof(usb_user_language_id),
-                &usb_user_language_id);
-            return true;
+   switch (type)
+   {
+   case STRING_DESCRIPTOR:
+   #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
+   OSDeviceDebug::putString("STRING ");
+   OSDeviceDebug::putHex(index);
+   //OSDeviceDebug::putNewLine();
+   #endif
+   switch (index)
+   {
+   case LANG_ID: // zero index, return an array of suported LANGID codes
+   OSUsbDevice::usb_set_return(sizeof(usb_user_language_id),
+   &usb_user_language_id);
+   return true;
 
-            case STRING_INDEX_MAN:
-            OSUsbDevice::usb_set_return(
-                sizeof(usb_user_manufacturer_string_descriptor),
-                &usb_user_manufacturer_string_descriptor);
-            return true;
+   case STRING_INDEX_MAN:
+   OSUsbDevice::usb_set_return(
+   sizeof(usb_user_manufacturer_string_descriptor),
+   &usb_user_manufacturer_string_descriptor);
+   return true;
 
-            case STRING_INDEX_PROD:
-            OSUsbDevice::usb_set_return(sizeof(usb_user_product_string_descriptor),
-                &usb_user_product_string_descriptor);
-            return true;
+   case STRING_INDEX_PROD:
+   OSUsbDevice::usb_set_return(sizeof(usb_user_product_string_descriptor),
+   &usb_user_product_string_descriptor);
+   return true;
 
-            case STRING_INDEX_SN:
-            OSUsbDevice::usb_set_return(sizeof(usb_user_serial_number),
-                &usb_user_serial_number);
-            return true;
+   case STRING_INDEX_SN:
+   OSUsbDevice::usb_set_return(sizeof(usb_user_serial_number),
+   &usb_user_serial_number);
+   return true;
 
-            default:
-            return false;
-          }
+   default:
+   return false;
+   }
 
-        case DEVICE_QUALIFIER_DESCRIPTOR:
-        OSDeviceDebug::putString("DEVICE QUALIFIER - ???");
-        OSDeviceDebug::putNewLine();
-        return false; // not yet implemented
+   case DEVICE_QUALIFIER_DESCRIPTOR:
+   OSDeviceDebug::putString("DEVICE QUALIFIER - ???");
+   OSDeviceDebug::putNewLine();
+   return false; // not yet implemented
 
-        default:
-        return false;
-      }
-*/
-    return false;
-  }
+   default:
+   return false;
+   }
+   */
+  return false;
+}
 
 /*
  * Get line coding parameters (baudrate...) from the device to the host.
@@ -368,25 +371,27 @@ DeviceCharacterUsb::specificCdcGetDescriptor(unsigned char type,
 
 void
 DeviceCharacterUsb::cdcGetLineCoding(void)
-  {
-    OSUsbDevice::Usb_ack_receive_setup();
+{
+  OSUsbDevice::Usb_ack_receive_setup();
 
-    OSUsbDevice::Usb_reset_endpoint_fifo_access(EP_CONTROL);
-    OSUsbDevice::writeLong(LSB0(m_lineCoding.baudRate));
-    OSUsbDevice::writeByte( m_lineCoding.charFormat);
-    OSUsbDevice::writeByte( m_lineCoding.parityType);
-    OSUsbDevice::writeByte( m_lineCoding.dataBits  );
+  OSUsbDevice::Usb_reset_endpoint_fifo_access(EP_CONTROL);
+  OSUsbDevice::writeLong(LSB0(m_lineCoding.baudRate));
+  OSUsbDevice::writeByte(m_lineCoding.charFormat);
+  OSUsbDevice::writeByte(m_lineCoding.parityType);
+  OSUsbDevice::writeByte(m_lineCoding.dataBits);
 
-    OSUsbDevice::Usb_send_control_in();
-    while (!OSUsbDevice::Is_usb_read_control_enabled()) ;
+  OSUsbDevice::Usb_send_control_in();
+  while (!OSUsbDevice::Is_usb_read_control_enabled())
+    ;
 
-    while(!OSUsbDevice::isInterruptReceiveOut()) ;
-    OSUsbDevice::interruptReceiveOutAck();
+  while (!OSUsbDevice::isInterruptReceiveOut())
+    ;
+  OSUsbDevice::interruptReceiveOutAck();
 
-    OSUsbDevice::Usb_ack_receive_out();
+  OSUsbDevice::Usb_ack_receive_out();
 
-    OSDeviceDebug::putNewLine();
-  }
+  OSDeviceDebug::putNewLine();
+}
 
 /*
  * Set the line coding parameters (baudrate...) on the device.
@@ -394,24 +399,26 @@ DeviceCharacterUsb::cdcGetLineCoding(void)
 
 void
 DeviceCharacterUsb::cdcSetLineCoding(void)
-  {
-    OSUsbDevice::Usb_ack_receive_setup();
+{
+  OSUsbDevice::Usb_ack_receive_setup();
 
-    while(!OSUsbDevice::isInterruptReceiveOut()) ;
-    OSUsbDevice::Usb_reset_endpoint_fifo_access(EP_CONTROL);
+  while (!OSUsbDevice::isInterruptReceiveOut())
+    ;
+  OSUsbDevice::Usb_reset_endpoint_fifo_access(EP_CONTROL);
 
-    m_lineCoding.baudRate = OSUsbDevice::readLong();
-    m_lineCoding.charFormat = OSUsbDevice::readByte();
-    m_lineCoding.parityType = OSUsbDevice::readByte();
-    m_lineCoding.dataBits = OSUsbDevice::readByte();
-    OSUsbDevice::interruptReceiveOutAck();
+  m_lineCoding.baudRate = OSUsbDevice::readLong();
+  m_lineCoding.charFormat = OSUsbDevice::readByte();
+  m_lineCoding.parityType = OSUsbDevice::readByte();
+  m_lineCoding.dataBits = OSUsbDevice::readByte();
+  OSUsbDevice::interruptReceiveOutAck();
 
-    OSUsbDevice::Usb_ack_in_ready();
-    OSUsbDevice::Usb_send_in();
-    while (!OSUsbDevice::Is_usb_tx_ready()) ;
+  OSUsbDevice::Usb_ack_in_ready();
+  OSUsbDevice::Usb_send_in();
+  while (!OSUsbDevice::Is_usb_tx_ready())
+    ;
 
-    //Uart_set_baudrate(m_lineCoding.baudRate);
-  }
+  //Uart_set_baudrate(m_lineCoding.baudRate);
+}
 
 /*
  * Manage the line state (DTR).
@@ -420,107 +427,107 @@ DeviceCharacterUsb::cdcSetLineCoding(void)
  */
 void
 DeviceCharacterUsb::cdcSetControlLineState()
-  {
+{
 
-    unsigned short value;
+  unsigned short value;
 
-    value = OSUsbDevice::readWord();
+  value = OSUsbDevice::readWord();
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-    OSDeviceDebug::putString(" val=");
-    OSDeviceDebug::putHex(value);
-    OSDeviceDebug::putString(" ");
-    //OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString(" val=");
+  OSDeviceDebug::putHex(value);
+  OSDeviceDebug::putString(" ");
+  //OSDeviceDebug::putNewLine();
 #endif
 
-    unsigned short index;
-    index = OSUsbDevice::readWord();
+  unsigned short index;
+  index = OSUsbDevice::readWord();
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-    OSDeviceDebug::putString("int=");
-    OSDeviceDebug::putHex(index);
-    OSDeviceDebug::putString(" ");
+  OSDeviceDebug::putString("int=");
+  OSDeviceDebug::putHex(index);
+  OSDeviceDebug::putString(" ");
 #endif
 
-    bool opened;
-    //opened = (value & 0x0001) ? true : false;
-    // TODO: check this
-    opened = (value) ? true : false;
+  bool opened;
+  //opened = (value & 0x0001) ? true : false;
+  // TODO: check this
+  opened = (value) ? true : false;
 
-    if (index == IF0_NB)
-      {
-        g_usb0->setOpened(opened);
+  if (index == IF0_NB)
+    {
+      g_usb0->setOpened(opened);
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-        OSDeviceDebug::putString("set ");
+      OSDeviceDebug::putString("set ");
 #endif
-      }
+    }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
-    if (index == IF0b_NB)
-    g_usb1->setOpened(opened);
+  if (index == IF0b_NB)
+  g_usb1->setOpened(opened);
 #endif
 
-    if (opened)
-      {
-        // TODO: check if it's ok to be here.
-        // enable RX interrupt
-        OSUsbDevice::endpointSelect(RX_EP);
-        OSUsbDevice::UsbEnableEndpointInterrupt(RX_EP);
-        OSUsbDevice::interruptReceiveOutEnable();
-        OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
-        OSUsbDevice::endpointSelect(EP_CONTROL);
+  if (opened)
+    {
+      // TODO: check if it's ok to be here.
+      // enable RX interrupt
+      OSUsbDevice::endpointSelect(RX_EP);
+      OSUsbDevice::UsbEnableEndpointInterrupt(RX_EP);
+      OSUsbDevice::interruptReceiveOutEnable();
+      OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
+      OSUsbDevice::endpointSelect(EP_CONTROL);
 
-        OSUsbLed::off(); // will be toggled to on() at interrupt prolog
-        // Note: interface numbers must start at 0 to match index!!!
-        if (index == IF0_NB)
-          {
-            OSScheduler::eventNotify(g_usb0->getOpenEvent());
+      OSUsbLed::off(); // will be toggled to on() at interrupt prolog
+      // Note: interface numbers must start at 0 to match index!!!
+      if (index == IF0_NB)
+        {
+          OSScheduler::eventNotify(g_usb0->getOpenEvent());
 #if defined(DEBUG) && false
-            OSDeviceDebug::putString("eventNotify(");
-            OSDeviceDebug::putHex((unsigned short)(g_usb0->getOpenEvent()));
-            OSDeviceDebug::putString(") ");
+          OSDeviceDebug::putString("eventNotify(");
+          OSDeviceDebug::putHex((unsigned short)(g_usb0->getOpenEvent()));
+          OSDeviceDebug::putString(") ");
 #endif
-          }
+        }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
-        if (index == IF0b_NB)
-        os.sched.eventNotify(g_usb1->getOpenEvent());
+      if (index == IF0b_NB)
+      os.sched.eventNotify(g_usb1->getOpenEvent());
 #endif
-      }
-    else
-      {
-        OSUsbLed::on(); // will be toggled to off() at interrupt prolog
-        if (index == IF0_NB)
-          {
-            OSScheduler::eventNotify(g_usb0->getReadEvent());
+    }
+  else
+    {
+      OSUsbLed::on(); // will be toggled to off() at interrupt prolog
+      if (index == IF0_NB)
+        {
+          OSScheduler::eventNotify(g_usb0->getReadEvent());
 #if defined(DEBUG) && false
-            OSDeviceDebug::putString("eventNotify(");
-            OSDeviceDebug::putHex((unsigned short)(g_usb0->getReadEvent()));
-            OSDeviceDebug::putString(") ");
+          OSDeviceDebug::putString("eventNotify(");
+          OSDeviceDebug::putHex((unsigned short)(g_usb0->getReadEvent()));
+          OSDeviceDebug::putString(") ");
 #endif
-          }
+        }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
-        if (index == IF0b_NB)
-        os.sched.eventNotify(g_usb1->getReadEvent());
+      if (index == IF0b_NB)
+      os.sched.eventNotify(g_usb1->getReadEvent());
 #endif
-      }
+    }
 
 #if defined(DEBUG)
-    if (opened)
-      {
-        OSDeviceDebug::putString("DTR ready");
-      }
-    else
-      {
-        OSDeviceDebug::putString("DTR not ready");
-      }
-    OSDeviceDebug::putNewLine();
+  if (opened)
+    {
+      OSDeviceDebug::putString("DTR ready");
+    }
+  else
+    {
+      OSDeviceDebug::putString("DTR not ready");
+    }
+  OSDeviceDebug::putNewLine();
 #endif
 
-    OSUsbDevice::Usb_ack_receive_setup();
-    OSUsbDevice::Usb_send_control_in();
-    while (!(OSUsbDevice::Is_usb_read_control_enabled()))
-      {
-        ;
-      }
-  }
+  OSUsbDevice::Usb_ack_receive_setup();
+  OSUsbDevice::Usb_send_control_in();
+  while (!(OSUsbDevice::Is_usb_read_control_enabled()))
+    {
+      ;
+    }
+}
 
 /*
  * Configure all associated endpoints.
@@ -529,7 +536,7 @@ DeviceCharacterUsb::cdcSetControlLineState()
 void
 DeviceCharacterUsb::specificCdcEndpointInit(
     unsigned char __attribute__( ( unused ) ) conf_nb)
-  {
+{
 #if (USB_HIGH_SPEED_SUPPORT==ENABLED)
 
   OSUsbDevice::usb_configure_endpoint(INT_EP, TYPE_INTERRUPT, DIRECTION_IN,
@@ -542,41 +549,43 @@ DeviceCharacterUsb::specificCdcEndpointInit(
       TWO_BANKS, NYET_ENABLED);
 
 #else
-    OSUsbDevice::usb_configure_endpoint(INT_EP, TYPE_INTERRUPT, DIRECTION_IN,
-        SIZE_32, ONE_BANK, NYET_ENABLED);
+  OSUsbDevice::usb_configure_endpoint(INT_EP, TYPE_INTERRUPT, DIRECTION_IN,
+      SIZE_32, ONE_BANK, NYET_ENABLED);
 
-    OSUsbDevice::usb_configure_endpoint(TX_EP, TYPE_BULK, DIRECTION_IN, SIZE_64,
-        TWO_BANKS, NYET_ENABLED);
+  OSUsbDevice::usb_configure_endpoint(TX_EP, TYPE_BULK, DIRECTION_IN, SIZE_64,
+      TWO_BANKS, NYET_ENABLED);
 
-    OSUsbDevice::usb_configure_endpoint(RX_EP, TYPE_BULK, DIRECTION_OUT, SIZE_64,
-        TWO_BANKS, NYET_ENABLED);
+  OSUsbDevice::usb_configure_endpoint(RX_EP, TYPE_BULK, DIRECTION_OUT, SIZE_64,
+      TWO_BANKS, NYET_ENABLED);
 #endif
 #if TO_BE_PORTED
-    OSUsbDevice::endpointSelect(RX_EP);
-    OSUsbDevice::interruptReceiveOutEnable();
+  OSUsbDevice::endpointSelect(RX_EP);
+  OSUsbDevice::interruptReceiveOutEnable();
 
-    OSUsbDevice::endpointReset(INT_EP);
-    OSUsbDevice::endpointReset(TX_EP);
-    OSUsbDevice::endpointReset(RX_EP);
+  OSUsbDevice::endpointReset(INT_EP);
+  OSUsbDevice::endpointReset(TX_EP);
+  OSUsbDevice::endpointReset(RX_EP);
 #endif
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
-    OSUsbDevice::usb_configure_endpoint(INTb_EP, TYPE_INTERRUPT, DIRECTION_IN, SIZE_32,
-        ONE_BANK, NYET_ENABLED);
+  OSUsbDevice::usb_configure_endpoint(INTb_EP, TYPE_INTERRUPT, DIRECTION_IN, SIZE_32,
+      ONE_BANK, NYET_ENABLED);
 
-    OSUsbDevice::usb_configure_endpoint(TXb_EP, TYPE_BULK, DIRECTION_IN, SIZE_32, ONE_BANK,
-        NYET_ENABLED);
+  OSUsbDevice::usb_configure_endpoint(TXb_EP, TYPE_BULK, DIRECTION_IN, SIZE_32, ONE_BANK,
+      NYET_ENABLED);
 
-    OSUsbDevice::usb_configure_endpoint(RXb_EP, TYPE_BULK, DIRECTION_OUT, SIZE_32, TWO_BANKS,
-        NYET_ENABLED);
+  OSUsbDevice::usb_configure_endpoint(RXb_EP, TYPE_BULK, DIRECTION_OUT, SIZE_32, TWO_BANKS,
+      NYET_ENABLED);
 
-    OSUsbDevice::endpointSelect(RXb_EP);
-    OSUsbDevice::interruptReceiveOutEnable();
+  OSUsbDevice::endpointSelect(RXb_EP);
+  OSUsbDevice::interruptReceiveOutEnable();
 
-    OSUsbDevice::endpointReset(INTb_EP);
-    OSUsbDevice::endpointReset(TXb_EP);
-    OSUsbDevice::endpointReset(RXb_EP);
+  OSUsbDevice::endpointReset(INTb_EP);
+  OSUsbDevice::endpointReset(TXb_EP);
+  OSUsbDevice::endpointReset(RXb_EP);
 #endif
-  }
+}
+
+// ----------------------------------------------------------------------------
 
 #endif /* defined(OS_INCLUDE_DEVICECHARACTERUSB) */
 

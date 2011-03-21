@@ -7,9 +7,9 @@
 #ifndef HAL_OSUSBDEVICEDESCRIPTORSCONFIG_H_
 #define HAL_OSUSBDEVICEDESCRIPTORSCONFIG_H_
 
-
-
 #include "portable/kernel/include/OS.h"
+
+// ----------------------------------------------------------------------------
 
 // English US
 #define LANGUAGE_ID           0x0409
@@ -64,7 +64,6 @@
 #define CONF2_NB                1    // configuration number 1
 #endif
 #define CONF_NB            1     //! Number of this configuration
-
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
 #define NB2_INTERFACE           4    // number of interfaces
 #else
@@ -291,5 +290,6 @@
 
 #endif
 
+// ----------------------------------------------------------------------------
 
 #endif /* HAL_OSUSBDEVICEDESCRIPTORSCONFIG_H_ */
