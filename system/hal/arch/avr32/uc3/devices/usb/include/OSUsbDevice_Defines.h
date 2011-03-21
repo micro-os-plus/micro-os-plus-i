@@ -11,6 +11,14 @@
 
 // ----------------------------------------------------------------------------
 
+// Standard Features
+// TODO: check if portable and move
+#define FEATURE_DEVICE_REMOTE_WAKEUP            0x01
+#define FEATURE_ENDPOINT_HALT                   0x00
+#define FEATURE_TEST_MODE                       0x02
+
+// ----------------------------------------------------------------------------
+
 #define MSK_UADD              0x7F
 #define MSK_EP_NBR                            0x0F
 #define MSK_EP_DIR                            0x80
