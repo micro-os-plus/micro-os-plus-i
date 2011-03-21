@@ -105,7 +105,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="hal/boards/AVI|hal/arch/avr8/at90can|hal/arch/TEMPLATE_ARCH|hal/arch/avr32|hal/arch/arm_cortex_m3|portable/tasks|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/boards/AVI|hal/arch/avr8/at90can|hal/arch/TEMPLATE_ARCH|hal/arch/avr32|hal/arch/arm_cortex_m3|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 						<entry excluding="TaskReportStacks.cpp|system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
