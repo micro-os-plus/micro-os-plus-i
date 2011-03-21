@@ -9,6 +9,8 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
+// ----------------------------------------------------------------------------
+
 // English US
 #define LANGUAGE_ID           0x0409
 
@@ -214,5 +216,7 @@
  ,Usb_unicode('.') \
  ,Usb_unicode('0') \
 }
+
+// ----------------------------------------------------------------------------
 
 #endif /* HAL_OSUSBDEVICEDESCRIPTORS_CONFIG_H_ */
