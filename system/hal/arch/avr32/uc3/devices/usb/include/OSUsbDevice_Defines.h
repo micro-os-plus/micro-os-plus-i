@@ -11,18 +11,9 @@
 
 // ----------------------------------------------------------------------------
 
-// Standard Features
-// TODO: check if portable and move
-#define FEATURE_DEVICE_REMOTE_WAKEUP            0x01
-#define FEATURE_ENDPOINT_HALT                   0x00
-#define FEATURE_TEST_MODE                       0x02
-
-// ----------------------------------------------------------------------------
-
 #define MSK_UADD              0x7F
 #define MSK_EP_NBR                            0x0F
 #define MSK_EP_DIR                            0x80
-
 
 // Parameters for endpoint configuration
 // These define are the values used to enable and configure an endpoint.
@@ -303,27 +294,27 @@ AVR32_usb_allocate_memory(ep),\
 AVR32_is_usb_endpoint_configured(ep)\
 )
 
-  // Access point to the FIFO data registers of pipes/endpoints
-  // @param x      Pipe/endpoint of which to access FIFO data register
-  // @param scale  Data index scale in bits: 64, 32, 16 or 8
-  // @return       Volatile 64-, 32-, 16- or 8-bit data pointer to FIFO data register
+// Access point to the FIFO data registers of pipes/endpoints
+// @param x      Pipe/endpoint of which to access FIFO data register
+// @param scale  Data index scale in bits: 64, 32, 16 or 8
+// @return       Volatile 64-, 32-, 16- or 8-bit data pointer to FIFO data register
 #define AVR32_USBB_FIFOX_DATA(x, scale) \
           (((volatile TPASTE2(U, scale) (*)[0x10000 / ((scale) / 8)])AVR32_USBB_SLAVE)[(x)])
-  // Get 64-, 32-, 16- or 8-bit access to FIFO data register of selected endpoint.
-  // @param ep     Endpoint of which to access FIFO data register
-  // @param scale  Data scale in bits: 64, 32, 16 or 8
-  // @return       Volatile 64-, 32-, 16- or 8-bit data pointer to FIFO data register
-  // @warning It is up to the user of this macro to make sure that all accesses
-  // are aligned with their natural boundaries except 64-bit accesses which
-  // require only 32-bit alignment.
-  // @warning It is up to the user of this macro to make sure that used HSB
-  // addresses are identical to the DPRAM internal pointer modulo 32 bits.
+// Get 64-, 32-, 16- or 8-bit access to FIFO data register of selected endpoint.
+// @param ep     Endpoint of which to access FIFO data register
+// @param scale  Data scale in bits: 64, 32, 16 or 8
+// @return       Volatile 64-, 32-, 16- or 8-bit data pointer to FIFO data register
+// @warning It is up to the user of this macro to make sure that all accesses
+// are aligned with their natural boundaries except 64-bit accesses which
+// require only 32-bit alignment.
+// @warning It is up to the user of this macro to make sure that used HSB
+// addresses are identical to the DPRAM internal pointer modulo 32 bits.
 #define Usb_get_endpoint_fifo_access(ep, scale) \
           (AVR32_USBB_FIFOX_DATA(ep, scale))
-  // Reset known position inside FIFO data register of selected endpoint.
-  // @param ep     Endpoint of which to reset known position
-  // @warning Always call this macro before any read/write macro/function
-  // when at FIFO beginning.
+// Reset known position inside FIFO data register of selected endpoint.
+// @param ep     Endpoint of which to reset known position
+// @warning Always call this macro before any read/write macro/function
+// when at FIFO beginning.
 #define AVR32_usb_reset_endpoint_fifo_access(ep) \
           (OSUsbDevice::pep_fifo[(ep)].u64ptr = Usb_get_endpoint_fifo_access(ep, 64))
 
@@ -373,16 +364,17 @@ AVR32_is_usb_endpoint_configured(ep)\
 
 // utils
 #if LITTLE_ENDIAN_MCU
-  #define Usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
-  #define Usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
-  #define usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
-  #define usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
+#define Usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
+#define Usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
+#define usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
+#define usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
 #else // BIG_ENDIAN_MCU
-  #define Usb_format_mcu_to_usb_data(width, data) (TPASTE2(Swap, width)(data))
-  #define Usb_format_usb_to_mcu_data(width, data) (TPASTE2(Swap, width)(data))
-  #define usb_format_mcu_to_usb_data(width, data) (TPASTE2(swap, width)(data))
-  #define usb_format_usb_to_mcu_data(width, data) (TPASTE2(swap, width)(data))
+#define Usb_format_mcu_to_usb_data(width, data) (TPASTE2(Swap, width)(data))
+#define Usb_format_usb_to_mcu_data(width, data) (TPASTE2(Swap, width)(data))
+#define usb_format_mcu_to_usb_data(width, data) (TPASTE2(swap, width)(data))
+#define usb_format_usb_to_mcu_data(width, data) (TPASTE2(swap, width)(data))
 #endif
 
+// ----------------------------------------------------------------------------
 
 #endif /* HAL_OSUSBDEVICEDEFINES_H_ */
