@@ -4,8 +4,10 @@
  *      This file is part of the uOS++ distribution.
  */
 
-#ifndef HAL_OSUSBDEVICEDEFINES_H_
-#define HAL_OSUSBDEVICEDEFINES_H_
+#ifndef HAL_OSUSBDEVICE_DEFINES_H_
+#define HAL_OSUSBDEVICE_DEFINES_H_
+
+// ----------------------------------------------------------------------------
 
 #define PGM_VOID_P      void *
 
@@ -342,7 +344,7 @@ AVR32_is_usb_endpoint_configured(ep)\
 //! at FIFO beginning.
 //! @warning Do not mix calls to this macro with calls to indexed macros below.
 #define AVR32_usb_read_endpoint_data(ep, scale) \
-        (*OSUsbDevice::pep_fifo[(ep)].TPASTE3(u, scale, ptr)\
+        (*OSUsbDeviceImpl::pep_fifo[(ep)].TPASTE3(u, scale, ptr)\
          TPASTE3(Pep_fifo_access_, scale, _post_inc)())
 
 //! Write 64-, 32-, 16- or 8-bit data to FIFO data register of selected endpoint.
@@ -359,7 +361,7 @@ AVR32_is_usb_endpoint_configured(ep)\
 //! at FIFO beginning.
 //! @warning Do not mix calls to this macro with calls to indexed macros below.
 #define AVR32_usb_write_endpoint_data(ep, scale, data) \
-        (*OSUsbDevice::pep_fifo[(ep)].TPASTE3(u, scale, ptr)\
+        (*OSUsbDeviceImpl::pep_fifo[(ep)].TPASTE3(u, scale, ptr)\
          TPASTE3(Pep_fifo_access_, scale, _post_inc)() = (data))
 
 // utils
@@ -377,4 +379,4 @@ AVR32_is_usb_endpoint_configured(ep)\
 
 // ----------------------------------------------------------------------------
 
-#endif /* HAL_OSUSBDEVICEDEFINES_H_ */
+#endif /* HAL_OSUSBDEVICE_DEFINES_H_ */
