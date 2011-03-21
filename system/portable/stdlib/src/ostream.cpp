@@ -293,7 +293,6 @@ ostream::operator <<(short n)
   //sentry s( *this );
 #if (__SIZEOF_INT__ == 2)
   print16( *this, ( unsigned short ) n, true );
-  print32( *this, ( unsigned long ) n, true );
 #else
   print32(*this, (unsigned long) n, true);
 #endif /* (__SIZEOF_INT__ == 2) */
@@ -380,7 +379,11 @@ ostream::operator <<(void *p)
   p = p;
   //-- char buffer[ 20 ];
   //-- write( buffer, snprintf( buffer, 20, "%p", p ));
+#if (__SIZEOF_INT__ == 2)
+  print16(*this, (unsigned int) p);
+#else
   print32(*this, (unsigned int) p);
+#endif /* (__SIZEOF_INT__ == 2) */
 
   if (ios::flags() & ios_base::unitbuf)
     {
