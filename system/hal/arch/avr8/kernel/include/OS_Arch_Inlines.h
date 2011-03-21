@@ -136,4 +136,38 @@ OSCPUImpl::stackPop(void)
   return tmp;
 }
 
+inline OSInterruptsMask_t
+OSCPUImpl::getInterruptsMask(void)
+{
+  register unsigned char tmp;
+
+  asm volatile
+  (
+      " in    %[R], __SREG__ \n"
+
+      : [R] "=r" (tmp)
+      :
+      :
+  );
+
+  return tmp;
+}
+
+inline void
+OSCPUImpl::setInterruptsMask(OSInterruptsMask_t mask)
+{
+  register unsigned char tmp;
+
+  tmp = mask;
+
+  asm volatile
+  (
+      " out    __SREG__, %[R] \n"
+
+      :
+      : [R] "r" (tmp)
+      :
+  );
+}
+
 #endif /* HAL_OS_ARCH_INLINES_H_ */

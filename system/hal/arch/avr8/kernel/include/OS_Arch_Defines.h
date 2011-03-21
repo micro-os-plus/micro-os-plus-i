@@ -14,6 +14,8 @@ typedef unsigned char OSStack_t;
 typedef unsigned char OSResetBits_t;
 typedef PGM_VOID_P OSProgramPtr_t;
 
+typedef unsigned char OSInterruptsMask_t;
+
 #define PROGMEM_READ_BYTE(_ADDR) (pgm_read_byte_near((unsigned int)(_ADDR)))
 
 #include "avr/io.h"
