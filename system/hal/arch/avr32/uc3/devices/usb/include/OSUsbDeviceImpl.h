@@ -15,7 +15,9 @@
 
 #include "portable/devices/usb/include/OSUsbLed.h"
 
-#include "hal/arch/avr32/uc3/devices/usb/include/OSUsbDeviceDescriptorsConfig.h"
+#include "portable/devices/usb/include/OSUsbDevice_Defines.h"
+#include "hal/arch/avr32/uc3/devices/usb/include/OSUsbDevice_Defines.h"
+
 #include "hal/arch/avr32/uc3/devices/usb/include/OSUsbDeviceDescriptors.h"
 
 // ----------------------------------------------------------------------------
@@ -24,70 +26,9 @@
 
 // ----------------------------------------------------------------------------
 
-#define MAX_EP_NB                       7
-
-#define EP_CONTROL                      0
-#define EP_1                            1
-#define EP_2                            2
-#define EP_3                            3
-#define EP_4                            4
-#define EP_5                            5
-#define EP_6                            6
-#define EP_7                            7
-
-// USB device standard  requests decoding module
-#define GET_STATUS                      0x00
-#define GET_DEVICE                      0x01
-#define CLEAR_FEATURE                   0x01     // see FEATURES below
-#define GET_STRING                      0x03
-#define SET_FEATURE                     0x03     // see FEATURES below
-#define SET_ADDRESS                     0x05
-#define GET_DESCRIPTOR                  0x06
-#define SET_DESCRIPTOR                  0x07
-#define GET_CONFIGURATION               0x08
-#define SET_CONFIGURATION               0x09
-#define GET_INTERFACE                   0x0A
-#define SET_INTERFACE                   0x0B
-#define SYNCH_FRAME                     0x0C
-
-// Descriptor Types
-#define DEVICE_DESCRIPTOR                       0x01
-#define CONFIGURATION_DESCRIPTOR                0x02
-#define STRING_DESCRIPTOR                       0x03
-#define INTERFACE_DESCRIPTOR                    0x04
-#define ENDPOINT_DESCRIPTOR                     0x05
-#define DEVICE_QUALIFIER_DESCRIPTOR             0x06
-#define OTHER_SPEED_CONFIGURATION_DESCRIPTOR    0x07
-
-#define ZERO_TYPE                       0x00
-#define INTERFACE_TYPE                  0x01
-#define ENDPOINT_TYPE                   0x02
-
-#define REQUEST_DEVICE_STATUS           0x80
-#define REQUEST_INTERFACE_STATUS        0x81
-#define REQUEST_ENDPOINT_STATUS         0x82
-
-#define USB_DT_CS_INTERFACE             0x24
-
-#define USB_CDC_HEADER_TYPE             0x00
-#define USB_CDC_CALL_MANAGEMENT_TYPE    0x01
-#define USB_ACM_TYPE                    0x02
-#define USB_CDC_UNION_TYPE              0x06
-
-// Standard Features
-#define FEATURE_DEVICE_REMOTE_WAKEUP          0x01
-#define FEATURE_ENDPOINT_HALT                 0x00
-#define FEATURE_TEST_MODE                     0x02
-
-#define ZERO_TYPE                           0x00 // DEVICE_TYPE
-#define INTERFACE_TYPE                  0x01
-
-// ----------------------------------------------------------------------------
-
 #define MSK_UADD              0x7F
 #define MSK_EP_NBR                            0x0F
 #define MSK_EP_DIR                            0x80
-
 
 // Parameters for endpoint configuration
 // These define are the values used to enable and configure an endpoint.
@@ -368,27 +309,27 @@ AVR32_usb_allocate_memory(ep),\
 AVR32_is_usb_endpoint_configured(ep)\
 )
 
-  // Access point to the FIFO data registers of pipes/endpoints
-  // @param x      Pipe/endpoint of which to access FIFO data register
-  // @param scale  Data index scale in bits: 64, 32, 16 or 8
-  // @return       Volatile 64-, 32-, 16- or 8-bit data pointer to FIFO data register
+// Access point to the FIFO data registers of pipes/endpoints
+// @param x      Pipe/endpoint of which to access FIFO data register
+// @param scale  Data index scale in bits: 64, 32, 16 or 8
+// @return       Volatile 64-, 32-, 16- or 8-bit data pointer to FIFO data register
 #define AVR32_USBB_FIFOX_DATA(x, scale) \
           (((volatile TPASTE2(U, scale) (*)[0x10000 / ((scale) / 8)])AVR32_USBB_SLAVE)[(x)])
-  // Get 64-, 32-, 16- or 8-bit access to FIFO data register of selected endpoint.
-  // @param ep     Endpoint of which to access FIFO data register
-  // @param scale  Data scale in bits: 64, 32, 16 or 8
-  // @return       Volatile 64-, 32-, 16- or 8-bit data pointer to FIFO data register
-  // @warning It is up to the user of this macro to make sure that all accesses
-  // are aligned with their natural boundaries except 64-bit accesses which
-  // require only 32-bit alignment.
-  // @warning It is up to the user of this macro to make sure that used HSB
-  // addresses are identical to the DPRAM internal pointer modulo 32 bits.
+// Get 64-, 32-, 16- or 8-bit access to FIFO data register of selected endpoint.
+// @param ep     Endpoint of which to access FIFO data register
+// @param scale  Data scale in bits: 64, 32, 16 or 8
+// @return       Volatile 64-, 32-, 16- or 8-bit data pointer to FIFO data register
+// @warning It is up to the user of this macro to make sure that all accesses
+// are aligned with their natural boundaries except 64-bit accesses which
+// require only 32-bit alignment.
+// @warning It is up to the user of this macro to make sure that used HSB
+// addresses are identical to the DPRAM internal pointer modulo 32 bits.
 #define Usb_get_endpoint_fifo_access(ep, scale) \
           (AVR32_USBB_FIFOX_DATA(ep, scale))
-  // Reset known position inside FIFO data register of selected endpoint.
-  // @param ep     Endpoint of which to reset known position
-  // @warning Always call this macro before any read/write macro/function
-  // when at FIFO beginning.
+// Reset known position inside FIFO data register of selected endpoint.
+// @param ep     Endpoint of which to reset known position
+// @warning Always call this macro before any read/write macro/function
+// when at FIFO beginning.
 #define AVR32_usb_reset_endpoint_fifo_access(ep) \
           (OSUsbDeviceImpl::pep_fifo[(ep)].u64ptr = Usb_get_endpoint_fifo_access(ep, 64))
 
@@ -438,17 +379,16 @@ AVR32_is_usb_endpoint_configured(ep)\
 
 // utils
 #if LITTLE_ENDIAN_MCU
-  #define Usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
-  #define Usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
-  #define usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
-  #define usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
+#define Usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
+#define Usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
+#define usb_format_mcu_to_usb_data(width, data) ((TPASTE2(U, width))(data))
+#define usb_format_usb_to_mcu_data(width, data) ((TPASTE2(U, width))(data))
 #else // BIG_ENDIAN_MCU
-  #define Usb_format_mcu_to_usb_data(width, data) (TPASTE2(Swap, width)(data))
-  #define Usb_format_usb_to_mcu_data(width, data) (TPASTE2(Swap, width)(data))
-  #define usb_format_mcu_to_usb_data(width, data) (TPASTE2(swap, width)(data))
-  #define usb_format_usb_to_mcu_data(width, data) (TPASTE2(swap, width)(data))
+#define Usb_format_mcu_to_usb_data(width, data) (TPASTE2(Swap, width)(data))
+#define Usb_format_usb_to_mcu_data(width, data) (TPASTE2(Swap, width)(data))
+#define usb_format_mcu_to_usb_data(width, data) (TPASTE2(swap, width)(data))
+#define usb_format_usb_to_mcu_data(width, data) (TPASTE2(swap, width)(data))
 #endif
-
 
 //-----------------------------------------------------------------------------
 
@@ -767,7 +707,7 @@ public:
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
   static unsigned char m_selectedEndpoint;
-  static unsigned char usb_interface_status[NB_INTERFACE];  // All interface with default setting
+  static unsigned char usb_interface_status[NB_INTERFACE]; // All interface with default setting
   static UnionVPtr pep_fifo[AVR32_USBB_EPT_NUM];
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
 };
