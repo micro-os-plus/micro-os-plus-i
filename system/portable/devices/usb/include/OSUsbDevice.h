@@ -40,6 +40,16 @@ class OSUsbDevice : public OSUsbDeviceImpl
 public:
   OSUsbDevice();
 
+  static unsigned short
+  readWord(void);
+  static unsigned long
+  readLong(void);
+
+  static void
+  writeWord(unsigned short w);
+  static void
+  writeLong(unsigned long l);
+
 // ----------------------------------------------------------------------------
 
 // TODO: bring common code here
