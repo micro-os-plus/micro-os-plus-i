@@ -17,7 +17,8 @@
 // the C equivalent of OS::resetHandler()
 //extern "C"  void _ZN2OS12resetHandlerEv(void) __attribute__((naked, noreturn));
 
-extern "C" void _trampoline(void) __attribute__((naked, noreturn, section(".reset")));
+extern "C" void
+_trampoline(void) __attribute__((naked, noreturn, section(".reset")));
 
 void
 _trampoline(void)
@@ -44,6 +45,15 @@ OSImpl::familyEarlyInit(void)
 #if defined(DEBUG)
 
   //OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString("DID=");
+  OSDeviceDebug::putHex((unsigned long) __builtin_mfdr(0));
+  OSDeviceDebug::putNewLine();
+
+  OSDeviceDebug::putString("UID=");
+  for (int* p = (int*) 0x80800204; p < (int*) 0x80800212; ++p)
+    OSDeviceDebug::putPtr((void *) *p);
+  OSDeviceDebug::putNewLine();
+
   OSDeviceDebug::putString("CPU/HSB=");
   OSDeviceDebug::putDec(OS_CFGLONG_CPU_FREQUENCY_HZ);
   OSDeviceDebug::putString(" Hz");
