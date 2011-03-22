@@ -222,8 +222,13 @@ void OS::earlyInit(void)
     OSDeviceDebug::putNewLine();
 
     OSDeviceDebug::putString_P(PSTR("Oscillator="));
+#if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
     OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ);
     OSDeviceDebug::putString_P(PSTR(" Hz"));
+#else
+    OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ/1000);
+    OSDeviceDebug::putString_P(PSTR(" KHz"));
+#endif /* defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG) */
     OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
 
