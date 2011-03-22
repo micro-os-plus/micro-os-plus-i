@@ -36,16 +36,8 @@ public:
   // read/write methods
   static unsigned char
   readByte(void);
-  static unsigned short
-  readWord(void);
-  static unsigned long
-  readLong(void);
   static void
   writeByte(unsigned char b);
-  static void
-  writeWord(unsigned short w);
-  static void
-  writeLong(unsigned long l);
 
   static void
   standardProcessRequest(void);

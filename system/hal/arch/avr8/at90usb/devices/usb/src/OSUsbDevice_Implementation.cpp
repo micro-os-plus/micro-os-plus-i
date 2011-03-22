@@ -325,62 +325,6 @@ OSUsbDeviceImpl::usb_start_device(void)
 
 }
 
-// ----------------------------------------------------------------------------
-
-/*
- * Read USB Word, LSB | MSB
- */
-unsigned short
-OSUsbDeviceImpl::readWord(void)
-{
-  unsigned short w;
-
-  w = readByte();
-  w |= (readByte() << 8);
-  return w;
-}
-
-/*
- * Read USB Long, LSB | MSB
- */
-unsigned long
-OSUsbDeviceImpl::readLong(void)
-{
-  unsigned long l;
-
-  l = readByte();
-  l |= (((unsigned long) readByte()) << 8);
-  l |= (((unsigned long) readByte()) << 16);
-  l |= (((unsigned long) readByte()) << 24);
-  return l;
-}
-
-/*
- * Write USB Word, LSB | MSB
- */
-void
-OSUsbDeviceImpl::writeWord(unsigned short w)
-{
-  writeByte((unsigned char) w & 0xFF);
-  w >>= 8;
-  writeByte((unsigned char) w & 0xFF);
-}
-
-/*
- * Write USB Long, LSB | MSB
- */
-void
-OSUsbDeviceImpl::writeLong(unsigned long l)
-{
-  writeByte((unsigned char) l & 0xFF);
-  l >>= 8;
-  writeByte((unsigned char) l & 0xFF);
-  l >>= 8;
-  writeByte((unsigned char) l & 0xFF);
-  l >>= 8;
-  writeByte((unsigned char) l & 0xFF);
-}
-
 /*
  * Read the SETUP request sent to the default control endpoint
  * and call the appropriate function. When exiting this
@@ -615,8 +559,8 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
     return;
     }
 
-  dummy16 = OSUsbDeviceImpl::readWord(); // don't care of wIndex field
-  wLength = OSUsbDeviceImpl::readWord(); // read wLength
+  dummy16 = OSUsbDevice::readWord(); // don't care of wIndex field
+  wLength = OSUsbDevice::readWord(); // read wLength
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
   OSDeviceDebug::putString(" ix=");
   OSDeviceDebug::putHex(dummy16);
