@@ -65,8 +65,13 @@ OSImpl::familyEarlyInit(void)
 
   //OSDeviceDebug::putNewLine();
   OSDeviceDebug::putString("CPU=");
+#if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
   OSDeviceDebug::putDec(OS_CFGLONG_CPU_FREQUENCY_HZ);
   OSDeviceDebug::putString(" Hz");
+#else
+  OSDeviceDebug::putDec(OS_CFGLONG_CPU_FREQUENCY_HZ/1000);
+  OSDeviceDebug::putString(" KHz");
+#endif /* defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG) */
   OSDeviceDebug::putNewLine();
 
 #endif /* defined(DEBUG) */
