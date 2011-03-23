@@ -98,6 +98,12 @@ public:
   OSEvent_t
   getOpenEvent(void);
 
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+  // set the match array
+  void
+  setReadMatchArray(char* match);
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+
 #if 1
   // OSTimeout::OS_NEVER = no timeout (default)
   // OSTimeout::IMMEDIATELLY = return WOULD_BLOCK if necessary
@@ -160,6 +166,10 @@ protected:
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
   unsigned long m_baudRate;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+  char *  m_pReadMatchArray;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
 private:
 
