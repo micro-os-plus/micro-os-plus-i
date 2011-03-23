@@ -46,6 +46,16 @@ public:
   bool
   isConnected(void) const;
 
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
+  // set the baud rate
+  void
+  setBaudRate(unsigned long baud);
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
+
+  // get the current baud rate
+  virtual unsigned long
+  getBaudRate(void);
+
   // blocking read.
   // return byte or negative (OSReturn::OS_DISCONNECTED, OSReturn::OS_TIMEOUT)
   OSReturn_t
@@ -147,6 +157,10 @@ protected:
 
   bool m_isOpened;
 
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
+  unsigned long m_baudRate;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
+
 private:
 
   // Implementation for different methods.
@@ -223,6 +237,14 @@ OSDeviceCharacter::getOpenEvent(void)
 {
   return m_openEvent;
 }
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
+inline void
+OSDeviceCharacter::setBaudRate(unsigned long baud)
+{
+ m_baudRate = baud;
+}
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
 
 inline void
 OSDeviceCharacter::setReadEvent(OSEvent_t event)
