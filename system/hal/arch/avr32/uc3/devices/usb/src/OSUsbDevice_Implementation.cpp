@@ -693,8 +693,6 @@ OSUsbDeviceImpl::readWord(void)
   w = readByte();
   w |= (readByte() << 8);
 
-  w = usb_format_usb_to_mcu_data(16, w);
-
   return w;
 }
 
@@ -711,8 +709,6 @@ OSUsbDeviceImpl::readLong(void)
   l |= (((unsigned long) readByte()) << 16);
   l |= (((unsigned long) readByte()) << 24);
 
-  l = usb_format_usb_to_mcu_data(32, l);
-
   return l;
 }
 
@@ -722,7 +718,6 @@ OSUsbDeviceImpl::readLong(void)
 void
 OSUsbDeviceImpl::writeWord(unsigned short w)
 {
-  w = usb_format_mcu_to_usb_data(16, w);
   writeByte((unsigned char) w & 0xFF);
   w >>= 8;
   writeByte((unsigned char) w & 0xFF);
@@ -734,7 +729,6 @@ OSUsbDeviceImpl::writeWord(unsigned short w)
 void
 OSUsbDeviceImpl::writeLong(unsigned long l)
 {
-  l = usb_format_mcu_to_usb_data(16, l);
   writeByte((unsigned char) l & 0xFF);
   l >>= 8;
   writeByte((unsigned char) l & 0xFF);
@@ -1079,7 +1073,7 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
   U16 wLength, counter;
   U8 descriptor_type;
   U8 string_type;
-  Union32 temp;
+  unsigned short dummy16;
 #if (USB_HIGH_SPEED_SUPPORT==ENABLED)
   Bool b_first_data = TRUE;
 #endif
@@ -1149,11 +1143,8 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
     break;
     }
 
-  temp.u32 = readLong();
-  //temp.u32 = AVR32_usb_read_endpoint_data(EP_CONTROL, 32);      //!< read wIndex and wLength with a 32-bit access
-  //!< since this access is aligned with a 32-bit
-  //!< boundary from the beginning of the endpoint
-  wLength = usb_format_usb_to_mcu_data(16, temp.u16[1]); //!< ignore wIndex, keep and format wLength
+  dummy16 = OSUsbDeviceImpl::readWord(); // don't care of wIndex field
+  wLength = OSUsbDeviceImpl::readWord(); // read wLength
   Usb_ack_receive_setup(); //!< clear the setup received flag
 
   if (wLength > data_to_transfer)
@@ -1457,9 +1448,9 @@ OSUsbDeviceImpl::usb_set_feature(void)
         }
     }
 #else
-  U16 wValue = usb_format_usb_to_mcu_data(16, readWord());
-  U16 wIndex = usb_format_usb_to_mcu_data(16, readWord());
-  U16 wLength = usb_format_usb_to_mcu_data(16, readWord());
+  U16 wValue = readWord();
+  U16 wIndex = readWord();
+  U16 wLength = readWord();
 
   if (wLength)
     goto unsupported_request;
@@ -1640,10 +1631,10 @@ OSUsbDeviceImpl::usb_get_interface(void)
   U16 wValue;
 
   // Read wValue
-  wValue = usb_format_usb_to_mcu_data(16, readWord());
+  wValue =  readWord();
   // wValue = Alternate Setting
   // wIndex = Interface
-  wInterface = usb_format_usb_to_mcu_data(16, readWord());
+  wInterface = readWord();
   if (0 != wValue)
     return FALSE;
   Usb_ack_receive_setup();
@@ -1679,8 +1670,8 @@ OSUsbDeviceImpl::usb_set_interface(void)
 
   // wValue = Alternate Setting
   // wIndex = Interface
-  U16 wValue = usb_format_usb_to_mcu_data(16, readWord());
-  U16 wIndex = usb_format_usb_to_mcu_data(16, readWord());
+  U16 wValue = readWord();
+  U16 wIndex = readWord();
   Usb_ack_receive_setup();
 
   // Get descriptor
