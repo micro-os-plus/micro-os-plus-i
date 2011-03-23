@@ -31,7 +31,15 @@ DeviceCharacterBufferedUsart1::implPortInit(void)
       OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_GPIO_FUNCTION);
 
   usart_options_t usartConfig;
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
+  if(m_baudRate == 0)
+    m_baudRate = OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_BAUD_RATE;
+  usartConfig.baudrate =m_baudRate;
+#else
   usartConfig.baudrate = OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_BAUD_RATE;
+#endif  /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
+
   usartConfig.channelmode = USART_NORMAL_CHMODE;
   usartConfig.charlength = 8;
   usartConfig.paritytype = USART_NO_PARITY;
