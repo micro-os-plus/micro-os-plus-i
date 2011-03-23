@@ -445,6 +445,14 @@ OSDeviceCharacter::availableRead(void)
   return r;
 }
 
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+  void
+  setReadMatchArray(char* match)
+  {
+
+  }
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
 
 // ----- streambuf virtuals --------------------------------------------------
