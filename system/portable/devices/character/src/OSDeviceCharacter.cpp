@@ -36,6 +36,10 @@ OSDeviceCharacter::OSDeviceCharacter()
   m_writeEvent = OSEvent::OS_NONE;
   m_openEvent = OSEvent::OS_NONE;
 
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
+  m_baudRate = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
+
   m_isOpened = false;
 }
 
@@ -213,6 +217,12 @@ OSDeviceCharacter::isOpened(void) const
 // OSReturn::OS_WOULD_BLOCK
 // OSReturn::OS_TIMEOUT
 // OSReturn::OS_DISCONNECTED
+
+unsigned long
+OSDeviceCharacter::getBaudRate(void)
+{
+  return m_baudRate;
+}
 
 int
 OSDeviceCharacter::writeByte(unsigned char b)
