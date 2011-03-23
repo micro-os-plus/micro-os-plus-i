@@ -37,14 +37,17 @@ public:
 
 // ----------------------------------------------------------------------------
 
-#if false
+typedef unsigned short OSTimerTicks_t;
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
+
 class OSTimeout
   {
 public:
   static const OSTimerTicks_t OS_IMMEDIATELY = 0;
   static const OSTimerTicks_t OS_NEVER = (0 - 1);
   };
-#endif
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS) */
 
 // ----------------------------------------------------------------------------
 

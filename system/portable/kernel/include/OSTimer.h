@@ -9,7 +9,6 @@
 
 #include "portable/kernel/include/OS.h"
 
-typedef unsigned short OSTimerTicks_t;
 typedef unsigned long OSTime_t;
 
 class Timer;
