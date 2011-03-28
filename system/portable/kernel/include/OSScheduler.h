@@ -488,7 +488,7 @@ OSCriticalSection::enter(void)
   tmp = OSCPUImpl::getInterruptsMask();
   OSCPUImpl::stackPush(tmp);
 #if defined(OS_INCLUDE_OSCRITICALSECTION_ENTER_WITH_MASK)
-  tmp |= 0x001E;
+  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
   OSCPUImpl::setInterruptsMask(tmp);
 #else
   OSCPUImpl::interruptsDisable();
