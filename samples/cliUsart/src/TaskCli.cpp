@@ -71,10 +71,12 @@ TaskCli::taskMain(void)
 
   SimpleCli & cli = m_cli;
 #endif
-
+  dev.setReadTimer(&os.sched.timerTicks);
+  //dev.setReadTimeout(0);
   // task endless loop
   for (;;)
     {
+      dev.setBaudRate(19200);
       dev.open(); // wait for dtr
 #if !defined(APP_EXCLUDE_TASKCLI_TASKMAIN_CLI)
       cout << endl << endl << greeting << endl;
@@ -118,9 +120,30 @@ TaskCli::taskMain(void)
           lineProcess();
 #else
           int c;
+#if true
+          unsigned char match[] = "1\0";
+          dev.setReadMatchArray(match);
           c = dev.readByte();
-          dev.writeByte(c);
+          while((c!='1') && (c>=0))
+              {
+              dev.writeByte(c);
+              dev.flush();
+              c = dev.readByte();
+              }
+          if(c<0)
+            clog << "error -" << dec << (int) (-c) << endl;
+          else
+            dev.writeByte(c);
           dev.flush();
+
+#else
+          c = dev.readByte();
+          if(c>=0)
+            dev.writeByte(c);
+          else
+            clog << "error -" << dec << (int) (-c) << endl;
+          dev.flush();
+#endif
 #if false
           if (c == 0x03)
             break; //CtrlC should quit
