@@ -49,8 +49,12 @@ public:
   isSet(void) __attribute__((always_inline));
 
 private:
+#if !defined(OS_EXCLUDE_STACK_USAGE)
   // true if the scheduler is locked, i.e. yield will return to same task
   static bool volatile ms_isLocked;
+#else /* defined(OS_EXCLUDE_STACK_USAGE) */
+  static unsigned char volatile ms_lockDepth;
+#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
 
   char m_dummy;
 };
@@ -437,13 +441,18 @@ inline bool
 OSSchedulerLock::set(bool flag)
 {
   bool b;
-  b = ms_isLocked;
-#if defined(DEBUG) && false
+  b = isSet();
+#if !defined(OS_EXCLUDE_STACK_USAGE)
+  ms_isLocked = flag;
+#else /* defined(OS_EXCLUDE_STACK_USAGE) */
+  ms_lockDepth = (flag ? 1 : 0);
+#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
+
+  #if defined(DEBUG) && false
   OSDeviceDebug::putString("lock set(");
   OSDeviceDebug::putString(flag? "T": "F");
   OSDeviceDebug::putString(") ");
 #endif
-  ms_isLocked = flag;
   return b;
 }
 
@@ -451,31 +460,48 @@ inline bool
 OSSchedulerLock::clear(void)
 {
   bool b;
-  b = ms_isLocked;
+  b = isSet();
+#if !defined(OS_EXCLUDE_STACK_USAGE)
+  ms_isLocked = false;
+#else /* defined(OS_EXCLUDE_STACK_USAGE) */
+  ms_lockDepth = 0;
+#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
+
 #if defined(DEBUG) && false
   OSDeviceDebug::putString("lock clear() ");
 #endif
-  ms_isLocked = false;
   return b;
 }
 
 inline bool
 OSSchedulerLock::isSet(void)
 {
+#if !defined(OS_EXCLUDE_STACK_USAGE)
   return ms_isLocked;
+#else /* defined(OS_EXCLUDE_STACK_USAGE) */
+  return (ms_lockDepth != 0);
+#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
 }
 
 inline void
 OSSchedulerLock::enter(void)
 {
+#if !defined(OS_EXCLUDE_STACK_USAGE)
   OSCPUImpl::stackPush(ms_isLocked);
   ms_isLocked = true;
+#else /* defined(OS_EXCLUDE_STACK_USAGE) */
+  ++ms_lockDepth;
+#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
 }
 
 inline void
 OSSchedulerLock::exit(void)
 {
+#if !defined(OS_EXCLUDE_STACK_USAGE)
   ms_isLocked = OSCPUImpl::stackPop();
+#else /* defined(OS_EXCLUDE_STACK_USAGE) */
+  --ms_lockDepth;
+#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
 }
 
 // ============================================================================

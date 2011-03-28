@@ -19,7 +19,11 @@ OSStack_t** g_ppCurrentStack;
 
 // ----- OSSchedulerLock static variables -------------------------------------
 
+#if !defined(OS_EXCLUDE_STACK_USAGE)
 bool volatile OSSchedulerLock::ms_isLocked;
+#else /* defined(OS_EXCLUDE_STACK_USAGE) */
+unsigned char volatile OSSchedulerLock::ms_lockDepth;
+#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
 
 // ----- OSScheduler static variables -----------------------------------------
 
