@@ -178,7 +178,34 @@ OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
   OSDeviceDebug::putNewLine();
 #endif
 
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+  if(m_rxBuf.isAboveHighWM())
+    {
+      m_pReadMatchArray = 0;
+      OSScheduler::eventNotify(getReadEvent());
+    }
+  else
+    {
+      if (m_pReadMatchArray != 0)
+        {
+          unsigned char *auxBuff;
+          auxBuff = m_pReadMatchArray;
+          while((*auxBuff != 0) && (m_pReadMatchArray != 0) )
+            {
+              if(*auxBuff == c)
+                {
+                  m_pReadMatchArray  = 0;
+                  OSScheduler::eventNotify(getReadEvent());
+                }
+              auxBuff++;
+            }
+        }
+    }
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+
+#if !defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
   OSScheduler::eventNotify(getReadEvent());
+#endif /* !defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 }
 
 // ----- write ---------------------------------------------------------------
