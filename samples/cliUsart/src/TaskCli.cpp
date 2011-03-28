@@ -121,7 +121,7 @@ TaskCli::taskMain(void)
 #else
           int c;
 #if true
-          dev.setReadMatchArray("1");
+          dev.setReadMatchArray((unsigned char*)"1");
           c = dev.readByte();
           while ((c != '1') && (c >= 0))
             {
