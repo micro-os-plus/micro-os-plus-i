@@ -30,6 +30,10 @@ OSDeviceCharacter::OSDeviceCharacter()
   m_openTimeout = OSTimeout::OS_NEVER;
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+  m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+
   // initialise events with default values
   // will be set to the implementation values at open
   m_readEvent = OSEvent::OS_NONE;
@@ -350,8 +354,12 @@ OSDeviceCharacter::readByte(void)
 #endif
 
   if (!m_isOpened)
-    return OSReturn::OS_NOT_OPENED;
-
+    {
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+      m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+      return OSReturn::OS_NOT_OPENED;
+    }
   bool canRead;
   for (;;)
     {
@@ -380,6 +388,9 @@ OSDeviceCharacter::readByte(void)
       if (timeout == OSTimeout::OS_IMMEDIATELY)
         {
           OSScheduler::eventWaitClear();
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+          m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
           return OSReturn::OS_WOULD_BLOCK;
         }
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
@@ -410,6 +421,10 @@ OSDeviceCharacter::readByte(void)
           OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte() return timeout"));
           OSDeviceDebug::putNewLine();
 #endif
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+          m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
           return OSReturn::OS_TIMEOUT;
         }
       else
@@ -424,8 +439,12 @@ OSDeviceCharacter::readByte(void)
     }
 
   if (!isConnected())
-    return OSReturn::OS_DISCONNECTED;
-
+    {
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+      m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+      return OSReturn::OS_DISCONNECTED;
+    }
   int c;
   c = implReadByte();
 
@@ -434,6 +453,11 @@ OSDeviceCharacter::readByte(void)
   OSDeviceDebug::putHex((unsigned short)c);
   OSDeviceDebug::putNewLine();
 #endif
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+  m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+
   return c;
 }
 
@@ -447,9 +471,9 @@ OSDeviceCharacter::availableRead(void)
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
   void
-  setReadMatchArray(char* match)
+  OSDeviceCharacter::setReadMatchArray(unsigned char* match)
   {
-
+    m_pReadMatchArray = match;
   }
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
