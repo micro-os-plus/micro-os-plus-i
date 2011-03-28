@@ -101,7 +101,7 @@ public:
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
   // set the match array
   void
-  setReadMatchArray(char* match);
+  setReadMatchArray(unsigned char* match);
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
 #if 1
@@ -168,7 +168,7 @@ protected:
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
-  char *  m_pReadMatchArray;
+  unsigned char *m_pReadMatchArray;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
 private:
