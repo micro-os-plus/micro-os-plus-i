@@ -40,6 +40,10 @@
 #endif
 #endif
 
+#if !defined(OS_CFGINT_OSCRITICALSECTION_MASK)
+#define OS_CFGINT_OSCRITICALSECTION_MASK                (0xF << (16+1))
+#endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASK) */
+
 /*
  * Usage:
  *      _PORT = GPIOX (currently ignored)
