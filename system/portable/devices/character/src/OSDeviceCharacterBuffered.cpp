@@ -18,8 +18,8 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
     unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
     unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
     unsigned short txLWM) :
-  m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM), m_txBuf(pTxBuf, txBufSize, txHWM,
-      txLWM)
+  m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM),
+      m_txBuf(pTxBuf, txBufSize, txHWM, txLWM)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered()="));
@@ -30,8 +30,8 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
 
 OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
     unsigned short rxBufSize, unsigned char *pTxBuf, unsigned short txBufSize) :
-  m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4), m_txBuf(pTxBuf,
-      txBufSize, txBufSize * 3 / 4, txBufSize / 4)
+  m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4),
+      m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered()="));
@@ -179,33 +179,39 @@ OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
 #endif
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
-  if(m_rxBuf.isAboveHighWM())
+  if (m_pReadMatchArray == 0)
     {
-      m_pReadMatchArray = 0;
+      // if the match array is not set, notify every character
       OSScheduler::eventNotify(getReadEvent());
     }
   else
     {
-      if (m_pReadMatchArray != 0)
+      // if the match array is set, first check if there is more space
+      if (m_rxBuf.isAboveHighWM())
         {
-          unsigned char *auxBuff;
-          auxBuff = m_pReadMatchArray;
-          while((*auxBuff != 0) && (m_pReadMatchArray != 0) )
+          m_pReadMatchArray = 0;
+          OSScheduler::eventNotify(getReadEvent());
+        }
+      else
+        {
+          // if there is enough space, check if the character is
+          // in the given array
+          unsigned char *p;
+          for (p = m_pReadMatchArray; *p != '\0'; ++p)
             {
-              if(*auxBuff == c)
+              if (*p == c)
                 {
-                  m_pReadMatchArray  = 0;
+                  // if we have a match, notify
+                  m_pReadMatchArray = 0;
                   OSScheduler::eventNotify(getReadEvent());
+                  break;
                 }
-              auxBuff++;
             }
         }
     }
-#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
-
-#if !defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+#else /* !defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
   OSScheduler::eventNotify(getReadEvent());
-#endif /* !defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 }
 
 // ----- write ---------------------------------------------------------------
