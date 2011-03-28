@@ -18,9 +18,9 @@
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
   OSTask(pName, m_stack, sizeof(m_stack)), m_dev(dev),
 #if true
-  m_cin(&m_dev), m_cout(&m_dev),
+      m_cin(&m_dev), m_cout(&m_dev),
 #endif
-  m_cli(m_line, sizeof(m_line))
+      m_cli(m_line, sizeof(m_line))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskCli()=");
@@ -49,9 +49,9 @@ TaskCli::taskMain(void)
         {
 #if false
           clog << "TaskCli::taskMain(" << showbase << hex << this <<
-              ") SP="<< hex
-              << ( unsigned short ) SP <<
-              endl;
+          ") SP="<< hex
+          << ( unsigned short ) SP <<
+          endl;
 #else
           debug.putString("TaskCli::taskMain()");
           debug.putNewLine();
@@ -99,21 +99,21 @@ TaskCli::taskMain(void)
           if (c == traits::eof())
             {
               if (os.isDebug)
-                clog << "disconnected" << endl;
+              clog << "disconnected" << endl;
 
               break;
             }
           else if (c == OSReturn::OS_TIMEOUT)
             {
               if (os.isDebug)
-                clog << "timeout" << endl;
+              clog << "timeout" << endl;
 
               break;
             }
           else if (c < 0)
             {
               if (os.isDebug)
-                clog << "error -" << dec << (int) (-c) << endl;
+              clog << "error -" << dec << (int) (-c) << endl;
 
               break;
             }
@@ -121,16 +121,15 @@ TaskCli::taskMain(void)
 #else
           int c;
 #if true
-          unsigned char match[] = "1\0";
-          dev.setReadMatchArray(match);
+          dev.setReadMatchArray("1");
           c = dev.readByte();
-          while((c!='1') && (c>=0))
-              {
+          while ((c != '1') && (c >= 0))
+            {
               dev.writeByte(c);
               dev.flush();
               c = dev.readByte();
-              }
-          if(c<0)
+            }
+          if (c < 0)
             clog << "error -" << dec << (int) (-c) << endl;
           else
             dev.writeByte(c);
@@ -139,14 +138,15 @@ TaskCli::taskMain(void)
 #else
           c = dev.readByte();
           if(c>=0)
-            dev.writeByte(c);
+          dev.writeByte(c);
           else
-            clog << "error -" << dec << (int) (-c) << endl;
+          clog << "error -" << dec << (int) (-c) << endl;
           dev.flush();
 #endif
+
 #if false
           if (c == 0x03)
-            break; //CtrlC should quit
+          break; //CtrlC should quit
 #endif
 #endif
         }
