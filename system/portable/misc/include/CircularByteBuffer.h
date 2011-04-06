@@ -27,6 +27,10 @@ public:
   put(unsigned char c);
   unsigned char
   get(void);
+
+  unsigned short
+  putBytes(unsigned char* pBuf, unsigned short count);
+
   bool
   isEmpty(void);
   bool

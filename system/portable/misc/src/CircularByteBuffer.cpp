@@ -74,6 +74,13 @@ CircularByteBuffer::put(unsigned char c)
   m_len++;
 }
 
+// return the actual number of bytes, if not enough space for all
+unsigned short
+CircularByteBuffer::putBytes(unsigned char* pBuf, unsigned short count)
+{
+  // TODO: implement it
+}
+
 unsigned char
 CircularByteBuffer::get(void)
 {
