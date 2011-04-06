@@ -61,6 +61,11 @@ public:
   OSReturn_t
   readByte(void);
 
+  // blocking read multiple byte read
+  // return number of the bytes read or error
+  OSReturn_t
+  readBytes(unsigned char* pBuf, int bufSize);
+
   // Check if there is available data to be read
   // and if it is return the size of the data.
   OSReturn_t
@@ -70,6 +75,11 @@ public:
   // return byte or negative (OSReturn::OS_DISCONNECTED, OSReturn::OS_TIMEOUT)
   int
   writeByte(unsigned char b);
+
+  // blocking multiple byte write. does not flush, unless buffer full.
+  // return number of  bytes or negative (OSReturn::OS_DISCONNECTED, OSReturn::OS_TIMEOUT)
+  int
+  writeBytes(unsigned char* pBuf, int len);
 
   // flush existing buffer
   OSReturn_t
