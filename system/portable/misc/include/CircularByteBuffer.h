@@ -10,28 +10,39 @@
 #include "portable/kernel/include/OS.h"
 
 class CircularByteBuffer
-  {
+{
 public:
   CircularByteBuffer();
   CircularByteBuffer(unsigned char *pc, unsigned short size,
       unsigned short highWM, unsigned short lowWM);
 
-  void init(unsigned char *pc, unsigned short size, unsigned short highWM,
+  void
+  init(unsigned char *pc, unsigned short size, unsigned short highWM,
       unsigned short lowWM);
 
-  void clear(void);
+  void
+  clear(void);
 
-  void put(unsigned char c);
-  unsigned char get(void);
-  bool isEmpty(void);
-  bool isFull(void);
-  bool isAboveHighWM(void);
-  bool isBelowLowWM(void);
+  void
+  put(unsigned char c);
+  unsigned char
+  get(void);
+  bool
+  isEmpty(void);
+  bool
+  isFull(void);
+  bool
+  isAboveHighWM(void);
+  bool
+  isBelowLowWM(void);
 
-  unsigned short length(void);
-  unsigned short size(void);
-  
-  void dump(void);
+  unsigned short
+  length(void);
+  unsigned short
+  size(void);
+
+  void
+  dump(void);
 
 private:
   unsigned char *m_pBuf;
@@ -41,36 +52,42 @@ private:
   unsigned short m_lowWM;
   unsigned char *m_pPut;
   unsigned char *m_pGet;
-  };
+};
 
-inline bool CircularByteBuffer::isEmpty(void)
-  {
-    return (m_len == 0);
-  }
+inline bool
+CircularByteBuffer::isEmpty(void)
+{
+  return (m_len == 0);
+}
 
-inline bool CircularByteBuffer::isFull(void)
-  {
-    return (m_len == m_sz);
-  }
+inline bool
+CircularByteBuffer::isFull(void)
+{
+  return (m_len == m_sz);
+}
 
-inline bool CircularByteBuffer::isAboveHighWM(void)
-  {
-    return (m_len > m_highWM);
-  }
+inline bool
+CircularByteBuffer::isAboveHighWM(void)
+{
+  return (m_len > m_highWM);
+}
 
-inline bool CircularByteBuffer::isBelowLowWM(void)
-  {
-    return (m_len < m_lowWM);
-  }
+inline bool
+CircularByteBuffer::isBelowLowWM(void)
+{
+  return (m_len < m_lowWM);
+}
 
-inline unsigned short CircularByteBuffer::length(void)
-  {
-    return m_len;
-  }
+inline unsigned short
+CircularByteBuffer::length(void)
+{
+  return m_len;
+}
 
-inline unsigned short CircularByteBuffer::size(void)
-  {
-    return m_sz;
-  }
+inline unsigned short
+CircularByteBuffer::size(void)
+{
+  return m_sz;
+}
 
 #endif /*CIRCULARBYTEBUFFER_H_ */

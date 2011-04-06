@@ -52,7 +52,7 @@ OSReturn_t Parser::parseToken(unsigned char *pSeparators,
     unsigned char *p;
     p = m_pToken;
     if (p == 0)
-      return OSReturn::NOT_INITIALIZED;
+    return OSReturn::NOT_INITIALIZED;
 
     *p = '\0';
 
@@ -120,7 +120,7 @@ OSReturn_t Parser::parseToken(unsigned char *pSeparators,
 OSReturn_t Parser::parseSubstring(unsigned short len)
   {
     if (len == 0)
-      return OSReturn::OS_BAD_PARAMETER;
+    return OSReturn::OS_BAD_PARAMETER;
 
     unsigned char *p;
     p = m_pToken;
@@ -167,13 +167,13 @@ OSReturn_t Parser::parseNibble(unsigned char nibble)
 
     ch = 0;
     if ( '0' <= nibble && nibble <= '9')
-      ch = (nibble - '0' );
+    ch = (nibble - '0' );
     else if ( 'a' <= nibble && nibble <= 'f')
-      ch = (nibble - ( unsigned char ) 'a' + 10 );
+    ch = (nibble - ( unsigned char ) 'a' + 10 );
     else if ( 'A' <= nibble && nibble <= 'F')
-      ch = (nibble - ( unsigned char ) 'A' + 10 );
+    ch = (nibble - ( unsigned char ) 'A' + 10 );
     else
-      return OSReturn::OS_ILLEGAL_CHARACTER;
+    return OSReturn::OS_ILLEGAL_CHARACTER;
 
     return ch;
   }
@@ -191,13 +191,13 @@ OSReturn_t Parser::parseHex(unsigned char *pChar, unsigned char *pStr)
         nibble = *pStr++;
 
         if ( '0' <= nibble && nibble <= '9')
-          ch |= (nibble - '0' );
+        ch |= (nibble - '0' );
         else if ( 'a' <= nibble && nibble <= 'f')
-          ch |= (nibble - (unsigned char)'a' + 10 );
+        ch |= (nibble - (unsigned char)'a' + 10 );
         else if ( 'A' <= nibble && nibble <= 'F')
-          ch |= (nibble - (unsigned char)'A' + 10 );
+        ch |= (nibble - (unsigned char)'A' + 10 );
         else
-          return OSReturn::OS_BAD_PARAMETER;
+        return OSReturn::OS_BAD_PARAMETER;
       }
 
     *pChar = ch;
@@ -218,7 +218,7 @@ OSReturn_t Parser::parseUnsigned(unsigned short *pShort, unsigned char *pStr)
             w += (c - '0');
           }
         else
-          return c;
+        return c;
 
         ++pStr;
       }
@@ -277,7 +277,7 @@ OSReturn_t Parser::parseFixedPrec(signed long *pLong, unsigned short prec,
             break;
           }
         else
-          return c;
+        return c;
 
         ++pStr;
       }
@@ -293,14 +293,14 @@ OSReturn_t Parser::parseFixedPrec(signed long *pLong, unsigned short prec,
                 l += (c - '0');
               }
             else
-              return c;
+            return c;
 
             ++pStr;
           }
       }
 
     if (bMinus)
-      l = -l;
+    l = -l;
 
     *pLong = l;
     return OSReturn::OS_OK;
