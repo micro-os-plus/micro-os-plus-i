@@ -78,7 +78,30 @@ CircularByteBuffer::put(unsigned char c)
 unsigned short
 CircularByteBuffer::putBytes(unsigned char* pBuf, unsigned short count)
 {
-  // TODO: implement it
+  unsigned short endSz, sz;
+
+  sz = count;
+  if(count > (m_sz - m_len))
+    sz = m_sz - m_len;
+
+  endSz = (unsigned short) (m_pPut - m_pBuf);
+  if(endSz >= sz)
+    {
+      memcpy(m_pPut, pBuf, sz);
+      m_pPut += sz;
+      if ((unsigned short) (m_pPut - m_pBuf) >= m_sz)
+         m_pPut = m_pBuf;
+      m_len += sz;
+    }
+  else
+    {
+      memcpy(m_pPut, pBuf, endSz);
+      m_pPut = m_pBuf;
+      memcpy(m_pPut, pBuf + endSz, sz - endSz);
+      m_pPut += (sz - endSz);
+      m_len += sz;
+    }
+  return sz;
 }
 
 unsigned char
