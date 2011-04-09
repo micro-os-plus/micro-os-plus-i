@@ -52,17 +52,33 @@ TaskBlink::taskMain(void)
   m_oLed.init();
 
 #if false
+  int n1, n2, n3;
+  n2 = m_rate;
   os.sched.critical.enter();
     {
-      os.sched.timerTicks.sleep(1);
+      os.sched.timerTicks.sleep(n2);
+      os.sched.eventWait((OSEvent_t)&n2);
     }
   os.sched.critical.exit();
 
+#if false
   OSScheduler::criticalEnter();
     {
-      os.sched.timerTicks.sleep(2);
+      os.sched.timerTicks.sleep(n2);
+      os.sched.eventWait((OSEvent_t)&n2);
     }
   OSScheduler::criticalExit();
+#endif
+
+  OSSchedulerLock::enter();
+  {
+    os.sched.timerTicks.sleep(n2);
+    os.sched.eventWait((OSEvent_t)&n2);
+  }
+  OSSchedulerLock::exit();
+
+  os.sched.timerTicks.sleep(n2);
+  os.sched.eventWait((OSEvent_t)&n2);
 #endif
 
   // task endless loop
