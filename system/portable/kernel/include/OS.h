@@ -14,7 +14,7 @@
 typedef int OSReturn_t;
 
 class OSReturn
-  {
+{
 public:
   static const OSReturn_t OS_OK = 0;
   static const OSReturn_t OS_TIMEOUT = -1;
@@ -33,7 +33,7 @@ public:
   static const OSReturn_t OS_IMMEDIATELY = -14;
   static const OSReturn_t OS_ITEM_NOT_FOUND = -15;
   static const OSReturn_t OS_NOT_ENOUGH_SPACE = -16;
-  };
+};
 
 // ----------------------------------------------------------------------------
 
@@ -43,9 +43,9 @@ typedef unsigned short OSTimerTicks_t;
 
 class OSTimeout
   {
-public:
-  static const OSTimerTicks_t OS_IMMEDIATELY = 0;
-  static const OSTimerTicks_t OS_NEVER = (0 - 1);
+  public:
+    static const OSTimerTicks_t OS_IMMEDIATELY = 0;
+    static const OSTimerTicks_t OS_NEVER = (0 - 1);
   };
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS) */
 
@@ -87,37 +87,50 @@ public:
 // ----------------------------------------------------------------------------
 
 class OSCPUImpl
-  {
+{
 public:
   // Initialise the SP register in order to point to the stack section.
-  inline static void stackInit(void) __attribute__((always_inline));
+  inline static void
+  stackInit(void) __attribute__((always_inline));
   // Some CPU initialisations.
-  inline static void earlyInit(void) __attribute__((always_inline));
+  inline static void
+  earlyInit(void) __attribute__((always_inline));
   // Put MCU to the idle sleep mode.
-  inline static void idle(void) __attribute__((always_inline));
+  inline static void
+  idle(void) __attribute__((always_inline));
   // Put MCU to sleep.
-  inline static void sleep(void) __attribute__((always_inline));
+  inline static void
+  sleep(void) __attribute__((always_inline));
   // Put MCU to deep sleep.
-  inline static void deepSleep(void) __attribute__((always_inline));
+  inline static void
+  deepSleep(void) __attribute__((always_inline));
   // Returns the reset bits used to know the reset reason.
-  inline static OSResetBits_t fetchResetBits(void) __attribute__((always_inline));
+  inline static OSResetBits_t
+  fetchResetBits(void) __attribute__((always_inline));
   // Reset the WDT.
-  inline static void watchdogReset(void) __attribute__((always_inline));
+  inline static void
+  watchdogReset(void) __attribute__((always_inline));
   // No operation performed. Embeds the nop assembly command.
-  inline static void nop(void) __attribute__((always_inline));
+  inline static void
+  nop(void) __attribute__((always_inline));
   // Generate a soft reset.
-  inline static void softReset(void) __attribute__((always_inline));
+  inline static void
+  softReset(void) __attribute__((always_inline));
   // Wrapper for the rete instruction.
-  inline static void returnFromInterrupt(void) __attribute__((always_inline,noreturn));
+  inline static void
+  returnFromInterrupt(void) __attribute__((always_inline,noreturn));
   // Copy link register's (LR) value into the PC. This will restart execution
   // of the previously executed routine.
-  inline static void returnFromSubroutine(void) __attribute__((always_inline,noreturn));
+  inline static void
+  returnFromSubroutine(void) __attribute__((always_inline,noreturn));
 
 #if defined(OS_INLINE_INTERRUPTS_ENABLE_DISABLE)
   // Enable interrupts (global interrupt mask bit - GM from SR).
-  inline static void interruptsEnable(void) __attribute__((always_inline));
+  inline static void
+  interruptsEnable(void) __attribute__((always_inline));
   // Disable all interrupts (global interrupt mask bit - GM from SR).
-  inline static void interruptsDisable(void) __attribute__((always_inline));
+  inline static void
+  interruptsDisable(void) __attribute__((always_inline));
 #else
   // Enable interrupts (global interrupt mask bit - GM from SR).
   inline static void interruptsEnable(void);
@@ -131,24 +144,28 @@ public:
 #endif
 
   // support for critical sections
-  inline static void setInterruptsMask(OSInterruptsMask_t) __attribute__((always_inline));
-  inline static OSInterruptsMask_t getInterruptsMask(void) __attribute__((always_inline));
+  inline static void
+  setInterruptsMask(OSInterruptsMask_t) __attribute__((always_inline));
+  inline static OSInterruptsMask_t
+  getInterruptsMask(void) __attribute__((always_inline));
 
-  inline static void stackPush(OSStack_t) __attribute__((always_inline));
-  inline static OSStack_t stackPop(void) __attribute__((always_inline));
+  inline static void
+  stackPush(OSStack_t) __attribute__((always_inline));
+  inline static OSStack_t
+  stackPop(void) __attribute__((always_inline));
 
 private:
 
-  };
-
+};
 
 // ----------------------------------------------------------------------------
 
 class OSImpl
-  {
+{
 public:
-  static void familyEarlyInit(void);
-  };
+  static void
+  familyEarlyInit(void);
+};
 
 // ----------------------------------------------------------------------------
 
@@ -161,7 +178,8 @@ public:
 #endif /* OS_INCLUDE_OSSAPPLICATIONIMPL_LOGEXCEPTIONDETAILS */
 
 #if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
-  static void interruptTick(void);
+  static void
+  interruptTick(void);
 #endif /* OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK */
 
 };
@@ -193,8 +211,6 @@ private:
 
 // ----------------------------------------------------------------------------
 
-extern "C" OSStack_t **g_ppCurrentStack;
-
 #include "portable/devices/debug/include/OSDeviceDebug.h"
 
 #include "portable/kernel/include/OSScheduler.h"
@@ -215,7 +231,7 @@ extern "C" OSStack_t **g_ppCurrentStack;
 
 // ----------------------------------------------------------------------------
 
-class OSCPU: public OSCPUImpl
+class OSCPU : public OSCPUImpl
 {
   // inherit all methods from CPU implementation
 public:
@@ -224,10 +240,12 @@ public:
   OSCPU();
 #endif
   // Returns the reset bits used to know the reset reason.
-  static OSResetBits_t getResetBits(void);
+  static OSResetBits_t
+  getResetBits(void);
 
   // save to private member the reset bits using implementation dependent method
-  static void saveResetBits(void);
+  static void
+  saveResetBits(void);
 
 private:
   // internal variable to keep reset bits
@@ -237,16 +255,16 @@ private:
   char m_dummy;
 };
 
-inline OSResetBits_t OSCPU::getResetBits(void)
-  {
-    return ms_resetBits;
-  }
-
+inline OSResetBits_t
+OSCPU::getResetBits(void)
+{
+  return ms_resetBits;
+}
 
 // ----------------------------------------------------------------------------
 
 class OS : public OSImpl
-  {
+{
 
 public:
 
@@ -279,16 +297,18 @@ public:
 
   // Performs early initialisations.
   // Must be called before all constructors.
-  static void earlyInit(void);
+  static void
+  earlyInit(void);
 
   // isDebug function return true if debug is active, false otherwise.
 #if defined(DEBUG)
 
   //const static bool isDebug = true;
-  inline static bool isDebug()
-    {
-      return true;
-    }
+  inline static bool
+  isDebug()
+  {
+    return true;
+  }
   ;
 #else
 
@@ -302,21 +322,27 @@ public:
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMILLIS)
   // Busy waiting for n milliseconds.
-  static void busyWaitMillis(unsigned int n);
+  static void
+  busyWaitMillis(unsigned int n);
 #endif
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMICROS)
   // Busy waiting for n microseconds.
-  static void busyWaitMicros(unsigned int n);
+  static void
+  busyWaitMicros(unsigned int n);
 #endif
 
-  static void resetHandler(void) __attribute__((naked, noreturn));
+  static void
+  resetHandler(void) __attribute__((naked, noreturn));
 
 private:
-  static void dataInit(void);
-  static void bssInit(void);
-  static void staticConstructorsInit(void);
-  };
+  static void
+  dataInit(void);
+  static void
+  bssInit(void);
+  static void
+  staticConstructorsInit(void);
+};
 
 // ----------------------------------------------------------------------------
 
@@ -356,22 +382,42 @@ private:
 inline void
 OSRealTimeCriticalSection::enter(void)
 {
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+
   register OSStack_t tmp;
 
   tmp = OSCPUImpl::getInterruptsMask();
   OSCPUImpl::stackPush(tmp);
   OSCPUImpl::interruptsDisable();
+
+#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+
+  OSCPUImpl::interruptsDisable();
+  ++OSCriticalSection::ms_nestingLevel;
+
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 }
 
 inline void
 OSRealTimeCriticalSection::exit(void)
 {
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+
   register OSStack_t tmp;
 
   tmp = OSCPUImpl::stackPop();
   OSCPUImpl::setInterruptsMask(tmp);
+
+#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+
+  if (--OSCriticalSection::ms_nestingLevel  == 0)
+    {
+      OSCPUImpl::interruptsEnable();
+    }
+
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 }
 
 // ----------------------------------------------------------------------------
 
-#endif /*OS_H_ */
+#endif /* OS_H_ */
