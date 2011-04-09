@@ -56,7 +56,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
 #endif /* OS_INCLUDE_OSTASK_INTERRUPTION */
         {
 
-#if false
+#if true
           bool doYield;
           OSCriticalSection::enter();
             {
@@ -151,8 +151,8 @@ OSTimer::eventRemove(OSEvent_t event)
   return ret;
 }
 
-// insert an entry in the timer list
-// WARNING: needs synchronization
+// Insert an entry in the timer list.
+// WARNING: needs synchronisation
 bool
 OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
 {
@@ -221,8 +221,8 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
   return true;
 }
 
-// remove the i-th list entry
-// WARNING: needs synchronization
+// Remove the i-th list entry.
+// WARNING: needs synchronisation.
 void
 OSTimer::remove(int i)
 {
