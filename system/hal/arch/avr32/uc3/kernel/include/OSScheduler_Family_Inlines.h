@@ -10,7 +10,7 @@
 #ifndef HAL_FAMILY_OSSCHEDULER_INLINES_H_
 #define HAL_FAMILY_OSSCHEDULER_INLINES_H_
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 /*
  * Overview
@@ -22,22 +22,22 @@
  * and only the resulting stack pointer (SP) is stored in the current task area.
  *
  * To make things simpler and faster, the code uses the global variable
- * g_ppCurrentStack that points to the current OSTask::m_pStack, where
+ * OSScheduler::ms_ppCurrentStack that points to the current OSTask::m_pStack, where
  * the pointer to the current stack frame is located. This variable is
  * set during the context switch in OSScheduler::contextSwitch().
  *
  * - contextSave() : store the SP through the global pointer
- *      *g_ppCurrentStack = SP
+ *      *OSScheduler::ms_ppCurrentStack = SP
  *
  * - contextRestore() : load the SP through the global pointer
- *      SP = *g_ppCurrentStack
+ *      SP = *OSScheduler::ms_ppCurrentStack
  */
 
 /*
  * AVR32 Specifics
  *
- * Since on AVR32 there is no special, unified, support for context switching,
- * (like on ARM Cortex M3/M4), we have two distinct context switching
+ * On AVR32 there is no special, unified, support for context switching,
+ * (like on ARM Cortex M3/M4), do we have two distinct context switching
  * situations:
  *
  * - the yield() code
@@ -70,7 +70,8 @@
  *      R4
  *      R5
  *      R6
- *      R7              <- BOTTOM, low addresses
+ *      R7
+ *      criticalSectionNesting   <- BOTTOM, low addresses
  *
  * (*) automatically done for INT0..INT3
  * (**) automatically done for SCALL
@@ -116,7 +117,7 @@ inline unsigned int getSP(void)
 inline void
 OSSchedulerImpl::stackPointerSave(void)
   {
-    *g_ppCurrentStack = (OSStack_t *)getSP();
+    *OSScheduler::ms_ppCurrentStack = (OSStack_t *)getSP();
   }
 
 #else
@@ -124,18 +125,18 @@ OSSchedulerImpl::stackPointerSave(void)
 inline void
 OSSchedulerImpl::stackPointerSave(void)
   {
-    register unsigned int tmp1; // asm("r8");
-    register unsigned int tmp2; // asm("r9");
+    register unsigned int tmp1;
+    register unsigned int tmp2;
 
     asm volatile
     (
         " mov     %[RA], LO(%[pTCB]) \n"
-        " orh     %[RA], HI(%[pTCB]) \n" // RA = &g_ppCurrentStack
-        " ld.w    %[RB], %[RA][0] \n" // RB = g_ppCurrentStack)
-        " st.w    %[RB][0], sp \n" // *g_ppCurrentStack = SP
+        " orh     %[RA], HI(%[pTCB]) \n" // RA = &OSScheduler::ms_ppCurrentStack
+        " ld.w    %[RB], %[RA][0] \n" // RB = OSScheduler::ms_ppCurrentStack)
+        " st.w    %[RB][0], sp \n" // *OSScheduler::ms_ppCurrentStack = SP
 
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
-        : [pTCB] "i" (&g_ppCurrentStack)
+        : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         :
     );
   }
@@ -160,7 +161,7 @@ inline void setSP(OSStack_t * p)
 inline void
 OSSchedulerImpl::stackPointerRestore(void)
   {
-    setSP(*g_ppCurrentStack);
+    setSP(*OSScheduler::ms_ppCurrentStack);
   }
 
 #else
@@ -172,23 +173,69 @@ OSSchedulerImpl::stackPointerRestore(void)
 inline void
 OSSchedulerImpl::stackPointerRestore(void)
   {
-    register unsigned int tmp1; // asm("r8");
-    register unsigned int tmp2; // asm("r9");
+    register unsigned int tmp1;
+    register unsigned int tmp2;
 
     asm volatile
     (
         " mov     %[RA], LO(%[pTCB]) \n"
-        " orh     %[RA], HI(%[pTCB]) \n" // RA = &g_ppCurrentStack
-        " ld.w    %[RB], %[RA][0] \n" // RB = g_ppCurrentStack)
-        " ld.w    sp, %[RB][0] \n" // SP = *g_ppCurrentStack
+        " orh     %[RA], HI(%[pTCB]) \n" // RA = &OSScheduler::ms_ppCurrentStack
+        " ld.w    %[RB], %[RA][0] \n" // RB = OSScheduler::ms_ppCurrentStack)
+        " ld.w    sp, %[RB][0] \n" // SP = *OSScheduler::ms_ppCurrentStack
 
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
-        : [pTCB] "i" (&g_ppCurrentStack)
+        : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         : "sp"
     );
   }
 
 #endif
+
+/*
+ * Save the global critical section nesting counter onto stack
+ */
+
+inline void
+OSSchedulerImpl::criticalSectionNestingSave(void)
+  {
+    register unsigned int tmp1;
+    register unsigned int tmp2;
+
+    asm volatile
+    (
+        " mov     %[RA], LO(%[pCSN]) \n"
+        " orh     %[RA], HI(%[pCSN]) \n"
+        " ld.w    %[RB], %[RA][0] \n"
+        " st.w    --sp, %[RB] \n " // push Nesting onto stack
+
+        : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
+        : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
+        :
+    );
+  }
+
+/*
+ *  Restore the global critical section nesting counter from stack
+ */
+
+inline void
+OSSchedulerImpl::criticalSectionNestingRestore(void)
+  {
+    register unsigned int tmp1;
+    register unsigned int tmp2;
+
+    asm volatile
+    (
+        " ld.w    %[RA], sp++ \n" // pop Nesting from stack
+        " mov     %[RB], LO(%[pCSN]) \n"
+        " orh     %[RB], HI(%[pCSN]) \n"
+        " st.w    %[RB][0], %[RA] \n"
+
+        : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
+        : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
+        : "sp"
+    );
+  }
 
 /*
  * Save the remaining R0-R7 registers onto the stack.
@@ -241,8 +288,6 @@ OSSchedulerImpl::registersRestore(void)
  *
  */
 
-#if true
-
 unsigned int getSRfromStack(void) __attribute__ ((always_inline));
 
 inline unsigned int getSRfromStack(void)
@@ -250,7 +295,7 @@ inline unsigned int getSRfromStack(void)
     register unsigned int ret;
     asm volatile
     (
-        " ld.w %[RET], sp[8*4] \n"
+        " ld.w %[RET], sp[9*4] \n" // 8 without nesting
 
         : [RET] "=r" (ret)
         :
@@ -265,36 +310,6 @@ OSSchedulerImpl::isContextSwitchAllowed(void)
   {
     return ((getSRfromStack() >> 22) & 0x7) > 1 ? false : true;
   }
-
-#else
-
-inline bool
-OSSchedulerImpl::isContextSwitchAllowed(void)
-  {
-    register bool bRet; //asm ("r8");
-    register unsigned int tmp;
-
-    // Return 0 (false) if SR mode bits > 1, i.e. in interrupt mode
-    // Return 1 (true) if SR mode bits <= 1, i.e. in application or supervisor mode
-    asm volatile
-    (
-        " ld.w    %[RTMP], sp[8*4] \n" // Read SR in stack
-        " bfextu  %[RTMP], %[RTMP], 22, 3 \n" // Extract the mode bits to R0.
-        " cp.w    %[RTMP], 1 \n" // Compare the mode bits with supervisor mode(b'001)
-        " brhi    9f \n" // if interrupt or exception, jump
-        " mov     %[RET], 1 \n" // return true
-        " bral    8f \n"
-        "9: "
-        " mov     %[RET], 0 \n" // return false
-        "8:"
-
-        : [RTMP] "=r" (tmp), [RET] "=r" (bRet)
-        :
-        :
-    );
-    return bRet;
-  }
-#endif
 
 #endif /* OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING */
 
@@ -315,39 +330,11 @@ OSSchedulerImpl::isContextSwitchAllowed(void)
 inline void
 OSSchedulerImpl::FirstTask_contextRestore(void)
 {
-#if false
-  register unsigned int tmp1;
-  register unsigned int tmp2;
-
-  asm volatile
-  (
-      " mov     %[RA], LO(%[pTCB]) \n"
-      " orh     %[RA], HI(%[pTCB]) \n"
-      " ld.w    %[RB], %[RA][0] \n"
-      " ld.w    sp, %[RB][0] \n"
-
-      : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
-      : [pTCB] "i" (&g_ppCurrentStack)
-      : "sp"
-  );
-
-  asm volatile
-  (
-      // Restore R0..R7
-      " ldm     sp++, r0-r7 \n"
-      // R0-R7 should not be used below this line
-      :
-      :
-      : "sp"
-  );
-
-#else
 
   OSSchedulerImpl::stackPointerRestore();
+  OSSchedulerImpl::criticalSectionNestingRestore();
   OSSchedulerImpl::registersRestore();
   // R1-R7 should not be used below this line
-
-#endif
 
   asm volatile
   (
@@ -385,7 +372,7 @@ SCALL_contextRestore(void) __attribute__((always_inline));
 
 /*
  * Push all registers onto the stack and remember position in global variable
- *    *g_ppCurrentStack = SP (stack pointer)
+ *    *OSScheduler::ms_ppCurrentStack = SP (stack pointer)
  *
  * Leave interrupts as they were.
  *
@@ -439,41 +426,14 @@ SCALL_contextSave(void)
       :
   );
 
-#if false
-  register unsigned int saveSP asm("r10");
-
-  asm volatile
-  (
-      " mov     %[RSP], sp \n"
-      : [RSP] "=r" (saveSP)
-      :
-      :
-  );
-
-  // Enter critical section to protect the global g_ppCurrentStack
-  OSCriticalSection::enter();
-
-  register unsigned int tmp1 asm("r8");
-  register unsigned int tmp2 asm("r9");
-
-  // Store SP in the task area
-  asm volatile
-  (
-      " mov     %[RA], LO(%[pTCB]) \n"
-      " orh     %[RA], HI(%[pTCB]) \n"
-      " ld.w    %[RB], %[RA][0] \n"
-      " st.w    %[RB][0], %[RSP] \n"
-
-      : [RA] "=r" (tmp1),[RB] "=r" (tmp2)
-      : [pTCB] "i" (&g_ppCurrentStack), [RSP] "r" (saveSP)
-      :
-  );
-#else
+  OSSchedulerImpl::criticalSectionNestingSave();
 
   // enter critical region here; interrupts will be re-enabled
   // when the new context is executed
+
 #if defined(OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK)
 
+#if false
   register unsigned int tmp; // asm("r8");
   asm volatile
   (
@@ -483,56 +443,29 @@ SCALL_contextSave(void)
 
       : [R] "=r" (tmp)
       // TODO: define a configuration macro for the MASK
-      : [MASK] "i" (0x001E), [SR] "i" (AVR32_SR)
+      : [MASK] "i" (0x0F << 1), [SR] "i" (AVR32_SR)
       :
   );
+#else
+  register OSStack_t tmp;
+
+  tmp = OSCPUImpl::getInterruptsMask();
+  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
+  OSCPUImpl::setInterruptsMask(tmp);
+#endif
 
 #else
   OSCPUImpl::interruptsDisable();
 #endif
 
   OSSchedulerImpl::stackPointerSave();
-
-#endif
 }
 
 inline void
 SCALL_contextRestore(void)
 {
-#if false
-  register unsigned int tmp1 asm("r8");
-  register unsigned int tmp2 asm("r9");
-  register unsigned int saveSP asm("r10");
-
-  // First restore the stack pointer in a local register saveSP.
-  // We cannot use SP now, since criticalEnter/Exit relies on stack.
-  asm volatile
-  (
-      " mov     %[RA], LO(%[pTCB]) \n"
-      " orh     %[RA], HI(%[pTCB]) \n"
-      " ld.w    %[RB], %[RA][0] \n"
-      " ld.w    %[RSP], %[RB][0] \n"
-
-      : [RA] "=r" (tmp1), [RB] "=r" (tmp2), [RSP] "=r" (saveSP)
-      : [pTCB] "i" (&g_ppCurrentStack)
-      :
-  );
-
-  // Exit the critical section used to protect the global g_ppCurrentStack
-  OSCriticalSection::exit();
-
-  asm volatile
-  (
-      // Restore the saved SP in the stack pointer register
-      " mov     sp, %[RSP] \n"
-
-      :
-      : [RSP] "r" (saveSP)
-      :
-  );
-#else
   OSSchedulerImpl::stackPointerRestore();
-#endif
+  OSSchedulerImpl::criticalSectionNestingRestore();
 
   asm volatile
   (
@@ -549,6 +482,10 @@ SCALL_contextRestore(void)
 
       // RETS will take care of the extra PC and SR restore.
       // So, we have to prepare the stack as required for RETS.
+
+      // TODO: check if needed
+      // Here we might need to exit the critical section. (FreeRTOS does it)
+
       " ld.w    r0, r7[-8*4] \n" // Read SR
       " st.w    r7[-2*4], r0 \n" // Copy SR
       " ld.w    r0, r7[-7*4] \n" // Read PC
@@ -570,107 +507,12 @@ SCALL_contextRestore(void)
 }
 
 /*
- * Critical section management.
- *
- * Since critical sections can be nested, we store the saved values onto
- * the stack.
- *
- * Notice: The function context is addressed via R07, not SP, so using the
- * stack as temporary storage should be safe.
- *
- * There were some rumours about the compiler aggressively optimising the stack,
- * leading to strange behaviours, but we cannot confirm them.
- */
-
-/*
- * Push SR onto the stack and disable interrupts.
- *
- * To allow Real-Time interrupts to run, we do not disable all interrupts,
- * but selectively mask only the non-Real-Time levels.
- *
- */
-
-inline void
-OSScheduler::criticalEnter(void)
-{
-#if !defined(OS_EXCLUDE_MULTITASKING)
-  register unsigned int tmp; //asm("r8");
-
-  asm volatile
-  (
-      " mfsr    %[R], %[SR] \n"
-      " st.w    --sp, %[R] \n" // push value onto stack
-
-#if defined(OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK)
-      " orh     %[R], %[MASK] \n" // selectively disable interrupts in MASK
-      " mtsr    %[SR], %[R] \n"
-#else
-      " ssrf    %[GM] \n" // disable all interrupts
-#endif
-
-      : [R] "=r" (tmp)
-      // TODO: define a configuration macro for the MASK
-      : [MASK] "i" (0x001E), [SR] "i" (AVR32_SR), [GM] "i" (AVR32_SR_GM_OFFSET)
-      : "sp"
-  );
-#endif
-}
-
-inline void
-OSScheduler::realTimeCriticalEnter(void)
-{
-#if !defined(OS_EXCLUDE_MULTITASKING)
-  register unsigned int tmp; //asm("r8");
-
-  asm volatile
-  (
-      " mfsr    %[R], %[SR] \n"
-      " st.w    --sp, %[R] \n" // push value onto stack
-
-      " ssrf    %[GM] \n" // disable all interrupts
-
-      : [R] "=r" (tmp)
-      : [SR] "i" (AVR32_SR), [GM] "i" (AVR32_SR_GM_OFFSET)
-      : "sp"
-  );
-#endif
-}
-
-/*
- * Pop SR from the stack; this will also restore interrupts to
- * their previous state.
- *
- */
-
-inline void
-OSScheduler::criticalExit(void)
-{
-#if !defined(OS_EXCLUDE_MULTITASKING)
-  register unsigned int tmp; // asm("r8");
-
-  asm volatile
-  (
-      " ld.w    %[R], sp++ \n"
-      " mtsr    %[SR], %[R] \n"
-
-      : [R] "=r" (tmp)
-      : [SR] "i" (AVR32_SR)
-      : "sp", "cc" // "cc" mean configuration flags
-  );
-#endif
-}
-
-/*
  * Perform a context switch by triggering a system call exception.
- *
  */
 
 inline void
 OSSchedulerImpl::yield(void)
 {
-#if defined(OS_INCLUDE_OSSCHEDULER_YIELD_UNDER_CONSTRUCTION)
-  ; // test code here
-#else
   asm volatile
   (
       " scall \n"
@@ -678,7 +520,6 @@ OSSchedulerImpl::yield(void)
       :
       :
   );
-#endif
 }
 
-#endif /*HAL_FAMILY_OSSCHEDULER_INLINES_H_*/
+#endif /* HAL_FAMILY_OSSCHEDULER_INLINES_H_ */

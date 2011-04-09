@@ -16,37 +16,38 @@ OSSchedulerImpl::stackInitialise(OSStack_t * pStackTop, void
 
   /* Place a few bytes of known values on the bottom of the stack.
    This is just useful for debugging. */
-#define STACK_WORD_COUNT   (16+1)
-  /* -           +16*4=64 */
-  *pStackTop-- = (0x12345600 | id);
+#define STACK_WORD_COUNT   (17+1)
+
+  *pStackTop-- = (0x12345600 | id); /* - +17*4=68 */
 
   /* Simulate how the stack would look after a call to yield()*/
 
-  *pStackTop-- = 0x08; /* R8          +15*4=60 */
-  *pStackTop-- = 0x09; /* R9          +14*4=56 */
-  *pStackTop-- = 0x10; /* R10         +13*4=52 */
-  *pStackTop-- = 0x11; /* R11         +12*4=48 */
-  /* R12         +11*4=44 */
-  *pStackTop-- = (OSStack_t) pParams;
-  /* R14/LR      +10*4=40 */
-  *pStackTop-- = 0xDEADBEEF;
-#define STACK_PCL_WORD_OFFSET   (9)
-  /* R15/PC      +9*4=36 */
-  *pStackTop-- = (OSStack_t) pCode;
-  /* SR          +8*4=32 */
-  *pStackTop-- = 0x00400000;
+  *pStackTop-- = 0x08; /* R8          +16*4=64 */
+  *pStackTop-- = 0x09; /* R9          +15*4=60 */
+  *pStackTop-- = 0x10; /* R10         +14*4=56 */
+  *pStackTop-- = 0x11; /* R11         +13*4=52 */
+
+  *pStackTop-- = (OSStack_t) pParams; /* R12  +12*4=48 */
+  *pStackTop-- = 0xDEADBEEF;   /* R14/LR      +11*4=44 */
+
+#define STACK_PCL_WORD_OFFSET   (10)
+
+  *pStackTop-- = (OSStack_t) pCode; /* R15/PC +10*4=40 */
+  *pStackTop-- = 0x00400000; /* SR    +9*4=36 */
   /* Task starts in system mode, with all interrupts enabled */
 
-#define STACK_R0_WORD_OFFSET    (7)
-  /* R0          +7*4=28 */
-  *pStackTop-- = 0xFF0000FF;
-  *pStackTop-- = 0x01; /* R1          +6*4=24 */
-  *pStackTop-- = 0x02; /* R2          +5*4=20 */
-  *pStackTop-- = 0x03; /* R3          +4*4=16 */
-  *pStackTop-- = 0x04; /* R4          +3*4=12 */
-  *pStackTop-- = 0x05; /* R5          +2*4=8 */
-  *pStackTop-- = 0x06; /* R6          +1*4=4 */
-  *pStackTop-- = 0x07; /* R7          +0*4=0 */
+#define STACK_R0_WORD_OFFSET    (8)
+
+  *pStackTop-- = 0xFF0000FF; /* R0    +8*4=32 */
+  *pStackTop-- = 0x01; /* R1          +7*4=24 */
+  *pStackTop-- = 0x02; /* R2          +6*4=20 */
+  *pStackTop-- = 0x03; /* R3          +5*4=16 */
+  *pStackTop-- = 0x04; /* R4          +4*4=12 */
+  *pStackTop-- = 0x05; /* R5          +3*4=8 */
+  *pStackTop-- = 0x06; /* R6          +2*4=4 */
+  *pStackTop-- = 0x07; /* R7          +1*4=0 */
+
+  *pStackTop-- = 0x0; /* criticalSectionNesting +0*4=0 */
 
   ++pStackTop;
 
