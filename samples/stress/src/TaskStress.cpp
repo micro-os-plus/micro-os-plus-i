@@ -1,8 +1,7 @@
 /*
- * TaskStress.cpp
+ *      Copyright (C) 2011 Liviu Ionescu.
  *
- *  Created on: Feb 17, 2011
- *      Author: alex
+ *      This file is part of the uOS++ distribution.
  */
 
 #include "TaskStress.h"
@@ -69,6 +68,7 @@ TaskStress::taskMain(void)
 
       os.busyWaitMicros(nBusy);
       os.sched.timerTicks.sleep(nSleep);
+
       nCnt += nSleep;
       if (nCnt >= 1000)
         {
@@ -82,8 +82,12 @@ TaskStress::taskMain(void)
 unsigned int
 TaskStress::rand(void)
 {
+#if false
+  return 9;
+#else
   unsigned int ret;
   os.sched.lock.enter();
+  //os.sched.critical.enter();
     {
       ms_rand = ms_rand * 214013L + 2531011L;
 #if (__SIZEOF_INT__ == 2)
@@ -93,5 +97,8 @@ TaskStress::rand(void)
 #endif
     }
   os.sched.lock.exit();
+  //os.sched.critical.exit();
+
   return ret;
+#endif
 }
