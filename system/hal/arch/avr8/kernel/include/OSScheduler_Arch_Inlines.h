@@ -147,8 +147,8 @@ OSSchedulerImpl::stackPointerSave(void)
   {
     asm volatile
     (
-        " lds   r26, g_ppCurrentStack \n"
-        " lds   r27, g_ppCurrentStack+1 \n"
+        " lds   r26, OSScheduler::ms_ppCurrentStack \n"
+        " lds   r27, OSScheduler::ms_ppCurrentStack+1 \n"
         " in    r0, __SP_L__ \n"
         " st    x+, r0 \n"
         " in    r0, __SP_H__ \n"
@@ -165,8 +165,8 @@ OSSchedulerImpl::stackPointerRestore(void)
   {
     asm volatile
     (
-        " lds   r26, g_ppCurrentStack \n"
-        " lds   r27, g_ppCurrentStack+1 \n"
+        " lds   r26, OSScheduler::ms_ppCurrentStack \n"
+        " lds   r27, OSScheduler::ms_ppCurrentStack+1 \n"
         " ld    r28, x+ \n"
         " out   __SP_L__, r28 \n"
         " ld    r29, x+ \n"

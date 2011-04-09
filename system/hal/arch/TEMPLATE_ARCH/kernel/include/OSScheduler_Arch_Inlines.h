@@ -12,7 +12,7 @@
 /*
  * Code to save the current task 'context' on the task control block.
  *
- * The code uses the global variable g_ppCurrentStack that points to the
+ * The code uses the global variable OSScheduler::ms_ppCurrentStack that points to the
  * current context (i.e. the OSTask::m_pStack, where the pointer to the
  * current stack frame is stored). This variable is set during the context
  * switch in OSScheduler::contextSwitch().
@@ -21,7 +21,7 @@
 inline void OSScheduler::contextSave(void)
   {
     // push all registers to stack
-    // *g_ppCurrentStack = SP (stack pointer)
+    // *OSScheduler::ms_ppCurrentStack = SP (stack pointer)
     // leave interrupts as they were
     asm volatile (
         "		\n"
@@ -35,7 +35,7 @@ inline void OSScheduler::contextSave(void)
 
 inline void OSScheduler::contextRestore(void)
   {
-    // SP = *g_ppCurrentStack
+    // SP = *OSScheduler::ms_ppCurrentStack
     // pop everything from stack
     asm volatile
     (

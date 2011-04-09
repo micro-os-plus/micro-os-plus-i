@@ -112,11 +112,11 @@ void OSTimerTicks::implAcknowledgeInterrupt()
 
 #if defined(OS_INCLUDE_OSSCHEDULER_16BIT_TIMER)
 
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
 extern "C" __attribute__((naked))
 #else
 extern "C" __attribute__((signal))
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
 void TIMER1_COMPA_vect(void);
 
 void
@@ -129,15 +129,15 @@ TIMER1_COMPA_vect(void)
 #else
 
     // interrupts disabled in here
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
     OSScheduler::interruptEnter();
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
       {
         OSScheduler::timerTicks.interruptServiceRoutine();
       }
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
     OSScheduler::interruptExit();
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
     // interrupts enabled after this point
 
 #endif
@@ -147,11 +147,11 @@ TIMER1_COMPA_vect(void)
 
 #if defined (__AVR_AT90CAN128__)
 
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
 extern "C" __attribute__((naked))
 #else
 extern "C" __attribute__((signal))
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
 void TIMER0_COMP_vect(void);
 
 void TIMER0_COMP_vect(void)
@@ -163,15 +163,15 @@ void TIMER0_COMP_vect(void)
 #else
 
     // interrupts disabled in here
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
     OSScheduler::interruptEnter();
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
       {
         OSScheduler::timerTicks.interruptServiceRoutine();
       }
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
     OSScheduler::interruptExit();
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
     // interrupts enabled after this point
 
 #endif
@@ -179,11 +179,11 @@ void TIMER0_COMP_vect(void)
 
 #else
 
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
 extern "C" __attribute__((naked))
 #else
 extern "C" __attribute__((signal))
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
 void  TIMER0_COMPA_vect(void);
 
 void TIMER0_COMPA_vect(void)
@@ -194,17 +194,17 @@ void TIMER0_COMPA_vect(void)
 
 #else
     // interrupts disabled in here
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
     OSScheduler::interruptEnter();
 #else
     OSScheduler::ISR_ledActiveOn();
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
       {
         OSScheduler::timerTicks.interruptServiceRoutine();
       }
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
     OSScheduler::interruptExit();
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
     // interrupts enabled after this point
 #endif
   }

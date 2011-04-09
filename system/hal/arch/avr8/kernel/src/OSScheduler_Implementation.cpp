@@ -144,7 +144,7 @@ OSSchedulerImpl::dumpContextInfo(OSTask * pTask)
   OSDeviceDebug::putPtr(pStack);
   OSDeviceDebug::putString(" PC=");
   unsigned char * q;
-  q = ((unsigned char *) *((unsigned short *) g_ppCurrentStack) + 34);
+  q = ((unsigned char *) *((unsigned short *) OSScheduler::ms_ppCurrentStack) + 34);
   unsigned short w;
   w = (q[0] << 8) | q[1];
   OSDeviceDebug::putPC((const char *) w);

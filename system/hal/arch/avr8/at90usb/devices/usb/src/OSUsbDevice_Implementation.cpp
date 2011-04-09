@@ -15,7 +15,7 @@
 #include "hal/arch/avr8/at90usb/devices/usb/include/OSUsbDeviceImpl.h"
 #include "portable/devices/character/include/DeviceCharacterUsb.h"
 
-//----- Static data -----------------------------------------------------------
+// ----- Static data ----------------------------------------------------------
 
 volatile unsigned short OSUsbDeviceImpl::g_usb_event = 0;
 unsigned char OSUsbDeviceImpl::data_to_transfer;
