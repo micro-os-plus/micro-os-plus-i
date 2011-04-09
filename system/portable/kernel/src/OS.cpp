@@ -17,21 +17,20 @@ OSRealTimeCriticalSection OSRealTime::critical;
 #if defined(DEBUG) && !defined(OS_EXCLUDE_MULTITASKING)
 
 OS::OS()
-  {
+{
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("OS()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("OS()="));
+  OSDeviceDebug::putPtr(this);
+  OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
-  }
-
+}
 
 OSCPU::OSCPU()
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("OSCPU()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("OSCPU()="));
+  OSDeviceDebug::putPtr(this);
+  OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
 }
 
@@ -43,9 +42,8 @@ OSCPU::saveResetBits(void)
   ms_resetBits = fetchResetBits();
 }
 
-
-extern "C"
-int  main( void ) __attribute__( ( weak ) );
+extern "C" int
+main(void) __attribute__( ( weak ) );
 
 #if !defined(OS_EXCLUDE_RESET_HANDLER)
 
@@ -119,29 +117,31 @@ extern unsigned long __os_bss_start;
 /* end address for the .bss section. defined in linker script */
 extern unsigned long __os_bss_end;
 
-void OS::dataInit(void)
-  {
-    unsigned long *pSrc, *pDest;
+void
+OS::dataInit(void)
+{
+  unsigned long *pSrc, *pDest;
 
-    /* Copy the data segment initialisers from flash to SRAM */
-    pSrc = &__os_data_load_start;
-    pDest = &__os_data_start;
-    for (; pDest < &__os_data_end;)
-      {
-        *(pDest++) = *(pSrc++);
-      }
-  }
+  /* Copy the data segment initialisers from flash to SRAM */
+  pSrc = &__os_data_load_start;
+  pDest = &__os_data_start;
+  for (; pDest < &__os_data_end;)
+    {
+      *(pDest++) = *(pSrc++);
+    }
+}
 
-void OS::bssInit(void)
-  {
-    unsigned long *pDest;
+void
+OS::bssInit(void)
+{
+  unsigned long *pDest;
 
-    /* Zero fill the bss segment. */
-    for (pDest = &__os_bss_start; pDest < &__os_bss_end;)
-      {
-        *(pDest++) = 0;
-      }
-  }
+  /* Zero fill the bss segment. */
+  for (pDest = &__os_bss_start; pDest < &__os_bss_end;)
+    {
+      *(pDest++) = 0;
+    }
+}
 
 /* start address for the constructors section. defined in linker script */
 extern unsigned long __os_ctors_array_start;
@@ -149,24 +149,27 @@ extern unsigned long __os_ctors_array_start;
 /* end address for the constructors section. defined in linker script */
 extern unsigned long __os_ctors_array_end;
 
-typedef void (*pFunc_t)(void);
+typedef void
+(*pFunc_t)(void);
 
-void OS::staticConstructorsInit(void)
-  {
-    unsigned long *p;
-    void (*pFunc)(void);
+void
+OS::staticConstructorsInit(void)
+{
+  unsigned long *p;
+  void
+  (*pFunc)(void);
 
-    p = &__os_ctors_array_start;
-    for (; p < &__os_ctors_array_end; p++)
-      {
+  p = &__os_ctors_array_start;
+  for (; p < &__os_ctors_array_end; p++)
+    {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS) && defined(OS_DEBUG_CONSTRUCTORS_INIT)
-        OSDeviceDebug::putString("INIT=");
-        OSDeviceDebug::putHex(*p);
-        OSDeviceDebug::putNewLine();
+      OSDeviceDebug::putString("INIT=");
+      OSDeviceDebug::putHex(*p);
+      OSDeviceDebug::putNewLine();
 #endif
-        pFunc = (pFunc_t) (*p);
-        (*pFunc)();
-      }
+      pFunc = (pFunc_t) (*p);
+      (*pFunc)();
+    }
 }
 
 #endif /* OS_EXCLUDE_RESET_HANDLER */
@@ -182,77 +185,80 @@ void OS::nakedEarlyInit(void)
 #endif
 
 // runs before constructors
-void OS::earlyInit(void)
-  {
+void
+OS::earlyInit(void)
+{
 #if defined(DEBUG)
-    OSDeviceDebug::putString_P(PSTR("OS::earlyInit()"));
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("OS::earlyInit()"));
+  OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
 
 #if defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING)
-    OSDeviceDebug::putString_P(PSTR("Multitasking: disabled"));
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("Multitasking: disabled"));
+  OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING) */
 
 #if defined(DEBUG) && defined(OS_EXCLUDE_PREEMPTION)
-    OSDeviceDebug::putString_P(PSTR("Preemption: disabled"));
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("Preemption: disabled"));
+  OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_EXCLUDE_PREEMPTION) */
 
 #if defined(DEBUG) && defined(OS_EXCLUDE_OSTIMER)
-    OSDeviceDebug::putString_P(PSTR("SysTick: disabled"));
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("SysTick: disabled"));
+  OSDeviceDebug::putNewLine();
 #else
-#if defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
-    OSDeviceDebug::putString_P(PSTR("SysTick: not naked"));
-    OSDeviceDebug::putNewLine();
-#endif /* defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#if defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
+  OSDeviceDebug::putString_P(PSTR("SysTick: not naked"));
+  OSDeviceDebug::putNewLine();
+#endif /* defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
 
-    OSDeviceDebug::putString_P(PSTR("SysTick="));
-    OSDeviceDebug::putDec((unsigned short)OS_CFGINT_TICK_RATE_HZ);
-    OSDeviceDebug::putString_P(PSTR(" ticks/sec"));
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("SysTick="));
+  OSDeviceDebug::putDec((unsigned short) OS_CFGINT_TICK_RATE_HZ);
+  OSDeviceDebug::putString_P(PSTR(" ticks/sec"));
+  OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_EXCLUDE_OSTIMER) */
 
-    OSCPU::saveResetBits();
+  OSCPU::saveResetBits();
 
 #if defined(DEBUG)
-    OSDeviceDebug::putString_P(PSTR("ResetBits="));
-    OSDeviceDebug::putHex((unsigned char) OSCPU::getResetBits());
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("ResetBits="));
+  OSDeviceDebug::putHex((unsigned char) OSCPU::getResetBits());
+  OSDeviceDebug::putNewLine();
 
-    OSDeviceDebug::putString_P(PSTR("Oscillator="));
+  OSDeviceDebug::putString_P(PSTR("Oscillator="));
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
-    OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ);
-    OSDeviceDebug::putString_P(PSTR(" Hz"));
+  OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ);
+  OSDeviceDebug::putString_P(PSTR(" Hz"));
 #else
-    OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ/1000);
-    OSDeviceDebug::putString_P(PSTR(" KHz"));
+  OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ/1000);
+  OSDeviceDebug::putString_P(PSTR(" KHz"));
 #endif /* defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG) */
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
 
-    OS::familyEarlyInit();
+  OS::familyEarlyInit();
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
-    OSScheduler::earlyInit();
+  OSScheduler::earlyInit();
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
-  }
+}
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMILLIS)
 
-void OS::busyWaitMillis(unsigned int n)
-  {
-    for (; n--;)
-      {
-        int i;
-        // calibrate from OSC
-        for (i = (OS_CFGLONG_CPU_FREQUENCY_HZ / 10000 * OS_CFGINT_BUSYWAIT_CALIBRATION / 10000); i--;)
-          {
-            OSCPU::nop();
-          }
-      }
-  }
+void
+OS::busyWaitMillis(unsigned int n)
+{
+  for (; n--;)
+    {
+      int i;
+      // calibrate from OSC
+      for (i = (OS_CFGLONG_CPU_FREQUENCY_HZ / 10000
+          * OS_CFGINT_BUSYWAIT_CALIBRATION / 10000); i--;)
+        {
+          OSCPU::nop();
+        }
+    }
+}
 
 #endif /* OS_INCLUDE_OS_BUSYWAITMILLIS */
 
@@ -263,7 +269,8 @@ OS::busyWaitMicros(unsigned int n)
 {
   int i;
   // calibrate from OSC
-  for (i = (OS_CFGLONG_CPU_FREQUENCY_HZ / 10000 * OS_CFGINT_BUSYWAIT_CALIBRATION / 10000 * n / 1000); i--;)
+  for (i = (OS_CFGLONG_CPU_FREQUENCY_HZ / 10000
+      * OS_CFGINT_BUSYWAIT_CALIBRATION / 10000 * n / 1000); i--;)
     {
       OSCPU::nop();
     }
@@ -274,27 +281,30 @@ OS::busyWaitMicros(unsigned int n)
 // ----------------------------------------------------------------------------
 // default main. may be redefined by application
 
-int main()
-  {
+int
+main()
+{
 #if defined(DEBUG)
-    OSDeviceDebug::putNewLine();
-    OSDeviceDebug::putString_P(PSTR("main()"));
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("main()"));
+  OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
-    // tasks were created and registered by class constructors
-    OSScheduler::start();
+  // tasks were created and registered by class constructors
+  OSScheduler::start();
 #else
-    OS::main();
+  OS::main();
 #endif /*OS_EXCLUDE_MULTITASKING*/
 
-    //no return
-  }
+  //no return
+}
 
 // ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_NEW_DELETE)
+
+#warning "malloc() and free() are not thread safe!"
 
 void *operator
 new( unsigned int n )
@@ -310,33 +320,36 @@ delete( void *p )
 
 #else
 
-void operator
+void
+operator
 delete(void *p __attribute__( ( unused ) ) )
-  {
+{
 #if defined(DEBUG)
-    ; // dummy, refered by virtual destructors
-    OSDeviceDebug::putString_P(PSTR("delete("));
-#if (__SIZEOF_POINTER__ == 2)
-    OSDeviceDebug::putPtr(p);
-#endif
-    OSDeviceDebug::putChar(')');
-    OSDeviceDebug::putNewLine();
+  ; // dummy, refered by virtual destructors
+  OSDeviceDebug::putString_P(PSTR("delete("));
+  //#if (__SIZEOF_POINTER__ == 2)
+  OSDeviceDebug::putPtr(p);
+  //#endif
+  OSDeviceDebug::putChar(')');
+  OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
-  }
+}
 
-#endif /*OS_INCLUDE_NEW_DELETE*/
+#endif /* OS_INCLUDE_NEW_DELETE */
 
 // ----------------------------------------------------------------------------
 
 // Nothing smart to do, normally should never be called, just a reference.
 // Without it here we risk the linker will add a lot of useless stuff from
 // the standard C++ library.
-extern "C" void __cxa_pure_virtual(void);
+extern "C" void
+__cxa_pure_virtual(void);
 
-void __cxa_pure_virtual(void)
-  {
+void
+__cxa_pure_virtual(void)
+{
 #if defined(DEBUG)
-    OSDeviceDebug::putString_P(PSTR("Pure Virtual"));
-    OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("Pure Virtual"));
+  OSDeviceDebug::putNewLine();
 #endif
-  }
+}
