@@ -13,7 +13,7 @@
 #include <string.h>
 
 // C++ style constructor, run taskMain
-OSTask::OSTask(const char *pName, const OSStack_t *pStack,
+OSTask::OSTask(const char* pName, const OSStack_t* pStack,
     unsigned short stackSize, OSTaskPriority_t priority)
 {
   OSTask::init(pName, (OSTaskMainPtr_t) &OSTask::staticMain, this, pStack,
@@ -21,8 +21,8 @@ OSTask::OSTask(const char *pName, const OSStack_t *pStack,
 }
 
 // C style constructor, run any function
-OSTask::OSTask(const char *pName, OSTaskMainPtr_t entryPoint,
-    void *pParameters, const OSStack_t *pStack, unsigned short stackSize,
+OSTask::OSTask(const char* pName, OSTaskMainPtr_t entryPoint,
+    void* pParameters, const OSStack_t* pStack, unsigned short stackSize,
     OSTaskPriority_t priority)
 {
   OSTask::init(pName, entryPoint, pParameters, pStack, stackSize, priority);
@@ -68,7 +68,7 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
 
   m_pName = pName;
   m_entryPoint = entryPoint;
-  m_pStackBottom = (unsigned char *) pStack;
+  m_pStackBottom = (unsigned char*) pStack;
   m_stackSize = stackSize;
   m_staticPriority = priority;
   m_pParameters = pParameters;
@@ -77,9 +77,6 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
   m_eventWaitReturn = OSEventWaitReturn::OS_NONE;
   m_isSuspended = false;
   m_isWaiting = false;
-
-  //m_hasReturnValue = false;   // TODO: remove if no longer needed
-  //m_isPreempted = false;      // TODO: remove if no longer needed
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
   // by default, tasks will enter deep sleep
@@ -95,18 +92,19 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
 #endif
 
   // Register this task to the scheduler.
-  // The scheduler constructor should run first for this to work.
+  // The scheduler is already initialised at earlyInit() for this to work.
   m_id = OSScheduler::taskRegister(this);
 
   // Fill the stack with constant pattern (0x5A)
-  memset((void *) pStack, STACK_FILL_BYTE, stackSize);
+  memset((void*) pStack, STACK_FILL_BYTE, stackSize);
 
   // Initialise the stack so that a context restore will be performed
-  m_pStack = OSSchedulerImpl::stackInitialise((OSStack_t*) (&pStack[stackSize
-      / sizeof(OSStack_t) - 1]), entryPoint, pParameters, m_id);
+  m_pStack = OSSchedulerImpl::stackInitialise(
+      (OSStack_t*) (&pStack[stackSize / sizeof(OSStack_t) - 1]), entryPoint,
+      pParameters, m_id);
 
-  // pStack points to first register on arm and
-  // to byte before first register on AVR8
+  // pStack points to the first register on arm and
+  // to the byte before the first register on AVR8
 
 #if defined(DEBUG) && false
     {
@@ -116,24 +114,9 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
 #endif
 }
 
-#if false
-
-// The task should run forever, termination is not supported,
-// so the destructor is not needed.
-OSTask::~OSTask()
-  {
-#if defined(DEBUG)
-    OSDeviceDebug::putString_P(PSTR("~OSTask('"));
-    OSDeviceDebug::putString(m_pName);
-    OSDeviceDebug::putString("')");
-    OSDeviceDebug::putNewLine();
-#endif
-  }
-#endif
-
 // Redirect to virtual function
 void
-OSTask::staticMain(OSTask * pt)
+OSTask::staticMain(OSTask* pt)
 {
   pt->taskMain();
 
@@ -151,6 +134,7 @@ OSTask::yield()
 {
   OSSchedulerImpl::yield();
 }
+
 // Should be overridden by actual implementation
 void
 OSTask::taskMain(void)
@@ -160,7 +144,7 @@ OSTask::taskMain(void)
     ;
 }
 
-// Suspend the task and remove from ready list.
+// Suspend the task and remove from the ready list.
 void
 OSTask::suspend(void)
 {
@@ -172,7 +156,7 @@ OSTask::suspend(void)
   OSCriticalSection::exit();
 }
 
-// Resume the task and insert into ready list.
+// Resume the task and insert into the ready list.
 void
 OSTask::resume(void)
 {
@@ -182,52 +166,6 @@ OSTask::resume(void)
       OSActiveTasks::insert(this);
     }
   OSCriticalSection::exit();
-}
-
-char const *
-OSTask::getName(void)
-{
-  return m_pName;
-}
-
-unsigned char *
-OSTask::getStackBottom(void)
-{
-  return m_pStackBottom;
-}
-
-OSStack_t *
-OSTask::getStack(void)
-{
-  return m_pStack;
-}
-
-unsigned short
-OSTask::getStackSize(void)
-{
-  return m_stackSize;
-}
-
-// since all registers are saved on the task stack,
-// the 'context' in simply a pointer to the stack (the address below
-// the deepest register pushed; for offsets to registers please see
-// OSScheduler::stackInitialise()).
-void *
-OSTask::getContext(void)
-{
-  return (void *) &m_pStack;
-}
-
-void
-OSTask::setPriority(OSTaskPriority_t priority)
-{
-  m_staticPriority = priority;
-}
-
-void
-OSTask::setEvent(OSEvent_t event)
-{
-  m_event = event;
 }
 
 #if defined(OS_INCLUDE_OSTASK_GETSTACKUSED)
@@ -248,13 +186,7 @@ OSTask::getStackUsed(void)
   return r;
 }
 
-#endif
-
-int
-OSTask::getID(void)
-{
-  return m_id;
-}
+#endif /* defined(OS_INCLUDE_OSTASK_GETSTACKUSED) */
 
 #if defined(OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER)
 
@@ -273,44 +205,6 @@ OSProgramPtr_t OSTask::getProgramCounter(void)
 #else
 #error "implement it in a portable way, this is avr8 only"
 #endif /* defined(OS_CONFIG_ARCH_AVR8) */
-
-#endif
-
-OSEvent_t
-OSTask::getEvent(void)
-{
-  return m_event;
-}
-
-OSTaskPriority_t
-OSTask::getPriority(void)
-{
-  return m_staticPriority;
-}
-
-bool
-OSTask::isSuspended(void)
-{
-  return m_isSuspended;
-}
-
-bool
-OSTask::isWaiting(void)
-{
-  return m_isWaiting;
-}
-
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
-
-bool OSTask::isDeepSleepAllowed(void)
-  {
-    return m_allowSleep;
-  }
-
-void OSTask::setAllowSleep(bool b)
-  {
-    m_allowSleep = b;
-  }
 
 #endif
 
@@ -343,7 +237,7 @@ void OSTask::virtualWatchdogCheck(void)
             OSDeviceDebug::putDec(getStackUsed());
             OSDeviceDebug::putChar('/');
             OSDeviceDebug::putDec(getStackSize());
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_GETSTACKUSED) */
             OSDeviceDebug::putNewLine();
 #endif
 
@@ -369,7 +263,7 @@ OSTask::schedulerTick( void )
     return;
   }
 
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) */
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
 
@@ -388,19 +282,7 @@ void OSTask::requestInterruption(void)
 #endif
   }
 
-bool
-OSTask::isInterrupted(void)
-  {
-    return m_isInterrupted;
-  }
-
-void
-OSTask::setInterruption(bool flag)
-  {
-    m_isInterrupted = flag;
-  }
-
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
 
 int
 OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
@@ -411,14 +293,15 @@ OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
   int ret;
   ret = 0;
 
-#if defined (OSTASK_NOTIFY_MEASURE)
+#if defined(OS_INCLUDE_OSTASK_NOTIFY_MEASURE)
   OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_APP_CONFIG_LED3);
-#endif
-#if defined (OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL)
-  OSScheduler::realTimeCriticalEnter();
-#else
+#endif /* defined(OS_INCLUDE_OSTASK_NOTIFY_MEASURE) */
+
+#if defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL)
+  OSRealTimeCriticalSection::enter();
+#else /* !defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
   OSCriticalSection::enter();
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
     {
       // not-suspended waiting tasks are notified
       if ((m_isWaiting) && (!m_isSuspended))
@@ -444,32 +327,43 @@ OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
             }
         }
     }
+#if defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL)
+  OSRealTimeCriticalSection::exit();
+#else /* !defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
   OSCriticalSection::exit();
+#endif /* defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
 
-#if defined (OSTASK_NOTIFY_MEASURE)
+#if defined(OS_INCLUDE_OSTASK_NOTIFY_MEASURE)
   OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_APP_CONFIG_LED3);
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_NOTIFY_MEASURE) */
 
   // return the number of notified tasks
   return ret;
 }
 
+// Runs in a critical section
 bool
 OSTask::eventWaitPrepare(OSEvent_t event)
 {
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
 
+  // Do not wait if the task is interrupted
   if (m_isInterrupted)
     {
       setEventWaitReturn(OSEventWaitReturn::OS_CANCELED);
       return false;
     }
+
 #endif
+
+  // Do not wait if the scheduler is locked
   if (OSSchedulerLock::isSet())
     {
       setEventWaitReturn(OSEventWaitReturn::OS_LOCKED);
       return false;
     }
+
+  // Do not wait if the event is NONE
   if (event == OSEvent::OS_NONE)
     {
       // if no event, return NONE
@@ -477,11 +371,11 @@ OSTask::eventWaitPrepare(OSEvent_t event)
       return false;
     }
 
-  // mark the task is waiting on the given event
+  // Mark that the task is waiting on the given event
   m_event = event;
   m_isWaiting = true;
 
-  // allow yield()
+  // Later this response will allow yield()
   return true;
 }
 

@@ -40,10 +40,6 @@ public:
       const OSStack_t *pStack, unsigned short stackSize,
       OSTaskPriority_t priority = OSTask::DEFAULT_PRIORITY);
 
-#if false
-  virtual ~OSTask();
-#endif
-
   // Main function task.
   // Overridden by actual implementation.
   virtual void
@@ -168,8 +164,8 @@ public:
 
   // Wake up this task if it waits for the given event.
   int
-  eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
-      OSEventWaitReturn::OS_VOID);
+  eventNotify(OSEvent_t event,
+      OSEventWaitReturn_t ret = OSEventWaitReturn::OS_VOID);
 
   // Retrieve the value returned by the last eventWait()
   OSEventWaitReturn_t
@@ -292,5 +288,115 @@ OSTask::eventWaitClear(void)
   m_isWaiting = false;
   m_event = OSEvent::OS_NONE; // no longer wait for it
 }
+
+// ---
+
+inline char const *
+OSTask::getName(void)
+{
+  return m_pName;
+}
+
+inline unsigned char *
+OSTask::getStackBottom(void)
+{
+  return m_pStackBottom;
+}
+
+inline OSStack_t *
+OSTask::getStack(void)
+{
+  return m_pStack;
+}
+
+inline unsigned short
+OSTask::getStackSize(void)
+{
+  return m_stackSize;
+}
+
+// since all registers are saved on the task stack,
+// the 'context' in simply a pointer to the stack (the address below
+// the deepest register pushed; for offsets to registers please see
+// OSScheduler::stackInitialise()).
+inline void *
+OSTask::getContext(void)
+{
+  return (void *) &m_pStack;
+}
+
+inline void
+OSTask::setPriority(OSTaskPriority_t priority)
+{
+  m_staticPriority = priority;
+}
+
+inline void
+OSTask::setEvent(OSEvent_t event)
+{
+  m_event = event;
+}
+
+inline int
+OSTask::getID(void)
+{
+  return m_id;
+}
+
+inline OSEvent_t
+OSTask::getEvent(void)
+{
+  return m_event;
+}
+
+inline OSTaskPriority_t
+OSTask::getPriority(void)
+{
+  return m_staticPriority;
+}
+
+inline bool
+OSTask::isSuspended(void)
+{
+  return m_isSuspended;
+}
+
+inline bool
+OSTask::isWaiting(void)
+{
+  return m_isWaiting;
+}
+
+#if defined(OS_INCLUDE_OSTASK_SLEEP)
+
+inline bool
+OSTask::isDeepSleepAllowed(void)
+  {
+    return m_allowSleep;
+  }
+
+inline void
+OSTask::setAllowSleep(bool b)
+  {
+    m_allowSleep = b;
+  }
+
+#endif /* defined(OS_INCLUDE_OSTASK_SLEEP) */
+
+#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+
+inline bool
+OSTask::isInterrupted(void)
+  {
+    return m_isInterrupted;
+  }
+
+inline void
+OSTask::setInterruption(bool flag)
+  {
+    m_isInterrupted = flag;
+  }
+
+#endif /* defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
 
 #endif /* OSTASK_H_ */
