@@ -21,9 +21,12 @@
 #define OS_INCLUDE_OSTIMERSECONDS                       (1)
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
-//#define OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR               (1)
+//#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
 
-#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
+#define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK                          (1)
+
+//#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
+#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 #define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
@@ -40,7 +43,6 @@
 #define OS_INCLUDE_OSTREAM                              1
 #define OS_INCLUDE_OSTREAM_OSTASK                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
-
 
 #define OS_TEST_PHASE 2
 
