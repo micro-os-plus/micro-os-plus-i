@@ -49,12 +49,7 @@ public:
   isSet(void) __attribute__((always_inline));
 
 private:
-#if !defined(OS_EXCLUDE_STACK_USAGE)
-  // true if the scheduler is locked, i.e. yield will return to same task
-  static bool volatile ms_isLocked;
-#else /* defined(OS_EXCLUDE_STACK_USAGE) */
-  static unsigned char volatile ms_lockDepth;
-#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
+  static unsigned char volatile ms_nestingLevel;
 
   char m_dummy;
 };
@@ -68,11 +63,31 @@ public:
   OSCriticalSection();
 #endif
 
-  // Pair of functions, using a stack to save/restore value
+  // Pair of functions to enable disable interrupts
+
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+
+  // Inlines using a stack to save/restore the interrupt status.
+
   static void
   enter(void) __attribute__((always_inline));
+
   static void
   exit(void) __attribute__((always_inline));
+
+#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+
+  // Regular functions using a nesting counter.
+
+  static void
+  enter(void);
+
+  static void
+  exit(void);
+
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+
+  static OSStack_t volatile ms_nestingLevel;
 
 private:
   char m_dummy;
@@ -103,26 +118,6 @@ public:
   static bool
   isRunning(void);
 
-#if false
-  // disable preemption.
-  // yield() will immediately return to the same task,
-  // and eventWait() will immediately return with OS_EVENT_WAIT_RETURN_LOCKED.
-  static void
-  lock(void);
-
-  // enable preemption
-  static void
-  unlock(void);
-
-  // check if the scheduler was locked
-  static bool
-  isLocked(void);
-
-  // Lock the scheduler if the flag is true, clear otherwise.
-  static void
-  setLock(bool flag);
-#endif
-
   // Return true if the scheduler runs in preemptive mode.
   inline static bool
   isPreemptive(void);
@@ -133,11 +128,11 @@ public:
   setPreemptive(bool flag);
 
   // Return a pointer to the task currently running on the CPU.
-  static OSTask *
+  static OSTask*
   getTaskCurrent(void);
 
   // returns the idle task
-  static OSTask *
+  static OSTask*
   getTaskIdle(void);
 
   // Return the number of tasks registered to the scheduler.
@@ -146,7 +141,7 @@ public:
 
   // Return the i-th task registered to the scheduler,
   // or NULL for illegal index or missing task.
-  static OSTask *
+  static OSTask*
   getTask(int i);
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
@@ -157,17 +152,6 @@ public:
   static void
   setAllowDeepSleep(bool flag);
 #endif
-
-  // enter a critical section, i.e. a section where interrupts are disabled.
-  inline static void
-  criticalEnter(void) __attribute__((always_inline));
-  // enter a real time critical section, i.e. a section where
-  // all interrupts are disabled.
-  inline static void
-  realTimeCriticalEnter(void) __attribute__((always_inline));
-  // exit from critical section.
-  inline static void
-  criticalExit(void) __attribute__((always_inline));
 
   // sleep until event occurs
   static OSEventWaitReturn_t
@@ -191,8 +175,8 @@ public:
 
   // wakeup all tasks waiting for event
   static int
-  eventNotify(OSEvent_t event, OSEventWaitReturn_t ret =
-      OSEventWaitReturn::OS_VOID);
+  eventNotify(OSEvent_t event,
+      OSEventWaitReturn_t ret = OSEventWaitReturn::OS_VOID);
 
   // Suspend the current task and reschedule the CPU to the next task.
   static void
@@ -212,7 +196,7 @@ public:
 
   // register a task to the scheduler
   static unsigned char
-  taskRegister(OSTask * pTask);
+  taskRegister(OSTask* pTask);
 
   // TODO: do we need this?
   static void
@@ -270,7 +254,9 @@ public:
 #endif
 
   // pointer to the active task (running task)
-  static OSTask *ms_pTaskRunning;
+  static OSTask* volatile ms_pTaskRunning;
+
+  static volatile OSStack_t** volatile ms_ppCurrentStack;
 
   friend class OSTimerTicks;
 
@@ -282,7 +268,7 @@ private:
 
   // set the idle task
   static void
-  setTaskIdle(OSTask *);
+  setTaskIdle(OSTask*);
 
   // TODO: remove if no longer needed
   //static void timerISR(void) __attribute__( ( naked ) );
@@ -300,7 +286,7 @@ private:
   //static bool ms_isLocked;
 
   // list of tasks registered to the scheduler
-  static OSTask *ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
+  static OSTask* ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
   // the number of tasks registered to the scheduler
   static unsigned char ms_tasksCount;
   //static unsigned char tasksIdx;
@@ -310,7 +296,7 @@ private:
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 
   // the Idle task
-  static OSTask *ms_pTaskIdle;
+  static OSTask* ms_pTaskIdle;
 
   // the ready list used for managing the runnable tasks
   static OSActiveTasks ms_activeTasks;
@@ -332,20 +318,16 @@ public:
 
   // starts the first task from the ready list
   static void
-  start(void) __attribute__( ( noreturn ) );
+  start(void) __attribute__((noreturn));
 
   // yield function
   inline static void
   yield(void) __attribute__((always_inline));
 
   // initialise the stack for a task
-  static OSStack_t *
-  stackInitialise(OSStack_t * pStackTop, void
-  (*entryPoint)(void *), void *pParams, unsigned char id);
-
-  // TODO: remove if no longer needed
-  //  static void
-  //  stackSetReturnedValue(OSStack_t * pStack, OSEventWaitReturn_t ret);
+  static OSStack_t*
+  stackInitialise(OSStack_t* pStackTop, void
+  (*entryPoint)(void*), void* pParams, unsigned char id);
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSWITCHREQUEST)
   static void
@@ -357,7 +339,7 @@ public:
 
   // dump context info to the device debug
   static void
-  dumpContextInfo(OSTask *);
+  dumpContextInfo(OSTask*);
 
   // restore the context for the next task to be scheduled
   inline static void
@@ -381,6 +363,14 @@ public:
   inline static void
   registersRestore(void) __attribute__((always_inline));
 
+  // save the critical section nesting counter
+  inline static void
+  criticalSectionNestingSave(void) __attribute__((always_inline));
+
+  // restore the critical section nesting counter
+  inline static void
+  criticalSectionNestingRestore(void) __attribute__((always_inline));
+
   // check if the context switch can be done. The context
   // switch cannot be done if the current context is a nested interrupt.
   // In order to check this, the SR register saved on stack is verified
@@ -403,13 +393,13 @@ public:
 
   // insert task in ready list
   static void
-  insert(OSTask * pTask);
+  insert(OSTask* pTask);
   // delete task from ready list
   static void
-  remove(OSTask * pTask);
+  remove(OSTask* pTask);
 
   // returns the first task from ready list (task with higher priority)
-  inline static OSTask *
+  inline static OSTask*
   getTop(void);
   // returns the number of the tasks from ready list
   inline static unsigned char
@@ -425,12 +415,12 @@ public:
 private:
   // find if pTask is in the ready tasks array
   static int
-  find(OSTask * pTask);
+  find(OSTask* pTask);
 
   // members
 
   // array of ready tasks
-  static OSTask *ms_array[];
+  static OSTask* ms_array[];
   // number of ready tasks (ready to run) in ms_array
   static unsigned char ms_count;
 };
@@ -442,17 +432,14 @@ OSSchedulerLock::set(bool flag)
 {
   bool b;
   b = isSet();
-#if !defined(OS_EXCLUDE_STACK_USAGE)
-  ms_isLocked = flag;
-#else /* defined(OS_EXCLUDE_STACK_USAGE) */
-  ms_lockDepth = (flag ? 1 : 0);
-#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
+  ms_nestingLevel = (flag ? 1 : 0);
 
-  #if defined(DEBUG) && false
+#if defined(DEBUG) && false
   OSDeviceDebug::putString("lock set(");
   OSDeviceDebug::putString(flag? "T": "F");
   OSDeviceDebug::putString(") ");
 #endif
+
   return b;
 }
 
@@ -461,11 +448,7 @@ OSSchedulerLock::clear(void)
 {
   bool b;
   b = isSet();
-#if !defined(OS_EXCLUDE_STACK_USAGE)
-  ms_isLocked = false;
-#else /* defined(OS_EXCLUDE_STACK_USAGE) */
-  ms_lockDepth = 0;
-#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
+  ms_nestingLevel = 0;
 
 #if defined(DEBUG) && false
   OSDeviceDebug::putString("lock clear() ");
@@ -476,35 +459,38 @@ OSSchedulerLock::clear(void)
 inline bool
 OSSchedulerLock::isSet(void)
 {
-#if !defined(OS_EXCLUDE_STACK_USAGE)
-  return ms_isLocked;
-#else /* defined(OS_EXCLUDE_STACK_USAGE) */
-  return (ms_lockDepth != 0);
-#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
+  return (ms_nestingLevel != 0);
 }
 
 inline void
 OSSchedulerLock::enter(void)
 {
-#if !defined(OS_EXCLUDE_STACK_USAGE)
-  OSCPUImpl::stackPush(ms_isLocked);
-  ms_isLocked = true;
-#else /* defined(OS_EXCLUDE_STACK_USAGE) */
-  ++ms_lockDepth;
-#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
+  ++ms_nestingLevel;
 }
 
 inline void
 OSSchedulerLock::exit(void)
 {
-#if !defined(OS_EXCLUDE_STACK_USAGE)
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) && false
   ms_isLocked = OSCPUImpl::stackPop();
-#else /* defined(OS_EXCLUDE_STACK_USAGE) */
-  --ms_lockDepth;
-#endif /* !defined(OS_EXCLUDE_STACK_USAGE) */
+#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+  --ms_nestingLevel;
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 }
 
 // ============================================================================
+
+inline OSTask *
+OSActiveTasks::getTop(void)
+{
+  return ms_array[0];
+}
+
+// ============================================================================
+
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+
+// When we can use the stack, the enter()/exit() calls are inlined
 
 inline void
 OSCriticalSection::enter(void)
@@ -513,12 +499,13 @@ OSCriticalSection::enter(void)
 
   tmp = OSCPUImpl::getInterruptsMask();
   OSCPUImpl::stackPush(tmp);
-#if defined(OS_INCLUDE_OSCRITICALSECTION_ENTER_WITH_MASK)
+
+#if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
   tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
   OSCPUImpl::setInterruptsMask(tmp);
-#else
+#else /* !defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
   OSCPUImpl::interruptsDisable();
-#endif
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
 }
 
 inline void
@@ -529,6 +516,8 @@ OSCriticalSection::exit(void)
   tmp = OSCPUImpl::stackPop();
   OSCPUImpl::setInterruptsMask(tmp);
 }
+
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 
 // ============================================================================
 
@@ -582,6 +571,7 @@ OSScheduler::getTasksCount(void)
   return ms_tasksCount;
 }
 
+// Runs in a critical section
 inline bool
 OSScheduler::eventWaitPrepare(OSEvent_t event)
 {
@@ -651,6 +641,7 @@ OSScheduler::interruptEnter(void)
 {
   OSSchedulerImpl::registersSave();
   OSScheduler::ISR_ledActiveOn();
+  OSSchedulerImpl::criticalSectionNestingSave();
 
 #if !defined(OS_EXCLUDE_PREEMPTION)
 
@@ -678,6 +669,7 @@ OSScheduler::interruptExit(void)
 
 #endif
 
+  OSSchedulerImpl::criticalSectionNestingRestore();
   OSSchedulerImpl::registersRestore();
   OSCPUImpl::returnFromInterrupt();
 
@@ -754,12 +746,6 @@ OSScheduler::ledActiveOff(void)
 #endif /* ! OS_EXCLUDE_OSSCHEDULER_LED_ACTIVE */
 
 // ============================================================================
-
-inline OSTask *
-OSActiveTasks::getTop(void)
-{
-  return ms_array[0];
-}
 
 inline unsigned char
 OSActiveTasks::getCount(void)
