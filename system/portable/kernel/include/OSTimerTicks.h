@@ -62,17 +62,17 @@ inline OSTimerTicks_t OSTimerTicks::microsToTicks(unsigned short micros)
 inline  void OSTimerTicks::interruptContextHandler(void)
 {
   // the current interrupt level disabled in here
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
   OSScheduler::interruptEnter();
 #else
   OSScheduler::ISR_ledActiveOn();
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
     {
       OSScheduler::timerTicks.interruptServiceRoutine();
     }
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
   OSScheduler::interruptExit();
-#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
   // the current interrupt level enabled after this point
 }
 
