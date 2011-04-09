@@ -21,22 +21,24 @@
 
 #define COUNT_IRQ_NUM               0
 
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
 __attribute__((naked))
 #else
 __attribute__((interrupt))
-#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)*/
+#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)*/
 void
 SysTick_contextHandler(void);
 
+#if false
 __attribute__((noinline)) void
 SysTick_interruptServiceRoutine();
+#endif
 
-#if !defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION)
 __attribute__((naked))
 #else
 __attribute__((interrupt))
-#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)*/
+#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION)*/
 void
 SysSeconds_contextHandler(void);
 
@@ -133,60 +135,22 @@ OSTimerTicks::implInit(void)
 #endif /*defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER)*/
 }
 
-#if defined(OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION)
-
-void
-SysTick_contextHandler(void)
-  {
-#if true
-    OSSchedulerImpl::registersSave();
-    if (OSSchedulerImpl::isContextSwitchAllowed())
-      {
-        OSSchedulerImpl::stackPointerSave();
-      }
-    else
-    OSCPU::nop();
-#endif
-    OS_CFGVAR_TIMER.channel[OS_CFGINT_TIMER_CHANNEL].sr;
-
-    OSScheduler::timerTicks.interruptServiceRoutine();
-#if true
-    if (OSSchedulerImpl::isContextSwitchAllowed())
-      {
-#if true
-        if (OSScheduler::isContextSwitchRequired())
-          {
-            OSScheduler::performContextSwitch();
-          }
-#endif
-        OSSchedulerImpl::stackPointerRestore();
-      }
-    else
-    OSCPU::nop();
-    OSSchedulerImpl::registersRestore();
-
-    OSCPU::returnFromInterrupt();
-#endif
-
-  }
-
-#else
 
 void
 SysTick_contextHandler(void)
 {
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
   OSScheduler::interruptEnter();
-#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)*/
+#else
+  OSScheduler::ISR_ledActiveOn();
+#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)*/
     {
       OSScheduler::timerTicks.interruptServiceRoutine();
     }
-#if !defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
   OSScheduler::interruptExit();
-#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR)*/
+#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)*/
 }
-
-#endif /*defined(OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION)*/
 
 void
 OSTimerTicks::implAcknowledgeInterrupt(void)
@@ -247,15 +211,17 @@ OSTimerSeconds::implAcknowledgeInterrupt(void)
 void
 SysSeconds_contextHandler(void)
   {
-#if !defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION)
     OSScheduler::interruptEnter();
-#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR) */
+#else
+    OSScheduler::ISR_ledActiveOn();
+#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION) */
       {
         OSScheduler::timerSeconds.interruptServiceRoutine();
       }
-#if !defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR)
+#if !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION)
     OSScheduler::interruptExit();
-#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_NAKED_ISR) */
+#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION) */
   }
 #endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
 
