@@ -92,36 +92,36 @@ OSCriticalSection::OSCriticalSection()
 // the usual routines to enter()/exit() critical sections.
 void
 OSCriticalSection::enter(void)
-{
+  {
 #if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
-  register OSStack_t tmp;
+    register OSStack_t tmp;
 
-  tmp = OSCPUImpl::getInterruptsMask();
-  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
-  OSCPUImpl::setInterruptsMask(tmp);
+    tmp = OSCPUImpl::getInterruptsMask();
+    tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
+    OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-  OSCPUImpl::interruptsDisable();
+    OSCPUImpl::interruptsDisable();
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
 
-  ++ms_nestingLevel;
-}
+    ++ms_nestingLevel;
+  }
 
 void
 OSCriticalSection::exit(void)
-{
-  if ((ms_nestingLevel > 0) && (--ms_nestingLevel == 0))
-    {
+  {
+    if ((ms_nestingLevel > 0) && (--ms_nestingLevel == 0))
+      {
 #if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
-      register OSStack_t tmp;
+        register OSStack_t tmp;
 
-      tmp = OSCPUImpl::getInterruptsMask();
-      tmp &= ~(OS_CFGINT_OSCRITICALSECTION_MASK);
-      OSCPUImpl::setInterruptsMask(tmp);
+        tmp = OSCPUImpl::getInterruptsMask();
+        tmp &= ~(OS_CFGINT_OSCRITICALSECTION_MASK);
+        OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-      OSCPUImpl::interruptsEnable();
+        OSCPUImpl::interruptsEnable();
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-    }
-}
+      }
+  }
 
 #endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 
@@ -395,12 +395,15 @@ OSScheduler::performContextSwitch()
     {
       OSCriticalSection::enter();
         {
+          OSTask* pTask;
+          pTask = ms_pTaskRunning;
+
           // Remove the running task from the ready list
-          OSActiveTasks::remove(ms_pTaskRunning);
+          OSActiveTasks::remove(pTask);
 
           // Eventually reinsert it at the end of the list (round robin)
-          if (!ms_pTaskRunning->m_isSuspended && !ms_pTaskRunning->m_isWaiting)
-            OSActiveTasks::insert(ms_pTaskRunning);
+          if (!pTask->isSuspended() && !pTask->isWaiting())
+            OSActiveTasks::insert(pTask);
 
           // Select the running task from the top of the list
           ms_pTaskRunning = OSActiveTasks::getTop();
