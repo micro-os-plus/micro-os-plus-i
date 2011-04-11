@@ -57,16 +57,17 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
         {
 
 #if true
-          bool doYield;
+          bool doWait;
+          ret = OSEventWaitReturn::OS_FAILED;
           OSCriticalSection::enter();
             {
-              doYield = insert(ticks, event, OSEventWaitReturn::OS_VOID)
+              doWait = insert(ticks, event, OSEventWaitReturn::OS_VOID)
                   && OSScheduler::eventWaitPrepare(event);
             }
           OSCriticalSection::exit();
-          if (doYield)
+          if (doWait)
             {
-              OSSchedulerImpl::yield();
+              OSScheduler::eventWaitPerform();
             }
           ret = OSScheduler::getEventWaitReturn();
 #else
