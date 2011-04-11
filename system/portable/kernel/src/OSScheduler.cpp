@@ -406,9 +406,9 @@ OSScheduler::performContextSwitch()
             OSActiveTasks::insert(pTask);
 
           // Select the running task from the top of the list
-          ms_pTaskRunning = OSActiveTasks::getTop();
+          pTask = ms_pTaskRunning = OSActiveTasks::getTop();
           // Prepare the global variable with the pointer to the m_pStack.
-          ms_ppCurrentStack = (volatile OSStack_t**) &ms_pTaskRunning->m_pStack;
+          ms_ppCurrentStack = (volatile OSStack_t**) &pTask->m_pStack;
         }
       OSCriticalSection::exit();
     }
@@ -466,7 +466,7 @@ OSScheduler::taskRegister(OSTask *pTask)
 #endif
         }
 
-      // initial tasks are inserted in ready list at start()
+      // Initial tasks are inserted in the ready list at start()
       // later tasks should be inserted when constructed
       if (id != 0xFF && ms_isRunning)
         OSActiveTasks::insert(pTask); // insert task in ready list
