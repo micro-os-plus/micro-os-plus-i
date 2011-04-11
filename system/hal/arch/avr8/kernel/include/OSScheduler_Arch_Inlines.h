@@ -7,7 +7,7 @@
 #ifndef HAL_OSSCHEDULER_ARCH_INLINES_H_
 #define HAL_OSSCHEDULER_ARCH_INLINES_H_
 
-//------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 /*
  * Code to save the current task 'context' on the task control block.
@@ -147,15 +147,15 @@ OSSchedulerImpl::stackPointerSave(void)
   {
     asm volatile
     (
-        " lds   r26, OSScheduler::ms_ppCurrentStack \n"
-        " lds   r27, OSScheduler::ms_ppCurrentStack+1 \n"
+        " lds   r26, %[pTCB] \n"
+        " lds   r27, %[pTCB]+1 \n"
         " in    r0, __SP_L__ \n"
         " st    x+, r0 \n"
         " in    r0, __SP_H__ \n"
         " st    x+, r0 \n"
 
         :
-        :
+        : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         :
     );
   }
@@ -165,19 +165,20 @@ OSSchedulerImpl::stackPointerRestore(void)
   {
     asm volatile
     (
-        " lds   r26, OSScheduler::ms_ppCurrentStack \n"
-        " lds   r27, OSScheduler::ms_ppCurrentStack+1 \n"
+        " lds   r26, %[pTCB] \n"
+        " lds   r27, %[pTCB]+1 \n"
         " ld    r28, x+ \n"
         " out   __SP_L__, r28 \n"
         " ld    r29, x+ \n"
         " out   __SP_H__, r29 \n"
 
         :
-        :
+        : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         :
     );
   }
 
+#if false
 /*
  * Critical section management.
  *
@@ -187,7 +188,7 @@ OSSchedulerImpl::stackPointerRestore(void)
  * stack as temporary storage should be safe.
  */
 inline void
-OSScheduler::criticalEnter(void)
+OSCriticalSection::enter(void)
   {
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
@@ -209,7 +210,7 @@ OSScheduler::criticalEnter(void)
  * Pop SREG from the stack, restore interrupts to previous status
  */
 inline void
-OSScheduler::criticalExit(void)
+OSCriticalSection::exit(void)
   {
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
@@ -225,5 +226,21 @@ OSScheduler::criticalExit(void)
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
+
+#endif
+
+// save the critical section nesting counter
+inline  void
+OSSchedulerImpl::criticalSectionNestingSave(void)
+{
+  ;
+}
+
+// restore the critical section nesting counter
+inline void
+OSSchedulerImpl::criticalSectionNestingRestore(void)
+{
+  ;
+}
 
 #endif /* HAL_OSSCHEDULER_ARCH_INLINES_H_ */
