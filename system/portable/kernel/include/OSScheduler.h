@@ -67,7 +67,7 @@ public:
 
 #if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
 
-  // Inlines using a stack to save/restore the interrupt status.
+  // Inlines using the stack to save/restore the interrupt status.
 
   static void
   enter(void) __attribute__((always_inline));
@@ -77,7 +77,7 @@ public:
 
 #else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 
-  // Regular functions using a nesting counter.
+  // Regular functions, using a nesting counter.
 
   static void
   enter(void);
