@@ -83,12 +83,17 @@ TaskCli::taskMain(void)
 #else
       dev.writeByte('\n');
       dev.writeByte('\r');
+#if false
       for (const char* p = greeting; *p; ++p)
-        dev.writeByte(*p);
-
+      dev.writeByte(*p);
+#else
+      unsigned char p[] = "Write Bytes";
+      dev.writeBytes(p, 11);
+#endif
       dev.writeByte('\n');
       dev.writeByte('\r');
 #endif
+      dev.flush();
       for (; dev.isConnected();)
         {
 #if !defined(APP_EXCLUDE_TASKCLI_TASKMAIN_CLI)
@@ -119,24 +124,28 @@ TaskCli::taskMain(void)
             }
           lineProcess();
 #else
-          int c;
+          int c, n, i;
+          unsigned char
+              pB[OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_RXBUF_ARRAY_SIZE];
 #if true
-          dev.setReadMatchArray((unsigned char*)"1");
+          dev.setReadMatchArray((unsigned char*) "1");
           c = dev.readByte();
-          while ((c != '1') && (c >= 0))
-            {
-              dev.writeByte(c);
-              dev.flush();
-              c = dev.readByte();
-            }
           if (c < 0)
             clog << "error -" << dec << (int) (-c) << endl;
           else
             dev.writeByte(c);
           dev.flush();
-
+          n = dev.availableRead();
+          for (i = 0; i < n; i++)
+            {
+              c = dev.readByte();
+              pB[i] = c;
+            }
+          dev.writeBytes(pB, n);
+          dev.flush();
 #else
           c = dev.readByte();
+          debug.putChar(c);
           if(c>=0)
           dev.writeByte(c);
           else
