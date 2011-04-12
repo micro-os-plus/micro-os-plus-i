@@ -76,21 +76,21 @@ CircularByteBuffer::put(unsigned char c)
 
 // return the actual number of bytes, if not enough space for all
 unsigned short
-CircularByteBuffer::putBytes(unsigned char* pBuf, unsigned short count)
+CircularByteBuffer::putBytes(const unsigned char* pBuf, unsigned short count)
 {
   unsigned short endSz, sz;
 
   sz = count;
-  if(count > (m_sz - m_len))
+  if (count > (m_sz - m_len))
     sz = m_sz - m_len;
 
-  endSz = (unsigned short) (m_pPut - m_pBuf);
-  if(endSz >= sz)
+  endSz = (unsigned short) (m_sz - (m_pPut - m_pBuf));
+  if (endSz >= sz)
     {
       memcpy(m_pPut, pBuf, sz);
       m_pPut += sz;
       if ((unsigned short) (m_pPut - m_pBuf) >= m_sz)
-         m_pPut = m_pBuf;
+        m_pPut = m_pBuf;
       m_len += sz;
     }
   else

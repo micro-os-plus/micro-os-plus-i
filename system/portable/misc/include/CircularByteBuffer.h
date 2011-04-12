@@ -29,7 +29,7 @@ public:
   get(void);
 
   unsigned short
-  putBytes(unsigned char* pBuf, unsigned short count);
+  putBytes(const unsigned char* pBuf, unsigned short count);
 
   bool
   isEmpty(void);
