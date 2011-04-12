@@ -330,6 +330,119 @@ OSDeviceCharacter::writeByte(unsigned char b)
 }
 
 int
+OSDeviceCharacter::writeBytes(unsigned char* buf, int len)
+{
+
+  if (!m_isOpened)
+    return OSReturn::OS_NOT_OPENED;
+
+  bool canWrite;
+  int i;
+  i = 0;
+  for (;;)
+    {
+      bool doWait;
+      doWait = false;
+      OSEvent_t event;
+      OSCriticalSection::enter();
+        {
+          canWrite = implCanWrite() || !implIsConnected();
+          if (!canWrite)
+            {
+              event = getWriteEvent();
+              // Must be done in critical section
+              doWait = OSScheduler::eventWaitPrepare(event);
+            }
+        }
+      OSCriticalSection::exit();
+
+      if (canWrite)
+        {
+          i += implWriteBytes(buf + i, len - i);
+          if (i == len)
+            break;
+        }
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
+      OSTimerTicks_t timeout;
+      timeout = getWriteTimeout();
+
+      if (timeout == OSTimeout::OS_IMMEDIATELY)
+        {
+#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE)
+          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeByte() would block"));
+          OSDeviceDebug::putNewLine();
+#endif
+          OSScheduler::eventWaitClear();
+          return OSReturn::OS_WOULD_BLOCK;
+        }
+#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
+      if (timeout != OSTimeout::OS_NEVER)
+        {
+          m_pWriteTimer->eventNotify(timeout, event,
+              OSEventWaitReturn::OS_TIMEOUT);
+        }
+#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+
+#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE)
+      OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeByte() wait "));
+      OSDeviceDebug::putHex((unsigned short)event);
+      OSDeviceDebug::putNewLine();
+#endif
+      if (doWait)
+        OSScheduler::eventWaitPerform();
+
+      OSEventWaitReturn_t ret;
+      ret = OSScheduler::getEventWaitReturn();
+      //OSDeviceDebug::putHex((unsigned short)ret);
+      //OSDeviceDebug::putNewLine();
+
+      if (ret == OSEventWaitReturn::OS_TIMEOUT)
+        {
+#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE)
+          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeByte() return timeout"));
+          OSDeviceDebug::putNewLine();
+#endif
+          return OSReturn::OS_TIMEOUT;
+        }
+      else
+        {
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
+          if (timeout != OSTimeout::OS_NEVER)
+            {
+              m_pWriteTimer->eventRemove(event);
+            }
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
+        }
+    }
+
+  if (!isConnected())
+    return OSReturn::OS_DISCONNECTED;
+
+#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE)
+  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeBytes() return"));
+  OSDeviceDebug::putNewLine();
+#endif
+  return i;
+}
+// TODO implWriteBytes() as default implementation
+int
+OSDeviceCharacter::implWriteBytes(const unsigned char* buf, int len)
+{
+  int i;
+
+  i = 0;
+  while (implCanWrite() && (i < len))
+    {
+      implWriteByte(buf[i]);
+      i++;
+    }
+  return i;
+}
+
+int
 OSDeviceCharacter::flush(void)
 {
   if (!m_isOpened)
@@ -470,11 +583,11 @@ OSDeviceCharacter::availableRead(void)
 }
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
-  void
-  OSDeviceCharacter::setReadMatchArray(unsigned char* match)
-  {
-    m_pReadMatchArray = match;
-  }
+void
+OSDeviceCharacter::setReadMatchArray(unsigned char* match)
+{
+  m_pReadMatchArray = match;
+}
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)

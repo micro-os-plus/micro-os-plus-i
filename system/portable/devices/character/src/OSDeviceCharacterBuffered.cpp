@@ -249,6 +249,24 @@ OSDeviceCharacterBuffered::implWriteByte(unsigned char b)
 }
 
 int
+OSDeviceCharacterBuffered::implWriteBytes(const unsigned char* buf, int len)
+{
+  int i;
+  OSCriticalSection::enter();
+    {
+      i = m_txBuf.putBytes(buf,len);
+
+      if (m_txBuf.isAboveHighWM())
+        {
+          implInterruptTxEnable(); // start transmission
+        }
+    }
+  OSCriticalSection::exit();
+
+  return i;
+}
+
+int
 OSDeviceCharacterBuffered::implFlush(void)
 {
 #if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_IMPLFLUSH)
