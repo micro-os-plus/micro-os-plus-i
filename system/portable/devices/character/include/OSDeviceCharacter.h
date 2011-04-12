@@ -23,7 +23,7 @@ deviceCharacterType_t;
 // TODO: methods for buffered read/write operations must be added.
 class OSDeviceCharacter
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
-: public streambuf
+    : public streambuf
 #endif
 
 {
@@ -212,6 +212,8 @@ private:
   implCanWrite(void) = 0;
   virtual int
   implWriteByte(unsigned char b) = 0;
+  virtual int
+  implWriteBytes(const unsigned char* buf, int len);
 
   virtual int
   implFlush(void) = 0;
@@ -236,10 +238,14 @@ private:
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
   // streambuf definitions
-  virtual int overflow(int c = traits::eof());
-  virtual int showmanyc();
-  virtual int underflow();
-  virtual int sync();
+  virtual int
+  overflow(int c = traits::eof());
+  virtual int
+  showmanyc();
+  virtual int
+  underflow();
+  virtual int
+  sync();
 #endif
 
 };
@@ -262,7 +268,7 @@ OSDeviceCharacter::getOpenEvent(void)
 inline void
 OSDeviceCharacter::setBaudRate(unsigned long baud)
 {
- m_baudRate = baud;
+  m_baudRate = baud;
 }
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
 
@@ -292,65 +298,77 @@ OSDeviceCharacter::getWriteEvent(void)
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
 
-inline void OSDeviceCharacter::setOpenTimeout(OSTimerTicks_t t)
-  {
-    m_openTimeout = t;
-  }
+inline void
+OSDeviceCharacter::setOpenTimeout(OSTimerTicks_t t)
+{
+  m_openTimeout = t;
+}
 
-inline OSTimerTicks_t OSDeviceCharacter::getOpenTimeout(void)
-  {
-    return m_openTimeout;
-  }
+inline OSTimerTicks_t
+OSDeviceCharacter::getOpenTimeout(void)
+{
+  return m_openTimeout;
+}
 
-inline void OSDeviceCharacter::setReadTimeout(OSTimerTicks_t t)
-  {
-    m_readTimeout = t;
-  }
+inline void
+OSDeviceCharacter::setReadTimeout(OSTimerTicks_t t)
+{
+  m_readTimeout = t;
+}
 
-inline OSTimerTicks_t OSDeviceCharacter::getReadTimeout(void)
-  {
-    return m_readTimeout;
-  }
+inline OSTimerTicks_t
+OSDeviceCharacter::getReadTimeout(void)
+{
+  return m_readTimeout;
+}
 
-inline void OSDeviceCharacter::setWriteTimeout(OSTimerTicks_t t)
-  {
-    m_writeTimeout = t;
-  }
+inline void
+OSDeviceCharacter::setWriteTimeout(OSTimerTicks_t t)
+{
+  m_writeTimeout = t;
+}
 
-inline OSTimerTicks_t OSDeviceCharacter::getWriteTimeout(void)
-  {
-    return m_writeTimeout;
-  }
+inline OSTimerTicks_t
+OSDeviceCharacter::getWriteTimeout(void)
+{
+  return m_writeTimeout;
+}
 
-inline void OSDeviceCharacter::setOpenTimer(OSTimer *pTimer)
-  {
-    m_pOpenTimer = pTimer;
-  }
+inline void
+OSDeviceCharacter::setOpenTimer(OSTimer *pTimer)
+{
+  m_pOpenTimer = pTimer;
+}
 
-inline OSTimer *OSDeviceCharacter::getOpenTimer(void)
-  {
-    return m_pOpenTimer;
-  }
+inline OSTimer *
+OSDeviceCharacter::getOpenTimer(void)
+{
+  return m_pOpenTimer;
+}
 
-inline void OSDeviceCharacter::setReadTimer(OSTimer *pTimer)
-  {
-    m_pReadTimer = pTimer;
-  }
+inline void
+OSDeviceCharacter::setReadTimer(OSTimer *pTimer)
+{
+  m_pReadTimer = pTimer;
+}
 
-inline OSTimer *OSDeviceCharacter::getReadTimer(void)
-  {
-    return m_pReadTimer;
-  }
+inline OSTimer *
+OSDeviceCharacter::getReadTimer(void)
+{
+  return m_pReadTimer;
+}
 
-inline void OSDeviceCharacter::setWriteTimer(OSTimer *pTimer)
-  {
-    m_pWriteTimer = pTimer;
-  }
+inline void
+OSDeviceCharacter::setWriteTimer(OSTimer *pTimer)
+{
+  m_pWriteTimer = pTimer;
+}
 
-inline OSTimer *OSDeviceCharacter::getWriteTimer(void)
-  {
-    return m_pWriteTimer;
-  }
+inline OSTimer *
+OSDeviceCharacter::getWriteTimer(void)
+{
+  return m_pWriteTimer;
+}
 
 #endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
 

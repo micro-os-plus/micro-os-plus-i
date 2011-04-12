@@ -59,6 +59,8 @@ private:
   virtual int
   implWriteByte(unsigned char b);
   virtual int
+  implWriteBytes(const unsigned char* buf, int len);
+  virtual int
   implFlush(void);
 
   // port implementation routines

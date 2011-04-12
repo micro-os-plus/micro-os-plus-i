@@ -92,6 +92,8 @@ private:
   implGetWriteEvent(void);
   virtual int
   implWriteByte(unsigned char b);
+  virtual int
+  implWriteBytes(unsigned char* buf, int len);
 
   virtual int
   implFlush(void);
