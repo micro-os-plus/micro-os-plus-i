@@ -34,6 +34,8 @@ OSDeviceCharacter::OSDeviceCharacter()
   m_pReadMatchArray = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
+  m_countToRead = 0;
+
   // initialise events with default values
   // will be set to the implementation values at open
   m_readEvent = OSEvent::OS_NONE;
@@ -572,6 +574,156 @@ OSDeviceCharacter::readByte(void)
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
   return c;
+}
+
+// OSReturn::OS_NOT_OPENED
+// OSReturn::OS_WOULD_BLOCK
+// OSReturn::OS_TIMEOUT
+// OSReturn::OS_DISCONNECTED
+
+int
+OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
+{
+#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_READBYTE)
+  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte()"));
+  OSDeviceDebug::putNewLine();
+#endif
+
+  if (!m_isOpened)
+    {
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+      m_pReadMatchArray = 0;
+      *count = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+      return OSReturn::OS_NOT_OPENED;
+    }
+
+  int av;
+
+  av = implAvailableRead();
+  if (av >= bufSize)
+    {
+      *count = implReadBytes(pBuf, bufSize);
+      return OSReturn::OS_OK;
+    }
+
+  bool canRead;
+  for (;;)
+    {
+      bool doWait;
+      doWait = false;
+      OSEvent_t event;
+      OSCriticalSection::enter();
+        {
+          canRead = implCanRead() || !implIsConnected();
+          if (!canRead)
+            {
+              event = getReadEvent();
+              // Must be done in critical section
+              doWait = OSScheduler::eventWaitPrepare(event);
+            }
+        }
+      OSCriticalSection::exit();
+
+      if (canRead)
+        break;
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
+      OSTimerTicks_t timeout;
+      timeout = getReadTimeout();
+
+      if (timeout == OSTimeout::OS_IMMEDIATELY)
+        {
+          OSScheduler::eventWaitClear();
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+          m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+          av = implAvailableRead();
+          if (av > 0)
+            *count = implReadBytes(pBuf, bufSize);
+          m_countToRead = 0;
+          return OSReturn::OS_WOULD_BLOCK;
+        }
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
+
+      //OSDeviceDebug::putHex((unsigned short)event);
+      //OSDeviceDebug::putNewLine();
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
+      if (timeout != OSTimeout::OS_NEVER)
+        {
+          m_pReadTimer->eventNotify(timeout, event,
+              OSEventWaitReturn::OS_TIMEOUT);
+        }
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
+
+      if (doWait)
+        OSScheduler::eventWaitPerform();
+
+      OSEventWaitReturn_t ret;
+      ret = OSScheduler::getEventWaitReturn();
+
+      //OSDeviceDebug::putHex((unsigned short)ret);
+      //OSDeviceDebug::putNewLine();
+
+      if (ret == OSEventWaitReturn::OS_TIMEOUT)
+        {
+#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_READBYTE)
+          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte() return timeout"));
+          OSDeviceDebug::putNewLine();
+#endif
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+          m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+
+          av = implAvailableRead();
+          if (av > 0)
+            *count = implReadBytes(pBuf, bufSize);
+          m_countToRead = 0;
+
+          return OSReturn::OS_TIMEOUT;
+        }
+      else
+        {
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
+          if (timeout != OSTimeout::OS_NEVER)
+            {
+              m_pReadTimer->eventRemove(event);
+            }
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
+        }
+    }
+
+  if (!isConnected())
+    {
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+      m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+
+      av = implAvailableRead();
+      if (av > 0)
+        *count = implReadBytes(pBuf, bufSize);
+      m_countToRead = 0;
+
+      return OSReturn::OS_DISCONNECTED;
+    }
+  av = implAvailableRead();
+  if (av > 0)
+    *count = implReadBytes(pBuf, bufSize);
+  m_countToRead = 0;
+
+#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_READBYTE)
+  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte() returns "));
+  OSDeviceDebug::putHex((unsigned short)c);
+  OSDeviceDebug::putNewLine();
+#endif
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+  m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+
+  return OSReturn::OS_OK;
 }
 
 int
