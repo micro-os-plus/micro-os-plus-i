@@ -52,6 +52,8 @@ private:
   implAvailableRead(void);
   virtual int
   implReadByte(void);
+  virtual int
+  implReadBytes(unsigned char* pBuf, int size);
 
   // write
   virtual bool
