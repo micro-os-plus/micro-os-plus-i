@@ -104,6 +104,34 @@ CircularByteBuffer::putBytes(const unsigned char* pBuf, unsigned short count)
   return sz;
 }
 
+unsigned short
+CircularByteBuffer::getBytes(unsigned char* pBuf, unsigned short size)
+{
+  unsigned short ln, endSz;
+
+  endSz = m_sz - (unsigned short) (m_pGet - m_pBuf);
+  ln = m_len;
+  if (ln > size)
+    ln = size;
+  if (endSz >= ln)
+    {
+      memcpy(pBuf, m_pGet, ln);
+      m_pGet += ln;
+      if ((unsigned short) (m_pGet - m_pBuf) >= m_sz)
+        m_pGet = m_pBuf;
+      m_len -= ln;
+    }
+  else
+    {
+      memcpy(pBuf, m_pGet, endSz);
+      m_pGet = m_pBuf;
+      memcpy(pBuf + endSz, m_pGet, ln - endSz);
+      m_pGet += (ln - endSz);
+      m_len -= ln;
+    }
+  return ln;
+}
+
 unsigned char
 CircularByteBuffer::get(void)
 {

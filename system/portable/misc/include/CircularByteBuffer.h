@@ -30,6 +30,8 @@ public:
 
   unsigned short
   putBytes(const unsigned char* pBuf, unsigned short count);
+  unsigned short
+  getBytes(unsigned char* pBuf, unsigned short size);
 
   bool
   isEmpty(void);
