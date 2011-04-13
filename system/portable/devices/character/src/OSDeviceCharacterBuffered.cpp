@@ -18,8 +18,8 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
     unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
     unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
     unsigned short txLWM) :
-  m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM),
-      m_txBuf(pTxBuf, txBufSize, txHWM, txLWM)
+  m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM), m_txBuf(pTxBuf, txBufSize, txHWM,
+      txLWM)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered()="));
@@ -30,8 +30,8 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
 
 OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
     unsigned short rxBufSize, unsigned char *pTxBuf, unsigned short txBufSize) :
-  m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4),
-      m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4)
+  m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4), m_txBuf(pTxBuf,
+      txBufSize, txBufSize * 3 / 4, txBufSize / 4)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered()="));
@@ -149,6 +149,18 @@ OSDeviceCharacterBuffered::implReadByte(void)
   return r;
 }
 
+int
+OSDeviceCharacterBuffered::implReadBytes(unsigned char* pBuf, int size)
+{
+  int r;
+  OSCriticalSection::enter();
+    {
+      r = m_rxBuf.getBytes(pBuf, size);
+    }
+  OSCriticalSection::exit();
+
+  return r;
+}
 void
 OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
 {
@@ -179,20 +191,17 @@ OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
 #endif
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
-  if (m_pReadMatchArray == 0)
+  if ((m_pReadMatchArray == 0) || m_rxBuf.isAboveHighWM() || (m_countToRead
+      == 0))
     {
-      // if the match array is not set, notify every character
+      // if the match array is not set or buffer is near full or single char read, notify every character
+      m_pReadMatchArray = 0;
+      m_countToRead = 0;
       OSScheduler::eventNotify(getReadEvent());
     }
   else
     {
-      // if the match array is set, first check if there is more space
-      if (m_rxBuf.isAboveHighWM())
-        {
-          m_pReadMatchArray = 0;
-          OSScheduler::eventNotify(getReadEvent());
-        }
-      else
+      if (m_pReadMatchArray != 0)
         {
           // if there is enough space, check if the character is
           // in the given array
@@ -203,11 +212,20 @@ OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
                 {
                   // if we have a match, notify
                   m_pReadMatchArray = 0;
+                  m_countToRead = 0;
                   OSScheduler::eventNotify(getReadEvent());
                   break;
                 }
             }
         }
+
+      if ((m_countToRead != 0) && (m_rxBuf.length() >= m_countToRead))
+        {
+          m_pReadMatchArray = 0;
+          m_countToRead = 0;
+          OSScheduler::eventNotify(getReadEvent());
+        }
+
     }
 #else /* !defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
   OSScheduler::eventNotify(getReadEvent());
@@ -254,7 +272,7 @@ OSDeviceCharacterBuffered::implWriteBytes(const unsigned char* buf, int len)
   int i;
   OSCriticalSection::enter();
     {
-      i = m_txBuf.putBytes(buf,len);
+      i = m_txBuf.putBytes(buf, len);
 
       if (m_txBuf.isAboveHighWM())
         {
