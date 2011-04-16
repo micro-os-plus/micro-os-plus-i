@@ -14,11 +14,6 @@
 
 unsigned char volatile OSSchedulerLock::ms_nestingLevel;
 
-// ----- OSCriticalSection static variables -----------------------------------
-
-// Used in contextSave/Restore.
-OSStack_t volatile OSCriticalSection::ms_nestingLevel;
-
 // ----- OSScheduler static variables -----------------------------------------
 
 // Used in contextSave/Restore.
@@ -45,15 +40,15 @@ OSCriticalSection OSScheduler::critical;
 
 #if !defined(OS_EXCLUDE_OSTIMER)
 OSTimerTicks OSScheduler::timerTicks;
-#endif
+#endif /* !defined(OS_EXCLUDE_OSTIMER) */
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
 OSTimerSeconds OSScheduler::timerSeconds;
-#endif
+#endif /* defined(OS_INCLUDE_OSTIMERSECONDS) */
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
 bool OSScheduler::ms_allowDeepSleep;
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_SLEEP) */
 
 // ----- OSActiveTasks static variables ---------------------------------------
 
@@ -71,59 +66,7 @@ OSSchedulerLock::OSSchedulerLock()
   OSDeviceDebug::putNewLine();
 #endif
 }
-#endif
-
-// ============================================================================
-
-#if defined(DEBUG)
-OSCriticalSection::OSCriticalSection()
-{
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSCriticalSection()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
-}
-#endif
-
-#if defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
-
-// When we cannot use the stack, we no longer need to inline, so here are
-// the usual routines to enter()/exit() critical sections.
-void
-OSCriticalSection::enter(void)
-  {
-#if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
-    register OSStack_t tmp;
-
-    tmp = OSCPUImpl::getInterruptsMask();
-    tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
-    OSCPUImpl::setInterruptsMask(tmp);
-#else /* !defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-    OSCPUImpl::interruptsDisable();
-#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-
-    ++ms_nestingLevel;
-  }
-
-void
-OSCriticalSection::exit(void)
-  {
-    if ((ms_nestingLevel > 0) && (--ms_nestingLevel == 0))
-      {
-#if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
-        register OSStack_t tmp;
-
-        tmp = OSCPUImpl::getInterruptsMask();
-        tmp &= ~(OS_CFGINT_OSCRITICALSECTION_MASK);
-        OSCPUImpl::setInterruptsMask(tmp);
-#else /* !defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-        OSCPUImpl::interruptsEnable();
-#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-      }
-  }
-
-#endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#endif /* defined(DEBUG) */
 
 // ============================================================================
 
@@ -134,19 +77,19 @@ OSScheduler::earlyInit(void)
 #if defined(DEBUG)
   OSDeviceDebug::putString_P(PSTR("OSScheduler::earlyInit()"));
   OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) */
 
   ms_isRunning = false;
 
 #if !defined(OS_EXCLUDE_PREEMPTION)
   ms_isPreemptive = true;
-#else
+#else /* defined(OS_EXCLUDE_PREEMPTION) */
   ms_isPreemptive = false;
-#endif
+#endif /* !defined(OS_EXCLUDE_PREEMPTION) */
 
 #if defined(OS_INCLUDE_OSTASK_SLEEP)
   ms_allowDeepSleep = true;
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_SLEEP) */
 
   OSCriticalSection::ms_nestingLevel = 0;
 
@@ -168,9 +111,9 @@ OSScheduler::OSScheduler()
   OSDeviceDebug::putString_P(PSTR("OSScheduler()="));
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS) */
 }
-#endif
+#endif /* defined(DEBUG) */
 
 void
 OSScheduler::start(void)
@@ -192,14 +135,14 @@ OSScheduler::start(void)
 
 #if defined(DEBUG)
   OSActiveTasks::dump();
-#endif
+#endif /* defined(DEBUG) */
 
   if (getTaskIdle() == 0)
     {
 #if defined(DEBUG)
       OSDeviceDebug::putString_P(PSTR("No IDLE task"));
       OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) */
     }
   else
     {
@@ -210,21 +153,19 @@ OSScheduler::start(void)
           = (volatile OSStack_t**) &ms_pTaskRunning->m_pStack;
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_START)
-        {
-          OSDeviceDebug::putString_P(PSTR("Start "));
-          OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
+      OSDeviceDebug::putString_P(PSTR("OSScheduler::start() "));
+      OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
 
-          OSDeviceDebug::putNewLine();
-        }
-#endif
+      OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_START) */
 
 #if !defined(OS_EXCLUDE_OSTIMER)
       timerTicks.init();
-#endif
+#endif /* !defined(OS_EXCLUDE_OSTIMER) */
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
       timerSeconds.init();
-#endif
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS) */
 
       ms_isRunning = true;
 
@@ -242,7 +183,8 @@ OSScheduler::start(void)
 #if defined(DEBUG)
   OSDeviceDebug::putString_P(PSTR("OSScheduler::start() failed, loop"));
   OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) */
+
   for (;;)
     ;
 }
@@ -309,7 +251,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
       OSTask *pt;
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
       pt = ms_tasks[notifyIndex];
-#else
+#else /* !defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
       pt = ms_tasks[i];
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 
@@ -385,7 +327,7 @@ OSScheduler::performContextSwitch()
       OSDeviceDebug::putChar('<');
       OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
     }
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH) */
 
   // Should be used only here, in scheduler core routines!!!
   OSCPU::watchdogReset();
@@ -415,22 +357,18 @@ OSScheduler::performContextSwitch()
   else
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH)
-        {
-          OSDeviceDebug::putChar('L');
-        }
-#endif
+      OSDeviceDebug::putChar('L');
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH) */
       // if scheduler is locked, return OS_LOCKED
       ms_pTaskRunning->m_eventWaitReturn = OSEventWaitReturn::OS_LOCKED;
     }
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH)
-    {
-      //OSActiveTasks::dump();
-      OSDeviceDebug::putChar('>');
-      OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
-      OSDeviceDebug::putNewLine();
-    }
-#endif
+  //OSActiveTasks::dump();
+  OSDeviceDebug::putChar('>');
+  OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
+  OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH) */
 }
 
 // Get the address of the task registered under 'id' in tasks array,
@@ -463,7 +401,7 @@ OSScheduler::taskRegister(OSTask *pTask)
 #if defined(DEBUG)
           OSDeviceDebug::putString_P(PSTR("task table full"));
           OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) */
         }
 
       // Initial tasks are inserted in the ready list at start()
@@ -480,7 +418,7 @@ OSScheduler::taskRegister(OSTask *pTask)
       OSDeviceDebug::putDec((unsigned short) id);
       OSDeviceDebug::putNewLine();
     }
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_TASKREGISTER) */
 
   return id;
 }
@@ -534,7 +472,7 @@ void OSScheduler::ISRcancelTask(OSTask *pTask)
       }
   }
 
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
 
 // ============================================================================
 
@@ -601,7 +539,7 @@ OSActiveTasks::insert(OSTask *pTask)
       OSDeviceDebug::putString(pTask->getName());
       OSDeviceDebug::putNewLine();
     }
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSACTIVETASKS_INSERT) */
 }
 
 // Must be called in a critical section.
@@ -633,7 +571,7 @@ OSActiveTasks::remove(OSTask * pTask)
       OSDeviceDebug::putString(pTask->getName());
       OSDeviceDebug::putNewLine();
     }
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSACTIVETASKS_REMOVE) */
 }
 
 // Return index of given task, or -1
@@ -665,7 +603,7 @@ OSActiveTasks::dump(void)
     }
   OSDeviceDebug::putNewLine();
 }
-#endif
+#endif /* defined(DEBUG) */
 
 // ----------------------------------------------------------------------------
 
