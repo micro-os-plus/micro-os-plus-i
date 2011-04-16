@@ -51,7 +51,7 @@
 #define _CONF_ISP_H_
 
 #include <avr32/io.h>
-#include "hal/arch/avr32/lib/include/compiler.h"
+//#include "hal/arch/avr32/lib/include/compiler.h"
 
 
 //_____ D E F I N I T I O N S ______________________________________________
