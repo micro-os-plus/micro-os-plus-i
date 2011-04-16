@@ -4,11 +4,13 @@
  *      This file is part of the uOS++ distribution.
  */
 
-#include "portable/kernel/include/Timer.h"
+#include "portable/kernel/include/OS_Defines.h"
 
 #if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
 
 #if defined(OS_INCLUDE_TIMER)
+
+//#include "portable/kernel/include/Timer.h"
 
 #include "portable/kernel/include/OS.h"
 

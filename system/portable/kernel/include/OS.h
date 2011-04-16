@@ -93,8 +93,8 @@ public:
   inline static void
   stackInit(void) __attribute__((always_inline));
   // Some CPU initialisations.
-  inline static void
-  earlyInit(void) __attribute__((always_inline));
+   static void
+  earlyInit(void);
   // Put MCU to the idle sleep mode.
   inline static void
   idle(void) __attribute__((always_inline));
@@ -213,6 +213,10 @@ private:
 
 #include "portable/devices/debug/include/OSDeviceDebug.h"
 
+#include "portable/kernel/include/OSCriticalSection.h"
+
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
 #include "portable/kernel/include/OSScheduler.h"
 
 #include "portable/kernel/include/OSTask.h"
@@ -227,7 +231,7 @@ private:
 
 #include "portable/kernel/include/Timer.h"
 
-//#include "portable/devices/debug/include/OSDeviceDebug.h"
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 
 // ----------------------------------------------------------------------------
 
@@ -286,14 +290,14 @@ public:
   OS();
 #endif
 #else
-  // TODO: if is no longer used please remove it.
+  // Used when multitasking is disabled
   static void main(void) __attribute__( ( noreturn ) );
-#endif
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 
 #if defined(OS_INCLUDE_NAKED_INIT)
   // Naked version for the earlyInit function.
   static void nakedEarlyInit(void) __attribute__( ( naked, section( ".init6" ) ) );
-#endif
+#endif /* defined(OS_INCLUDE_NAKED_INIT) */
 
   // Performs early initialisations.
   // Must be called before all constructors.
@@ -324,13 +328,13 @@ public:
   // Busy waiting for n milliseconds.
   static void
   busyWaitMillis(unsigned int n);
-#endif
+#endif /* defined(OS_INCLUDE_OS_BUSYWAITMILLIS) */
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMICROS)
   // Busy waiting for n microseconds.
   static void
   busyWaitMicros(unsigned int n);
-#endif
+#endif /* defined(OS_INCLUDE_OS_BUSYWAITMICROS) */
 
   static void
   resetHandler(void) __attribute__((naked, noreturn));

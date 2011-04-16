@@ -67,8 +67,12 @@ OS::resetHandler(void)
   // earlyInit() should also init GPIO, so that leds will be available
   OSCPU::earlyInit();
 
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
   OSScheduler::ledActiveInit();
   OSScheduler::ISR_ledActiveOn();
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 
   dataInit();
   bssInit();
@@ -91,7 +95,29 @@ OS::resetHandler(void)
 
   OS::staticConstructorsInit();
 
-  main(); // call standard main()
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
+  // Tasks were created and registered by class constructors
+  // We're ready to rock...
+  OSScheduler::start();
+
+#else /* defined(OS_EXCLUDE_MULTITASKING)*/
+
+#if defined(DEBUG)
+  OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("OS::main()"));
+  OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
+
+  OS::main();
+
+  // Should never get here.
+#if defined(DEBUG)
+  OSDeviceDebug::putString_P(PSTR("OS::main() failed, loop"));
+  OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
+
+#endif /*OS_EXCLUDE_MULTITASKING*/
 
   // noreturn
   for (;;)
@@ -163,7 +189,7 @@ OS::staticConstructorsInit(void)
   for (; p < &__os_ctors_array_end; p++)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS) && defined(OS_DEBUG_CONSTRUCTORS_INIT)
-      OSDeviceDebug::putString("INIT=");
+      OSDeviceDebug::putString(".ctor=");
       OSDeviceDebug::putHex(*p);
       OSDeviceDebug::putNewLine();
 #endif
@@ -277,28 +303,6 @@ OS::busyWaitMicros(unsigned int n)
 }
 
 #endif /* OS_INCLUDE_OS_BUSYWAITMICROS */
-
-// ----------------------------------------------------------------------------
-// default main. may be redefined by application
-
-int
-main()
-{
-#if defined(DEBUG)
-  OSDeviceDebug::putNewLine();
-  OSDeviceDebug::putString_P(PSTR("main()"));
-  OSDeviceDebug::putNewLine();
-#endif /* defined(DEBUG) */
-
-#if !defined(OS_EXCLUDE_MULTITASKING)
-  // tasks were created and registered by class constructors
-  OSScheduler::start();
-#else
-  OS::main();
-#endif /*OS_EXCLUDE_MULTITASKING*/
-
-  //no return
-}
 
 // ----------------------------------------------------------------------------
 

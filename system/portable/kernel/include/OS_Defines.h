@@ -190,8 +190,9 @@
 #endif
 
 #if defined(OS_EXCLUDE_MULTITASKING)
-#define OS_CFGINT_TASKS_TABLE_SIZE                      (0)
-#endif
+#undef OS_CFGINT_TASKS_TABLE_SIZE
+#define OS_EXCLUDE_OSTIMER                              (1)
+#endif /* defined(OS_EXCLUDE_MULTITASKING) */
 
 #if !defined(OS_INCLUDE_OSTASK_INTERRUPTION) && defined(OS_INCLUDE_SDI12SENSOR)
 #define OS_INCLUDE_OSTASK_INTERRUPTION                  (1)
