@@ -49,7 +49,7 @@ protected:
   static void implAcknowledgeInterrupt(void);
 
 private:
-  // contain the timeouts( expressed in ticks) for every alarm
+  // contain the timeouts (expressed in ticks) for every alarm
   static OSTimerStruct_t m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
   };
 
