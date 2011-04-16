@@ -125,6 +125,8 @@ OSSchedulerImpl::stackPointerSave(void)
 inline void
 OSSchedulerImpl::stackPointerSave(void)
   {
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
     register unsigned int tmp1;
     register unsigned int tmp2;
 
@@ -139,6 +141,8 @@ OSSchedulerImpl::stackPointerSave(void)
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         :
     );
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
 
 #endif
@@ -173,6 +177,8 @@ OSSchedulerImpl::stackPointerRestore(void)
 inline void
 OSSchedulerImpl::stackPointerRestore(void)
   {
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
     register unsigned int tmp1;
     register unsigned int tmp2;
 
@@ -187,6 +193,8 @@ OSSchedulerImpl::stackPointerRestore(void)
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         : "sp"
     );
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
 
 #endif
@@ -198,6 +206,8 @@ OSSchedulerImpl::stackPointerRestore(void)
 inline void
 OSSchedulerImpl::criticalSectionNestingSave(void)
   {
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
     register unsigned int tmp1;
     register unsigned int tmp2;
 
@@ -212,6 +222,8 @@ OSSchedulerImpl::criticalSectionNestingSave(void)
         : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
         :
     );
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
 
 /*
@@ -221,6 +233,8 @@ OSSchedulerImpl::criticalSectionNestingSave(void)
 inline void
 OSSchedulerImpl::criticalSectionNestingRestore(void)
   {
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
     register unsigned int tmp1;
     register unsigned int tmp2;
 
@@ -235,6 +249,8 @@ OSSchedulerImpl::criticalSectionNestingRestore(void)
         : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
         : "sp"
     );
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
 
 /*

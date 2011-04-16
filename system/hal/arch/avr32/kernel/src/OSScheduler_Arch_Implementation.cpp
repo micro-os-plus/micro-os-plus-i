@@ -8,6 +8,8 @@
 
 #if defined(OS_CONFIG_ARCH_AVR32)
 
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
 OSStack_t *
 OSSchedulerImpl::stackInitialise(OSStack_t * pStackTop, void
 (*pCode)(void *), void *pParams, unsigned char id)
@@ -133,6 +135,8 @@ OSSchedulerImpl::dumpContextInfo(OSTask * pTask)
 }
 
 #endif /* DEBUG */
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 
 #endif /* OS_CONFIG_ARCH_AVR32 */
 
