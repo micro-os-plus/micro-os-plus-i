@@ -32,8 +32,6 @@
 #endif
 
 #include <avr32/io.h>
-#include "hal/arch/avr32/lib/include/compiler.h"
-#include "hal/arch/avr32/uc3/lib/include/pm.h"
 
 inline void
 OSCPUImpl::stackInit(void)
@@ -45,27 +43,6 @@ OSCPUImpl::stackInit(void)
       :
       :
   );
-}
-
-extern unsigned long _evba;
-
-inline void
-OSCPUImpl::earlyInit(void)
-{
-  //Configure peripheral clock's
-  pm_cksel(&AVR32_PM, CFG_INT_PBA_DIV, CFG_INT_PBA_SEL, CFG_INT_PBB_DIV,
-      CFG_INT_PBB_SEL, CFG_INT_HSB_DIV, CFG_INT_HSB_SEL);
-
-  // Switch to external Oscillator 0
-  pm_switch_to_osc0(&AVR32_PM, OS_CFGLONG_OSCILLATOR_HZ,
-      AVR32_PM_OSCCTRL0_STARTUP_2048_RCOSC);
-
-  // initialise local bus; without it GPIO does not work
-  Set_system_register(AVR32_CPUCR,
-      Get_system_register(AVR32_CPUCR) | AVR32_CPUCR_LOCEN_MASK);
-
-  // Set up EVBA so interrupts can be enabled later.
-  Set_system_register(AVR32_EVBA, (int)&_evba);
 }
 
 inline OSResetBits_t
