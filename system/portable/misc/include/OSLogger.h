@@ -15,7 +15,7 @@ typedef int logLevel_t;
 typedef int logCode_t;
 
 // Plenty of log levels to choose from
-class LogLevel
+class OSLogLevel
 {
 public:
   static const logLevel_t OS_OFF = 0;
@@ -33,11 +33,11 @@ public:
   static const logLevel_t OS_ALL = 90;
 };
 
-class Logger
+class OSLogger
 {
 public:
   // Loggers have names, to distinguish between them
-  Logger(const char* name);
+  OSLogger(const char* name);
 
   void
   logFatal(logCode_t code, const char* msg);
@@ -81,63 +81,63 @@ private:
 };
 
 inline logLevel_t
-Logger::getLevel(void)
+OSLogger::getLevel(void)
 {
   return m_minLevel;
 }
 
 inline void
-Logger::setLevel(logLevel_t level)
+OSLogger::setLevel(logLevel_t level)
 {
   m_minLevel = level;
 }
 
 inline void
-Logger::logFatal(logCode_t code, const char* msg)
+OSLogger::logFatal(logCode_t code, const char* msg)
 {
-  log(LogLevel::OS_FATAL, code, msg);
+  log(OSLogLevel::OS_FATAL, code, msg);
 }
 
 inline void
-Logger::logError(logCode_t code, const char* msg)
+OSLogger::logError(logCode_t code, const char* msg)
 {
-  log(LogLevel::OS_FATAL, code, msg);
+  log(OSLogLevel::OS_FATAL, code, msg);
 }
 
 inline void
-Logger::logWarning(logCode_t code, const char* msg)
+OSLogger::logWarning(logCode_t code, const char* msg)
 {
-  log(LogLevel::OS_WARNING, code, msg);
+  log(OSLogLevel::OS_WARNING, code, msg);
 }
 
 inline void
-Logger::logInfo(logCode_t code, const char* msg)
+OSLogger::logInfo(logCode_t code, const char* msg)
 {
-  log(LogLevel::OS_INFO, code, msg);
+  log(OSLogLevel::OS_INFO, code, msg);
 }
 
 inline void
-Logger::logConfig(logCode_t code, const char* msg)
+OSLogger::logConfig(logCode_t code, const char* msg)
 {
-  log(LogLevel::OS_CONFIG, code, msg);
+  log(OSLogLevel::OS_CONFIG, code, msg);
 }
 
 inline void
-Logger::logDebug(logCode_t code, const char* msg)
+OSLogger::logDebug(logCode_t code, const char* msg)
 {
-  log(LogLevel::OS_DEBUG, code, msg);
+  log(OSLogLevel::OS_DEBUG, code, msg);
 }
 
 inline void
-Logger::logTrace(logCode_t code, const char* msg)
+OSLogger::logTrace(logCode_t code, const char* msg)
 {
-  log(LogLevel::OS_TRACE, code, msg);
+  log(OSLogLevel::OS_TRACE, code, msg);
 }
 
 inline void
-Logger::logInsane(logCode_t code, const char* msg)
+OSLogger::logInsane(logCode_t code, const char* msg)
 {
-  log(LogLevel::OS_INSANE, code, msg);
+  log(OSLogLevel::OS_INSANE, code, msg);
 }
 
 #endif /* LOGGER_H_ */

@@ -6,69 +6,69 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_LOGGER)
+#if defined(OS_INCLUDE_OSLOGGER)
 
 #include "portable/kernel/include/OS.h"
 
-#include "portable/misc/include/Logger.h"
+#include "portable/misc/include/OSLogger.h"
 
-Logger::Logger(const char* name)
+OSLogger::OSLogger(const char* name)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("Logger('"));
+  OSDeviceDebug::putString_P(PSTR("OSLogger('"));
   OSDeviceDebug::putString(name);
   OSDeviceDebug::putString_P(PSTR("')="));
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
 
-  m_minLevel = LogLevel::OS_INFO;
+  m_minLevel = OSLogLevel::OS_INFO;
   m_name = name;
 }
 
 const char*
-Logger::convertLevelToString(logLevel_t level)
+OSLogger::convertLevelToString(logLevel_t level)
 {
   const char* p;
   switch (level)
     {
-  case LogLevel::OS_OFF:
+  case OSLogLevel::OS_OFF:
     p = "off";
     break;
 
-  case LogLevel::OS_FATAL:
+  case OSLogLevel::OS_FATAL:
     p = "fatal";
     break;
 
-  case LogLevel::OS_ERROR:
+  case OSLogLevel::OS_ERROR:
     p = "error";
     break;
 
-  case LogLevel::OS_WARNING:
+  case OSLogLevel::OS_WARNING:
     p = "warning";
     break;
 
-  case LogLevel::OS_INFO:
+  case OSLogLevel::OS_INFO:
     p = "info";
     break;
 
-  case LogLevel::OS_CONFIG:
+  case OSLogLevel::OS_CONFIG:
     p = "config";
     break;
 
-  case LogLevel::OS_DEBUG:
+  case OSLogLevel::OS_DEBUG:
     p = "debug";
     break;
 
-  case LogLevel::OS_TRACE:
+  case OSLogLevel::OS_TRACE:
     p = "trace";
     break;
 
-  case LogLevel::OS_INSANE:
+  case OSLogLevel::OS_INSANE:
     p = "insane";
     break;
 
-  case LogLevel::OS_ALL:
+  case OSLogLevel::OS_ALL:
     p = "all";
     break;
 
@@ -80,7 +80,7 @@ Logger::convertLevelToString(logLevel_t level)
 }
 
 void
-Logger::log(logLevel_t level, logCode_t code, const char* msg)
+OSLogger::log(logLevel_t level, logCode_t code, const char* msg)
 {
   if (level <= m_minLevel)
     {
@@ -89,7 +89,7 @@ Logger::log(logLevel_t level, logCode_t code, const char* msg)
 }
 
 void
-Logger::implLog(logLevel_t level, logCode_t code, const char* msg)
+OSLogger::implLog(logLevel_t level, logCode_t code, const char* msg)
 {
 #if defined(DEBUG)
   OSDeviceDebug::putString("log ");
@@ -105,4 +105,4 @@ Logger::implLog(logLevel_t level, logCode_t code, const char* msg)
 #endif /* defined(DEBUG) */
 }
 
-#endif /* defined(OS_INCLUDE_LOGGER) */
+#endif /* defined(OS_INCLUDE_OSLOGGER) */
