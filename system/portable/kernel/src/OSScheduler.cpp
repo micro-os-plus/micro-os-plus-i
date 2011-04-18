@@ -438,19 +438,23 @@ OSScheduler::interruptTick(void)
       pt = ms_tasks[ i ];
 #if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK)
       pt->schedulerTick();
-#endif /* OS_INCLUDE_OSTASK_SCHEDULERTICK */
+#endif /* defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) */
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
       if (pt->isInterrupted())
       ISRcancelTask(pt);
-#endif /* OS_INCLUDE_OSTASK_INTERRUPTION */
+#endif /* defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
     }
 
 #endif /* defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) || defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
 
+#if defined(OS_INCLUDE_OSREALTIME)
+  OSRealTime::interruptTick();
+#endif /* defined(OS_INCLUDE_OSREALTIME) */
+
 #if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
   OSApplicationImpl::interruptTick();
-#endif /* OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK */
+#endif /* defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK) */
 }
 
 #if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
