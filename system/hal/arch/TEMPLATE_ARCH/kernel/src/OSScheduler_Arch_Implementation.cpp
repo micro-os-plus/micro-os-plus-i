@@ -8,152 +8,135 @@
 
 #if defined(OS_CONFIG_ARCH_TEMPLATE)
 
-OSStack_t * OSScheduler::stackInitialise(OSStack_t * pStackTop, void(*pCode)(
-    void *), void *pParams, unsigned char id)
-  {
-    /* The value on the right is the offset from the task stack pointer */
+#if !defined(OS_EXCLUDE_MULTITASKING)
 
-    /* Place a few bytes of known values on the bottom of the stack.
-     This is just useful for debugging. */
-#define STACK_WORD_COUNT   (16+1)
-    *pStackTop-- = (0x12345600 | id); /* -           +16*4=68 */
+OSStack_t *
+OSSchedulerImpl::stackInitialise(OSStack_t * pStackTop, void
+(*pCode)(void *), void *pParams, unsigned char id)
+{
+  /* The value on the right is the offset from the task stack pointer */
 
-    /* Simulate how the stack would look after a call to yield()*/
+  /* Place a few bytes of known values on the bottom of the stack.
+   This is just useful for debugging. */
+#define STACK_WORD_COUNT   (17+1)
 
-    /* Task starts with interrupts enabled ??? */
-    /* T bit set */
-    *pStackTop-- = 0x01000000; /* xPSR        +15*4=64 */
+  *pStackTop-- = (0x12345600 | id); /* - +17*4=68 */
 
-    /* The start of the task code will be popped off the stack last,
-     so place it on first. */
+  /* Simulate how the stack would look after a call to yield()*/
 
-#define STACK_PCL_WORD_OFFSET   (14)
-    *pStackTop-- = (OSStack_t) pCode; /* PCL         +14*4=60 */
+  *pStackTop-- = 0x08; /* R8          +16*4=64 */
+  *pStackTop-- = 0x09; /* R9          +15*4=60 */
+  *pStackTop-- = 0x10; /* R10         +14*4=56 */
+  *pStackTop-- = 0x11; /* R11         +13*4=52 */
 
-    /* Next simulate the stack as if after a call to contextSave(). */
-    *pStackTop-- = 0x00; /* LR          +13*4=56 */
-    *pStackTop-- = 0x12; /* R12         +12*4=52 */
-    *pStackTop-- = 0x03; /* R3          +11*4=48 */
-    *pStackTop-- = 0x02; /* R2          +10*4=44 */
-    *pStackTop-- = 0x01; /* R1          +9*4=40 */
+  *pStackTop-- = (OSStack_t) pParams; /* R12  +12*4=48 */
+  *pStackTop-- = 0xDEADBEEF;   /* R14/LR      +11*4=44 */
+
+#define STACK_PCL_WORD_OFFSET   (10)
+
+  *pStackTop-- = (OSStack_t) pCode; /* R15/PC +10*4=40 */
+  *pStackTop-- = 0x00400000; /* SR    +9*4=36 */
+  /* Task starts in system mode, with all interrupts enabled */
+
 #define STACK_R0_WORD_OFFSET    (8)
-    *pStackTop-- = (OSStack_t) pParams; /* R0          +8*4=36 */
-    *pStackTop-- = 0x11; /* R11         +7*4=32 */
-    *pStackTop-- = 0x10; /* R10         +6*4=28 */
-    *pStackTop-- = 0x09; /* R9          +5*4=24 */
-    *pStackTop-- = 0x08; /* R8          +4*4=20 */
-    *pStackTop-- = 0x07; /* R7          +3*4=16 */
-    *pStackTop-- = 0x06; /* R6          +2*4=12 */
-    *pStackTop-- = 0x05; /* R5          +1*4=8 */
-    *pStackTop-- = 0x04; /* R4          +0*4=4 */
-    ++pStackTop;
+
+  *pStackTop-- = 0xFF0000FF; /* R0    +8*4=32 */
+  *pStackTop-- = 0x01; /* R1          +7*4=24 */
+  *pStackTop-- = 0x02; /* R2          +6*4=20 */
+  *pStackTop-- = 0x03; /* R3          +5*4=16 */
+  *pStackTop-- = 0x04; /* R4          +4*4=12 */
+  *pStackTop-- = 0x05; /* R5          +3*4=8 */
+  *pStackTop-- = 0x06; /* R6          +2*4=4 */
+  *pStackTop-- = 0x07; /* R7          +1*4=0 */
+
+  *pStackTop-- = 0x0; /* criticalSectionNesting +0*4=0 */
+
+  ++pStackTop;
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_STACKINITIALIZE)
-      {
-        OSDeviceDebug::putString("Stack Init SP=");
-        OSDeviceDebug::putPtr(pStackTop);
-        OSDeviceDebug::putString(" PC=");
-        OSDeviceDebug::putPtr((void*) pCode);
+    {
+      OSDeviceDebug::putString("Stack Init SP=");
+      OSDeviceDebug::putPtr(pStackTop);
+      OSDeviceDebug::putString(" PC=");
+      OSDeviceDebug::putPtr((void*) pCode);
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_DUMPSTACK)
-        OSStack_t *p;
-        int i;
-        for (p = pStackTop, i = 0; i < STACK_WORD_COUNT; p++, i++)
-          {
-            OSDeviceDebug::putNewLine();
-            OSDeviceDebug::putDec(i);
-            OSDeviceDebug::putChar(' ');
-            OSDeviceDebug::putHex(*p);
-          }
-        OSDeviceDebug::putChar(' ');
-        OSDeviceDebug::putPtr(--p);
+      OSStack_t *p;
+      int i;
+      for (p = pStackTop, i = 0; i < STACK_WORD_COUNT; p++, i++)
+        {
+          OSDeviceDebug::putNewLine();
+          OSDeviceDebug::putDec(i);
+          OSDeviceDebug::putChar(' ');
+          OSDeviceDebug::putHex(*p);
+        }
+      OSDeviceDebug::putChar(' ');
+      OSDeviceDebug::putPtr(--p);
 #endif /* OS_DEBUG_OSSCHEDULER_DUMPSTACK */
-        OSDeviceDebug::putNewLine();
-      }
+      OSDeviceDebug::putNewLine();
+    }
 #endif /* OS_DEBUG_OSSCHEDULER_STACKINITIALIZE */
 
-    return pStackTop;
-  }
+  return pStackTop;
+}
 
-#if false
-void OSScheduler::stackSetReturnedValue(OSStack_t * pStack,
-    OSEventWaitReturn_t ret)
-  {
-#if false && defined(DEBUG)
-    OSDeviceDebug::putString(" rv=");
-    OSDeviceDebug::putHex((unsigned short)ret);
-    OSDeviceDebug::putString(" *");
-    OSDeviceDebug::putHex((unsigned short)pStack);
-    OSDeviceDebug::putNewLine();
-#endif
+void
+OSSchedulerImpl::start(void)
+{
+  // be sure interrupts remain disabled before restoring first context
+  //OS::interruptsClearMask();
+  //OS::interruptsEnable();
 
-    pStack[STACK_R0_WORD_OFFSET] = (OSStack_t) ret;
-  }
-#endif
+  OSSchedulerImpl::FirstTask_contextRestore();
 
-void OSScheduler::startImpl(void)
-  {
-
-
-    OS::interruptsClearMask();
-    OS::interruptsEnable();
-
-    /* System call to start first task. */
-    asm volatile
-    (
-        " 		\n" /* Use the NVIC offset register to locate the stack. */
-        : : :
-    );
-
-    for (;;)
-      ; // noreturn
-  }
-
-void OSScheduler::ISRcontextSwitchRequest(void)
-  {
-
-  }
+  for (;;)
+    ; // noreturn
+}
 
 #if defined(DEBUG)
 
-void OSScheduler::dumpContextInfo(OSTask * pTask)
-  {
-    OSDeviceDebug::putChar('\'');
-    OSDeviceDebug::putString(pTask->getName());
+void
+OSSchedulerImpl::dumpContextInfo(OSTask * pTask)
+{
+  OSDeviceDebug::putChar('\'');
+  OSDeviceDebug::putString(pTask->getName());
 
-    OSStack_t * pStack;
-    pStack = pTask->getStack();
-    OSDeviceDebug::putString("' SP=");
-    OSDeviceDebug::putPtr(pStack);
-    OSDeviceDebug::putString(" PC=");
-    OSDeviceDebug::putHex(pStack[STACK_PCL_WORD_OFFSET]);
+  OSStack_t * pStack;
+  pStack = pTask->getStack();
+  OSDeviceDebug::putString("' SP=");
+  OSDeviceDebug::putPtr(pStack);
+  OSDeviceDebug::putString(" PC=");
+  OSDeviceDebug::putHex(pStack[STACK_PCL_WORD_OFFSET]);
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_DUMPSTACK)
 
-    const char * sRegNames[] =
-      { "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R0", "R1", "R2",
-          "R3", "R12", "LR", "PC", "XPSR", "X" };
+  const char * sRegNames[] =
+    { "R7", "R6", "R5", "R4", "R3", "R2", "R1", "R0", "SR", "PC", "LR",
+      "R12", "R11", "R10", "R9", "R8", "X"};
 
-    int i;
-    for (i = 0; i < STACK_WORD_COUNT; ++i, ++pStack)
-      {
-        OSDeviceDebug::putNewLine();
-        OSDeviceDebug::putDec(i);
-        OSDeviceDebug::putChar(' ');
-        OSDeviceDebug::putString(sRegNames[i]);
-        OSDeviceDebug::putChar('=');
-        OSDeviceDebug::putHex(*pStack);
-        if (i==0 || i==(STACK_WORD_COUNT-1)){
+  int i;
+  for (i = 0; i < STACK_WORD_COUNT; ++i, ++pStack)
+    {
+      OSDeviceDebug::putNewLine();
+      OSDeviceDebug::putDec(i);
+      OSDeviceDebug::putChar(' ');
+      OSDeviceDebug::putString(sRegNames[i]);
+      OSDeviceDebug::putChar('=');
+      OSDeviceDebug::putHex(*pStack);
+      if (i==0 || i==(STACK_WORD_COUNT-1))
+        {
           OSDeviceDebug::putChar(' ');
           OSDeviceDebug::putPtr(pStack);
         }
-      }
+    }
 
 #endif /* OS_DEBUG_OSSCHEDULER_DUMPSTACK */
 
-    OSDeviceDebug::putNewLine();
-  }
+  OSDeviceDebug::putNewLine();
+}
 
 #endif /* DEBUG */
 
-#endif /* OS_CONFIG_ARCH_ARM_CORTEX_M3 */
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+
+#endif /* defined(OS_CONFIG_ARCH_TEMPLATE) */
 

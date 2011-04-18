@@ -8,53 +8,34 @@
 
 #if defined(OS_CONFIG_FAMILY_TEMPLATE)
 
+void
+OSCPUImpl::earlyInit(void)
+{
+  ;
+}
 
-void __init_data_and_bss(void) __attribute__((noinline));
-void __init_static_constructors(void) __attribute__((noinline));
 
-extern "C" int main(void);
-
-void Reset_Handler(void)
-  {
-#if false
-    SystemInit();
-#endif
-
-    // be sure we start with interrupts disabled
-    OS::interruptsDisable();
-
-    OSScheduler::ledActiveInit();
-    OSScheduler::ISRledActiveOn();
-
-#if false
-    wdt_enable(WDTO_2S);
-
-#if !defined(OS_EXCLUDE_MULTITASKING)
-    set_sleep_mode(SLEEP_MODE_IDLE);
-    sleep_enable();
-#endif
-#endif
-
-    //__init_data_and_bss();
-
+void
+OSImpl::familyEarlyInit(void)
+{
 #if defined(DEBUG)
-    OSDeviceDebug::earlyInit();
-#endif
 
-    OS::earlyInit();
+  OSDeviceDebug::putString("DID=");
+  //OSDeviceDebug::putHex((unsigned long) __builtin_mfdr(0));
+  OSDeviceDebug::putNewLine();
 
-    //__init_static_constructors();
+  OSDeviceDebug::putString("UID=");
+  //for (int* p = (int*) 0x80800204; p < (int*) 0x80800212; ++p)
+  //  OSDeviceDebug::putPtr((void *) *p);
+  OSDeviceDebug::putNewLine();
 
-    main(); // call standard main()
+  OSDeviceDebug::putString("CPU=");
+  OSDeviceDebug::putDec(OS_CFGLONG_CPU_FREQUENCY_HZ);
+  OSDeviceDebug::putString(" Hz");
+  OSDeviceDebug::putNewLine();
 
-    for (;;)
-      ;
-  }
+#endif /* defined(DEBUG) */
+}
 
-void OS::saveResetBits(void)
-  {
-    ms_resetBits = -1;
-  }
-
-#endif
+#endif /* defined(OS_CONFIG_FAMILY_TEMPLATE) */
 
