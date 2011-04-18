@@ -43,7 +43,7 @@ OSCPU::saveResetBits(void)
 }
 
 extern "C" int
-main(void) __attribute__( ( weak ) );
+main(void) __attribute__((weak));
 
 #if !defined(OS_EXCLUDE_RESET_HANDLER)
 

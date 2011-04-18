@@ -184,30 +184,6 @@ public:
 
 };
 
-// ----------------------------------------------------------------------------
-
-class OSRealTimeCriticalSection
-{
-public:
-  // Pair of functions, using a stack to save/restore value
-  static void
-  enter(void) __attribute__((always_inline));
-  static void
-  exit(void) __attribute__((always_inline));
-
-private:
-  char m_dummy;
-};
-
-class OSRealTime
-{
-public:
-  // critical section support
-  static OSRealTimeCriticalSection critical;
-
-private:
-  char m_dummy;
-};
 
 // ----------------------------------------------------------------------------
 
@@ -215,11 +191,14 @@ private:
 
 #include "portable/kernel/include/OSCriticalSection.h"
 
+
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
 #include "portable/kernel/include/OSScheduler.h"
 
 #include "portable/kernel/include/OSTask.h"
+
+#include "portable/kernel/include/OSRealTime.h"
 
 #include "portable/kernel/include/OSTimer.h"
 
@@ -381,46 +360,6 @@ private:
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-// ----------------------------------------------------------------------------
-
-inline void
-OSRealTimeCriticalSection::enter(void)
-{
-#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
-
-  register OSStack_t tmp;
-
-  tmp = OSCPUImpl::getInterruptsMask();
-  OSCPUImpl::stackPush(tmp);
-  OSCPUImpl::interruptsDisable();
-
-#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
-
-  OSCPUImpl::interruptsDisable();
-  ++OSCriticalSection::ms_nestingLevel;
-
-#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
-}
-
-inline void
-OSRealTimeCriticalSection::exit(void)
-{
-#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
-
-  register OSStack_t tmp;
-
-  tmp = OSCPUImpl::stackPop();
-  OSCPUImpl::setInterruptsMask(tmp);
-
-#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
-
-  if (--OSCriticalSection::ms_nestingLevel  == 0)
-    {
-      OSCPUImpl::interruptsEnable();
-    }
-
-#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
-}
 
 // ----------------------------------------------------------------------------
 
