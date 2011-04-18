@@ -74,3 +74,63 @@ OSCriticalSection::exit(void)
 #endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 
 // ----------------------------------------------------------------------------
+
+#if defined(DEBUG)
+OSRealTimeCriticalSection::OSRealTimeCriticalSection()
+{
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+  OSDeviceDebug::putString_P(PSTR("OSRealTimeCriticalSection()="));
+  OSDeviceDebug::putPtr(this);
+  OSDeviceDebug::putNewLine();
+#endif
+}
+#endif
+
+#if defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+
+// When we cannot use the stack, we no longer need to inline, so here are
+// the usual routines to enter()/exit() critical sections.
+void
+OSRealTimeCriticalSection::enter(void)
+  {
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
+#if defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS)
+    register OSStack_t tmp;
+
+    tmp = OSCPUImpl::getInterruptsMask();
+    tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKALL);
+    OSCPUImpl::setInterruptsMask(tmp);
+#else /* !defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
+    OSCPUImpl::interruptsDisable();
+#endif /* defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
+
+    ++OSCriticalSection::ms_nestingLevel;
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+  }
+
+void
+OSRealTimeCriticalSection::exit(void)
+  {
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
+    if ((OSCriticalSection::ms_nestingLevel > 0) && (--OSCriticalSection::ms_nestingLevel == 0))
+      {
+#if defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS)
+        register OSStack_t tmp;
+
+        tmp = OSCPUImpl::getInterruptsMask();
+        tmp &= ~(OS_CFGINT_OSCRITICALSECTION_MASKALL);
+        OSCPUImpl::setInterruptsMask(tmp);
+#else /* !defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
+        OSCPUImpl::interruptsEnable();
+#endif /* defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
+      }
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+  }
+
+#endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+
+// ----------------------------------------------------------------------------
