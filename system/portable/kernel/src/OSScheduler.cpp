@@ -94,9 +94,9 @@ OSScheduler::earlyInit(void)
   OSCriticalSection::ms_nestingLevel = 0;
 
   // pIdleTask = 0;      // will be set by IdleTask constructor
-
   // do not reset if not run before any constructor (<=.init6)
   // since task constructors can increment it
+
   ms_tasksCount = 0;
 
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
@@ -379,7 +379,7 @@ OSScheduler::getTask(int id)
   if (id < ms_tasksCount)
     return ms_tasks[id];
   else
-    return NULL;
+    return (OSTask *)0;
 }
 
 // Internal methods
