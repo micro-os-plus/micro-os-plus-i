@@ -11,4 +11,4 @@
 
 // right now everything was defined in the family file
 
-#endif /*HAL_ARCH_OS_INLINES_H_*/
+#endif /* HAL_ARCH_OS_INLINES_H_ */

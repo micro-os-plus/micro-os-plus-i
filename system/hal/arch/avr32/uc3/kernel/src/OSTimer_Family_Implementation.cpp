@@ -6,9 +6,9 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
-
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
+
+#if !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER)
 
 #include "portable/kernel/include/OS.h"
 
@@ -227,6 +227,6 @@ SysSeconds_contextHandler(void)
 
 #endif /*defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)*/
 
-#endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
-
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
+
+#endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */

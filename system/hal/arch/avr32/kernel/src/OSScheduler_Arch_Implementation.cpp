@@ -129,14 +129,14 @@ OSSchedulerImpl::dumpContextInfo(OSTask * pTask)
         }
     }
 
-#endif /* OS_DEBUG_OSSCHEDULER_DUMPSTACK */
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_DUMPSTACK) */
 
   OSDeviceDebug::putNewLine();
 }
 
-#endif /* DEBUG */
+#endif /* defined(DEBUG) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 
-#endif /* OS_CONFIG_ARCH_AVR32 */
+#endif /* defined(OS_CONFIG_ARCH_AVR32) */
 

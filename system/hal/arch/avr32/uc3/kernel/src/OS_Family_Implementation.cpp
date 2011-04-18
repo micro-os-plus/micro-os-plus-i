@@ -335,5 +335,5 @@ os_ex_dtlb_miss_wr(void)
   os_exception_handler(25, "DTLB Miss (Write)");
 }
 
-#endif /* OS_CONFIG_FAMILY_AVR32UC3 */
+#endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
 

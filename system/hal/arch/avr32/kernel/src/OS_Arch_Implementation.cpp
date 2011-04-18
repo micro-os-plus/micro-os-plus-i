@@ -20,5 +20,5 @@ __dso_handle(void)
 }
 #endif
 
-#endif /* OS_CONFIG_ARCH_AVR32 */
+#endif /* defined(OS_CONFIG_ARCH_AVR32) */
 
