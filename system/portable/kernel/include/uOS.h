@@ -22,9 +22,9 @@
 #include "portable/kernel/include/OSEventFlags.h"
 #endif
 
-#if defined(OS_INCLUDE_LOGGER)
-#include "portable/misc/include/Logger.h"
-#endif /* defined(OS_INCLUDE_LOGGER) */
+#if defined(OS_INCLUDE_OSLOGGER)
+#include "portable/misc/include/OSLogger.h"
+#endif /* defined(OS_INCLUDE_OSLOGGER) */
 
 #if defined(OS_INCLUDE_SDI12SENSOR) || defined(OS_INCLUDE_SDI12SENSOR_TINY)
 // temporary solution to SDI12 timers
