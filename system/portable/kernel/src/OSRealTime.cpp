@@ -60,6 +60,7 @@ OSRealTime::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
   return 1;
 }
 
+// This is called from the system timer interruptTick()
 void
 OSRealTime::interruptTick(void)
 {
