@@ -40,9 +40,14 @@
 #endif
 #endif
 
+// Mask to disable ALL interrupts, including real-time ones
+#define OS_CFGINT_OSCRITICALSECTION_MASKALL             (0xF << (16+1))
+
+// Mask to disable regular interrupts, except real-time ones
 #if !defined(OS_CFGINT_OSCRITICALSECTION_MASK)
 #define OS_CFGINT_OSCRITICALSECTION_MASK                (0xF << (16+1))
 #endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASK) */
+
 
 /*
  * Usage:
