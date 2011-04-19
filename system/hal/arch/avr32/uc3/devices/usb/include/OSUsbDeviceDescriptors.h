@@ -11,6 +11,8 @@
 
 #include "hal/arch/avr32/uc3/devices/usb/include/OSUsbDeviceDescriptorsConfig.h"
 
+#include "hal/arch/avr32/lib/include/compiler.h"
+
 // ----------------------------------------------------------------------------
 
 #if TO_BE_PORTED

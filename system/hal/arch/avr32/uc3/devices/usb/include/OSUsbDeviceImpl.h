@@ -15,10 +15,14 @@
 
 #include "portable/devices/usb/include/OSUsbLed.h"
 
+#include "hal/arch/avr32/lib/include/compiler.h"
+#include "hal/arch/avr32/lib/include/tpaste.h"
+
 #include "portable/devices/usb/include/OSUsbDevice_Defines.h"
 #include "hal/arch/avr32/uc3/devices/usb/include/OSUsbDevice_Defines.h"
 
 #include "hal/arch/avr32/uc3/devices/usb/include/OSUsbDeviceDescriptors.h"
+
 
 // ----------------------------------------------------------------------------
 

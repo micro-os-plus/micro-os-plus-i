@@ -9,6 +9,8 @@
 
 #include "portable/kernel/include/OS.h"
 
+#include "hal/arch/avr32/lib/include/compiler.h"
+
 // ----------------------------------------------------------------------------
 
 // English US
