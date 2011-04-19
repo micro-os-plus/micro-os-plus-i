@@ -7,6 +7,8 @@
 #ifndef OS_APP_DEFINES_H_
 #define OS_APP_DEFINES_H_
 
+// ----- Portable Definitions -------------------------------------------------
+
 // override the board definitions, if needed
 //#define OS_CFGLONG_OSCILLATOR_HZ                        (16000000UL)
 
@@ -22,11 +24,6 @@
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
 //#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
-
-#define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK                          (1)
-
-//#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
-#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 #define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
@@ -44,7 +41,16 @@
 #define OS_INCLUDE_OSTREAM_OSTASK                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
 
+// ----- Board Definitions ----------------------------------------------------
+
 #define OS_TEST_PHASE 2
+
+#if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+
+#define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK          (1)
+#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
+
+#define OS_INCLUDE_OSREALTIME                           (1)
 
 #if OS_TEST_PHASE == 1
 
@@ -55,8 +61,11 @@
 
 #endif
 
-//#define OS_INCLUDE_SYSTICK_CONTEXT_HANDLER_UNDER_CONSTRUCTION  (1)
-//#define OS_INCLUDE_OSSCHEDULER_YIELD_UNDER_CONSTRUCTION (1)
+#elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
+
+#endif /* OS_CONFIG_BOARD_* */
+
+// ----- Debug Definitions ----------------------------------------------------
 
 #if defined(DEBUG)
 // One of the following must be defined in Eclipse project or Makefile
@@ -78,5 +87,7 @@
 //#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
 
 #endif /* defined(DEBUG) */
+
+// ----------------------------------------------------------------------------
 
 #endif /* OS_APP_DEFINES_H_ */
