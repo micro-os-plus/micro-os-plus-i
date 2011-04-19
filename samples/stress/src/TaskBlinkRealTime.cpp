@@ -66,6 +66,8 @@ TaskBlinkRealTime::taskMain(void)
   m_oLed.init();
 #endif
 
+  os.rt.registerTask(this);
+
   interruptInit();
 
   g_flagNotify = false;
@@ -216,10 +218,15 @@ TaskBlinkRealTime::interruptServiceRoutine(void)
   OSScheduler::eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
 #else
   OS::busyWaitMicros(100);
+#if defined(APP_INCLUDE_LOCAL_NOTIFY)
   g_flagNotify = true;
-#endif
+#else
+  os.rt.eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
+#endif /* defined(APP_INCLUDE_LOCAL_NOTIFY) */
 
-#endif
+#endif /* defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
+
+#endif /* defined(APP_INCLUDE_TASKBLINKREALTIME_ISRACTIONBUSYWAIT) */
 
 #if defined(APP_CFGINT_TASKBLINKREALTIME_ISRLEDBIT)
   OS_GPIO_PIN_LOW(APP_CFGREG_TASKBLINKREALTIME_ISRLEDPORTCONFIG, APP_CFGINT_TASKBLINKREALTIME_ISRLEDBIT);

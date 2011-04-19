@@ -80,13 +80,15 @@ OSApplicationImpl::interruptTick(void)
 #if defined(APP_INCLUDE_LENGTHEN_SYSTICK)
 #if defined(APP_INCLUDE_BUSY_WAIT)
   OS::busyWaitMicros(1000000/OS_CFGINT_TICK_RATE_HZ*APP_BUSY_PROCENTAGE/100);
-#else
+#else /* !defined(APP_INCLUDE_BUSY_WAIT) */
   for (int i = APP_CFGINT_NOTIFIES; --i;)
   os.sched.eventNotify(APP_EVENT_DUMMY);
-#endif
-#endif
+#endif /* defined(APP_INCLUDE_BUSY_WAIT) */
+#endif /* defined(APP_INCLUDE_LENGTHEN_SYSTICK) */
 
 #if defined(APP_INCLUDE_TASKBLINKREALTIME)
+
+#if defined(APP_INCLUDE_LOCAL_NOTIFY)
 
   if (g_flagNotify)
     {
@@ -94,7 +96,9 @@ OSApplicationImpl::interruptTick(void)
       os.sched.eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
     }
 
-#endif
+#endif /* defined(APP_INCLUDE_LOCAL_NOTIFY) */
+
+#endif /* defined(APP_INCLUDE_TASKBLINKREALTIME) */
 
 }
 
