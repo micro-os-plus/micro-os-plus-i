@@ -258,10 +258,15 @@ public:
   // Scheduler object used by this class.
   OSScheduler sched;
 
+#if defined(OS_INCLUDE_OSREALTIME)
+
   // Real time support
   OSRealTime rt;
 
-#endif
+#endif /* defined(OS_INCLUDE_OSREALTIME) */
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 #if defined(DEBUG)
