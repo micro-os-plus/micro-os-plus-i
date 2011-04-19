@@ -210,7 +210,7 @@ private:
   virtual int
   implReadByte(void) = 0;
   virtual int
-  implReadBytes(unsigned char* pBuf, int size) = 0;
+  implReadBytes(unsigned char* pBuf, int size);
 
   virtual bool
   implCanWrite(void) = 0;
