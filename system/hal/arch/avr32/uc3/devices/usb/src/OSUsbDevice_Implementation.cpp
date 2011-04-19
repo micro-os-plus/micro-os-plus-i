@@ -221,7 +221,8 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
 bool
 OSUsbDeviceImpl::usbDriverInit(void)
 {
-  OSScheduler::criticalEnter();
+  OSCriticalSection::enter();
+  {
 
   ////////////////////
   // Start USB clock.
@@ -287,8 +288,8 @@ OSUsbDeviceImpl::usbDriverInit(void)
   // freeze clocks in order to save power
   OSUsbDeviceImpl::Usb_freeze_clock();
   //(void)Is_usb_clock_frozen();
-
-  OSScheduler::criticalExit();
+  }
+  OSCriticalSection::exit();
 
   return 0;
 }
