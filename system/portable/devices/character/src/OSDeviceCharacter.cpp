@@ -607,6 +607,8 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
       return OSReturn::OS_OK;
     }
 
+  m_countToRead = bufSize;
+
   bool canRead;
   for (;;)
     {
@@ -724,6 +726,19 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
   return OSReturn::OS_OK;
+}
+
+int
+OSDeviceCharacter::implReadBytes(unsigned char* pBuf, int size)
+{
+  int r;
+  r = 0;
+  while ((availableRead() > 0) && (r < size))
+    {
+      *pBuf++ = implReadByte();
+      r++;
+    }
+  return r;
 }
 
 int
