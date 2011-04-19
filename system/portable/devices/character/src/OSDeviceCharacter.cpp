@@ -227,7 +227,11 @@ OSDeviceCharacter::isOpened(void) const
 unsigned long
 OSDeviceCharacter::getBaudRate(void)
 {
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
   return m_baudRate;
+#else
+  return 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
 }
 
 int
