@@ -28,6 +28,65 @@ SimpleCli::~SimpleCli()
 {
 }
 
+#define CHR_ASCII_BELL 0x07
+
+int
+SimpleCli::readLine(istream& cin, ostream& cout)
+{
+  unsigned char * pc;
+  int c;
+
+  for (pc = m_pLine;;)
+    {
+      cout.flush();
+      c = cin.get();
+      if (c < 0)
+        {
+          return c;
+        }
+      else
+        {
+          if ((c == '\r') || (c == '\n'))
+            break;
+
+          if (c == '\b')
+            {
+              if (pc > m_pLine)
+                {
+                  cout.put(c);
+                  cout.put(' ');
+                  cout.put(c);
+                  --pc;
+                }
+              else
+                {
+                  c = CHR_ASCII_BELL;
+                  cout.put(c);
+                }
+            }
+          else
+            {
+              if (((unsigned short) (pc - m_pLine)) < (m_iSize - 2))
+                *pc++ = c;
+              else
+                {
+                  c = CHR_ASCII_BELL;
+                  cout.put(c);
+                }
+            }
+          if ((' ' <= c) && (c < 0x7F))
+            {
+              cout.put(c);
+            }
+        }
+    }
+  //*pc++ = ' ';
+  *pc = '\0';
+
+  return pc - m_pLine;
+}
+
+#if defined(OS_INCLUDE_SIMPLECLI_PARSER)
 void
 SimpleCli::parseReset(void)
 {
@@ -195,62 +254,6 @@ SimpleCli::parseUnsigned( unsigned char *p, unsigned short *pw )
 
 #endif /* OS_INCLUDE_SIMPLECLI_PARSE_UNSIGNED_SHORT */
 
-#define CHR_ASCII_BELL 0x07
+#endif /* defined(OS_INCLUDE_SIMPLECLI_PARSER) */
 
-int
-SimpleCli::readLine(istream& cin, ostream& cout)
-{
-  unsigned char * pc;
-  int c;
-
-  for (pc = m_pLine;;)
-    {
-      cout.flush();
-      c = cin.get();
-      if (c < 0)
-        {
-          return c;
-        }
-      else
-        {
-          if ((c == '\r') || (c == '\n'))
-            break;
-
-          if (c == '\b')
-            {
-              if (pc > m_pLine)
-                {
-                  cout.put(c);
-                  cout.put(' ');
-                  cout.put(c);
-                  --pc;
-                }
-              else
-                {
-                  c = CHR_ASCII_BELL;
-                  cout.put(c);
-                }
-            }
-          else
-            {
-              if (((unsigned short) (pc - m_pLine)) < (m_iSize - 2))
-                *pc++ = c;
-              else
-                {
-                  c = CHR_ASCII_BELL;
-                  cout.put(c);
-                }
-            }
-          if ((' ' <= c) && (c < 0x7F))
-            {
-              cout.put(c);
-            }
-        }
-    }
-  //*pc++ = ' ';
-  *pc = '\0';
-
-  return pc - m_pLine;
-}
-
-#endif
+#endif /* defined(OS_INCLUDE_SIMPLECLI) */
