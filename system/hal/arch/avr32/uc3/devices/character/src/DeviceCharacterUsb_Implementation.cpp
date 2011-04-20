@@ -18,8 +18,12 @@
 int
 DeviceCharacterUsb::implOpen()
 {
-  OSDeviceDebug::putString("DeviceCharacterUsb::open()");
-  OSDeviceDebug::putNewLine();
+  OSCriticalSection::enter();
+    {
+      OSDeviceDebug::putString("DeviceCharacterUsb::open()");
+      OSDeviceDebug::putNewLine();
+    }
+  OSCriticalSection::exit();
 
   static bool flagShouldNotInit;
 
@@ -105,9 +109,9 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
 
   OSDeviceDebug::putChar('}');
   if (b >= ' ')
-    OSDeviceDebug::putChar(b);
+  OSDeviceDebug::putChar(b);
   else
-    OSDeviceDebug::putHex(b);
+  OSDeviceDebug::putHex(b);
 
 #endif
 
@@ -197,9 +201,9 @@ DeviceCharacterUsb::implReadByte(void)
 
   OSDeviceDebug::putChar('{');
   if (c >= ' ')
-    OSDeviceDebug::putChar(c);
+  OSDeviceDebug::putChar(c);
   else
-    OSDeviceDebug::putHex((unsigned char) c);
+  OSDeviceDebug::putHex((unsigned char) c);
 
 #endif
 
