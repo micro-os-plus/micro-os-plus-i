@@ -39,12 +39,22 @@
 #include "portable/devices/character/include/OSDeviceCharacter.h"
 #endif
 
+#if false
 #if defined(OS_INCLUDE_DEVICECHARACTERUSART)
 #include "portable/devices/character/include/DeviceCharacterUsart.h"
 #endif
 
 #if defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART1)
 #include "portable/devices/character/include/DeviceCharacterMultiUsart1.h"
+#endif
+#endif
+
+#if defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART0)
+#include "portable/devices/character/include/DeviceCharacterBufferedUsart0.h"
+#endif
+
+#if defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1)
+#include "portable/devices/character/include/DeviceCharacterBufferedUsart1.h"
 #endif
 
 #if defined(OS_INCLUDE_DEVICECHARACTERUSB)
@@ -61,6 +71,10 @@
 
 #if defined(OS_INCLUDE_SIMPLECLI)
 #include "portable/misc/include/SimpleCli.h"
+#endif
+
+#if defined(OS_INCLUDE_PARSER)
+#include "portable/misc/include/Parser.h"
 #endif
 
 #if defined(OS_INCLUDE_MEMCARD)
