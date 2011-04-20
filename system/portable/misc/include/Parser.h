@@ -10,45 +10,75 @@
 #include "portable/kernel/include/OS.h"
 
 class Parser
-  {
+{
 public:
   Parser();
 
-  void setInput(unsigned char *pLine);
-  
-  void setSeparators(unsigned char *pSeparators);
-  void setSpaces(unsigned char *pSpaces);
-   
-  void setToken(unsigned char *pToken, unsigned short tokenSize);
-  unsigned char *getToken(void);
+  void
+  setInput(unsigned char *pLine);
 
-  void setCurrent(unsigned short index);
+  void
+  setSeparators(unsigned char *pSeparators);
+  void
+  setSpaces(unsigned char *pSpaces);
 
+  void
+  setTokenBuffer(unsigned char *pToken, unsigned short tokenSize);
 
-  OSReturn_t parseToken(void);
-  OSReturn_t parseToken(unsigned char *pSeparators, unsigned char *pSpaces);
+  // Deprecated
+  void
+  setToken(unsigned char *pToken, unsigned short tokenSize);
+  unsigned char *
+  getToken(void);
 
-  OSReturn_t parseSubstring(unsigned short len);
+  void
+  setCurrent(unsigned short index);
 
-  unsigned short getTokenLength(void);
-  unsigned char getSeparator(void);
+  OSReturn_t
+  parseToken(void);
+  OSReturn_t
+  parseToken(unsigned char *pSeparators, unsigned char *pSpaces);
 
-  OSReturn_t parseHex(unsigned char *pChar);
-  OSReturn_t parseUnsigned(unsigned short *pShort);
-  OSReturn_t parseSigned(signed long *pLong);
+  OSReturn_t
+  parseSubstring(unsigned short len);
 
-  OSReturn_t parseFixedPrec(signed long *pLong, unsigned short prec);
+  unsigned short
+  getTokenLength(void);
+  unsigned char
+  getSeparator(void);
+
+  OSReturn_t
+  parseHex(unsigned char *pChar);
+  OSReturn_t
+  parseUnsigned(unsigned short *pShort);
+  OSReturn_t
+  parseSigned(signed long *pLong);
+
+  OSReturn_t
+  parseFixedPrec(signed long *pLong, unsigned short prec);
+
+  int
+  tokenCompare(const unsigned char* pStr);
+
+  // Warning: does not work on AVR32
+  int
+  tokenCompareIgnoreCase(const unsigned char* pStr);
 
   // static methods
-  static OSReturn_t parseNibble(unsigned char nibble);
-  static OSReturn_t parseHex(unsigned char *pChar, unsigned char *pStr);
-  static OSReturn_t parseUnsigned(unsigned short *pShort,
-      unsigned char *pStr);
-  static OSReturn_t parseSigned(signed long *pLong, unsigned char *pStr);
-  static OSReturn_t parseUnsigned(unsigned long *pLong, unsigned char *pStr);
+  static OSReturn_t
+  parseNibble(unsigned char nibble);
+  static OSReturn_t
+  parseHex(unsigned char *pChar, unsigned char *pStr);
+  static OSReturn_t
+  parseUnsigned(unsigned short *pShort, unsigned char *pStr);
+  static OSReturn_t
+  parseSigned(signed long *pLong, unsigned char *pStr);
+  static OSReturn_t
+  parseUnsigned(unsigned long *pLong, unsigned char *pStr);
 
-  static OSReturn_t parseFixedPrec(signed long *pLong, unsigned short prec,
-      bool hasSign, unsigned char *pStr);
+  static OSReturn_t
+  parseFixedPrec(signed long *pLong, unsigned short prec, bool hasSign,
+      unsigned char *pStr);
 
 protected:
   // members
@@ -63,40 +93,52 @@ protected:
 
   unsigned char m_sep;
   unsigned short m_len;
-  };
+};
 
 // ----------------------------------------------------------------------------
 
-inline unsigned char *Parser::getToken(void)
-  {
-    return m_pToken;
-  }
+inline unsigned char *
+Parser::getToken(void)
+{
+  return m_pToken;
+}
 
-inline unsigned char Parser::getSeparator(void)
-  {
-    return m_sep;
-  }
+inline unsigned char
+Parser::getSeparator(void)
+{
+  return m_sep;
+}
 
-inline void Parser::setToken(unsigned char *pToken,
-    unsigned short tokenSize)
-  {
-    m_pToken = pToken;
-    m_tokenSize = tokenSize;
-  }
+inline void
+Parser::setTokenBuffer(unsigned char *pToken, unsigned short tokenSize)
+{
+  m_pToken = pToken;
+  m_tokenSize = tokenSize;
+}
 
-inline void Parser::setSeparators(unsigned char *pSeparators)
-  {
-    m_pSeparators = pSeparators;
-  }
+inline void
+Parser::setToken(unsigned char *pToken, unsigned short tokenSize)
+{
+  m_pToken = pToken;
+  m_tokenSize = tokenSize;
+}
 
-inline void Parser::setSpaces(unsigned char *pSpaces)
-  {
-    m_pSpaces = pSpaces;
-  }
+inline void
+Parser::setSeparators(unsigned char *pSeparators)
+{
+  m_pSeparators = pSeparators;
+}
 
-inline unsigned short Parser::getTokenLength(void)
-  {
-    return m_len;
-  }
+inline void
+Parser::setSpaces(unsigned char *pSpaces)
+{
+  m_pSpaces = pSpaces;
+}
 
-#endif /*PARSER_H_*/
+inline unsigned short
+Parser::getTokenLength(void)
+{
+  return m_len;
+}
+
+#endif /* PARSER_H_ */
