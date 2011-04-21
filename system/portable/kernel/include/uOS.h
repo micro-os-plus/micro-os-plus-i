@@ -73,6 +73,10 @@
 #include "portable/misc/include/SimpleCli.h"
 #endif
 
+#if defined(OS_INCLUDE_COMMANDLINEINTERFACE)
+#include "portable/misc/include/CommandLineInterface.h"
+#endif
+
 #if defined(OS_INCLUDE_PARSER)
 #include "portable/misc/include/Parser.h"
 #endif
