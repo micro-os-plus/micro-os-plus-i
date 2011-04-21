@@ -29,6 +29,7 @@ class GpsCoordinate
 {
 public:
   GpsCoordinate();
+  ~GpsCoordinate();
 
   gpsHemisphere_t
   getHemisphere(void) const;
@@ -68,6 +69,7 @@ class GpsPosition
 {
 public:
   GpsPosition();
+  ~GpsPosition();
 
   gpsCoordinate_t*
   getLatitude();

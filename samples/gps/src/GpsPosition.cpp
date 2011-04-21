@@ -6,6 +6,8 @@
 
 #include "GpsPosition.h"
 
+// ----------------------------------------------------------------------------
+
 GpsCoordinate::GpsCoordinate()
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -15,11 +17,10 @@ GpsCoordinate::GpsCoordinate()
 #endif
 }
 
-GpsPosition::GpsPosition()
+GpsCoordinate::~GpsCoordinate()
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("GpsPosition()=");
-  debug.putPtr(this);
+  debug.putString("~GpsCoordinate()");
   debug.putNewLine();
 #endif
 }
@@ -34,11 +35,32 @@ operator <<(ostream& out, GpsCoordinate& c)
   return out;
 }
 
+// ----------------------------------------------------------------------------
+
+GpsPosition::GpsPosition()
+{
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+  debug.putString("GpsPosition()=");
+  debug.putPtr(this);
+  debug.putNewLine();
+#endif
+}
+
+GpsPosition::~GpsPosition()
+{
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+  debug.putString("~GpsPosition()");
+  debug.putNewLine();
+#endif
+}
+
 ostream&
 operator <<(ostream& out, GpsPosition& p)
 {
-  out << *p.getLatitude() << ", " << *p.getLongitude() << ", " << p.getAltitude() << "m";
+  out << *p.getLatitude() << ", " << *p.getLongitude() << ", "
+      << p.getAltitude() << "m";
 
   return out;
 }
 
+// ----------------------------------------------------------------------------
