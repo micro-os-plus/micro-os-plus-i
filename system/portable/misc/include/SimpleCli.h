@@ -47,4 +47,4 @@ private:
 #endif /* defined(OS_INCLUDE_SIMPLECLI_PARSER) */
 };
 
-#endif /*SIMPLECLI_H_ */
+#endif /* SIMPLECLI_H_ */
