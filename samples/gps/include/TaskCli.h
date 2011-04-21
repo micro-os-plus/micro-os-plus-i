@@ -9,9 +9,6 @@
 
 #include "portable/kernel/include/uOS.h"
 
-//#include "portable/devices/character/include/OSDeviceCharacter.h"
-//#include "portable/misc/include/SimpleCli.h"
-
 class TaskCli : public OSTask
 {
 public:
@@ -22,9 +19,19 @@ public:
   virtual void
   taskMain(void);
 
+  OSReturn_t
+  commandShowTasks(void);
+  OSReturn_t
+  commandShowStacks(void);
+  OSReturn_t
+  commandShowPosition(void);
+
 private:
   void
   processLine(void);
+
+  OSReturn_t
+  recurse(cliToken_t* p);
 
   // members
   OSStack_t m_stack[(OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
@@ -33,7 +40,7 @@ private:
   istream m_cin;
   ostream m_cout;
 
-  SimpleCli m_cli;
+  CommandLineInterface m_cli;
   Parser m_parser;
 
   unsigned char m_line[80]; // input line

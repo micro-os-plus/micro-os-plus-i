@@ -15,7 +15,7 @@
 
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
   OSTask(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(&m_dev),
-      m_cout(&m_dev), m_cli(m_line, sizeof(m_line))
+      m_cout(&m_dev), m_cli(m_cin, m_cout, m_line, sizeof(m_line))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskCli()=");
@@ -25,8 +25,23 @@ TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
 }
 
 // ----------------------------------------------------------------------------
+extern const cliToken_t l2[];
+
+const cliToken_t l1[] =
+  {
+    { "show", (cliToken_t*) l2, 0 },
+    { 0, 0, 0 } };
+
+const cliToken_t l2[] =
+  {
+    { "tasks", 0, (pCliMethod_t) & TaskCli::commandShowTasks },
+    { "stacks", 0, (pCliMethod_t) & TaskCli::commandShowStacks },
+    { "position", 0, (pCliMethod_t) & TaskCli::commandShowPosition },
+    { 0, 0, 0 } };
 
 static const char prompt[] = "> ";
+
+// ----------------------------------------------------------------------------
 
 /*
  * Task main code. 
@@ -49,10 +64,12 @@ TaskCli::taskMain(void)
 
   OSDeviceCharacter& dev = m_dev;
 
-  istream& cin = m_cin;
+  //istream& cin = m_cin;
   ostream& cout = m_cout;
 
-  SimpleCli & cli = m_cli;
+  CommandLineInterface & cli = m_cli;
+
+  cli.setCommands((cliToken_t*) l1, (pCliClass_t*) this);
 
   // task endless loop
   for (;;)
@@ -66,7 +83,7 @@ TaskCli::taskMain(void)
           cout << endl << prompt;
           int c;
 
-          c = cli.readLine(cin, cout);
+          c = cli.readLine();
           if (c == traits::eof())
             {
               if (os.isDebug)
@@ -89,7 +106,7 @@ TaskCli::taskMain(void)
               break;
             }
 
-          processLine();
+          cli.processLine();
         }
       dev.close();
     }
@@ -98,85 +115,57 @@ TaskCli::taskMain(void)
 static const char str_help[] = "show tasks | show stacks | show position";
 static const char str_unknown[] = "Cmd?";
 
-/*
- * Parse input line, identify commands and output results.
- * 
- * Accepted commands:
- * 
- *      show tasks
- *      show stacks
- *      show position
- */
-
-void
-TaskCli::processLine()
+OSReturn_t
+TaskCli::commandShowTasks(void)
 {
   ostream& cout = m_cout;
-  Parser& parser = m_parser;
 
-  parser.setInput(m_line);
-  parser.setSeparators((unsigned char*) " ");
-  parser.setToken(m_token, sizeof(m_token));
+  int nTasks;
+  nTasks = os.sched.getTasksCount();
 
-  parser.parseToken();
-
-  if (parser.getTokenLength() == 0)
-    goto err; // no token, empty line
-
-  if (parser.tokenCompare((const unsigned char*) "show") == 0)
+  for (int i = 0; i < nTasks; ++i)
     {
-      parser.parseToken();
+      OSTask *pt;
+      pt = os.sched.getTask(i);
 
-      if (parser.getTokenLength() == 0)
-        goto err;
-      // no subcommand
-
-      if (parser.tokenCompare((const unsigned char*) "tasks") == 0)
-        {
-          int nTasks;
-          nTasks = os.sched.getTasksCount();
-
-          for (int i = 0; i < nTasks; ++i)
-            {
-              OSTask *pt;
-              pt = os.sched.getTask(i);
-
-              cout << endl;
-              cout << ((pt == this) ? '*' : ' ');
-              cout << *pt; // print task info
-            }
-        }
-      else if (parser.tokenCompare((const unsigned char*) "stacks") == 0)
-        {
-          int nTasks;
-          nTasks = os.sched.getTasksCount();
-          for (int i = 0; i < nTasks; ++i)
-            {
-              OSTask* pt;
-              pt = os.sched.getTask(i);
-
-              cout << endl;
-              cout << ((pt == this) ? '*' : ' ');
-              cout << pt->getName() << ' ' << pt->getStackUsed() << '/'
-                  << pt->getStackSize();
-            }
-        }
-      else if (parser.tokenCompare((const unsigned char*) "position") == 0)
-        {
-          GpsPosition pos;
-          app.gps.getPosition(&pos);
-
-          cout << endl << pos;
-        }
-      else
-        goto err;
+      cout << endl;
+      cout << ((pt == this) ? '*' : ' ');
+      cout << *pt; // print task info
     }
-  else
-    goto err;
 
-  return;
-
-  err: cout << endl << str_unknown;
-  cout << endl << str_help;
+  return OSReturn::OS_OK;
 }
 
+OSReturn_t
+TaskCli::commandShowStacks(void)
+{
+  ostream& cout = m_cout;
+
+  int nTasks;
+  nTasks = os.sched.getTasksCount();
+  for (int i = 0; i < nTasks; ++i)
+    {
+      OSTask* pt;
+      pt = os.sched.getTask(i);
+
+      cout << endl;
+      cout << ((pt == this) ? '*' : ' ');
+      cout << pt->getName() << ' ' << pt->getStackUsed() << '/'
+          << pt->getStackSize();
+    }
+
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+TaskCli::commandShowPosition(void)
+{
+  ostream& cout = m_cout;
+
+  GpsPosition pos;
+  app.gps.getPosition(&pos);
+
+  cout << endl << pos;
+
+  return OSReturn::OS_OK;
+}
