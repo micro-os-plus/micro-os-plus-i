@@ -15,12 +15,12 @@ public:
   Parser();
 
   void
-  setInput(unsigned char *pLine);
+  setInput(unsigned char* pLine);
 
   void
-  setSeparators(unsigned char *pSeparators);
+  setSeparators(unsigned char* pSeparators);
   void
-  setSpaces(unsigned char *pSpaces);
+  setSpaces(unsigned char* pSpaces);
 
   void
   setTokenBuffer(unsigned char *pToken, unsigned short tokenSize);
@@ -28,7 +28,7 @@ public:
   // Deprecated
   void
   setToken(unsigned char *pToken, unsigned short tokenSize);
-  unsigned char *
+  unsigned char*
   getToken(void);
 
   void
@@ -48,14 +48,14 @@ public:
   getSeparator(void);
 
   OSReturn_t
-  parseHex(unsigned char *pChar);
+  parseHex(unsigned char* pChar);
   OSReturn_t
-  parseUnsigned(unsigned short *pShort);
+  parseUnsigned(unsigned short* pShort);
   OSReturn_t
-  parseSigned(signed long *pLong);
+  parseSigned(signed long* pLong);
 
   OSReturn_t
-  parseFixedPrec(signed long *pLong, unsigned short prec);
+  parseFixedPrec(signed long* pLong, unsigned short prec);
 
   int
   tokenCompare(const unsigned char* pStr);
@@ -68,27 +68,26 @@ public:
   static OSReturn_t
   parseNibble(unsigned char nibble);
   static OSReturn_t
-  parseHex(unsigned char *pChar, unsigned char *pStr);
+  parseHex(unsigned char* pStr, unsigned char* pChar);
   static OSReturn_t
-  parseUnsigned(unsigned short *pShort, unsigned char *pStr);
+  parseUnsigned(unsigned char* pStr, unsigned short* pShort);
   static OSReturn_t
-  parseSigned(signed long *pLong, unsigned char *pStr);
+  parseSigned( unsigned char* pStr, signed long* pLong);
   static OSReturn_t
-  parseUnsigned(unsigned long *pLong, unsigned char *pStr);
+  parseUnsigned(unsigned char* pStr, unsigned long* pLong);
 
   static OSReturn_t
-  parseFixedPrec(signed long *pLong, unsigned short prec, bool hasSign,
-      unsigned char *pStr);
+  parseFixedPrec(unsigned char* pStr, signed long* pLong, unsigned short prec, bool hasSign);
 
 protected:
   // members
-  unsigned char *m_pLine;
-  unsigned char *m_pCrt;
+  unsigned char* m_pLine;
+  unsigned char* m_pCrt;
 
-  unsigned char *m_pSeparators;
-  unsigned char *m_pSpaces;
+  unsigned char* m_pSeparators;
+  unsigned char* m_pSpaces;
 
-  unsigned char *m_pToken;
+  unsigned char* m_pToken;
   unsigned short m_tokenSize;
 
   unsigned char m_sep;

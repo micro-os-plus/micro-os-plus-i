@@ -20,7 +20,7 @@ Parser::Parser()
   OSDeviceDebug::putNewLine();
 #endif
 
-  m_pSeparators = (unsigned char *) "\0";
+  m_pSeparators = (unsigned char*) "\0";
   m_pSpaces = 0;
 
   m_pToken = 0;
@@ -28,7 +28,7 @@ Parser::Parser()
 }
 
 void
-Parser::setInput(unsigned char *pLine)
+Parser::setInput(unsigned char* pLine)
 {
   m_pLine = pLine;
   m_pCrt = pLine;
@@ -50,9 +50,9 @@ Parser::parseToken(void)
 }
 
 OSReturn_t
-Parser::parseToken(unsigned char *pSeparators, unsigned char *pSpaces)
+Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
 {
-  unsigned char *p;
+  unsigned char* p;
   p = m_pToken;
   if (p == 0)
     return OSReturn::OS_NOT_INITIALIZED;
@@ -75,6 +75,7 @@ Parser::parseToken(unsigned char *pSeparators, unsigned char *pSpaces)
         {
           bFound = true;
           m_sep = '\0';
+          --m_pCrt; // Remain on terminator
         }
       else
         {
@@ -119,7 +120,7 @@ Parser::parseToken(unsigned char *pSeparators, unsigned char *pSpaces)
 
 #if defined(DEBUG) && defined(OS_DEBUG_PARSER_PARSETOKEN)
   OSDeviceDebug::putString("Token='");
-  OSDeviceDebug::putString((const char*)m_pToken);
+  OSDeviceDebug::putString((const char*) m_pToken);
   OSDeviceDebug::putString("' 0x");
   OSDeviceDebug::putHex(m_sep);
   OSDeviceDebug::putNewLine();
@@ -155,26 +156,26 @@ Parser::parseSubstring(unsigned short len)
 }
 
 OSReturn_t
-Parser::parseHex(unsigned char *pChar)
+Parser::parseHex(unsigned char* pChar)
 {
-  return parseHex(pChar, m_pToken);
+  return parseHex(m_pToken, pChar);
 }
 
 OSReturn_t
-Parser::parseUnsigned(unsigned short *pShort)
+Parser::parseUnsigned(unsigned short* pShort)
 {
-  return parseUnsigned(pShort, m_pToken);
+  return parseUnsigned(m_pToken, pShort);
 }
 OSReturn_t
-Parser::parseSigned(signed long *pLong)
+Parser::parseSigned(signed long* pLong)
 {
-  return parseSigned(pLong, m_pToken);
+  return parseSigned(m_pToken, pLong);
 }
 
 OSReturn_t
-Parser::parseFixedPrec(signed long *pLong, unsigned short prec)
+Parser::parseFixedPrec(signed long* pLong, unsigned short prec)
 {
-  return parseFixedPrec(pLong, prec, true, m_pToken);
+  return parseFixedPrec(m_pToken, pLong, prec, true);
 }
 
 OSReturn_t
@@ -196,7 +197,7 @@ Parser::parseNibble(unsigned char nibble)
 }
 
 OSReturn_t
-Parser::parseHex(unsigned char *pChar, unsigned char *pStr)
+Parser::parseHex(unsigned char* pStr, unsigned char* pChar)
 {
   unsigned char ch;
 
@@ -223,7 +224,7 @@ Parser::parseHex(unsigned char *pChar, unsigned char *pStr)
 }
 
 OSReturn_t
-Parser::parseUnsigned(unsigned short *pShort, unsigned char *pStr)
+Parser::parseUnsigned(unsigned char* pStr, unsigned short* pShort)
 {
   unsigned short w;
   unsigned char c;
@@ -246,20 +247,20 @@ Parser::parseUnsigned(unsigned short *pShort, unsigned char *pStr)
 }
 
 OSReturn_t
-Parser::parseSigned(signed long *pLong, unsigned char *pStr)
+Parser::parseSigned(unsigned char* pStr, signed long* pLong)
 {
-  return parseFixedPrec(pLong, 0, true, pStr);
+  return parseFixedPrec(pStr, pLong, 0, true);
 }
 
 OSReturn_t
-Parser::parseUnsigned(unsigned long *pLong, unsigned char *pStr)
+Parser::parseUnsigned(unsigned char* pStr, unsigned long* pLong)
 {
-  return parseFixedPrec((signed long *) pLong, 0, false, pStr);
+  return parseFixedPrec(pStr, (signed long*) pLong, 0, false);
 }
 
 OSReturn_t
-Parser::parseFixedPrec(signed long *pLong, unsigned short prec, bool hasSign,
-    unsigned char *pStr)
+Parser::parseFixedPrec(unsigned char* pStr, signed long* pLong,
+    unsigned short prec, bool hasSign)
 {
   signed long l;
   unsigned char c;
@@ -331,14 +332,14 @@ Parser::parseFixedPrec(signed long *pLong, unsigned short prec, bool hasSign,
 int
 Parser::tokenCompare(const unsigned char* pStr)
 {
-  return strcmp((const char*)m_pToken, (const char*)pStr);
+  return strcmp((const char*) m_pToken, (const char*) pStr);
 }
 
 // Warning: does not work on AVR32
 int
 Parser::tokenCompareIgnoreCase(const unsigned char* pStr)
 {
-  return strcasecmp((const char*)m_pToken, (const char*)pStr);
+  return strcasecmp((const char*) m_pToken, (const char*) pStr);
 }
 
 #endif /* defined(OS_INCLUDE_PARSER) */
