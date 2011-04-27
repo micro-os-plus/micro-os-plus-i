@@ -9,6 +9,8 @@
 
 #include "portable/kernel/include/OS.h"
 
+#include "portable/devices/character/include/OSDeviceCharacter.h"
+
 #include "portable/misc/include/Parser.h"
 
 #include "portable/stdlib/include/istream"
@@ -34,26 +36,41 @@ public:
 class CommandLineInterface
 {
 public:
-  CommandLineInterface(istream& cin, ostream& cout, unsigned char *pLine, unsigned short iSize);
+  CommandLineInterface(istream& cin, ostream& cout, unsigned char *pLine,
+      unsigned short iSize);
   ~CommandLineInterface();
 
   void
   setCommands(cliToken_t* pToken, pCliClass_t* pClass);
 
+  OSReturn_t
+  loop(OSDeviceCharacter& dev, unsigned char* greeting = 0);
+
   int
-  readLine();
+  readLine(void);
 
   void
   processLine(void);
 
+  void
+  setPrompt(unsigned char* pPrompt);
+  unsigned char*
+  getPrompt(void);
+
+  Parser&
+  getParser(void);
+
 private:
-  OSReturn_t recurse(cliToken_t* p);
+  OSReturn_t
+  recurse(cliToken_t* p);
 
   istream m_cin;
   ostream m_cout;
 
-  unsigned char *m_pLine;
+  unsigned char* m_pLine;
   unsigned short m_iSize;
+
+  unsigned char* m_pPrompt;
 
   Parser m_parser;
   unsigned char m_token[20]; // parsed token
@@ -67,6 +84,24 @@ CommandLineInterface::setCommands(cliToken_t* pToken, pCliClass_t* pClass)
 {
   m_pToken = pToken;
   m_pClass = pClass;
+}
+
+inline void
+CommandLineInterface::setPrompt(unsigned char* pPrompt)
+{
+  m_pPrompt = pPrompt;
+}
+
+inline unsigned char*
+CommandLineInterface::getPrompt(void)
+{
+  return m_pPrompt;
+}
+
+inline Parser&
+CommandLineInterface::getParser(void)
+{
+  return m_parser;
 }
 
 #endif /* COMMANDLINEINTERFACE_H_ */
