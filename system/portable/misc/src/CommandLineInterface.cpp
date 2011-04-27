@@ -25,6 +25,8 @@ CommandLineInterface::CommandLineInterface(istream& cin, ostream& cout,
 
   m_pLine = pLine;
   m_iSize = iSize;
+
+  m_pPrompt = (unsigned char*) "> ";
 }
 
 CommandLineInterface::~CommandLineInterface()
@@ -33,6 +35,55 @@ CommandLineInterface::~CommandLineInterface()
   OSDeviceDebug::putString("~CommandLineInterface()");
   OSDeviceDebug::putNewLine();
 #endif
+}
+
+OSReturn_t
+CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
+{
+  ostream& cout = m_cout;
+
+  if (greeting != 0)
+    cout << endl << endl << greeting << endl;
+
+  for (; dev.isConnected();)
+    {
+      cout << endl << m_pPrompt;
+      int c;
+
+      c = readLine();
+      if (c == traits::eof())
+        {
+#if defined(DEBUG)
+          OSDeviceDebug::putString("disconnected");
+          OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
+
+          return OSReturn::OS_DISCONNECTED;
+        }
+      else if (c == OSReturn::OS_TIMEOUT)
+        {
+#if defined(DEBUG)
+          OSDeviceDebug::putString("timeout");
+          OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
+
+          return OSReturn::OS_DISCONNECTED;
+        }
+      else if (c < 0)
+        {
+#if defined(DEBUG)
+          OSDeviceDebug::putString("error -");
+          OSDeviceDebug::putDec((unsigned short) (-c));
+          OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
+
+          return c;
+        }
+
+      processLine();
+    }
+
+  return OSReturn::OS_OK;
 }
 
 int
