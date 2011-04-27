@@ -26,6 +26,9 @@ public:
   OSReturn_t
   commandShowPosition(void);
 
+  OSReturn_t
+  commandTest(void);
+
 private:
   void
   processLine(void);
