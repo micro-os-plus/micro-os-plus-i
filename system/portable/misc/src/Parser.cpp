@@ -44,11 +44,32 @@ Parser::setCurrent(unsigned short index)
 }
 
 OSReturn_t
+Parser::skipTokens(unsigned short nTokens)
+{
+  return skipTokens(nTokens, m_pSeparators);
+}
+
+OSReturn_t
+Parser::skipTokens(unsigned short nTokens, unsigned char *pSeparators)
+{
+  OSReturn_t ret;
+
+  for (int i = 0; i < nTokens; ++i)
+    {
+      ret = parseToken(pSeparators, m_pSpaces);
+      if (ret == '\0')
+        break;
+    }
+  return ret;
+}
+
+OSReturn_t
 Parser::parseToken(void)
 {
   return parseToken(m_pSeparators, m_pSpaces);
 }
 
+// Parse to the next separator, ignoring spaces
 OSReturn_t
 Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
 {
@@ -71,6 +92,7 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
 
       bFound = false;
 
+      // First check if end of string reached
       if (c == '\0')
         {
           bFound = true;
@@ -79,6 +101,7 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
         }
       else
         {
+          // Then check if a separator, like COMMA is encountered
           for (unsigned char *q = pSeparators; q && *q && !bFound; ++q)
             {
               if (*q == c)
@@ -93,9 +116,11 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
             {
               if (tlen < m_tokenSize - 1)
                 {
+                  // If there is enough free space in the token array
                   bool bSpaceFound;
                   bSpaceFound = false;
 
+                  // Check if a special space character is encountered
                   for (unsigned char *q = pSpaces; q && *q && !bSpaceFound; ++q)
                     {
                       if (*q == c)
@@ -106,6 +131,7 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
                     }
                   if (!bSpaceFound)
                     {
+                      // Store the current character in the token array
                       *p++ = c;
                       *p = '\0';
 

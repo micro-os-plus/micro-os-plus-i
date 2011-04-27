@@ -34,6 +34,14 @@ public:
   void
   setCurrent(unsigned short index);
 
+  bool
+  isEndOfLine(void);
+
+  OSReturn_t
+  skipTokens(unsigned short nTokens);
+  OSReturn_t
+  skipTokens(unsigned short nTokens, unsigned char *pSeparators);
+
   OSReturn_t
   parseToken(void);
   OSReturn_t
@@ -72,12 +80,13 @@ public:
   static OSReturn_t
   parseUnsigned(unsigned char* pStr, unsigned short* pShort);
   static OSReturn_t
-  parseSigned( unsigned char* pStr, signed long* pLong);
+  parseSigned(unsigned char* pStr, signed long* pLong);
   static OSReturn_t
   parseUnsigned(unsigned char* pStr, unsigned long* pLong);
 
   static OSReturn_t
-  parseFixedPrec(unsigned char* pStr, signed long* pLong, unsigned short prec, bool hasSign);
+  parseFixedPrec(unsigned char* pStr, signed long* pLong, unsigned short prec,
+      bool hasSign);
 
 protected:
   // members
@@ -138,6 +147,12 @@ inline unsigned short
 Parser::getTokenLength(void)
 {
   return m_len;
+}
+
+inline bool
+Parser::isEndOfLine(void)
+{
+  return (m_sep == '\0');
 }
 
 #endif /* PARSER_H_ */
