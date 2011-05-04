@@ -56,6 +56,9 @@ public:
   virtual unsigned long
   getBaudRate(void);
 
+  bool
+  isSending(void);
+
   // blocking read.
   // return byte or negative (OSReturn::OS_DISCONNECTED, OSReturn::OS_TIMEOUT)
   OSReturn_t
@@ -218,6 +221,8 @@ private:
   implWriteByte(unsigned char b) = 0;
   virtual int
   implWriteBytes(const unsigned char* buf, int len);
+  virtual bool
+  implIsSending(void);
 
   virtual int
   implFlush(void) = 0;

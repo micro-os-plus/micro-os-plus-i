@@ -234,6 +234,12 @@ OSDeviceCharacter::getBaudRate(void)
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
 }
 
+bool
+OSDeviceCharacter::isSending(void)
+{
+  return implIsSending();
+}
+
 int
 OSDeviceCharacter::writeByte(unsigned char b)
 {
@@ -612,6 +618,7 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
     }
 
   m_countToRead = bufSize;
+  *count = 0;
 
   bool canRead;
   for (;;)
@@ -804,5 +811,11 @@ OSDeviceCharacter::sync(void)
 }
 
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF */
+
+bool
+OSDeviceCharacter::implIsSending(void)
+{
+  return false;
+}
 
 #endif /* OS_INCLUDE_OSDEVICECHARACTER */
