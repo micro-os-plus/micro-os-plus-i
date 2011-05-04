@@ -32,9 +32,14 @@ public:
   void
   interruptTxServiceRoutine(void);
 
+  bool
+  isSending(void);
+
 protected:
   CircularByteBuffer m_rxBuf;
   CircularByteBuffer m_txBuf;
+
+  bool m_sending;
 
 private:
   // open/close
@@ -44,6 +49,9 @@ private:
   implClose(void);
   virtual bool
   implIsConnected(void) const;
+
+  virtual bool
+  implIsSending(void);
 
   // read
   virtual bool

@@ -26,6 +26,7 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
+  m_sending = false;
 }
 
 OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
@@ -38,6 +39,7 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
+  m_sending = false;
 }
 
 void
@@ -259,6 +261,7 @@ OSDeviceCharacterBuffered::implWriteByte(unsigned char b)
       if (m_txBuf.isAboveHighWM())
         {
           implInterruptTxEnable(); // start transmission
+          m_sending = true;
         }
     }
   OSCriticalSection::exit();
@@ -277,6 +280,7 @@ OSDeviceCharacterBuffered::implWriteBytes(const unsigned char* buf, int len)
       if (m_txBuf.isAboveHighWM())
         {
           implInterruptTxEnable(); // start transmission
+          m_sending = true;
         }
     }
   OSCriticalSection::exit();
@@ -317,6 +321,7 @@ OSDeviceCharacterBuffered::interruptTxServiceRoutine(void)
   if (m_txBuf.isEmpty())
     {
       implInterruptTxDisable();
+      m_sending = false;
 #if defined(OS_DEBUG_OSDEVICECHARACTERBUFFERED_TX_ISR)
       OSDeviceDebug::putChar('<');
       OSDeviceDebug::putNewLine();
@@ -337,6 +342,12 @@ OSDeviceCharacterBuffered::interruptTxServiceRoutine(void)
           //OSDeviceDebug::putChar('n');
         }
     }
+}
+
+bool
+OSDeviceCharacterBuffered::implIsSending(void)
+{
+  return m_sending;
 }
 
 #endif /* OS_INCLUDE_OSDEVICECHARACTERBUFFERED */
