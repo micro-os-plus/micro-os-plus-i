@@ -21,14 +21,14 @@ delayWithYield(schedTicks_t n)
   for (; n--;)
     {
       os.busyWaitMillis(1); // busy wait one millisecond
-      os.sched.yield(); // release control to next task
+      os.sched.yield(); // release control to next thread
     }
 }
 
 // ---------------------------------------------------------------------------
 
-// Since all tasks share the processor, to compute the individual
-// rate, divide the tick rate by the number of tasks
+// Since all threads share the processor, to compute the individual
+// rate, divide the tick rate by the number of threads
 #define NTASKS  (3)
 #define MILLIS  (OS_CFGINT_TICK_RATE_HZ/NTASKS)
 

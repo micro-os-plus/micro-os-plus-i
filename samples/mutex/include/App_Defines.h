@@ -68,7 +68,7 @@
 
 #define APP_INCLUDE_OSMUTEX_WAITING_TASKS (1)
 
-// The maximum number of mutex stress tasks
+// The maximum number of mutex stress threads
 #define APP_CONFIG_RESOURCES_ARRAY_SIZE         (10)
 #define APP_CONFIG_ERROR_CODE                   (-1)
 

@@ -7,7 +7,7 @@
 #ifndef OS_APP_CONFIG_H_
 #define OS_APP_CONFIG_H_
 
-#define OS_CFGINT_TASKS_TABLE_SIZE                      (3)
+#define OS_CFGINT_THREADS_TABLE_SIZE                      (3)
 
 #define OS_INCLUDE_OSSCHEDULER_TIMERSECONDS             1
 

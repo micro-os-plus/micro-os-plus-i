@@ -13,7 +13,7 @@
 //#define OS_CFGINT_TIMER_PRESCALLER                      (64)
 //#define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
 
-#define OS_CFGINT_TASKS_TABLE_SIZE                      (2)
+#define OS_CFGINT_THREADS_TABLE_SIZE                      (2)
 
 #define OS_INCLUDE_OSSCHEDULER_TIMERSECONDS             (1)
 

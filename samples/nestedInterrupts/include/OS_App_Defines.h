@@ -14,7 +14,7 @@
 #define OS_CFGINT_TIMER_PRESCALLER                      (4)
 #define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
 
-#define OS_CFGINT_TASKS_TABLE_SIZE                      (3)
+#define OS_CFGINT_THREADS_TABLE_SIZE                      (3)
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
 //#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
@@ -25,7 +25,7 @@
 //#define OS_INCLUDE_OSTHREAD_SCHEDULERTICK                 (1)
 #define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
 
-#define OS_CFGINT_IDLE_TASK_STACK_SIZE                  (800)
+#define OS_CFGINT_IDLE_THREAD_STACK_SIZE                  (800)
 
 #define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 #define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
@@ -63,7 +63,7 @@
 #define OS_DEBUG_CONSTRUCTORS                           (1)
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
 //#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
-//#define OS_DEBUG_OSSCHEDULER_TASKREGISTER               (1)
+//#define OS_DEBUG_OSSCHEDULER_THREADREGISTER               (1)
 //#define OS_DEBUG_OSSCHEDULER_EVENTWAIT                  (1)
 //#define OS_DEBUG_OSSCHEDULER_EVENTNOTIFY                (1)
 //#define OS_DEBUG_OSREADYLIST_INSERT                     (1)

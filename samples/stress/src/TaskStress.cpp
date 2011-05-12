@@ -9,8 +9,8 @@
 unsigned int TaskStress::ms_rand;
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskStress::TaskStress(const char *pName, unsigned int minMicros,
@@ -30,7 +30,7 @@ TaskStress::TaskStress(const char *pName, unsigned int minMicros,
 }
 
 /*
- * Task main code.
+ * Thread main code.
  * Simulate a typical activity, a busy wait followed by a sleep.
  */
 
@@ -60,7 +60,7 @@ TaskStress::threadMain(void)
   int nCnt;
   nCnt = 0;
 
-  // task endless loop
+  // thread endless loop
   for (;;)
     {
       nBusy = (rand() % (m_maxMicros - m_minMicros)) + m_minMicros;

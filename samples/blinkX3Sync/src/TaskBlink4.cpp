@@ -7,12 +7,12 @@
 #include "TaskBlink4.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
-TaskBlink4::TaskBlink4(const char *pName, schedTicks_t rate, TaskBlink1& task) :
-  OSThread(pName, m_stack, sizeof(m_stack)), m_task(task)
+TaskBlink4::TaskBlink4(const char *pName, schedTicks_t rate, TaskBlink1& thread) :
+  OSThread(pName, m_stack, sizeof(m_stack)), m_thread(thread)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     debug.putString("TaskBlink4()=");
@@ -26,12 +26,12 @@ TaskBlink4::TaskBlink4(const char *pName, schedTicks_t rate, TaskBlink1& task) :
   }
 
 /*
- * Task main code.
+ * Thread main code.
  * Step between 4 states and toggle both preeption and another
- * flag to set the type of busy wait performed in associated task.
+ * flag to set the type of busy wait performed in associated thread.
  */
 
-void TaskBlink4::taskMain(void)
+void TaskBlink4::threadMain(void)
   {
     if (os.isDebug())
       {
@@ -46,7 +46,7 @@ void TaskBlink4::taskMain(void)
         os.sched.lock.exit();
       }
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
         // go to sleep for some ticks
@@ -55,8 +55,8 @@ void TaskBlink4::taskMain(void)
         if (os.isDebug())
           debug.putChar(m_bToggleBusyWait ? 'B' : 'b');
 
-        // set flag in associated task
-        m_task.setBusyWait(m_bToggleBusyWait);
+        // set flag in associated thread
+        m_thread.setBusyWait(m_bToggleBusyWait);
 
         if (m_bToggleBusyWait)
           {

@@ -18,8 +18,8 @@ NestedInterrupt_contextHandler(void);
 static TaskBlinkNested *pTaskBlinkNested;
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskBlinkNested::TaskBlinkNested(const char *pName, unsigned char iLed,
@@ -39,7 +39,7 @@ TaskBlinkNested::TaskBlinkNested(const char *pName, unsigned char iLed,
 }
 
 /*
- * Task main code.
+ * Thread main code.
  * Initialise led and toggle it using the rate.
  *
  * The toggle rate is done with busy wait, the loop being interrupted by yields.
@@ -72,7 +72,7 @@ TaskBlinkNested::threadMain(void)
 
   bool bSecond;
   bSecond = false;
-  // task endless loop
+  // thread endless loop
   for (;;)
     {
 #if true
@@ -209,7 +209,7 @@ TaskBlinkNested::interruptServiceRoutine(void)
   OS::busyWaitMicros(10);
 #else
 
-  // Notify task; some of these will be lost, but the total count
+  // Notify thread; some of these will be lost, but the total count
   // will accumulate, and when awaken, will be considered
   OSScheduler::eventNotify(APP_CFGINT_TASKBLINKNESTED_EVENT);
 

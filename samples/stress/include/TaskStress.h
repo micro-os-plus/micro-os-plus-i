@@ -13,10 +13,10 @@
 class TaskStress : public OSThread
   {
 public:
-  // task constructor
+  // active object constructor
   TaskStress(const char *pName, unsigned int minMicros, unsigned int maxMicros, unsigned int minTicks, unsigned int maxTicks);
 
-  // actual task main code
+  // actual thread main code
   virtual void threadMain(void);
 
   static unsigned int rand(void);

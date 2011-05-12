@@ -13,12 +13,12 @@
 class TaskStress : public OSThread
   {
 public:
-  // task constructor
+  // active object constructor
   // m_taskId is the numeric id of the task, used as index in resourceAccessNum
-  TaskStress(const char *pName, int m_taskId);
+  TaskStress(const char *pName, int m_threadId);
 
-  // actual task main code
-  virtual void taskMain(void);
+  // actual thread main code
+  virtual void threadMain(void);
 
   // returns a pseudo-random generated unsigned int number
   static unsigned int rand(void);
@@ -27,8 +27,8 @@ private:
   // members
   OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
 
-  // the numeric id of the task, used as index in resourceAccessNum
-  int m_taskId;
+  // the numeric id of the thread, used as index in resourceAccessNum
+  int m_threadId;
 
   // the random seed
   static unsigned int ms_rand;

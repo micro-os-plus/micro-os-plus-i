@@ -14,11 +14,11 @@
 class TaskBlink4 : public OSThread
   {
 public:
-  // task constructor
-  TaskBlink4(const char *pName, schedTicks_t rate, TaskBlink1& task);
+  // active object constructor
+  TaskBlink4(const char *pName, schedTicks_t rate, TaskBlink1& thread);
 
-  // actual task main code
-  virtual void taskMain(void);
+  // actual thread main code
+  virtual void threadMain(void);
 
 private:
   // members
@@ -27,7 +27,7 @@ private:
   schedTicks_t m_rate;
   bool m_bToggleBusyWait;
   bool m_bTogglePreemptive;
-  TaskBlink1& m_task;
+  TaskBlink1& m_thread;
   };
 
 #endif /*TASKBLINK4_H_*/

@@ -9,7 +9,7 @@
 // ------------------------------------------------------------------------------
 // Blink Task
 
-// task allocated on static storage
+// active objects allocated on static storage
 TaskPitpalac taskPitpalac("pitpalac");
 TaskBlink taskBlink("blink");
 

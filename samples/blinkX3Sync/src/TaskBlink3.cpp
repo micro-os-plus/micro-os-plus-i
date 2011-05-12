@@ -7,8 +7,8 @@
 #include "TaskBlink3.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskBlink3::TaskBlink3(const char *pName, unsigned char iLed) :
@@ -22,11 +22,11 @@ TaskBlink3::TaskBlink3(const char *pName, unsigned char iLed) :
   }
 
 /*
- * Task main code.
- * Initialise led and toggle it based on events notified by task 2.
+ * Thread main code.
+ * Initialise led and toggle it based on events notified by thread 2.
  */
 
-void TaskBlink3::taskMain(void)
+void TaskBlink3::threadMain(void)
   {
     if (os.isDebug())
       {
@@ -44,11 +44,11 @@ void TaskBlink3::taskMain(void)
     // initialise led port as output
     m_oLed.init();
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
-        // wait for the custom event triggered by another task.
-        // task is sleeping...
+        // wait for the custom event triggered by another thread.
+        // thread is sleeping...
         os.sched.eventWait(EVENT_CUSTOM);
 
         // toggle led

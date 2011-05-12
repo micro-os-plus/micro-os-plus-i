@@ -7,8 +7,8 @@
 #include "TaskBlink1.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskBlink1::TaskBlink1(const char *pName, unsigned char iLed, schedTicks_t rate) :
@@ -25,7 +25,7 @@ TaskBlink1::TaskBlink1(const char *pName, unsigned char iLed, schedTicks_t rate)
   }
 
 /*
- * Task main code.
+ * Thread main code.
  * Initialise led and toggle it using the rate.
  *
  * The toggle rate is done either with busy wait, or with real sleep.
@@ -33,7 +33,7 @@ TaskBlink1::TaskBlink1(const char *pName, unsigned char iLed, schedTicks_t rate)
  * entered, if preemption is disabled the loop is interrupted by yields.
  */
 
-void TaskBlink1::taskMain(void)
+void TaskBlink1::threadMain(void)
   {
     if (os.isDebug())
       {
@@ -53,12 +53,12 @@ void TaskBlink1::taskMain(void)
     // initialise led port as output
     m_oLed.init();
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
         if (m_bBusyWait)
           {
-            // busy wait case, to simulate a computing intensive task
+            // busy wait case, to simulate a computing intensive thread
             if (os.sched.isPreemptive())
               os.busyWaitMillis(m_rate); // long wait
             else
@@ -66,7 +66,7 @@ void TaskBlink1::taskMain(void)
           }
         else
           {
-            // task sleep using operating system support
+            // thread sleep using operating system support
             os.sched.timerTicks.sleep(m_rate);
           }
 

@@ -15,19 +15,19 @@
 /*
  * This project is intended to stress test the mutex synchronisation mechanism.
  *
- * The test method uses 10 instances of the stress task, all competing for the
- * same mutex. When each one acquires the mutex, a task counter is incremented.
+ * The test method uses 10 instances of the stress thread, all competing for the
+ * same mutex. When each one acquires the mutex, a thread counter is incremented.
  *
- * A separate reporting task outputs on the debug interface the current
+ * A separate reporting thread outputs on the debug interface the current
  * counters.
  *
  * There are two implementations of the mutex, the extended one with a local
  * round-robin notification mechanism, but more expensive, and one using
- * the scheduler mechanism to notify all tasks, that favours tasks by
+ * the scheduler mechanism to notify all threads, that favours threads by
  * registration order.
  *
  * The extended version should produce a more or less uniform distribution
- * of the counters. The simple one will favour first registered tasks.
+ * of the counters. The simple one will favour first registered threads.
  *
  * For applications with lots of active clients waiting for the same mutex,
  * it is recommended to use the extended version.
@@ -35,31 +35,31 @@
  * For usual applications with only two clients for a mutex, the simple
  * version is good enough.
  *
- * To activate the extended version, use OS_INCLUDE_OSMUTEX_WAITING_TASKS.
+ * To activate the extended version, use OS_INCLUDE_OSMUTEX_WAITING_THREADS.
  *
  * For this test, an application definition can switch between standard
- * and extended behaviours: APP_INCLUDE_OSMUTEX_WAITING_TASKS
+ * and extended behaviours: APP_INCLUDE_OSMUTEX_WAITING_THREADS
  */
 
 // ---------------------------------------------------------------------------
 
 // the mutex used to protect the shared variables
 
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
   OSThread* waitingTasksArray[APP_CONFIG_RESOURCES_ARRAY_SIZE];
-#if defined(APP_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(APP_INCLUDE_OSMUTEX_WAITING_THREADS)
   OSMutex mutex(waitingTasksArray, sizeof(waitingTasksArray)/sizeof(waitingTasksArray[0]));
 #else
   OSMutex mutex;
 #endif
 #else
   OSMutex mutex;
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 
-// the blink task, used to show we are alive
+// the blink active object, used to show we are alive
 TaskBlink taskB("B", APP_CONFIG_LED1, APP_CFGINT_TASKBLINK_TICKS);
 
-// the reporting task, used to output statistics
+// the reporting active object, used to output statistics
 TaskReport taskR("R", APP_CFGINT_TASKREPORT_SECONDS);
 
 // the stress tasks, which will attempt to access the protected region
@@ -75,12 +75,12 @@ TaskStress task8("8", 8);
 TaskStress task9("9", 9);
 
 // ----------------------------------------------------------------------------
-// global variables shared by all tasks and protected by the mutex
+// global variables shared by all threads and protected by the mutex
 
 // the global counter
 int resourceValue;
 
-// global array where each tasks increments its own counter
+// global array where each thread increments its own counter
 // it is used for debugging and live statistics
 int resourceAccessNum[APP_CONFIG_RESOURCES_ARRAY_SIZE];
 

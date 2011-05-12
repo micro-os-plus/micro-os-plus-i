@@ -12,8 +12,8 @@ RealTimeInterrupt_contextHandler(void);
 static TaskBlinkRealTime *pTaskBlinkRealTime;
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskBlinkRealTime::TaskBlinkRealTime(const char *pName, unsigned char iLed,
@@ -33,7 +33,7 @@ TaskBlinkRealTime::TaskBlinkRealTime(const char *pName, unsigned char iLed,
 }
 
 /*
- * Task main code.
+ * Thread main code.
  * Initialise led and toggle it using the rate.
  *
  * The toggle rate is done with busy wait, the loop being interrupted by yields.
@@ -68,7 +68,7 @@ TaskBlinkRealTime::threadMain(void)
 
   bool bSecond;
   bSecond = false;
-  // task endless loop
+  // thread endless loop
   for (;;)
     {
 #if true
@@ -220,7 +220,7 @@ TaskBlinkRealTime::interruptServiceRoutine(void)
 #else
 
 #if defined(OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL)
-  // Notify task; some of these will be lost, but the total count
+  // Notify thread; some of these will be lost, but the total count
   // will accumulate, and when awaken, will be considered
   OSScheduler::eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
 #else

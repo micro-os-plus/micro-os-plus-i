@@ -22,7 +22,7 @@ TaskDbgIn::TaskDbgIn(const char *pName, OSDeviceCharacter& outDev,
 }
 
 void
-TaskDbgIn::taskMain(void)
+TaskDbgIn::threadMain(void)
 {
   OSDeviceCharacter& outDev = m_outDev;
 
@@ -32,7 +32,7 @@ TaskDbgIn::taskMain(void)
     {
       if (os.isDebug())
         {
-          clog << "TaskDbgIn::taskMain(" << showbase << hex << this << endl;
+          clog << "TaskDbgIn::threadMain(" << showbase << hex << this << endl;
         }
 
       outDev = m_outDev;
@@ -59,7 +59,7 @@ TaskDbgIn::taskMain(void)
     }
   os.sched.lock.exit();
 
-  // task endless loop
+  // thread endless loop
   for (;;)
     {
       inDev->open();

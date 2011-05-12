@@ -14,10 +14,10 @@
 class TaskBlink : public OSThread
   {
 public:
-  // task constructor
+  // active object constructor
   TaskBlink(const char *pName, unsigned char iLed, schedTicks_t rate);
 
-  // actual task main code
+  // actual thread main code
   virtual void threadMain(void);
 
 private:

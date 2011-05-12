@@ -7,8 +7,8 @@
 #include "TaskBlink.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskBlink::TaskBlink(const char *pName, unsigned char iLed, schedTicks_t iRate) :
@@ -24,18 +24,18 @@ TaskBlink::TaskBlink(const char *pName, unsigned char iLed, schedTicks_t iRate) 
   }
 
 /*
- * Task main code.
+ * Thread main code.
  * Initialise led and toggle it using the rate.
  */
 
-void TaskBlink::taskMain(void)
+void TaskBlink::threadMain(void)
   {
     if (os.isDebug())
       {
         // lock scheduler to ensure line is atomic.
         os.sched.lock.enter();
           {
-            // display task parameters.
+            // display thread parameters.
             debug.putString("Thread '");
             debug.putString(getName());
             debug.putString("', led=");
@@ -50,7 +50,7 @@ void TaskBlink::taskMain(void)
     // initialise led port as output
     m_oLed.init();
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
         // go to sleep for some ticks

@@ -15,11 +15,11 @@ extern int resourceAccessNum[];
 unsigned int TaskStress::ms_rand;
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
-TaskStress::TaskStress(const char *pName, int taskId) :
+TaskStress::TaskStress(const char *pName, int threadId) :
   OSThread(pName, m_stack, sizeof(m_stack))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -27,18 +27,18 @@ TaskStress::TaskStress(const char *pName, int taskId) :
   debug.putPtr(this);
   debug.putNewLine();
 #endif
-  m_taskId = taskId;
+  m_threadId = threadId;
 }
 
 /*
- * Task main code.
+ * Thread main code.
  * Acquire the mutex, increment counter and release the mutex.
  *
- * The task activity is simulated with some random sleep().
+ * The thread activity is simulated with some random sleep().
  */
 
 void
-TaskStress::taskMain(void)
+TaskStress::threadMain(void)
 {
   if (true && os.isDebug())
     {
@@ -47,7 +47,7 @@ TaskStress::taskMain(void)
           debug.putString("Thread '");
           debug.putString(getName());
           debug.putString("', id=");
-          debug.putDec((unsigned short) m_taskId);
+          debug.putDec((unsigned short) m_threadId);
           debug.putNewLine();
         }
       os.sched.lock.exit();
@@ -58,7 +58,7 @@ TaskStress::taskMain(void)
   // The sleep interval, in OS ticks, randomly computed
   schedTicks_t sleepTicks;
 
-  // task endless loop
+  // thread endless loop
   for (;;)
     {
       // Compute a random value in the given range
@@ -68,22 +68,22 @@ TaskStress::taskMain(void)
       // Sleep for a random number of ticks
       os.sched.timerTicks.sleep(sleepTicks);
 
-      // Block task until the mutex is acquired
+      // Block thread until the mutex is acquired
       mutex.acquire();
         {
           // We have exclusive access to the shared resource
 
           // Increment the global counter
           resourceValue++;
-          // Increment the task specific counter
-          resourceAccessNum[m_taskId]++;
+          // Increment the thread specific counter
+          resourceAccessNum[m_threadId]++;
 
-          // Simulate some activity done by the task
+          // Simulate some activity done by the thread
           os.sched.timerTicks.sleep(rand() % m_maxActivityTicks);
 
-          // Check if the task is the current owner of the mutex
+          // Check if the thread is the current owner of the mutex
           if (this != mutex.getOwnerThread())
-            resourceAccessNum[m_taskId] = APP_CONFIG_ERROR_CODE;
+            resourceAccessNum[m_threadId] = APP_CONFIG_ERROR_CODE;
         }
       mutex.release();
     }

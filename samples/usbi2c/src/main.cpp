@@ -16,7 +16,7 @@
 DeviceCharacterUsb devUsb;
 
 // ----------------------------------------------------------------------------
-// Input task, must be the first one to init I2C
+// Input active object, must be the first one to init I2C
 
 // I2C buffers
 unsigned char tx_store[OS_CFGINT_DEVICECHARACTERI2C_TXBUF_SIZE];
@@ -31,7 +31,7 @@ TaskDbgIn taskDbgIn("input", devUsb,  devI2C);
 // ----------------------------------------------------------------------------
 // Cli Task
 
-// task
+// active object
 TaskCli taskCli("usb", devUsb, devI2C);
 
 // ----------------------------------------------------------------------------

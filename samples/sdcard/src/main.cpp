@@ -24,14 +24,14 @@ DeviceCharacterMultiUsart1 devUsart(tx_store, sizeof(tx_store), rx_store,
 
 DeviceMemCard card;
 
-// tasks allocated on static storage
+// active objects allocated on static storage
 TaskCli taskCli1("usb", devUsb, card);
 //TaskCli taskCli2("usart", devUsart, card );
 
 // ------------------------------------------------------------------------------
 // Blink Task
 
-// task allocated on static storage
+// active objects allocated on static storage
 TaskBlink taskBlink("blink");
 
 // ------------------------------------------------------------------------------

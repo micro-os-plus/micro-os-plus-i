@@ -12,11 +12,11 @@
 class TaskCli : public OSThread
   {
 public:
-  // task constructor
+  // active object constructor
   TaskCli(const char *pName, OSDeviceCharacter& dev, DeviceMemCard & card);
 
-  // actual task main code
-  virtual void taskMain(void);
+  // actual thread main code
+  virtual void threadMain(void);
 
 private:
   void lineProcess(void);

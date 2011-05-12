@@ -14,11 +14,11 @@
 class TaskBlinkBusyWait : public OSThread
   {
 public:
-  // task constructor
+  // active object constructor
   TaskBlinkBusyWait(const char *pName, unsigned int iLed, unsigned int rate);
 
-  // actual task main code
-  virtual void taskMain(void);
+  // actual thread main code
+  virtual void threadMain(void);
 
 private:
   // members

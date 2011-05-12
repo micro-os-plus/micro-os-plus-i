@@ -10,8 +10,8 @@
 #include "portable/kernel/include/ostream_OSThread.h"
 
 /*
- * Task constructor. 
- * Initialise system task object, initialise member objects
+ * Active object constructor. 
+ * Initialise parent system thread, initialise member objects
  * and store parameters in private members.
  *
  */
@@ -33,19 +33,19 @@ TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev, DeviceMemCard& card)
 static const char prompt[] = "> ";
 
 /*
- * Task main code. 
+ * Thread main code. 
  * Open device, output greeting and in a loop read and process lines.
  * I/O is done via standard streams routed to the attached device.
  *
  */
 
-void TaskCli::taskMain(void)
+void TaskCli::threadMain(void)
   {
     if (os.isDebug())
       {
         os.sched.lock.enter();
           {
-            clog << "TaskCli::taskMain(" << showbase << hex
+            clog << "TaskCli::threadMain(" << showbase << hex
                 << (unsigned short) this << ") SP="<< hex
                 << (unsigned short) SP << endl;
           }
@@ -63,7 +63,7 @@ void TaskCli::taskMain(void)
     OS_CONFIG_USBINT_LED_PORT_INIT |= _BV( PORTD0 );
     OS_CONFIG_USBINT_LED_PORT_INIT |= _BV( PORTD1 );
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
         dev.open(); // wait for dtr
@@ -248,7 +248,7 @@ static const char str_unknown[] = "Cmd?";
  * 	mc 		- memory config
  * 	mr blk	 	- memory read
  * 
- * 	st 		- show tasks
+ * 	st 		- show threads
  * 
  * 	ri		- recorder info
  * 	rd blk w	- read data
@@ -906,7 +906,7 @@ void TaskCli::cmdST()
         else
           cout << ' ';
 
-        cout << *pt; // print task info
+        cout << *pt; // print thread info
       }
   }
 

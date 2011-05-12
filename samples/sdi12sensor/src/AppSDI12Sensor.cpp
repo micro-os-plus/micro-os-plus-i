@@ -200,7 +200,7 @@ bool AppSDI12Sensor::prepareResponseExtendedCommands(const char *pBuf,
 
 /*
  * Data Acquisition code.
- * Runs on low priority task, so speed is not critical.
+ * Runs on low priority thread, so speed is not critical.
  * The only requirement is to finish before the declared value 
  * returned in M!
  * The results should be sent back via storeDValue().
@@ -220,7 +220,7 @@ void AppSDI12Sensor::prepareMeasuredData(unsigned char cmd,
         debug.putChar(' ');
       }
 
-    // seed random genrator, not necessary in real applications
+    // seed random generator, not necessary in real applications
     srand(os.sched.timerTicks.getTicks());
 
     int i;
@@ -276,7 +276,7 @@ void AppSDI12Sensor::prepareMeasuredData(unsigned char cmd,
   }
 
 /*
- * Runs on the fast task to process delayed action,
+ * Runs on the fast thread to process delayed action,
  * like storing values in eeprom for extended commands.
  */
 
@@ -290,8 +290,8 @@ void AppSDI12Sensor::processDelayedActions(void)
 
 /*
  * Periodic Data Acquisition code.
- * Runs on periodic task, independently of the other two.
- * If resources are used in common with the acquisition task,
+ * Runs on periodic thread, independently of the other two.
+ * If resources are used in common with the acquisition thread,
  * synchronization objects must be used (like mutex).
  */
 void AppSDI12Sensor::processPeriodicMeasurements(void)

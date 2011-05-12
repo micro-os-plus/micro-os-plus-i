@@ -11,7 +11,7 @@
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
 
-#define OS_CFGINT_TASKS_TABLE_SIZE                      (4)
+#define OS_CFGINT_THREADS_TABLE_SIZE                      (4)
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    1
 

@@ -7,8 +7,8 @@
 #include "TaskBlinkBusyWait.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskBlinkBusyWait::TaskBlinkBusyWait(const char *pName, unsigned int iLed, unsigned int rate) :
@@ -24,14 +24,14 @@ TaskBlinkBusyWait::TaskBlinkBusyWait(const char *pName, unsigned int iLed, unsig
 }
 
 /*
- * Task main code.
+ * Thread main code.
  * Initialise led and toggle it using the rate.
  *
  * The toggle rate is done with busy wait, the loop being interrupted by yields.
  */
 
 void
-TaskBlinkBusyWait::taskMain(void)
+TaskBlinkBusyWait::threadMain(void)
 {
   if (os.isDebug())
     {
@@ -51,7 +51,7 @@ TaskBlinkBusyWait::taskMain(void)
   // initialise led port as output
   m_oLed.init();
 
-  // task endless loop
+  // thread endless loop
   for (;;)
     {
       os.busyWaitMillis(m_rate);

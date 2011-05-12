@@ -7,8 +7,8 @@
 #include "TaskBlink2.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskBlink2::TaskBlink2(const char *pName, unsigned char iLed, schedTicks_t rate) :
@@ -25,11 +25,11 @@ TaskBlink2::TaskBlink2(const char *pName, unsigned char iLed, schedTicks_t rate)
   }
 
 /*
- * Task main code.
+ * Thread main code.
  * Initialise led and toggle it using the rate.
  */
 
-void TaskBlink2::taskMain(void)
+void TaskBlink2::threadMain(void)
   {
     if (os.isDebug())
       {
@@ -49,7 +49,7 @@ void TaskBlink2::taskMain(void)
     // initialise led port as output
     m_oLed.init();
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
         // go to sleep for some ticks
@@ -61,7 +61,7 @@ void TaskBlink2::taskMain(void)
         m_bToggle = !m_bToggle;
 
         // every second time notify the custom event;
-        // tasks sleeping on it will wakeup
+        // threads sleeping on it will wakeup
         if (m_bToggle)
           os.sched.eventNotify(EVENT_CUSTOM);
       }

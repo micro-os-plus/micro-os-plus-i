@@ -16,7 +16,7 @@
 //#define OS_CFGINT_TIMER_PRESCALLER                      (4)
 //#define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
 
-#define OS_CFGINT_TASKS_TABLE_SIZE                      (12)
+#define OS_CFGINT_THREADS_TABLE_SIZE                      (12)
 
 #define OS_INCLUDE_OSTIMERSECONDS                       (1)
 
@@ -29,7 +29,7 @@
 //#define OS_INCLUDE_OSTHREAD_SCHEDULERTICK                 (1)
 //#define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
 
-#define OS_CFGINT_IDLE_TASK_STACK_SIZE                  (800)
+#define OS_CFGINT_IDLE_THREAD_STACK_SIZE                  (800)
 
 #define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 #define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
@@ -41,7 +41,7 @@
 
 // used for activating the mutex mechanism
 #define OS_INCLUDE_OSMUTEX                              (1)
-//#define OS_INCLUDE_OSMUTEX_WAITING_TASKS                (1)
+//#define OS_INCLUDE_OSMUTEX_WAITING_THREADS                (1)
 #define OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY       (1)
 
 // ----- Board Definitions ----------------------------------------------------
@@ -66,7 +66,7 @@
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
 //#define OS_DEBUG_OSTIMER_SLEEP                          (1)
 //#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
-//#define OS_DEBUG_OSSCHEDULER_TASKREGISTER               (1)
+//#define OS_DEBUG_OSSCHEDULER_THREADREGISTER               (1)
 //#define OS_DEBUG_OSSCHEDULER_EVENTWAIT                  (1)
 //#define OS_DEBUG_OSSCHEDULER_EVENTNOTIFY                (1)
 //#define OS_DEBUG_OSREADYLIST_INSERT                     (1)

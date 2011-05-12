@@ -10,8 +10,8 @@
 
 // ------------------------------------------------------------------------------
 
-// task allocated on static storage
-// will create two tasks, with given names
+// active object allocated on static storage
+// will create two threads, with given names
 
 AppSDI12Sensor appSDI12("dacq", "periodic", "sdi12");
 

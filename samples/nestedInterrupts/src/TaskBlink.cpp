@@ -7,8 +7,8 @@
 #include "TaskBlink.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskBlink::TaskBlink(const char *pName, unsigned char iLed, schedTicks_t rate) :
@@ -24,7 +24,7 @@ TaskBlink::TaskBlink(const char *pName, unsigned char iLed, schedTicks_t rate) :
 }
 
 /*
- * Task main code.
+ * Thread main code.
  * Initialise led and toggle it using the rate.
  *
  * The toggle rate is done with busy wait, the loop being interrupted by yields.
@@ -59,7 +59,7 @@ TaskBlink::threadMain(void)
   n = APP_CFGINT_DUMP_INTERVAL_SECONDS;
 #endif
 
-  // task endless loop
+  // thread endless loop
   for (;;)
     {
 
@@ -67,7 +67,7 @@ TaskBlink::threadMain(void)
 
       if (os.isDebug())
         {
-          // Disable all other tasks to write during the display.
+          // Disable all other threads to write during the display.
           // Only the interrupts may write something
           os.sched.lock.enter();
             {
@@ -84,16 +84,16 @@ TaskBlink::threadMain(void)
                 }
               if (i == 0)
                 {
-                  int nTasks;
-                  nTasks = os.sched.getThreadsCount();
-                  for (int j = 0; j < nTasks; ++j)
+                  int nThreads;
+                  nThreads = os.sched.getThreadsCount();
+                  for (int j = 0; j < nThreads; ++j)
                     {
                       OSThread *pt;
                       pt = os.sched.getThread(j);
                       clog << endl;
                       clog << ((pt == this) ? '*' : ' ');
 
-                      clog << *pt; // print task info
+                      clog << *pt; // print thread info
                     }
                   clog << endl;
                 }

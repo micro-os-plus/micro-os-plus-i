@@ -11,7 +11,7 @@
 
 // ---------------------------------------------------------------------------
 
-// tasks allocated on static storage
+// active objects allocated on static storage
 TaskBlink task1("A", APP_CFGINT_TASKBLINK_LEDBIT, APP_CFGINT_TASKBLINK_TICKS);
 TaskBlinkNested task2("B", APP_CFGINT_TASKBLINKNESTED_LEDBIT, APP_CFGINT_TASKBLINKNESTED_TICKS);
 

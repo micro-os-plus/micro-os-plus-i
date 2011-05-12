@@ -12,8 +12,8 @@ extern int resourceValue;
 extern int resourceAccessNum[];
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Active object constructor.
+ * Initialise parent system thread and store parameters in private members.
  */
 
 TaskReport::TaskReport(const char *pName, schedTicks_t seconds) :
@@ -29,14 +29,14 @@ TaskReport::TaskReport(const char *pName, schedTicks_t seconds) :
 }
 
 /*
- * Task main code.
+ * Thread main code.
  * Report mutex usage counters.
  *
  * The reporting rate is done with sleep(seconds).
  */
 
 void
-TaskReport::taskMain(void)
+TaskReport::threadMain(void)
 {
   if (os.isDebug())
     {
@@ -51,17 +51,17 @@ TaskReport::taskMain(void)
       os.sched.lock.exit();
     }
 
-  // Task endless loop
+  // Thread endless loop
   for (;;)
     {
       // This test requires the debug device to be present,
       // it makes no sense to run the Release build.
       if (os.isDebug())
         {
-          // Block this task until the mutex is acquired
+          // Block this thread until the mutex is acquired
           mutex.acquire();
             {
-              // Disable all other tasks to write during the display.
+              // Disable all other thread to write during the display.
               // Only the interrupts may write something
               os.sched.lock.enter();
                 {

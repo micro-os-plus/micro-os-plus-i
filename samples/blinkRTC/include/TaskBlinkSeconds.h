@@ -14,11 +14,11 @@
 class TaskBlinkSeconds : public OSThread
   {
 public:
-  // task constructor
+  // active object constructor
   TaskBlinkSeconds(const char *pName, unsigned char iLed, unsigned int rate);
 
-  // actual task main code
-  virtual void taskMain(void);
+  // actual thread main code
+  virtual void threadMain(void);
 
 private:
   // members

@@ -12,13 +12,13 @@
 class TaskDbgIn : public OSThread
 {
 public:
-  // task constructor
+  // active object constructor
   TaskDbgIn(const char *pName, OSDeviceCharacter& outDev,
       OSDeviceCharacter& inDev2);
 
-  // actual task main code
+  // actual thread main code
   virtual void
-  taskMain(void);
+  threadMain(void);
 
 private:
 

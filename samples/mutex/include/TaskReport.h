@@ -12,11 +12,11 @@
 class TaskReport : public OSThread
   {
 public:
-  // task constructor
+  // active object constructor
   TaskReport(const char *pName, schedTicks_t seconds);
 
-  // actual task main code
-  virtual void taskMain(void);
+  // actual thread main code
+  virtual void threadMain(void);
 
 private:
   // members

@@ -16,7 +16,7 @@
 //#define OS_CFGINT_TIMER_PRESCALLER                      (4)
 //#define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
 
-#define OS_CFGINT_TASKS_TABLE_SIZE                      (3)
+#define OS_CFGINT_THREADS_TABLE_SIZE                      (3)
 
 // Only for tests, when ready should not be used
 //#define OS_EXCLUDE_PREEMPTION                           (1)
@@ -38,7 +38,7 @@
 #define OS_DEBUG_CONSTRUCTORS                           (1)
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
 //#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
-//#define OS_DEBUG_OSSCHEDULER_TASKREGISTER               (1)
+//#define OS_DEBUG_OSSCHEDULER_THREADREGISTER               (1)
 //#define OS_DEBUG_OSREADYLIST_INSERT                     (1)
 //#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
 //#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
