@@ -13,13 +13,13 @@
  * Overview
  *
  * These definitions handle the operations required to save and restore the
- * current task 'context' to/from the task control block (TCB).
+ * current thread 'context' to/from the thread control block (TCB).
  *
- * The processor registers are pushed onto/popped from the current task stack,
- * and only the resulting stack pointer (SP) is stored in the current task area.
+ * The processor registers are pushed onto/popped from the current thread stack,
+ * and only the resulting stack pointer (SP) is stored in the current thread area.
  *
  * To make things simpler and faster, the code uses the global variable
- * OSScheduler::ms_ppCurrentStack that points to the current OSTask::m_pStack, where
+ * OSScheduler::ms_ppCurrentStack that points to the current OSThread::m_pStack, where
  * the pointer to the current stack frame is located. This variable is
  * set during the context switch in OSScheduler::contextSwitch().
  *
@@ -34,7 +34,7 @@
 #if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
 /*
- *  Save the current SP to the current task, via the global pointer.
+ *  Save the current SP to the current thread, via the global pointer.
  */
 
 
@@ -63,7 +63,7 @@ OSSchedulerImpl::stackPointerSave(void)
 
 
 /*
- *  Restore the SP register for the current task, via the global pointer
+ *  Restore the SP register for the current thread, via the global pointer
  */
 
 inline void
@@ -185,7 +185,7 @@ OSSchedulerImpl::registersRestore(void)
  *
  * In this case, except saving/restoring registers, we should NOT attempt
  * anything else, not even storing the SP, since this will overwrite the
- * current task context.
+ * current thread context.
  *
  * In the AVR32 case, the processor mode is available as 3 bits in SR.
  * The value of 0 means user mode, 1 means system mode, both ok.
@@ -220,8 +220,8 @@ OSSchedulerImpl::isContextSwitchAllowed(void)
 #endif /* OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING */
 
 /*
- * Restore the artificially created context for the first task.
- * Used only once at startup; all other tasks will start via a regular
+ * Restore the artificially created context for the first thread.
+ * Used only once at startup; all other threads will start via a regular
  * context switch.
  *
  * As a side-effect, this function also enables interrupts. This happens when
@@ -234,7 +234,7 @@ OSSchedulerImpl::isContextSwitchAllowed(void)
  */
 
 inline void
-OSSchedulerImpl::FirstTask_contextRestore(void)
+OSSchedulerImpl::FirstThread_contextRestore(void)
 {
 
   OSSchedulerImpl::stackPointerRestore();
