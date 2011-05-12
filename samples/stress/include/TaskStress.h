@@ -10,20 +10,20 @@
 
 #include "portable/kernel/include/uOS.h"
 
-class TaskStress : public OSTask
+class TaskStress : public OSThread
   {
 public:
   // task constructor
   TaskStress(const char *pName, unsigned int minMicros, unsigned int maxMicros, unsigned int minTicks, unsigned int maxTicks);
 
   // actual task main code
-  virtual void taskMain(void);
+  virtual void threadMain(void);
 
   static unsigned int rand(void);
 
 private:
   // members
-  OSStack_t m_stack[ (OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
+  OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
 
   unsigned int m_minMicros;
   unsigned int m_maxMicros;

@@ -22,7 +22,7 @@ static TaskBlinkRealTime *pTaskBlinkRealTime;
 
 TaskBlinkRealTime::TaskBlinkRealTime(const char *pName, unsigned char iLed,
     schedTicks_t rate) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
+  OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskBlinkRealTime()=");
@@ -44,13 +44,13 @@ TaskBlinkRealTime::TaskBlinkRealTime(const char *pName, unsigned char iLed,
  */
 
 void
-TaskBlinkRealTime::taskMain(void)
+TaskBlinkRealTime::threadMain(void)
 {
   if (os.isDebug())
     {
       os.sched.lock.enter();
         {
-          debug.putString("Task '");
+          debug.putString("Thread '");
           debug.putString(getName());
           debug.putString("', led=");
           debug.putDec((unsigned short)m_oLed.bitNumber());
@@ -66,7 +66,7 @@ TaskBlinkRealTime::taskMain(void)
   m_oLed.init();
 #endif
 
-  os.rt.registerTask(this);
+  os.rt.registerThread(this);
 
   interruptInit();
 
@@ -212,7 +212,7 @@ TaskBlinkRealTime::interruptServiceRoutine(void)
   OS::busyWaitMicros(10);
 #else
 
-#if defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL)
+#if defined(OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL)
   // Notify task; some of these will be lost, but the total count
   // will accumulate, and when awaken, will be considered
   OSScheduler::eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
@@ -224,7 +224,7 @@ TaskBlinkRealTime::interruptServiceRoutine(void)
   os.rt.eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
 #endif /* defined(APP_INCLUDE_LOCAL_NOTIFY) */
 
-#endif /* defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL) */
 
 #endif /* defined(APP_INCLUDE_TASKBLINKREALTIME_ISRACTIONBUSYWAIT) */
 

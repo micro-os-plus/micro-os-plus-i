@@ -15,7 +15,7 @@ unsigned int TaskStress::ms_rand;
 
 TaskStress::TaskStress(const char *pName, unsigned int minMicros,
     unsigned int maxMicros, unsigned int minTicks, unsigned int maxTicks) :
-  OSTask(pName, m_stack, sizeof(m_stack))
+  OSThread(pName, m_stack, sizeof(m_stack))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskStress()=");
@@ -35,13 +35,13 @@ TaskStress::TaskStress(const char *pName, unsigned int minMicros,
  */
 
 void
-TaskStress::taskMain(void)
+TaskStress::threadMain(void)
 {
   if (os.isDebug())
     {
       os.sched.lock.enter();
         {
-          debug.putString("Task '");
+          debug.putString("Thread '");
           debug.putString(getName());
           debug.putString("', micros=");
           debug.putDec((unsigned short) m_minMicros);

@@ -18,7 +18,7 @@
 
 extern bool g_flagNotify;
 
-class TaskBlinkRealTime : public OSTask
+class TaskBlinkRealTime : public OSThread
 {
 public:
   // task constructor
@@ -26,7 +26,7 @@ public:
 
   // actual task main code
   virtual void
-  taskMain(void);
+  threadMain(void);
 
   void
   interruptInit(void);
@@ -39,7 +39,7 @@ public:
 
 private:
   // members
-  OSStack_t m_stack[(OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
+  OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
 
   LedVar m_oLed;
   schedTicks_t m_rate;
