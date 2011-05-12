@@ -9,7 +9,7 @@
 
 #include "portable/kernel/include/uOS.h"
 
-class TaskCli : public OSTask
+class TaskCli : public OSThread
 {
 public:
   // task constructor
@@ -27,7 +27,7 @@ private:
   xorCheck(unsigned char *pc);
 
   // members
-  unsigned char m_stack[OSTask::STACK_MINIMAL_SIZE + 100];
+  unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 100];
   OSDeviceCharacter & m_dev;
 
   istream m_cin;

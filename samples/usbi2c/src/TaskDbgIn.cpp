@@ -12,7 +12,7 @@
 
 TaskDbgIn::TaskDbgIn(const char *pName, OSDeviceCharacter& outDev,
     OSDeviceCharacter& inDev2) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_outDev(outDev), m_inDev2(inDev2)
+  OSThread(pName, m_stack, sizeof(m_stack)), m_outDev(outDev), m_inDev2(inDev2)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskDbgIn()=");

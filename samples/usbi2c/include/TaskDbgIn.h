@@ -9,7 +9,7 @@
 
 #include "portable/kernel/include/uOS.h"
 
-class TaskDbgIn : public OSTask
+class TaskDbgIn : public OSThread
 {
 public:
   // task constructor
@@ -23,7 +23,7 @@ public:
 private:
 
   // members
-  unsigned char m_stack[OSTask::STACK_MINIMAL_SIZE + 100];
+  unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 100];
   OSDeviceCharacter & m_outDev;
   OSDeviceCharacter & m_inDev2;
 };

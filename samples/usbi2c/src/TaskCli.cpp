@@ -20,7 +20,7 @@
 
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev,
     OSDeviceCharacter& devIn) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(&m_dev), m_cout(
+  OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(&m_dev), m_cout(
       &m_dev), m_cli(m_line, sizeof(m_line)), m_devIn(devIn)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -184,12 +184,12 @@ TaskCli::lineProcess()
       if (c == 't')
         {
           int cnt;
-          cnt = os.sched.getTasksCount();
+          cnt = os.sched.getThreadsCount();
 
           for (int i = 0; i < cnt; ++i)
             {
-              OSTask *pt;
-              pt = os.sched.getTask(i);
+              OSThread *pt;
+              pt = os.sched.getThread(i);
 
               cout << endl;
               if (pt == this)
