@@ -11,7 +11,7 @@
 OSStack_t * OSScheduler::stackInitialise(OSStack_t * pStackTop, void(*pCode)(
     void *), void *pParams, unsigned char id)
   {
-    /* The value on the right is the offset from the task stack pointer */
+    /* The value on the right is the offset from the thread stack pointer */
 
     /* Place a few bytes of known values on the bottom of the stack.
      This is just useful for debugging. */
@@ -20,11 +20,11 @@ OSStack_t * OSScheduler::stackInitialise(OSStack_t * pStackTop, void(*pCode)(
 
     /* Simulate how the stack would look after a call to yield()*/
 
-    /* Task starts with interrupts enabled ??? */
+    /* Thread starts with interrupts enabled ??? */
     /* T bit set */
     *pStackTop-- = 0x01000000; /* xPSR        +15*4=64 */
 
-    /* The start of the task code will be popped off the stack last,
+    /* The start of the thread code will be popped off the stack last,
      so place it on first. */
 
 #define STACK_PCL_WORD_OFFSET   (14)
@@ -97,7 +97,7 @@ void OSScheduler::startImpl(void)
     OS::interruptsClearMask();
     OS::interruptsEnable();
 
-    /* System call to start first task. */
+    /* System call to start first thread. */
     asm volatile
     (
         " 		\n" /* Use the NVIC offset register to locate the stack. */
@@ -115,13 +115,13 @@ void OSScheduler::ISRcontextSwitchRequest(void)
 
 #if defined(DEBUG)
 
-void OSScheduler::dumpContextInfo(OSTask * pTask)
+void OSScheduler::dumpContextInfo(OSThread * pThread)
   {
     OSDeviceDebug::putChar('\'');
-    OSDeviceDebug::putString(pTask->getName());
+    OSDeviceDebug::putString(pThread->getName());
 
     OSStack_t * pStack;
-    pStack = pTask->getStack();
+    pStack = pThread->getStack();
     OSDeviceDebug::putString("' SP=");
     OSDeviceDebug::putPtr(pStack);
     OSDeviceDebug::putString(" PC=");

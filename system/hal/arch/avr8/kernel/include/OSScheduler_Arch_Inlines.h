@@ -10,10 +10,10 @@
 // ----------------------------------------------------------------------------
 
 /*
- * Code to save the current task 'context' on the task control block.
+ * Code to save the current thread 'context' on the thread control block.
  *
  * For simplicity, all general purpose registers are pushed onto the current
- * task stack and only the new stack pointer is saved in the task control block
+ * thread stack and only the new stack pointer is saved in the thread control block
  * (in other words, the 'context' is just a pointer to the stack).
  *
  * The first thing to do is save the flags then disable interrupts. This is to
@@ -28,7 +28,7 @@
  * so we need not worry about reading/writing to the stack pointer.
  *
  * The code uses the global variable g_pCurrentContext that points to the
- * current context (i.e. the OSTask::m_pStack, where the pointer to the
+ * current context (i.e. the OSThread::m_pStack, where the pointer to the
  * current stack frame is stored). This variable is set during the context
  * switch in OSScheduler::contextSwitch().
  */

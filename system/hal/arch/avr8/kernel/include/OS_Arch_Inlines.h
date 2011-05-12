@@ -88,7 +88,7 @@ OSCPUImpl::fetchResetBits(void)
   return ret;
 }
 
-// release processor to next ready task
+// release processor to next ready thread
 inline void
 OSSchedulerImpl::yield(void)
 {

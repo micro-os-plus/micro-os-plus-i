@@ -14,7 +14,7 @@ OSStack_t *
 OSSchedulerImpl::stackInitialise(OSStack_t * pStackTop, void
 (*pCode)(void *), void *pParams, unsigned char id)
 {
-  /* The value on the right is the offset from the task stack pointer */
+  /* The value on the right is the offset from the thread stack pointer */
 
   /* Place a few bytes of known values on the bottom of the stack.
    This is just useful for debugging. */
@@ -36,7 +36,7 @@ OSSchedulerImpl::stackInitialise(OSStack_t * pStackTop, void
 
   *pStackTop-- = (OSStack_t) pCode; /* R15/PC +10*4=40 */
   *pStackTop-- = 0x00400000; /* SR    +9*4=36 */
-  /* Task starts in system mode, with all interrupts enabled */
+  /* Thread starts in system mode, with all interrupts enabled */
 
 #define STACK_R0_WORD_OFFSET    (8)
 
@@ -86,7 +86,7 @@ OSSchedulerImpl::start(void)
   //OS::interruptsClearMask();
   //OS::interruptsEnable();
 
-  OSSchedulerImpl::FirstTask_contextRestore();
+  OSSchedulerImpl::FirstThread_contextRestore();
 
   for (;;)
     ; // noreturn
@@ -95,13 +95,13 @@ OSSchedulerImpl::start(void)
 #if defined(DEBUG)
 
 void
-OSSchedulerImpl::dumpContextInfo(OSTask * pTask)
+OSSchedulerImpl::dumpContextInfo(OSThread * pThread)
 {
   OSDeviceDebug::putChar('\'');
-  OSDeviceDebug::putString(pTask->getName());
+  OSDeviceDebug::putString(pThread->getName());
 
   OSStack_t * pStack;
-  pStack = pTask->getStack();
+  pStack = pThread->getStack();
   OSDeviceDebug::putString("' SP=");
   OSDeviceDebug::putPtr(pStack);
   OSDeviceDebug::putString(" PC=");

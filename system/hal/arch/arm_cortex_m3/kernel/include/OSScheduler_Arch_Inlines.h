@@ -10,10 +10,10 @@
 //------------------------------------------------------------------------------------
 
 /*
- * Code to save the current task 'context' on the task control block.
+ * Code to save the current thread 'context' on the thread control block.
  *
  * The code uses the global variable OSScheduler::ms_ppCurrentStack that points to the
- * current context (i.e. the OSTask::m_pStack, where the pointer to the
+ * current context (i.e. the OSThread::m_pStack, where the pointer to the
  * current stack frame is stored). This variable is set during the context
  * switch in OSScheduler::contextSwitch().
  */
@@ -29,8 +29,8 @@ inline void OSScheduler::contextSave(void)
         "                       \n"
         " movw r3, #:lower16:OSScheduler::ms_ppCurrentStack \n"
         " movt r3, #:upper16:OSScheduler::ms_ppCurrentStack \n"
-        " ldr r2, [r3]          \n" /* &OSTask::m_pStack */
-        " str r0, [r2]          \n" /* save the new top of stack into OSTask::m_pStack */
+        " ldr r2, [r3]          \n" /* &OSThread::m_pStack */
+        " str r0, [r2]          \n" /* save the new top of stack into OSThread::m_pStack */
         "                       \n"
         " push {r3, lr}         \n" /* save return addr on caller Stack */
         :::"r0", "r2", "r3"
@@ -49,10 +49,10 @@ inline void OSScheduler::contextRestore(void)
     (
         " pop {r3, lr}          \n" /* restore return address */
         "                       \n"
-        " ldr r2, [r3]          \n" /* &OSTask::m_pStack */
-        " ldr r0, [r2]          \n" /* OSTask::m_pStack */
+        " ldr r2, [r3]          \n" /* &OSThread::m_pStack */
+        " ldr r0, [r2]          \n" /* OSThread::m_pStack */
         "                       \n"
-        " ldmia r0!, {r4-r11}   \n" /* pop new task registers */
+        " ldmia r0!, {r4-r11}   \n" /* pop new thread registers */
         " msr psp, r0           \n" /* restore process stack */
         :::"r0", "r2", "r3"
     );
@@ -95,7 +95,7 @@ inline void OSScheduler::criticalExit(void)
 #endif
   }
 
-// release processor to next ready task
+// release processor to next ready thread
 inline void OSScheduler::yieldImpl(void)
   {
     asm volatile
