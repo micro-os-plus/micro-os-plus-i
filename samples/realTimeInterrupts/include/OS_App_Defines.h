@@ -20,17 +20,20 @@
 #define OS_INCLUDE_TASKREPORTSTACKS                     (1)
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
-//#define OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR               (1)
+//#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
 
-#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
+//#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
+//#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
+// do not disable INT3
+#define OS_CFGINT_OSCRITICALSECTION_MASK                (0x7 << (16+1))
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 #define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
 
-//#define OS_INCLUDE_OSTASK_SCHEDULERTICK                 (1)
+//#define OS_INCLUDE_OSTHREAD_SCHEDULERTICK                 (1)
 #define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
 
-//#define OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL  (1)
+//#define OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL  (1)
 
 //#define OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER   (1)
 
@@ -39,14 +42,16 @@
 #define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG            (1)
 
-#define OS_INCLUDE_OSTASK_GETSTACKUSED                  1
-//#define OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER             1
+#define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
+//#define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
 #define OS_INCLUDE_CLOG                                 1
 #define OS_INCLUDE_OSTREAM                              1
-#define OS_INCLUDE_OSTREAM_OSTASK                       1
+#define OS_INCLUDE_OSTREAM_OSTHREAD                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
 
-//#define OSTASK_NOTIFY_MEASURE                           1
+#define OS_INCLUDE_OSREALTIME                           (1)
+
+//#define OSTHREAD_NOTIFY_MEASURE                           1
 
 #define OS_APP_CONFIG_LED3                 AVR32_PIN_PX51
 

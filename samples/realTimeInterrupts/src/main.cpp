@@ -15,12 +15,16 @@
 
 TaskBlink taskA("A", APP_CFGINT_TASKBLINK_LEDBIT, APP_CFGINT_TASKBLINK_TICKS);
 
+#if true
 TaskBlinkRealTime taskB("B", APP_CFGINT_TASKBLINKREALTIME_LEDBIT,
     APP_CFGINT_TASKBLINKREALTIME_TICKS);
+#endif
 
+#if false
 TaskReportStacks taskR("R", APP_CFGINT_DUMP_INTERVAL_SECONDS,
     APP_CFGINT_DUMP_MAX_INTERVAL_SECONDS,
     APP_CFGINT_DUMP_INCREASE_RATE_PROCENTS);
+#endif
 
 // ----------------------------------------------------------------------------
 

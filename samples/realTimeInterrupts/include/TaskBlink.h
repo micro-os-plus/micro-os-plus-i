@@ -11,18 +11,18 @@
 
 #include "LedVar.h"
 
-class TaskBlink : public OSTask
+class TaskBlink : public OSThread
   {
 public:
   // task constructor
   TaskBlink(const char *pName, unsigned char iLed, schedTicks_t rate);
 
   // actual task main code
-  virtual void taskMain(void);
+  virtual void threadMain(void);
 
 private:
   // members
-  OSStack_t m_stack[ (OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
+  OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
 
   LedVar m_oLed;
   schedTicks_t m_rate;
