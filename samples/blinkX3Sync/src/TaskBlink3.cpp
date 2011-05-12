@@ -12,7 +12,7 @@
  */
 
 TaskBlink3::TaskBlink3(const char *pName, unsigned char iLed) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
+  OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     debug.putString("TaskBlink3()=");
@@ -32,7 +32,7 @@ void TaskBlink3::taskMain(void)
       {
         os.sched.lock.enter();
           {
-            debug.putString("Task '");
+            debug.putString("Thread '");
             debug.putString(getName());
             debug.putString("', led=");
             debug.putDec(m_oLed.bitNumber());

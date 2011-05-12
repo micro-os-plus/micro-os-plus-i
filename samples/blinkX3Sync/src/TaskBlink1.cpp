@@ -12,7 +12,7 @@
  */
 
 TaskBlink1::TaskBlink1(const char *pName, unsigned char iLed, schedTicks_t rate) :
-  OSTask(pName, m_stack, sizeof(m_stack )), m_oLed(iLed)
+  OSThread(pName, m_stack, sizeof(m_stack )), m_oLed(iLed)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
         debug.putString("TaskBlink1()=");
@@ -39,7 +39,7 @@ void TaskBlink1::taskMain(void)
       {
         os.sched.lock.enter();
           {
-            debug.putString("Task '");
+            debug.putString("Thread '");
             debug.putString(getName());
             debug.putString("', led=");
             debug.putDec(m_oLed.bitNumber());
