@@ -13,7 +13,7 @@
 
 // simple task definition. will blink a given led with a given rate.
 
-class TaskBlink : public OSTask
+class TaskBlink : public OSThread
   {
 public:
   // task constructor
@@ -26,7 +26,7 @@ private:
   // members
 
   // task stack reserved here
-  OSStack_t m_stack[ (OSTask::STACK_MINIMAL_SIZE + 200) / sizeof(OSStack_t) ];
+  OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + 200) / sizeof(OSStack_t) ];
 
   LedVar m_oLed; // led bit
   schedTicks_t m_iRate; // blink rate in scheduler ticks
