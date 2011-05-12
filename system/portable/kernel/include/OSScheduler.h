@@ -247,7 +247,7 @@ private:
   //static bool ms_isLocked;
 
   // list of threads registered to the scheduler
-  static OSThread* ms_threads[OS_CFGINT_TASKS_TABLE_SIZE + 1];
+  static OSThread* ms_threads[OS_CFGINT_THREADS_TABLE_SIZE + 1];
   // the number of threads registered to the scheduler
   static unsigned char ms_threadsCount;
   //static unsigned char threadsIdx;

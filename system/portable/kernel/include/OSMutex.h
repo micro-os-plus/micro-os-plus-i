@@ -9,7 +9,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
 
 class OSMutexWaitingThreads
 {
@@ -34,7 +34,7 @@ private:
   unsigned short m_waitingThreadsCount;
 };
 
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 
 // The mutual exclusion (mutex) inter-thread synchronisation mechanism.
 class OSMutex
@@ -42,9 +42,9 @@ class OSMutex
 public:
   // Initialise the internal variables.
   OSMutex();
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
   OSMutex(OSThread** pWaitingThreadsArray, int waitingThreadsArraySize);
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 
   // Constants ; all are used as result code for acquire and release methods.
   static const int OS_OK = 1;
@@ -91,9 +91,9 @@ private:
   // the event return value of the event used for notification
   OSEventWaitReturn_t m_eventRet;
 
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
   OSMutexWaitingThreads m_waitingThreads;
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 
 };
 
@@ -121,7 +121,7 @@ OSMutex::getEventReturn(void)
   return m_eventRet;
 }
 
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
 
 // Get the first thread in the array
 inline OSThread*
@@ -142,6 +142,6 @@ OSMutexWaitingThreads::getCount(void)
   return m_waitingThreadsCount;
 }
 
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 
 #endif /* OSMUTEX_H_ */

@@ -13,10 +13,10 @@
 #include "portable/kernel/include/OSMutex.h"
 
 OSMutex::OSMutex()
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
 :
   m_waitingThreads(0, 0)
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   OSDeviceDebug::putString("OSMutex()=");
@@ -30,12 +30,12 @@ OSMutex::OSMutex()
   m_eventRet = OSEventWaitReturn::OS_NONE;
 }
 
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
 OSMutex::OSMutex(OSThread* pWaitingThreadsArray[], int waitingThreadsArraySize)
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
 :
   m_waitingThreads(pWaitingThreadsArray, waitingThreadsArraySize)
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   OSDeviceDebug::putString("OSMutex()=");
@@ -48,7 +48,7 @@ OSMutex::OSMutex(OSThread* pWaitingThreadsArray[], int waitingThreadsArraySize)
   m_event = (OSEvent_t) this;
   m_eventRet = OSEventWaitReturn::OS_NONE;
 }
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 
 int
 OSMutex::acquire(bool doNotBlock)
@@ -76,13 +76,13 @@ OSMutex::acquire(bool doNotBlock)
                 {
                   // if we are allowed, prepare to block
                   doWait = OSScheduler::eventWaitPrepare(m_event);
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
                   if (doWait)
                     {
                       // add current thread to waiting list
                       m_waitingThreads.add(OSScheduler::getThreadCurrent());
                     }
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
                 }
             }
         }
@@ -102,7 +102,7 @@ OSMutex::acquire(bool doNotBlock)
 
       if (doWait)
         {
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
           OSCriticalSection::enter();
             {
               OSScheduler::eventWaitPerform();
@@ -112,7 +112,7 @@ OSMutex::acquire(bool doNotBlock)
           OSCriticalSection::exit();
 #else
           OSScheduler::eventWaitPerform();
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
         }
       ret = OSScheduler::getEventWaitReturn();
 
@@ -163,7 +163,7 @@ OSMutex::release(OSThread * pThread)
       return OS_NOT_ACQUIRED;
     }
   // notify all threads waiting for this mutex
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
   if (m_waitingThreads.getSize() == 0)
     {
       // notify all existing threads
@@ -189,7 +189,7 @@ OSMutex::release(OSThread * pThread)
   return OS_OK;
 }
 
-#if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
+#if defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS)
 
 OSMutexWaitingThreads::OSMutexWaitingThreads(OSThread** pWaitingThreadsArray,
     int waitingThreadsArraySize)
@@ -265,6 +265,6 @@ OSMutexWaitingThreads::remove(OSThread* pThread)
   return OSReturn::OS_OK;
 }
 
-#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
+#endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 
 #endif /* defined(OS_INCLUDE_OSMUTEX) */

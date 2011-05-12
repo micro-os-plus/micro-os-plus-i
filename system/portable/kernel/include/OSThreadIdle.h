@@ -11,8 +11,8 @@
 
 #include "portable/kernel/include/OSThread.h"
 
-#ifndef OS_CFGINT_IDLE_TASK_STACK_SIZE
-#define OS_CFGINT_IDLE_TASK_STACK_SIZE  (OSThread::STACK_MINIMAL_SIZE+50)
+#ifndef OS_CFGINT_IDLE_THREAD_STACK_SIZE
+#define OS_CFGINT_IDLE_THREAD_STACK_SIZE  (OSThread::STACK_MINIMAL_SIZE+50)
 #endif
 
 class OSThreadIdle : public OSThread
@@ -37,7 +37,7 @@ private:
   // members
 
   // Stack used by this thread.
-  OSStack_t m_stack[OS_CFGINT_IDLE_TASK_STACK_SIZE / sizeof(OSStack_t)];
+  OSStack_t m_stack[OS_CFGINT_IDLE_THREAD_STACK_SIZE / sizeof(OSStack_t)];
   };
 
 #endif /*OSTHREADIDLE_H_*/

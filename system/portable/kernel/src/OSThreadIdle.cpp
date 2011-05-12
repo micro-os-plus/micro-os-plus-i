@@ -82,7 +82,7 @@ bool OSThreadIdle::enterSleep(void)
   }
 #endif
 
-#ifndef OS_INCLUDE_CUSTOM_IDLE_TASK
+#ifndef OS_INCLUDE_CUSTOM_IDLE_THREAD
 OSThreadIdle idleThread;
 #endif
 
