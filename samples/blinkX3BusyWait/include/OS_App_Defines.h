@@ -7,7 +7,7 @@
 #ifndef OS_APP_DEFINES_H_
 #define OS_APP_DEFINES_H_
 
-// ----------------------------------------------------------------------------
+// ----- Portable Definitions -------------------------------------------------
 
 // Override the board definitions, if needed
 //#define OS_CFGLONG_OSCILLATOR_HZ                        (16000000UL)
@@ -23,10 +23,19 @@
 // Mandatory here, since we test in cooperative multitasking mode.
 #define OS_EXCLUDE_PREEMPTION                           (1)
 
+
 // Mandatory here, we do not enable the timer yet.
 #define OS_EXCLUDE_OSTIMER                              (1)
 
-// ----------------------------------------------------------------------------
+// ----- Board Definitions ----------------------------------------------------
+
+#if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+
+#elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
+
+#endif /* OS_CONFIG_BOARD_* */
+
+// ----- Debug Definitions ----------------------------------------------------
 
 #if defined(DEBUG)
 
