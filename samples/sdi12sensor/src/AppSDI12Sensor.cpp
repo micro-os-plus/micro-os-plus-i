@@ -9,8 +9,8 @@
 
 AppSDI12Sensor::AppSDI12Sensor(const char *pNameAquire,
     const char *pNamePeriodic, const char *pNameSDI12,
-    OSTaskPriority_t priorityAquire, OSTaskPriority_t priorityPeriodic,
-    OSTaskPriority_t prioritySDI12) :
+    OSThreadPriority_t priorityAquire, OSThreadPriority_t priorityPeriodic,
+    OSThreadPriority_t prioritySDI12) :
 
   SDI12Sensor(pNameAquire, m_stackAquire, sizeof(m_stackAquire),
       priorityAquire, pNamePeriodic, m_stackPeriodic, sizeof(m_stackPeriodic),

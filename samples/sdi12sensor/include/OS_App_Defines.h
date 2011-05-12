@@ -19,12 +19,12 @@
 #define OS_INCLUDE_OSSCHEDULER_TIMERSECONDS			1
 #define OS_INCLUDE_32KHZ_TIMER                          1
 
-#define OS_INCLUDE_OSTASK_SLEEP                         1
-#define OS_INCLUDE_OSTASK_GETSTACKUSED			1
+#define OS_INCLUDE_OSTHREAD_SLEEP                         1
+#define OS_INCLUDE_OSTHREAD_GETSTACKUSED			1
 
 #define OS_INCLUDE_SDI12SENSOR                          1
 
-#define OS_INCLUDE_OSTASK_VIRTUALWATCHDOG              1
+#define OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG              1
 #define OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS         (5)
 
 #define OS_INCLUDE_OSTIMERSECONDS_UPTIME                1

@@ -14,9 +14,9 @@ class AppSDI12Sensor : public SDI12Sensor
 public:
   AppSDI12Sensor(const char *pNameAquire, const char *pNamePeriodic,
       const char *pNameSDI12,
-      OSTaskPriority_t priorityAquire = OSTask::DEFAULT_PRIORITY,
-      OSTaskPriority_t priorityPeriodic = OSTask::DEFAULT_PRIORITY,
-      OSTaskPriority_t prioritySDI12 = OSTask::DEFAULT_PRIORITY + 1);
+      OSThreadPriority_t priorityAquire = OSThread::DEFAULT_PRIORITY,
+      OSThreadPriority_t priorityPeriodic = OSThread::DEFAULT_PRIORITY,
+      OSThreadPriority_t prioritySDI12 = OSThread::DEFAULT_PRIORITY + 1);
 
   virtual ~AppSDI12Sensor();
   virtual void customInit(void);
