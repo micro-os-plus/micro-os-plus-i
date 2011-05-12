@@ -644,7 +644,7 @@ void SDI12BootLoader::processDelayedActions(void)
       }
   }
 
-void SDI12BootLoader::taskMain(void)
+void SDI12BootLoader::threadMain(void)
   {
     SDI12Sensor::timerInit();
 

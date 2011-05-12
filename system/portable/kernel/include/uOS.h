@@ -121,8 +121,8 @@
 #include "portable/stdlib/include/ostream"
 #endif
 
-#if defined(OS_INCLUDE_OSTREAM_OSTASK)
-#include "portable/kernel/include/ostream_OSTask.h"
+#if defined(OS_INCLUDE_OSTREAM_OSTHREAD)
+#include "portable/kernel/include/ostream_OSThread.h"
 #endif
 
 #if defined(OS_INCLUDE_TASKPITPALAC)

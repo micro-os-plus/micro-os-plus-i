@@ -19,11 +19,11 @@ public:
   // critical section support
   static OSRealTimeCriticalSection critical;
 
-  // Register the task that will receive notifications
+  // Register the thread that will receive notifications
   static void
-  registerTask(OSTask* pTask);
+  registerThread(OSThread* pThread);
 
-  // Wake up this task if it waits for the given event.
+  // Wake up this thread if it waits for the given event.
   static int
   eventNotify(OSEvent_t event,
       OSEventWaitReturn_t ret = OSEventWaitReturn::OS_VOID);
@@ -32,7 +32,7 @@ public:
   interruptTick(void);
 
 private:
-  static OSTask* volatile ms_pTask;
+  static OSThread* volatile ms_pThread;
   static bool volatile ms_requestNofication;
   static OSEvent_t volatile ms_event;
   static OSEventWaitReturn_t volatile ms_ret;

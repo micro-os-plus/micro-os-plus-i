@@ -40,7 +40,7 @@ public:
   static void
   processDelayedActions(void);
   static void
-  taskMain(void) __attribute__( ( noreturn ) );
+  threadMain(void) __attribute__( ( noreturn ) );
 
   static unsigned char ms_doReset;
   static unsigned short ms_addr;

@@ -15,7 +15,7 @@ typedef unsigned short OSEventFlagsBits_t;
 typedef unsigned char OSEventFlagsBits_t;
 #endif
 
-// Inter-task synchronisation mechanism allowing a task to wait for multiple events,
+// Inter-thread synchronisation mechanism allowing a thread to wait for multiple events,
 // defined as separate flags in a structure.
 class OSEventFlags
   {

@@ -93,19 +93,19 @@ public:
   deviceCharacterType_t getDeviceType(void);
 #endif
 
-  // set/get the task event to be used by read
+  // set/get the thread event to be used by read
   void
   setReadEvent(OSEvent_t event);
   OSEvent_t
   getReadEvent(void);
 
-  // set/get the task event to be used by write
+  // set/get the thread event to be used by write
   void
   setWriteEvent(OSEvent_t event);
   OSEvent_t
   getWriteEvent(void);
 
-  // set/get the task event to be used by open
+  // set/get the thread event to be used by open
   void
   setOpenEvent(OSEvent_t event);
   OSEvent_t
@@ -142,7 +142,7 @@ public:
   // Set timer to be used by the open function.
   // If the operation doesn't succeed after the open-timeout
   // (set with setOpenTimeout), this timer is used to
-  // wake-up the task and return with an error code.
+  // wake-up the thread and return with an error code.
   void
   setOpenTimer(OSTimer *pTimer);
   OSTimer *
@@ -151,7 +151,7 @@ public:
   // Set timer to be used by the read functions.
   // If the operation doesn't succeed after the read-timeout
   // (set with setReadTimeout), this timer is used to
-  // wake-up the task and return with an error code.
+  // wake-up the thread and return with an error code.
   void
   setReadTimer(OSTimer *pTimer);
   OSTimer *
@@ -160,7 +160,7 @@ public:
   // Set timer to be used by the write functions.
   // If the operation doesn't succeed after the write-timeout
   // (set with setWriteTimeout), this timer is used to
-  // wake-up the task and return with an error code.
+  // wake-up the thread and return with an error code.
   void
   setWriteTimer(OSTimer *pTimer);
   OSTimer *

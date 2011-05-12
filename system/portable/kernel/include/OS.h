@@ -198,7 +198,7 @@ public:
 
 #include "portable/kernel/include/OSScheduler.h"
 
-#include "portable/kernel/include/OSTask.h"
+#include "portable/kernel/include/OSThread.h"
 
 #include "portable/kernel/include/OSRealTime.h"
 

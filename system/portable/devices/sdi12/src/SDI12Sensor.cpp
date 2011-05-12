@@ -67,8 +67,8 @@ volatile OSTimerTicks_t SDI12Sensor::ms_periodicSeconds;
 
 unsigned char SDI12Sensor::ms_delayedMode;
 
-OSTask *SDI12Sensor::ms_pTask;
-OSTask *SDI12Sensor::ms_pTaskA;
+OSThread *SDI12Sensor::ms_pThread;
+OSThread *SDI12Sensor::ms_pThreadA;
 
 unsigned char SDI12Sensor::ms_doReset;
 
@@ -97,20 +97,20 @@ unsigned char SDI12Sensor::ms_prevValue3;
 
 SDI12Sensor::SDI12Sensor(const char *pNameAcquire,
     const unsigned char *pStackAcquire, unsigned short stackSizeAcquire,
-    OSTaskPriority_t priorityAcquire, const char *pNamePeriodic,
+    OSThreadPriority_t priorityAcquire, const char *pNamePeriodic,
     const unsigned char *pStackPeriodic, unsigned short stackSizePeriodic,
-    OSTaskPriority_t priorityPeriodic, const char *pNameSDI12,
+    OSThreadPriority_t priorityPeriodic, const char *pNameSDI12,
     const unsigned char *pStackSDI12, unsigned short stackSizeSDI12,
-    OSTaskPriority_t prioritySDI12)
+    OSThreadPriority_t prioritySDI12)
 
 :
-taskSDI12(pNameSDI12, (OSTaskMainPtr_t) staticMainSDI12, (void*) this,
+threadSDI12(pNameSDI12, (OSThreadMainPtr_t) staticMainSDI12, (void*) this,
     pStackSDI12, stackSizeSDI12, prioritySDI12),
 
-taskAcquire(pNameAcquire, (OSTaskMainPtr_t) staticMainAcquire, (void*) this,
+threadAcquire(pNameAcquire, (OSThreadMainPtr_t) staticMainAcquire, (void*) this,
     pStackAcquire, stackSizeAcquire, priorityAcquire),
 
-taskPeriodic(pNamePeriodic, (OSTaskMainPtr_t) staticMainPeriodic,
+threadPeriodic(pNamePeriodic, (OSThreadMainPtr_t) staticMainPeriodic,
     (void*) this, pStackPeriodic, stackSizePeriodic, priorityPeriodic)
   {
 
@@ -126,8 +126,8 @@ taskPeriodic(pNamePeriodic, (OSTaskMainPtr_t) staticMainPeriodic,
 
     //ms_bInitialised = false;
 
-    ms_pTask = &taskSDI12;
-    ms_pTaskA = &taskAcquire;
+    ms_pThread = &threadSDI12;
+    ms_pThreadA = &threadAcquire;
 
     ms_doReset = 0;
     ms_periodicSeconds = 0; // no periodic acquisition
@@ -158,15 +158,15 @@ void SDI12Sensor::processPeriodicMeasurements(void)
 
 void SDI12Sensor::cancelPeriodic(void)
   {
-    taskPeriodic.requestInterruption();
+    threadPeriodic.requestInterruption();
   }
 
 void SDI12Sensor::cancelAcquisition(void)
   {
     //ms_bIsCancelled = true;
 
-    // request interruption of acquisition task
-    taskAcquire.requestInterruption();
+    // request interruption of acquisition thread
+    threadAcquire.requestInterruption();
   }
 
 void SDI12Sensor::enableTimeout(OSTimerTicks_t ticks)
@@ -230,14 +230,14 @@ void SDI12Sensor::interruptTick(void)
 
         if (false /* ms_bIsCancelled */)
           {
-            // if acquisition task is in waiting state
-            if (ms_pTaskA->isWaiting())
+            // if acquisition thread is in waiting state
+            if (ms_pThreadA->isWaiting())
               {
 #if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_INTERRUPTTICK)
                 OSDeviceDebug::putChar('>');
 #endif
                 // iterate cancellation of pending event
-                OSScheduler::eventNotify(ms_pTaskA->getEvent(),
+                OSScheduler::eventNotify(ms_pThreadA->getEvent(),
                     OSEventWaitReturn::OS_CANCELED);
               }
           }
@@ -250,7 +250,7 @@ void SDI12Sensor::interruptTick(void)
 void SDI12Sensor::staticMainSDI12(SDI12Sensor *pt)
   {
 
-    pt->taskMainSDI12();
+    pt->threadMainSDI12();
     for (;;)
       {
         ; // watchdog should trigger
@@ -258,16 +258,16 @@ void SDI12Sensor::staticMainSDI12(SDI12Sensor *pt)
   }
 
 /*
- * Task main code.
+ * Thread main code.
  *
  */
 
-void SDI12Sensor::taskMainSDI12(void)
+void SDI12Sensor::threadMainSDI12(void)
   {
     OSSchedulerLock::enter();
       {
 #if defined(DEBUG)
-        OSDeviceDebug::putString("SDI12Sensor::taskMainSDI12()");
+        OSDeviceDebug::putString("SDI12Sensor::threadMainSDI12()");
         OSDeviceDebug::putNewLine();
 #endif
 
@@ -282,7 +282,7 @@ void SDI12Sensor::taskMainSDI12(void)
         // must be after customInit() where pin change is enabled
         interruptPinChangeEnable();
 
-        // start acquisition task;
+        // start acquisition thread;
         // all initializations must be done at this point
         ms_flags.notify(INITIALIZED);
       }
@@ -307,15 +307,15 @@ void SDI12Sensor::taskMainSDI12(void)
     bool bIsCcmd;
     bIsCcmd = false;
 
-    OSTask *pTask;
-    pTask = OSScheduler::getTaskCurrent();
+    OSThread *pThread;
+    pThread = OSScheduler::getThreadCurrent();
 
-    OSTask *pTaskIdle;
-    pTaskIdle = OSScheduler::getTaskIdle();
+    OSThread *pThreadIdle;
+    pThreadIdle = OSScheduler::getThreadIdle();
 
     bool bIdleAllowDeepSleep;
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
 #if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_STATE)
@@ -329,10 +329,10 @@ void SDI12Sensor::taskMainSDI12(void)
             case STATE0:
             // low power standby, waiting for break
 
-            pTask->virtualWatchdogSet(0);
+            pThread->virtualWatchdogSet(0);
 
             // permit to enter deep sleep
-            ms_pTask->setAllowSleep(true);
+            ms_pThread->setAllowSleep(true);
 
             ms_flags.clear(BREAK);
 
@@ -345,7 +345,7 @@ void SDI12Sensor::taskMainSDI12(void)
             // wait for break and clear condition
             flags = ms_flags.wait(BREAK);
 
-            pTask->virtualWatchdogSet(OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
+            pThread->virtualWatchdogSet(OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
             ms_state = STATE1;
             break;
@@ -377,15 +377,15 @@ void SDI12Sensor::taskMainSDI12(void)
             case STATE3:
             // look for address, break or 100 ms timeout
 
-            bIdleAllowDeepSleep = pTaskIdle->isAllowDeepSleep();
-            pTaskIdle->setAllowSleep(false);
+            bIdleAllowDeepSleep = pThreadIdle->isAllowDeepSleep();
+            pThreadIdle->setAllowSleep(false);
               {
                 ms_flags.clear(ADDRESS | BREAK | TIMEOUT);
                 enableTimeout(TIMEOUT100_TICKS);
                 flags = ms_flags.wait(ADDRESS | BREAK | TIMEOUT);
                 disableTimeout();
               }
-            pTaskIdle->setAllowSleep(bIdleAllowDeepSleep);
+            pThreadIdle->setAllowSleep(bIdleAllowDeepSleep);
 
             if ((flags & BREAK) != 0)
               {
@@ -500,7 +500,7 @@ void SDI12Sensor::taskMainSDI12(void)
 
                 ms_flags.notify(ACQUIRE);
 
-                pTask->virtualWatchdogSet(ms_dSeconds
+                pThread->virtualWatchdogSet(ms_dSeconds
                     + OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
                 ms_flags.clear(ACQUIRE_COMPLETED | BREAK);
@@ -517,8 +517,8 @@ void SDI12Sensor::taskMainSDI12(void)
 
                     // to stop automatic cancellation notification
                     //ms_bIsCancelled = false;
-                    // acknowledge task interrupted
-                    taskAcquire.ackInterruption();
+                    // acknowledge thread interrupted
+                    threadAcquire.ackInterruption();
 
                     // mark D values are no longer available
                     // no need to clearDValues();
@@ -599,7 +599,7 @@ void SDI12Sensor::taskMainSDI12(void)
 
             ms_flags.notify(ACQUIRE);
 
-            pTask->virtualWatchdogSet(ms_dSeconds
+            pThread->virtualWatchdogSet(ms_dSeconds
                 + OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
             ms_flags.clear(ACQUIRE_COMPLETED | BREAK);
@@ -624,8 +624,8 @@ void SDI12Sensor::taskMainSDI12(void)
             clearInputBuff();
             usartRxEnable();
 
-            bIdleAllowDeepSleep = pTaskIdle->isAllowDeepSleep();
-            pTaskIdle->setAllowSleep(false);
+            bIdleAllowDeepSleep = pThreadIdle->isAllowDeepSleep();
+            pThreadIdle->setAllowSleep(false);
               {
                 ms_flags.clear(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
                 enableTimeout(TIMEOUT100_TICKS);
@@ -633,7 +633,7 @@ void SDI12Sensor::taskMainSDI12(void)
                     | TIMEOUT);
                 disableTimeout();
               }
-            pTaskIdle->setAllowSleep(bIdleAllowDeepSleep);
+            pThreadIdle->setAllowSleep(bIdleAllowDeepSleep);
 
             if ((flags & BREAK) != 0)
               {
@@ -688,8 +688,8 @@ void SDI12Sensor::taskMainSDI12(void)
 
                     // to stop automatic cancellation notification
                     //ms_bIsCancelled = false;
-                    // acknowledge task interrupted
-                    taskAcquire.ackInterruption();
+                    // acknowledge thread interrupted
+                    threadAcquire.ackInterruption();
 
                     ms_state = STATE5;
 
@@ -1074,10 +1074,10 @@ bool SDI12Sensor::processSystemXCommand(void)
   {
     // system commands
     // aX$H : help
-    // aX$TN : tasks names
-    // aX$TS : tasks stacks
-    // aX$TP : tasks priorities
-    // aX$Tn : task n info
+    // aX$TN : threads names
+    // aX$TS : threads stacks
+    // aX$TP : threads priorities
+    // aX$Tn : thread n info
     // aX$U : uptime
     // aX$V : OS version
 
@@ -1094,17 +1094,17 @@ bool SDI12Sensor::processSystemXCommand(void)
       }
     else if (syscmd == 'T')
       {
-        int cTasks;
-        cTasks = OSScheduler::getTasksCount();
+        int cThreads;
+        cThreads = OSScheduler::getThreadsCount();
 
-        OSTask *pt;
+        OSThread *pt;
         syscmd = ms_buf[4];
         if (syscmd == 'N' || syscmd == 'S' || syscmd == 'P')
           {
 
-            for (int j = 0; j < cTasks; ++j)
+            for (int j = 0; j < cThreads; ++j)
               {
-                pt = OSScheduler::getTask(j);
+                pt = OSScheduler::getThread(j);
                 if (j > 0)
                 storeCharResponse(',');
 
@@ -1128,9 +1128,9 @@ bool SDI12Sensor::processSystemXCommand(void)
           {
             unsigned char i;
             i = parseUnsigned();
-            if (i < cTasks)
+            if (i < cThreads)
               {
-                pt = OSScheduler::getTask(i);
+                pt = OSScheduler::getThread(i);
                 storeStringResponse(pt->getName());
                 if (pt->isSuspended() || pt->isWaiting())
                   {
@@ -1300,23 +1300,23 @@ void SDI12Sensor::setPeriodicSeconds(OSTimerTicks_t seconds)
 
 // ---------------------------------------------------------------------------
 
-// upon request data acquisition task
-// should be scheduled *after* the main sdi12 task
+// upon request data acquisition thread
+// should be scheduled *after* the main sdi12 thread
 
 void SDI12Sensor::staticMainAcquire(SDI12Sensor *pt)
   {
-    pt->taskMainAcquire();
+    pt->threadMainAcquire();
     for (;;)
     ; // watchdog should trigger
   }
 
-void SDI12Sensor::taskMainAcquire(void)
+void SDI12Sensor::threadMainAcquire(void)
   {
 
 #if defined(DEBUG)
     OSSchedulerLock::enter();
       {
-        OSDeviceDebug::putString("taskMainAcquire()");
+        OSDeviceDebug::putString("threadMainAcquire()");
         OSDeviceDebug::putNewLine();
       }
     OSSchedulerLock::exit();
@@ -1325,10 +1325,10 @@ void SDI12Sensor::taskMainAcquire(void)
     // wait for initializations to complete
     ms_flags.wait(INITIALIZED);
 
-    OSTask *pTask;
-    pTask = OSScheduler::getTaskCurrent();
+    OSThread *pThread;
+    pThread = OSScheduler::getThreadCurrent();
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
         ms_flags.clear(ACQUIRE);
@@ -1346,12 +1346,12 @@ void SDI12Sensor::taskMainAcquire(void)
         OSDeviceDebug::putChar(' ');
 #endif
 
-        pTask->virtualWatchdogSet(ms_dSeconds
+        pThread->virtualWatchdogSet(ms_dSeconds
             + OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
         prepareMeasuredData(ms_dCmd, ms_dDigit, ms_dSeconds, ms_dCount);
 
-        pTask->virtualWatchdogSet(0);
+        pThread->virtualWatchdogSet(0);
 
 #if defined(DEBUG)
         OSDeviceDebug::putString("]");
@@ -1610,22 +1610,22 @@ void SDI12Sensor::storeDelayedMode(unsigned char mode)
 
 // ---------------------------------------------------------------------------
 
-// periodic data acquisition task
-// should be scheduled *after* the main sdi12 task
+// periodic data acquisition thread
+// should be scheduled *after* the main sdi12 thread
 
 void SDI12Sensor::staticMainPeriodic(SDI12Sensor *pt)
   {
-    pt->taskMainPeriodic();
+    pt->threadMainPeriodic();
     for (;;)
     ; // watchdog should trigger
   }
 
-void SDI12Sensor::taskMainPeriodic(void)
+void SDI12Sensor::threadMainPeriodic(void)
   {
 #if defined(DEBUG)
     OSSchedulerLock::enter();
       {
-        OSDeviceDebug::putString("taskMainPeriodic()");
+        OSDeviceDebug::putString("threadMainPeriodic()");
         OSDeviceDebug::putNewLine();
       }
     OSSchedulerLock::exit();
@@ -1637,10 +1637,10 @@ void SDI12Sensor::taskMainPeriodic(void)
     // wait for things to settle down and start with second 1
     OSScheduler::timerSeconds.sleep(1);
 
-    OSTask *pTask;
-    pTask = OSScheduler::getTaskCurrent();
+    OSThread *pThread;
+    pThread = OSScheduler::getThreadCurrent();
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
 
@@ -1663,12 +1663,12 @@ void SDI12Sensor::taskMainPeriodic(void)
             //OSDeviceDebug::putNewLine();
 #endif
 
-            pTask->virtualWatchdogSet(ms_periodicSeconds
+            pThread->virtualWatchdogSet(ms_periodicSeconds
                 + OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
             processPeriodicMeasurements();
 
-            pTask->virtualWatchdogSet(0);
+            pThread->virtualWatchdogSet(0);
 
 #if defined(DEBUG)
             OSDeviceDebug::putString(" }");
@@ -1679,10 +1679,10 @@ void SDI12Sensor::taskMainPeriodic(void)
         for (;;)
           {
             crtSecond = OSScheduler::timerSeconds.getUptime();
-            if (crtSecond >= ms_periodicNextSecond && !pTask->isInterrupted())
+            if (crtSecond >= ms_periodicNextSecond && !pThread->isInterrupted())
             break;
 
-            if (!pTask->isInterrupted())
+            if (!pThread->isInterrupted())
               {
                 // sleep enough to the next periodic acquisition moment
                 // to be able to react quickly to periodicSeconds changes,
@@ -1691,9 +1691,9 @@ void SDI12Sensor::taskMainPeriodic(void)
                     - crtSecond);
               }
 
-            if (pTask->isInterrupted())
+            if (pThread->isInterrupted())
               {
-                pTask->ackInterruption();
+                pThread->ackInterruption();
                 OSDeviceDebug::putString(" cancelled");
               }
           }
@@ -1813,7 +1813,7 @@ void SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
 #if defined(DEBUG)
                 OSDeviceDebug::putChar('?');
 #endif
-                ms_pTask->setAllowSleep(true);
+                ms_pThread->setAllowSleep(true);
               }
           }
         else
@@ -1824,7 +1824,7 @@ void SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
 #endif
 
             // must be here, otherwise we cannot measure pulse duration
-            ms_pTask->setAllowSleep(false);
+            ms_pThread->setAllowSleep(false);
             OSDebugLed2::on();
           }
         ms_ticksBRK = OSScheduler::timerTicks.getTicks();
@@ -1915,7 +1915,7 @@ void SDI12Sensor::interruptRxServiceRoutine(void)
                 --ms_bufCount;
               }
 
-            // notify task that command is in, do not store it
+            // notify thread that command is in, do not store it
             ms_flags.notify(EXCLAMATION);
           }
         else if (ms_bufCount < sizeof(ms_buf))

@@ -4,66 +4,66 @@
  *	This file is part of the uOS++ distribution.
  */
 
-#ifndef OSTASK_H_
-#define OSTASK_H_
+#ifndef OSTHREAD_H_
+#define OSTHREAD_H_
 
 #include "portable/kernel/include/OS.h"
 
 class OSScheduler;
 
-typedef unsigned char OSTaskPriority_t;
+typedef unsigned char OSThreadPriority_t;
 
 typedef void
-(*OSTaskMainPtr_t)(void *);
+(*OSThreadMainPtr_t)(void *);
 
-class OSTask
+class OSThread
 {
 public:
 
-  // Task range priorities.
-  static const OSTaskPriority_t IDLE_PRIORITY = 0x00;
-  static const OSTaskPriority_t MIN_PRIORITY = 0x01;
-  static const OSTaskPriority_t MAX_PRIORITY = 0xFF;
-  static const OSTaskPriority_t DEFAULT_PRIORITY = (MAX_PRIORITY / 2 + 1);
+  // Thread range priorities.
+  static const OSThreadPriority_t IDLE_PRIORITY = 0x00;
+  static const OSThreadPriority_t MIN_PRIORITY = 0x01;
+  static const OSThreadPriority_t MAX_PRIORITY = 0xFF;
+  static const OSThreadPriority_t DEFAULT_PRIORITY = (MAX_PRIORITY / 2 + 1);
 
-  // Value for the minimal size for a task.
+  // Value for the minimal size for a thread.
   static const unsigned short STACK_MINIMAL_SIZE = OS_CFGINT_STACK_MINIMAL_SIZE;
   // Pattern for initialising the stack.
   static const OSStack_t STACK_FILL_BYTE = 0x5A;
 
-  // Constructor; run static taskMain (C++ style).
-  OSTask(const char *pName, const OSStack_t *pStack, unsigned short stackSize,
-      OSTaskPriority_t priority = OSTask::DEFAULT_PRIORITY);
+  // Constructor; run static threadMain (C++ style).
+  OSThread(const char *pName, const OSStack_t *pStack, unsigned short stackSize,
+      OSThreadPriority_t priority = OSThread::DEFAULT_PRIORITY);
 
   // Constructor; run given entryPoint function (C style).
-  OSTask(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
+  OSThread(const char *pName, OSThreadMainPtr_t entryPoint, void *pParameters,
       const OSStack_t *pStack, unsigned short stackSize,
-      OSTaskPriority_t priority = OSTask::DEFAULT_PRIORITY);
+      OSThreadPriority_t priority = OSThread::DEFAULT_PRIORITY);
 
-  // Main function task.
+  // Thread main() function.
   // Overridden by actual implementation.
   virtual void
-  taskMain(void);
+  threadMain(void);
 
-  // Suspend the task and remove it from the ready list.
+  // Suspend the thread and remove it from the ready list.
   void
   suspend(void);
-  // Resume the task, previously suspended by inserting it into the ready list.
+  // Resume the thread, previously suspended by inserting it into the ready list.
   void
   resume(void);
-  // Check if the task is suspended.
+  // Check if the thread is suspended.
   bool
   isSuspended(void);
-  // Check if the task is waiting on an event.
+  // Check if the thread is waiting on an event.
   bool
   isWaiting(void);
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
-  // Return TRUE if the task can go to sleep, FALSE otherwise.
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+  // Return TRUE if the thread can go to sleep, FALSE otherwise.
   bool isDeepSleepAllowed();
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
+#if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   // Set the virtual watchdog expire interval (in seconds).
   void virtualWatchdogSet(unsigned short seconds);
   // If the virtual watchdog interval expires, the MCU is reset using
@@ -71,7 +71,7 @@ public:
   void virtualWatchdogCheck(void);
 #endif
 
-  // Return the task name.
+  // Return the thread name.
   char const *
   getName(void);
 
@@ -81,44 +81,44 @@ public:
   unsigned char *
   getStackBottom(void);
 
-  // Return the current stack pointer of the task.
+  // Return the current stack pointer of the thread.
   // This value is stored only during context switch,
-  // so the running task will not get the actual value.
+  // so the running thread will not get the actual value.
   OSStack_t *
   getStack(void);
 
-  // Return the stack size given at task creation.
+  // Return the stack size given at thread creation.
   unsigned short
   getStackSize(void); /* bytes */
 
-#if defined(OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER)
+#if defined(OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER)
   OSProgramPtr_t getProgramCounter(void);
 #endif
 
-  // Return the task ID.
+  // Return the thread ID.
   int
   getID(void);
 
-  // Return the task's context.
+  // Return the thread's context.
   void *
   getContext(void);
 
-  // Return task priority.
+  // Return thread priority.
   // Higher means better priority.
-  OSTaskPriority_t
+  OSThreadPriority_t
   getPriority(void);
 
-  // Set task priority.
+  // Set thread priority.
   void
-  setPriority(OSTaskPriority_t priority);
+  setPriority(OSThreadPriority_t priority);
 
-  // Return the event the task is waiting for.
-  // Cancelling a waiting task can be done by notifying
+  // Return the event the thread is waiting for.
+  // Cancelling a waiting thread can be done by notifying
   // this event with a return value of OS_EVENT_WAIT_RETURN_CANCELED.
   OSEvent_t
   getEvent(void);
 
-  // Set the event the task is waiting for.
+  // Set the event the thread is waiting for.
   void
   setEvent(OSEvent_t event);
 
@@ -126,12 +126,12 @@ public:
   unsigned short
   getStackUsed(void);
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
-  // Allow task to be put to sleep.
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+  // Allow thread to be put to sleep.
   void setAllowSleep(bool status);
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
   bool isInterrupted(void);
   void setInterruption(bool flag);
   void requestInterruption(void);
@@ -147,7 +147,7 @@ public:
   // and restored from here at contextRestore.
   OSStack_t *m_pStack;
 
-  // Prepare the task to enter the wait state
+  // Prepare the thread to enter the wait state
   bool
   eventWaitPrepare(OSEvent_t event);
 
@@ -162,7 +162,7 @@ public:
   OSEventWaitReturn_t
   eventWait(OSEvent_t event);
 
-  // Wake up this task if it waits for the given event.
+  // Wake up this thread if it waits for the given event.
   int
   eventNotify(OSEvent_t event,
       OSEventWaitReturn_t ret = OSEventWaitReturn::OS_VOID);
@@ -177,78 +177,78 @@ public:
 
 private:
   friend class OSScheduler; // TODO: explain why they are here
-  friend class OSActiveTasks;
+  friend class OSActiveThreads;
 
-  // Initialise task's environment.
+  // Initialise thread's environment.
   void
-  init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
+  init(const char *pName, OSThreadMainPtr_t entryPoint, void *pParameters,
       const OSStack_t *pStackBottom, unsigned short stackSize,
-      OSTaskPriority_t priority);
+      OSThreadPriority_t priority);
 
-  // Redirect to virtual function (taskMain).
+  // Redirect to virtual function (threadMain).
   static void
-  staticMain(OSTask * pt);
+  staticMain(OSThread * pt);
 
   static void
   yield(void);
 
-#if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK)
+#if defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK)
   // Warning: no longer run in critical section!
   virtual void schedulerTick( void );
 #endif
 
   // members
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
-  // True if the task is interrupted.
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
+  // True if the thread is interrupted.
   bool m_isInterrupted;
 #endif
 
-  // True if the task is suspended.
+  // True if the thread is suspended.
   bool m_isSuspended;
 
-  // True if task is waiting for an event. The event value is in m_event.
+  // True if thread is waiting for an event. The event value is in m_event.
   bool m_isWaiting;
 
-  // The event which the task is waiting for, or OSEvent::OS_NONE
+  // The event which the thread is waiting for, or OSEvent::OS_NONE
   OSEvent_t m_event;
 
   // The value to be returned by eventWait(), or OSEventReturn::OS_NONE
   OSEventWaitReturn_t m_eventWaitReturn;
 
-  // Task's priority.
-  OSTaskPriority_t m_staticPriority;
+  // Thread's priority.
+  OSThreadPriority_t m_staticPriority;
 
-  // Task's numerical ID, the index in the scheduler array.
+  // Thread's numerical ID, the index in the scheduler array.
   unsigned char m_id;
 
-  // Task's name.
+  // Thread's name.
   const char *m_pName;
 
-  // Task's entry point (i.e. the function executed by this task).
-  OSTaskMainPtr_t m_entryPoint;
+  // Thread's entry point (i.e. the function executed by this thread).
+  OSThreadMainPtr_t m_entryPoint;
 
-  // Data passed to this task.
+  // Data passed to this thread.
   void *m_pParameters;
 
-  // The bottom of the task's stack (lowest address).
+  // The bottom of the thread's stack (lowest address).
   unsigned char *m_pStackBottom;
 
-  // The size of the task's stack, in bytes.
+  // The size of the thread's stack, in bytes.
   unsigned short m_stackSize;
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
-  // True if the task can be put to sleep.
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+  // True if the thread can be put to sleep.
   bool m_allowSleep;
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
+#if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   unsigned short m_WDseconds;
 #endif
 };
 
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
-inline void OSTask::ackInterruption(void)
+inline void OSThread::ackInterruption(void)
   {
     setInterruption(false);
   }
@@ -256,7 +256,7 @@ inline void OSTask::ackInterruption(void)
 #endif
 
 inline OSEventWaitReturn_t
-OSTask::eventWait(OSEvent_t event)
+OSThread::eventWait(OSEvent_t event)
 {
   if (eventWaitPrepare(event))
     eventWaitPerform();
@@ -264,26 +264,26 @@ OSTask::eventWait(OSEvent_t event)
 }
 
 inline OSEventWaitReturn_t
-OSTask::eventWaitPerform(void)
+OSThread::eventWaitPerform(void)
 {
   yield();
   return m_eventWaitReturn;
 }
 
 inline OSEventWaitReturn_t
-OSTask::getEventWaitReturn(void)
+OSThread::getEventWaitReturn(void)
 {
   return m_eventWaitReturn;
 }
 
 inline void
-OSTask::setEventWaitReturn(OSEventWaitReturn_t ret)
+OSThread::setEventWaitReturn(OSEventWaitReturn_t ret)
 {
   m_eventWaitReturn = ret;
 }
 
 inline void
-OSTask::eventWaitClear(void)
+OSThread::eventWaitClear(void)
 {
   m_isWaiting = false;
   m_event = OSEvent::OS_NONE; // no longer wait for it
@@ -292,111 +292,111 @@ OSTask::eventWaitClear(void)
 // ---
 
 inline char const *
-OSTask::getName(void)
+OSThread::getName(void)
 {
   return m_pName;
 }
 
 inline unsigned char *
-OSTask::getStackBottom(void)
+OSThread::getStackBottom(void)
 {
   return m_pStackBottom;
 }
 
 inline OSStack_t *
-OSTask::getStack(void)
+OSThread::getStack(void)
 {
   return m_pStack;
 }
 
 inline unsigned short
-OSTask::getStackSize(void)
+OSThread::getStackSize(void)
 {
   return m_stackSize;
 }
 
-// since all registers are saved on the task stack,
+// since all registers are saved on the thread stack,
 // the 'context' in simply a pointer to the stack (the address below
 // the deepest register pushed; for offsets to registers please see
 // OSScheduler::stackInitialise()).
 inline void *
-OSTask::getContext(void)
+OSThread::getContext(void)
 {
   return (void *) &m_pStack;
 }
 
 inline void
-OSTask::setPriority(OSTaskPriority_t priority)
+OSThread::setPriority(OSThreadPriority_t priority)
 {
   m_staticPriority = priority;
 }
 
 inline void
-OSTask::setEvent(OSEvent_t event)
+OSThread::setEvent(OSEvent_t event)
 {
   m_event = event;
 }
 
 inline int
-OSTask::getID(void)
+OSThread::getID(void)
 {
   return m_id;
 }
 
 inline OSEvent_t
-OSTask::getEvent(void)
+OSThread::getEvent(void)
 {
   return m_event;
 }
 
-inline OSTaskPriority_t
-OSTask::getPriority(void)
+inline OSThreadPriority_t
+OSThread::getPriority(void)
 {
   return m_staticPriority;
 }
 
 inline bool
-OSTask::isSuspended(void)
+OSThread::isSuspended(void)
 {
   return m_isSuspended;
 }
 
 inline bool
-OSTask::isWaiting(void)
+OSThread::isWaiting(void)
 {
   return m_isWaiting;
 }
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
 
 inline bool
-OSTask::isDeepSleepAllowed(void)
+OSThread::isDeepSleepAllowed(void)
   {
     return m_allowSleep;
   }
 
 inline void
-OSTask::setAllowSleep(bool b)
+OSThread::setAllowSleep(bool b)
   {
     m_allowSleep = b;
   }
 
-#endif /* defined(OS_INCLUDE_OSTASK_SLEEP) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
 
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
 inline bool
-OSTask::isInterrupted(void)
+OSThread::isInterrupted(void)
   {
     return m_isInterrupted;
   }
 
 inline void
-OSTask::setInterruption(bool flag)
+OSThread::setInterruption(bool flag)
   {
     m_isInterrupted = flag;
   }
 
-#endif /* defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
 
-#endif /* OSTASK_H_ */
+#endif /* OSTHREAD_H_ */

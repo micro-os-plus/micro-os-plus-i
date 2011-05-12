@@ -31,8 +31,8 @@ public:
   static unsigned long getUptime(void);
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
-  // check for every task if the software watchdog (counter) expired
+#if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
+  // check for every thread if the software watchdog (counter) expired
   static void checkVirtualWatchdogs(void);
 #endif
 
@@ -98,7 +98,7 @@ OSTimerSeconds::interruptServiceRoutine(void)
   incrementUptime();
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
+#if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   checkVirtualWatchdogs();
 #endif
 }

@@ -4,13 +4,13 @@
  *	This file is part of the uOS++ distribution.
  */
 
-#ifndef OSTREAM_OSTASK_H_
-#define OSTREAM_OSTASK_H_
+#ifndef OSTREAM_OSTHREAD_H_
+#define OSTREAM_OSTHREAD_H_
 
 #include "portable/kernel/include/OS.h"
 
 #include "portable/stdlib/include/ostream"
 
-ostream & operator <<(ostream & out, OSTask& pt);
+ostream & operator <<(ostream & out, OSThread& pt);
 
-#endif /*OSTREAM_OSTASK_H_*/
+#endif /*OSTREAM_OSTHREAD_H_*/

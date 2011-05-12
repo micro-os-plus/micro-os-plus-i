@@ -52,11 +52,11 @@ public:
 #if defined(OS_INCLUDE_SDI12SENSOR)
 
   SDI12Sensor(const char *pNameAcquire, const unsigned char *pStackAcquire,
-      unsigned short stackSizeAcquire, OSTaskPriority_t priorityAcquire,
+      unsigned short stackSizeAcquire, OSThreadPriority_t priorityAcquire,
       const char *pNamePeriodic, const unsigned char *pStackPeriodic,
-      unsigned short stackSizePeriodic, OSTaskPriority_t priorityPeriodic,
+      unsigned short stackSizePeriodic, OSThreadPriority_t priorityPeriodic,
       const char *pNameSDI12, const unsigned char *pStackSDI12,
-      unsigned short stackSizeSDI12, OSTaskPriority_t prioritySDI12);
+      unsigned short stackSizeSDI12, OSThreadPriority_t prioritySDI12);
 
   virtual ~SDI12Sensor();
 
@@ -179,8 +179,8 @@ public:
 
 protected:
 #if defined(OS_INCLUDE_SDI12SENSOR)
-  virtual void taskMainAcquire(void);
-  virtual void taskMainPeriodic(void);
+  virtual void threadMainAcquire(void);
+  virtual void threadMainPeriodic(void);
 #endif
 
 private:
@@ -253,7 +253,7 @@ private:
   static void staticMainAcquire(SDI12Sensor * pt);
   static void staticMainPeriodic(SDI12Sensor * pt);
 
-  void taskMainSDI12(void);
+  void threadMainSDI12(void);
   bool processCommand(void);
 
   static unsigned char* putFloat(unsigned char *pBuf, unsigned char* pMax,
@@ -302,9 +302,9 @@ private:
   // --------------------------------------------
   // members
 
-  OSTask taskSDI12;
-  OSTask taskAcquire;
-  OSTask taskPeriodic;
+  OSThread threadSDI12;
+  OSThread threadAcquire;
+  OSThread threadPeriodic;
 
   static OSEventFlags ms_flags;
 
@@ -355,8 +355,8 @@ private:
 
   static unsigned char ms_doReset;
 
-  static OSTask *ms_pTask;
-  static OSTask *ms_pTaskA;
+  static OSThread *ms_pThread;
+  static OSThread *ms_pThreadA;
 
   static volatile OSTimerTicks_t ms_exclamationTicks;
 
@@ -409,7 +409,7 @@ SDI12Sensor::getOutputBufferSize(void)
 
 inline bool SDI12Sensor::isAcquisitionCancelled(void)
   {
-    return OSScheduler::getTaskCurrent()->isInterrupted();
+    return OSScheduler::getThreadCurrent()->isInterrupted();
   }
 
 inline OSTimerTicks_t SDI12Sensor::getPeriodicSeconds(void)

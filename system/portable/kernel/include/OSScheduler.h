@@ -9,18 +9,18 @@
 
 #include "portable/kernel/include/OS.h"
 
-#include "portable/kernel/include/OSTask.h"
+#include "portable/kernel/include/OSThread.h"
 
 typedef unsigned short schedTicks_t;
 
-class OSActiveTasks;
+class OSActiveThreads;
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
 class OSTimerSeconds;
 #endif /* defined(OS_INCLUDE_OSTIMERSECONDS) */
 
 class OSTimerTicks;
-class OSTask;
+class OSThread;
 
 // ============================================================================
 
@@ -88,24 +88,24 @@ public:
   static void
   setPreemptive(bool flag);
 
-  // Return a pointer to the task currently running on the CPU.
-  static OSTask*
-  getTaskCurrent(void);
+  // Return a pointer to the thread currently running on the CPU.
+  static OSThread*
+  getThreadCurrent(void);
 
-  // returns the idle task
-  static OSTask*
-  getTaskIdle(void);
+  // returns the idle thread
+  static OSThread*
+  getThreadIdle(void);
 
-  // Return the number of tasks registered to the scheduler.
+  // Return the number of threads registered to the scheduler.
   static int
-  getTasksCount(void);
+  getThreadsCount(void);
 
-  // Return the i-th task registered to the scheduler,
-  // or NULL for illegal index or missing task.
-  static OSTask*
-  getTask(int i);
+  // Return the i-th thread registered to the scheduler,
+  // or NULL for illegal index or missing thread.
+  static OSThread*
+  getThread(int i);
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   // Return true if the deep sleep flag was set to true
   static bool
   isAllowDeepSleep(void);
@@ -134,12 +134,12 @@ public:
   static void
   eventWaitClear(void);
 
-  // wakeup all tasks waiting for event
+  // wakeup all threads waiting for event
   static int
   eventNotify(OSEvent_t event,
       OSEventWaitReturn_t ret = OSEventWaitReturn::OS_VOID);
 
-  // Suspend the current task and reschedule the CPU to the next task.
+  // Suspend the current thread and reschedule the CPU to the next thread.
   static void
   yield(void);
 
@@ -155,9 +155,9 @@ public:
   inline static void
   ledActiveOff(void) __attribute__((always_inline));
 
-  // register a task to the scheduler
+  // register a thread to the scheduler
   static unsigned char
-  taskRegister(OSTask* pTask);
+  threadRegister(OSThread* pThread);
 
   // TODO: do we need this?
   static void
@@ -167,14 +167,14 @@ public:
   static bool
   isContextSwitchRequired(void);
 
-  // make the context switch to the first task
+  // make the context switch to the first thread
   // from the ReadyList
   static void
   performContextSwitch(void);
 
 #if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
-  // called in order to save the context of the current task
+  // called in order to save the context of the current thread
   // must be called in conjunction with interruptExit
   inline static void
   interruptEnter(void) __attribute__((always_inline));
@@ -200,7 +200,7 @@ public:
   // critical section support
   static OSCriticalSection critical;
 
-  // timer used by scheduler to schedule the next task
+  // timer used by scheduler to schedule the next thread
   static OSTimerTicks timerTicks;
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
@@ -208,14 +208,14 @@ public:
   static OSTimerSeconds timerSeconds;
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
-  // Notifies a task which is waiting for time events
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
+  // Notifies a thread which is waiting for time events
   // (something like kill command in linux - SIGKILL)
-  static void ISRcancelTask(OSTask *pTask);
+  static void ISRcancelThread(OSThread *pThread);
 #endif
 
-  // pointer to the active task (running task)
-  static OSTask* volatile ms_pTaskRunning;
+  // pointer to the active thread (running thread)
+  static OSThread* volatile ms_pThreadRunning;
 
   static volatile OSStack_t** volatile ms_ppCurrentStack;
 
@@ -227,9 +227,9 @@ private:
   //  static void
   //  timerSetup(void);
 
-  // set the idle task
+  // set the idle thread
   static void
-  setTaskIdle(OSTask*);
+  setThreadIdle(OSThread*);
 
   // TODO: remove if no longer needed
   //static void timerISR(void) __attribute__( ( naked ) );
@@ -243,26 +243,26 @@ private:
 
   // true if the scheduler was started
   static bool ms_isRunning;
-  // true if the scheduler is locked, i.e. yield will return to same task
+  // true if the scheduler is locked, i.e. yield will return to same thread
   //static bool ms_isLocked;
 
-  // list of tasks registered to the scheduler
-  static OSTask* ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
-  // the number of tasks registered to the scheduler
-  static unsigned char ms_tasksCount;
-  //static unsigned char tasksIdx;
+  // list of threads registered to the scheduler
+  static OSThread* ms_threads[OS_CFGINT_TASKS_TABLE_SIZE + 1];
+  // the number of threads registered to the scheduler
+  static unsigned char ms_threadsCount;
+  //static unsigned char threadsIdx;
 
   #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
   static unsigned char ms_notifyIndex;
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 
-  // the Idle task
-  static OSTask* ms_pTaskIdle;
+  // the Idle thread
+  static OSThread* ms_pThreadIdle;
 
-  // the ready list used for managing the runnable tasks
-  static OSActiveTasks ms_activeTasks;
+  // the ready list used for managing the runnable threads
+  static OSActiveThreads ms_activeThreads;
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   // records the deep sleep flag
   static bool ms_allowDeepSleep;
 #endif
@@ -277,7 +277,7 @@ class OSSchedulerImpl
 {
 public:
 
-  // starts the first task from the ready list
+  // starts the first thread from the ready list
   static void
   start(void) __attribute__((noreturn));
 
@@ -285,7 +285,7 @@ public:
   inline static void
   yield(void) __attribute__((always_inline));
 
-  // initialise the stack for a task
+  // initialise the stack for a thread
   static OSStack_t*
   stackInitialise(OSStack_t* pStackTop, void
   (*entryPoint)(void*), void* pParams, unsigned char id);
@@ -300,27 +300,27 @@ public:
 
   // dump context info to the device debug
   static void
-  dumpContextInfo(OSTask*);
+  dumpContextInfo(OSThread*);
 
-  // restore the context for the next task to be scheduled
+  // restore the context for the next thread to be scheduled
   inline static void
-  FirstTask_contextRestore(void) __attribute__((always_inline));
+  FirstThread_contextRestore(void) __attribute__((always_inline));
 
 #if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
 
-  // save the SP for the active task
+  // save the SP for the active thread
   inline static void
   stackPointerSave(void) __attribute__((always_inline));
 
-  // restore the SP for the active task
+  // restore the SP for the active thread
   inline static void
   stackPointerRestore(void) __attribute__((always_inline));
 
-  // save the registers for the active task
+  // save the registers for the active thread
   inline static void
   registersSave(void) __attribute__((always_inline));
 
-  // restore the registers for the active task
+  // restore the registers for the active thread
   inline static void
   registersRestore(void) __attribute__((always_inline));
 
@@ -347,22 +347,22 @@ public:
 
 // ============================================================================
 
-class OSActiveTasks
+class OSActiveThreads
 {
 public:
-  OSActiveTasks();
+  OSActiveThreads();
 
-  // insert task in ready list
+  // insert thread in ready list
   static void
-  insert(OSTask* pTask);
-  // delete task from ready list
+  insert(OSThread* pThread);
+  // delete thread from ready list
   static void
-  remove(OSTask* pTask);
+  remove(OSThread* pThread);
 
-  // returns the first task from ready list (task with higher priority)
-  inline static OSTask*
+  // returns the first thread from ready list (thread with higher priority)
+  inline static OSThread*
   getTop(void);
-  // returns the number of the tasks from ready list
+  // returns the number of the threads from ready list
   inline static unsigned char
   getCount(void);
 
@@ -374,15 +374,15 @@ public:
 #endif
 
 private:
-  // find if pTask is in the ready tasks array
+  // find if pThread is in the ready threads array
   static int
-  find(OSTask* pTask);
+  find(OSThread* pThread);
 
   // members
 
-  // array of ready tasks
-  static OSTask* ms_array[];
-  // number of ready tasks (ready to run) in ms_array
+  // array of ready threads
+  static OSThread* ms_array[];
+  // number of ready threads (ready to run) in ms_array
   static unsigned char ms_count;
 };
 
@@ -441,8 +441,8 @@ OSSchedulerLock::exit(void)
 
 // ============================================================================
 
-inline OSTask *
-OSActiveTasks::getTop(void)
+inline OSThread *
+OSActiveThreads::getTop(void)
 {
   return ms_array[0];
 }
@@ -475,62 +475,62 @@ OSScheduler::isPreemptive(void)
 #endif
 }
 
-inline OSTask *
-OSScheduler::getTaskCurrent(void)
+inline OSThread *
+OSScheduler::getThreadCurrent(void)
 {
-  return ms_pTaskRunning;
+  return ms_pThreadRunning;
 }
 
-inline OSTask *
-OSScheduler::getTaskIdle(void)
+inline OSThread *
+OSScheduler::getThreadIdle(void)
 {
-  return ms_pTaskIdle;
+  return ms_pThreadIdle;
 }
 
 inline void
-OSScheduler::setTaskIdle(OSTask * pt)
+OSScheduler::setThreadIdle(OSThread * pt)
 {
-  ms_pTaskIdle = pt;
+  ms_pThreadIdle = pt;
 }
 
 inline int
-OSScheduler::getTasksCount(void)
+OSScheduler::getThreadsCount(void)
 {
-  return ms_tasksCount;
+  return ms_threadsCount;
 }
 
 // Runs in a critical section
 inline bool
 OSScheduler::eventWaitPrepare(OSEvent_t event)
 {
-  return ms_pTaskRunning->eventWaitPrepare(event);
+  return ms_pThreadRunning->eventWaitPrepare(event);
 }
 
 inline OSEventWaitReturn_t
 OSScheduler::eventWaitPerform(void)
 {
-  return ms_pTaskRunning->eventWaitPerform();
+  return ms_pThreadRunning->eventWaitPerform();
 }
 
 inline void
 OSScheduler::eventWaitClear(void)
 {
-  ms_pTaskRunning->eventWaitClear();
+  ms_pThreadRunning->eventWaitClear();
 }
 
 inline OSEventWaitReturn_t
 OSScheduler::getEventWaitReturn(void)
 {
-  return ms_pTaskRunning->getEventWaitReturn();
+  return ms_pThreadRunning->getEventWaitReturn();
 }
 
 inline void
 OSScheduler::setEventWaitReturn(OSEventWaitReturn_t ret)
 {
-  ms_pTaskRunning->setEventWaitReturn(ret);
+  ms_pThreadRunning->setEventWaitReturn(ret);
 }
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
 
 inline bool OSScheduler::isAllowDeepSleep(void)
   {
@@ -542,7 +542,7 @@ inline void OSScheduler::setAllowDeepSleep(bool flag)
     ms_allowDeepSleep = flag;
   }
 
-#endif /* OS_INCLUDE_OSTASK_SLEEP */
+#endif /* OS_INCLUDE_OSTHREAD_SLEEP */
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE)
 
@@ -676,7 +676,7 @@ OSScheduler::ledActiveOff(void)
 // ============================================================================
 
 inline unsigned char
-OSActiveTasks::getCount(void)
+OSActiveThreads::getCount(void)
 {
   return ms_count;
 }

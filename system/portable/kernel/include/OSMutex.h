@@ -11,16 +11,16 @@
 
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
 
-class OSMutexWaitingTasks
+class OSMutexWaitingThreads
 {
 public:
-  OSMutexWaitingTasks(OSTask** pWaitingTasksArray, int waitingTasksArraySize);
+  OSMutexWaitingThreads(OSThread** pWaitingThreadsArray, int waitingThreadsArraySize);
 
   OSReturn_t
-  add(OSTask* pTask);
+  add(OSThread* pThread);
   OSReturn_t
-  remove(OSTask * pTask);
-  OSTask*
+  remove(OSThread * pThread);
+  OSThread*
   getItem(int i);
 
   int
@@ -29,21 +29,21 @@ public:
   getCount(void);
 
 private:
-  OSTask** m_pWaitingTasksArray;
-  unsigned short m_waitingTasksArraySize;
-  unsigned short m_waitingTasksCount;
+  OSThread** m_pWaitingThreadsArray;
+  unsigned short m_waitingThreadsArraySize;
+  unsigned short m_waitingThreadsCount;
 };
 
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
 
-// The mutual exclusion (mutex) inter-task synchronisation mechanism.
+// The mutual exclusion (mutex) inter-thread synchronisation mechanism.
 class OSMutex
 {
 public:
   // Initialise the internal variables.
   OSMutex();
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
-  OSMutex(OSTask** pWaitingTasksArray, int waitingTasksArraySize);
+  OSMutex(OSThread** pWaitingThreadsArray, int waitingThreadsArraySize);
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
 
   // Constants ; all are used as result code for acquire and release methods.
@@ -54,17 +54,17 @@ public:
   static const int OS_WOULD_BLOCK = -4;
 
   // try to acquire mutex
-  // if doNotBlock is false, the task is blocked until this mutex is released
+  // if doNotBlock is false, the thread is blocked until this mutex is released
   int
   acquire(bool doNotBlock = false);
 
   // release owned mutex
   int
-  release(OSTask * pTask = 0);
+  release(OSThread * pThread = 0);
 
-  // return the task owner of the mutex
-  OSTask *
-  getOwnerTask(void);
+  // return the thread owner of the mutex
+  OSThread *
+  getOwnerThread(void);
 
   // return the event used for notification the acquire and release of the mutex
   OSEvent_t
@@ -79,8 +79,8 @@ public:
   getEventReturn(void);
 
 private:
-  // the task which uses this mutex
-  OSTask * m_pOwnerTask;
+  // the thread which uses this mutex
+  OSThread * m_pOwnerThread;
 
   // true if the mutex is currently acquired
   bool m_isAcquired;
@@ -92,15 +92,15 @@ private:
   OSEventWaitReturn_t m_eventRet;
 
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
-  OSMutexWaitingTasks m_waitingTasks;
+  OSMutexWaitingThreads m_waitingThreads;
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
 
 };
 
-inline OSTask *
-OSMutex::getOwnerTask(void)
+inline OSThread *
+OSMutex::getOwnerThread(void)
 {
-  return m_pOwnerTask;
+  return m_pOwnerThread;
 }
 
 inline OSEvent_t
@@ -123,23 +123,23 @@ OSMutex::getEventReturn(void)
 
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
 
-// Get the first task in the array
-inline OSTask*
-OSMutexWaitingTasks::getItem(int i)
+// Get the first thread in the array
+inline OSThread*
+OSMutexWaitingThreads::getItem(int i)
 {
-  return m_pWaitingTasksArray[i];
+  return m_pWaitingThreadsArray[i];
 }
 
 inline int
-OSMutexWaitingTasks::getSize(void)
+OSMutexWaitingThreads::getSize(void)
 {
-  return m_waitingTasksArraySize;
+  return m_waitingThreadsArraySize;
 }
 
 inline int
-OSMutexWaitingTasks::getCount(void)
+OSMutexWaitingThreads::getCount(void)
 {
-  return m_waitingTasksCount;
+  return m_waitingThreadsCount;
 }
 
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
