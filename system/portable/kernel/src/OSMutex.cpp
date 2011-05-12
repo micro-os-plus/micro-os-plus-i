@@ -15,7 +15,7 @@
 OSMutex::OSMutex()
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
 :
-  m_waitingTasks(0, 0)
+  m_waitingThreads(0, 0)
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -25,16 +25,16 @@ OSMutex::OSMutex()
 #endif
 
   m_isAcquired = false;
-  m_pOwnerTask = 0;
+  m_pOwnerThread = 0;
   m_event = (OSEvent_t) this;
   m_eventRet = OSEventWaitReturn::OS_NONE;
 }
 
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
-OSMutex::OSMutex(OSTask* pWaitingTasksArray[], int waitingTasksArraySize)
+OSMutex::OSMutex(OSThread* pWaitingThreadsArray[], int waitingThreadsArraySize)
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
 :
-  m_waitingTasks(pWaitingTasksArray, waitingTasksArraySize)
+  m_waitingThreads(pWaitingThreadsArray, waitingThreadsArraySize)
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -44,7 +44,7 @@ OSMutex::OSMutex(OSTask* pWaitingTasksArray[], int waitingTasksArraySize)
 #endif
 
   m_isAcquired = false;
-  m_pOwnerTask = 0;
+  m_pOwnerThread = 0;
   m_event = (OSEvent_t) this;
   m_eventRet = OSEventWaitReturn::OS_NONE;
 }
@@ -67,8 +67,8 @@ OSMutex::acquire(bool doNotBlock)
           m_isAcquired = true;
           if (!isAcquired)
             {
-              // then acquire for the current task
-              m_pOwnerTask = OSScheduler::getTaskCurrent();
+              // then acquire for the current thread
+              m_pOwnerThread = OSScheduler::getThreadCurrent();
             }
           else
             {
@@ -79,8 +79,8 @@ OSMutex::acquire(bool doNotBlock)
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
                   if (doWait)
                     {
-                      // add current task to waiting list
-                      m_waitingTasks.add(OSScheduler::getTaskCurrent());
+                      // add current thread to waiting list
+                      m_waitingThreads.add(OSScheduler::getThreadCurrent());
                     }
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS) */
                 }
@@ -106,8 +106,8 @@ OSMutex::acquire(bool doNotBlock)
           OSCriticalSection::enter();
             {
               OSScheduler::eventWaitPerform();
-              // remove current task from waiting list
-              m_waitingTasks.remove(OSScheduler::getTaskCurrent());
+              // remove current thread from waiting list
+              m_waitingThreads.remove(OSScheduler::getThreadCurrent());
             }
           OSCriticalSection::exit();
 #else
@@ -131,12 +131,12 @@ OSMutex::acquire(bool doNotBlock)
 }
 
 int
-OSMutex::release(OSTask * pTask)
+OSMutex::release(OSThread * pThread)
 {
-  if (pTask == 0)
-    pTask = OSScheduler::getTaskCurrent();
+  if (pThread == 0)
+    pThread = OSScheduler::getThreadCurrent();
 
-  if (pTask != m_pOwnerTask)
+  if (pThread != m_pOwnerThread)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSMUTEX_RELEASE)
       OSDeviceDebug::putString("OSMutex::release() not owner");
@@ -150,7 +150,7 @@ OSMutex::release(OSTask * pTask)
     {
       isAcquired = m_isAcquired;
       m_isAcquired = false;
-      m_pOwnerTask = 0;
+      m_pOwnerThread = 0;
     }
   OSCriticalSection::exit();
 
@@ -162,24 +162,24 @@ OSMutex::release(OSTask * pTask)
 #endif
       return OS_NOT_ACQUIRED;
     }
-  // notify all tasks waiting for this mutex
+  // notify all threads waiting for this mutex
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
-  if (m_waitingTasks.getSize() == 0)
+  if (m_waitingThreads.getSize() == 0)
     {
-      // notify all existing tasks
+      // notify all existing threads
       OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
     }
   else
     {
-      // notify only tasks waiting, in the order of entering acquire()
-      for (int i = 0; i < m_waitingTasks.getCount(); ++i)
-        m_waitingTasks.getItem(i)->eventNotify(m_event,
+      // notify only threads waiting, in the order of entering acquire()
+      for (int i = 0; i < m_waitingThreads.getCount(); ++i)
+        m_waitingThreads.getItem(i)->eventNotify(m_event,
             (OSEventWaitReturn_t) m_event);
     }
 #else
   OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
 #endif
-  // give other tasks a chance to acquire the mutex
+  // give other threads a chance to acquire the mutex
   OSScheduler::yield();
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSMUTEX_RELEASE)
@@ -191,76 +191,76 @@ OSMutex::release(OSTask * pTask)
 
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
 
-OSMutexWaitingTasks::OSMutexWaitingTasks(OSTask** pWaitingTasksArray,
-    int waitingTasksArraySize)
+OSMutexWaitingThreads::OSMutexWaitingThreads(OSThread** pWaitingThreadsArray,
+    int waitingThreadsArraySize)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("OSMutexWaitingTasks()=");
+  OSDeviceDebug::putString("OSMutexWaitingThreads()=");
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
-  m_pWaitingTasksArray = pWaitingTasksArray;
-  m_waitingTasksArraySize = waitingTasksArraySize;
-  m_waitingTasksCount = 0;
+  m_pWaitingThreadsArray = pWaitingThreadsArray;
+  m_waitingThreadsArraySize = waitingThreadsArraySize;
+  m_waitingThreadsCount = 0;
 }
 
-// Add task to the end of the array
+// Add thread to the end of the array
 OSReturn_t
-OSMutexWaitingTasks::add(OSTask* pTask)
+OSMutexWaitingThreads::add(OSThread* pThread)
 {
-  if (m_waitingTasksCount < m_waitingTasksArraySize)
+  if (m_waitingThreadsCount < m_waitingThreadsArraySize)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSMUTEXWAITINGTASKS_ADD)
-      OSDeviceDebug::putString("OSMutexWaitingTasks.add() [");
-      OSDeviceDebug::putDec(m_waitingTasksCount);
+      OSDeviceDebug::putString("OSMutexWaitingThreads.add() [");
+      OSDeviceDebug::putDec(m_waitingThreadsCount);
       OSDeviceDebug::putString("]=");
-      OSDeviceDebug::putPtr(pTask);
+      OSDeviceDebug::putPtr(pThread);
       OSDeviceDebug::putNewLine();
 #endif
-      m_pWaitingTasksArray[m_waitingTasksCount++] = pTask;
+      m_pWaitingThreadsArray[m_waitingThreadsCount++] = pThread;
       return OSReturn::OS_OK;
     }
   else
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSMUTEXWAITINGTASKS)
-      OSDeviceDebug::putString("OSMutexWaitingTasks.add() not enough space");
+      OSDeviceDebug::putString("OSMutexWaitingThreads.add() not enough space");
       OSDeviceDebug::putNewLine();
 #endif
       return OSReturn::OS_NOT_ENOUGH_SPACE;
     }
 }
 
-// Remove given task from the array
+// Remove given thread from the array
 OSReturn_t
-OSMutexWaitingTasks::remove(OSTask* pTask)
+OSMutexWaitingThreads::remove(OSThread* pThread)
 {
   int j;
   j = -1;
-  for (int i = 0; i < (int)m_waitingTasksCount; ++i)
-    if (m_pWaitingTasksArray[i] == pTask)
+  for (int i = 0; i < (int)m_waitingThreadsCount; ++i)
+    if (m_pWaitingThreadsArray[i] == pThread)
       j = i;
 
   if (j == -1)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSMUTEXWAITINGTASKS)
-      OSDeviceDebug::putString("OSMutexWaitingTasks.remove() item not found ");
-      OSDeviceDebug::putPtr(pTask);
+      OSDeviceDebug::putString("OSMutexWaitingThreads.remove() item not found ");
+      OSDeviceDebug::putPtr(pThread);
       OSDeviceDebug::putNewLine();
 #endif
       return OSReturn::OS_ITEM_NOT_FOUND;
     }
 
-  for (; j < (int)m_waitingTasksCount - 1; ++j)
-    m_pWaitingTasksArray[j] = m_pWaitingTasksArray[j + 1];
+  for (; j < (int)m_waitingThreadsCount - 1; ++j)
+    m_pWaitingThreadsArray[j] = m_pWaitingThreadsArray[j + 1];
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSMUTEXWAITINGTASKS_REMOVE)
-  OSDeviceDebug::putString("OSMutexWaitingTasks.remove() [");
-  OSDeviceDebug::putDec(m_waitingTasksCount);
+  OSDeviceDebug::putString("OSMutexWaitingThreads.remove() [");
+  OSDeviceDebug::putDec(m_waitingThreadsCount);
   OSDeviceDebug::putString("]=");
-  OSDeviceDebug::putPtr(pTask);
+  OSDeviceDebug::putPtr(pThread);
   OSDeviceDebug::putNewLine();
 #endif
-  --m_waitingTasksCount;
+  --m_waitingThreadsCount;
 
   return OSReturn::OS_OK;
 }

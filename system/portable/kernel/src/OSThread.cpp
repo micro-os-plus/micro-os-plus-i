@@ -12,27 +12,27 @@
 
 #include <string.h>
 
-// C++ style constructor, run taskMain
-OSTask::OSTask(const char* pName, const OSStack_t* pStack,
-    unsigned short stackSize, OSTaskPriority_t priority)
+// C++ style constructor, run threadMain
+OSThread::OSThread(const char* pName, const OSStack_t* pStack,
+    unsigned short stackSize, OSThreadPriority_t priority)
 {
-  OSTask::init(pName, (OSTaskMainPtr_t) &OSTask::staticMain, this, pStack,
+  OSThread::init(pName, (OSThreadMainPtr_t) &OSThread::staticMain, this, pStack,
       stackSize, priority);
 }
 
 // C style constructor, run any function
-OSTask::OSTask(const char* pName, OSTaskMainPtr_t entryPoint,
+OSThread::OSThread(const char* pName, OSThreadMainPtr_t entryPoint,
     void* pParameters, const OSStack_t* pStack, unsigned short stackSize,
-    OSTaskPriority_t priority)
+    OSThreadPriority_t priority)
 {
-  OSTask::init(pName, entryPoint, pParameters, pStack, stackSize, priority);
+  OSThread::init(pName, entryPoint, pParameters, pStack, stackSize, priority);
 }
 
 // The stack size is in multiples of OSStack_t
 void
-OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
+OSThread::init(const char *pName, OSThreadMainPtr_t entryPoint, void *pParameters,
     const OSStack_t *pStack, unsigned short stackSize,
-    OSTaskPriority_t priority)
+    OSThreadPriority_t priority)
 {
   // no stack, sorry...
   if (pStack == 0 || stackSize == 0)
@@ -48,7 +48,7 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
 
 #if defined(DEBUG)
     {
-      OSDeviceDebug::putString_P(PSTR("OSTask('"));
+      OSDeviceDebug::putString_P(PSTR("OSThread('"));
       OSDeviceDebug::putString(pName);
       OSDeviceDebug::putString_P(PSTR("',"));
       OSDeviceDebug::putPtr((void*) entryPoint);
@@ -78,22 +78,22 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
   m_isSuspended = false;
   m_isWaiting = false;
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
-  // by default, tasks will enter deep sleep
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+  // by default, threads will enter deep sleep
   m_allowSleep = true;
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
+#if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   m_WDseconds = 0;
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
   m_isInterrupted = false;
 #endif
 
-  // Register this task to the scheduler.
+  // Register this thread to the scheduler.
   // The scheduler is already initialised at earlyInit() for this to work.
-  m_id = OSScheduler::taskRegister(this);
+  m_id = OSScheduler::threadRegister(this);
 
   // Fill the stack with constant pattern (0x5A)
   memset((void*) pStack, STACK_FILL_BYTE, stackSize);
@@ -116,13 +116,13 @@ OSTask::init(const char *pName, OSTaskMainPtr_t entryPoint, void *pParameters,
 
 // Redirect to virtual function
 void
-OSTask::staticMain(OSTask* pt)
+OSThread::staticMain(OSThread* pt)
 {
-  pt->taskMain();
+  pt->threadMain();
 
   // normally should not reach here
 #if defined(DEBUG)
-  OSDeviceDebug::putString_P(PSTR("taskMain returned, reset"));
+  OSDeviceDebug::putString_P(PSTR("threadMain returned, reset"));
   OSDeviceDebug::putNewLine();
 #endif
 
@@ -130,48 +130,48 @@ OSTask::staticMain(OSTask* pt)
 }
 
 void
-OSTask::yield()
+OSThread::yield()
 {
   OSSchedulerImpl::yield();
 }
 
 // Should be overridden by actual implementation
 void
-OSTask::taskMain(void)
+OSThread::threadMain(void)
 {
   // loop
   for (;;)
     ;
 }
 
-// Suspend the task and remove from the ready list.
+// Suspend the thread and remove from the ready list.
 void
-OSTask::suspend(void)
+OSThread::suspend(void)
 {
   OSCriticalSection::enter();
     {
       m_isSuspended = true;
-      OSActiveTasks::remove(this);
+      OSActiveThreads::remove(this);
     }
   OSCriticalSection::exit();
 }
 
-// Resume the task and insert into the ready list.
+// Resume the thread and insert into the ready list.
 void
-OSTask::resume(void)
+OSThread::resume(void)
 {
   OSCriticalSection::enter();
     {
       m_isSuspended = false;
-      OSActiveTasks::insert(this);
+      OSActiveThreads::insert(this);
     }
   OSCriticalSection::exit();
 }
 
-#if defined(OS_INCLUDE_OSTASK_GETSTACKUSED)
+#if defined(OS_INCLUDE_OSTHREAD_GETSTACKUSED)
 
 unsigned short
-OSTask::getStackUsed(void)
+OSThread::getStackUsed(void)
 {
   unsigned short i;
   unsigned short r;
@@ -186,13 +186,13 @@ OSTask::getStackUsed(void)
   return r;
 }
 
-#endif /* defined(OS_INCLUDE_OSTASK_GETSTACKUSED) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_GETSTACKUSED) */
 
-#if defined(OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER)
+#if defined(OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER)
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 
-OSProgramPtr_t OSTask::getProgramCounter(void)
+OSProgramPtr_t OSThread::getProgramCounter(void)
   {
     unsigned char * p;
     p = ( unsigned char * ) getStack() + 34;
@@ -208,11 +208,11 @@ OSProgramPtr_t OSTask::getProgramCounter(void)
 
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
+#if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
 
-void OSTask::virtualWatchdogSet(unsigned short seconds)
+void OSThread::virtualWatchdogSet(unsigned short seconds)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_OSTASK_VIRTUALWATCHDOGSET)
+#if defined(DEBUG) && defined(OS_DEBUG_OSTHREAD_VIRTUALWATCHDOGSET)
     OSDeviceDebug::putString_P(PSTR("vWD("));
     OSDeviceDebug::putDec(getID());
     OSDeviceDebug::putString(",");
@@ -222,7 +222,7 @@ void OSTask::virtualWatchdogSet(unsigned short seconds)
     m_WDseconds = seconds;
   }
 
-void OSTask::virtualWatchdogCheck(void)
+void OSThread::virtualWatchdogCheck(void)
   {
     if (m_WDseconds != 0)
       {
@@ -232,12 +232,12 @@ void OSTask::virtualWatchdogCheck(void)
             OSDeviceDebug::putString_P(PSTR("virtual WD '"));
             OSDeviceDebug::putString(m_pName);
             OSDeviceDebug::putChar('\'');
-#if defined(OS_INCLUDE_OSTASK_GETSTACKUSED)
+#if defined(OS_INCLUDE_OSTHREAD_GETSTACKUSED)
             OSDeviceDebug::putChar(' ');
             OSDeviceDebug::putDec(getStackUsed());
             OSDeviceDebug::putChar('/');
             OSDeviceDebug::putDec(getStackSize());
-#endif /* defined(OS_INCLUDE_OSTASK_GETSTACKUSED) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_GETSTACKUSED) */
             OSDeviceDebug::putNewLine();
 #endif
 
@@ -245,7 +245,7 @@ void OSTask::virtualWatchdogCheck(void)
           }
         else
           {
-#if defined(DEBUG) && defined(OS_DEBUG_OSTASK_VIRTUALWATCHDOGCHECK)
+#if defined(DEBUG) && defined(OS_DEBUG_OSTHREAD_VIRTUALWATCHDOGCHECK)
             OSDeviceDebug::putDec(getID());
             OSDeviceDebug::putChar('=');
 #endif
@@ -255,25 +255,25 @@ void OSTask::virtualWatchdogCheck(void)
 
 #endif
 
-#if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK)
+#if defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK)
 
 void
-OSTask::schedulerTick( void )
+OSThread::schedulerTick( void )
   {
     return;
   }
 
-#endif /* defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK) */
 
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
-void OSTask::requestInterruption(void)
+void OSThread::requestInterruption(void)
   {
     setInterruption(true);
 
     OSCriticalSection::enter();
       {
-        OSScheduler::ISRcancelTask(this);
+        OSScheduler::ISRcancelThread(this);
       }
     OSCriticalSection::exit();
 
@@ -282,10 +282,10 @@ void OSTask::requestInterruption(void)
 #endif
   }
 
-#endif /* defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
 
 int
-OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
+OSThread::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
 {
   if (event == OSEvent::OS_NONE)
     return 0;
@@ -293,23 +293,23 @@ OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
   int ret;
   ret = 0;
 
-#if defined(OS_INCLUDE_OSTASK_NOTIFY_MEASURE)
+#if defined(OS_INCLUDE_OSTHREAD_NOTIFY_MEASURE)
   OS_GPIO_PIN_HIGH(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_APP_CONFIG_LED3);
-#endif /* defined(OS_INCLUDE_OSTASK_NOTIFY_MEASURE) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_NOTIFY_MEASURE) */
 
-#if defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL)
+#if defined(OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL)
   OSRealTimeCriticalSection::enter();
-#else /* !defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
+#else /* !defined(OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL) */
   OSCriticalSection::enter();
-#endif /* defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL) */
     {
-      // not-suspended waiting tasks are notified
+      // not-suspended waiting threads are notified
       if ((m_isWaiting) && (!m_isSuspended))
         {
           OSEvent_t ev;
           ev = m_event;
 
-          // wakeup tasks
+          // wakeup threads
           // - waiting for event
           // - waiting for OS_ALL
           // - notified with OS_ALL
@@ -322,32 +322,32 @@ OSTask::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
               if (retVal == OSEventWaitReturn::OS_NONE)
                 OSDeviceDebug::putChar('^');
 #endif
-              OSActiveTasks::insert(this);
+              OSActiveThreads::insert(this);
               ret = 1;
             }
         }
     }
-#if defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL)
+#if defined(OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL)
   OSRealTimeCriticalSection::exit();
-#else /* !defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
+#else /* !defined(OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL) */
   OSCriticalSection::exit();
-#endif /* defined(OS_INCLUDE_OSTASK_EVENTNOTIFY_REALTIMECRITICAL) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_EVENTNOTIFY_REALTIMECRITICAL) */
 
-#if defined(OS_INCLUDE_OSTASK_NOTIFY_MEASURE)
+#if defined(OS_INCLUDE_OSTHREAD_NOTIFY_MEASURE)
   OS_GPIO_PIN_LOW(OS_CONFIG_ACTIVE_LED_PORT_CONFIG, OS_APP_CONFIG_LED3);
-#endif /* defined(OS_INCLUDE_OSTASK_NOTIFY_MEASURE) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_NOTIFY_MEASURE) */
 
-  // return the number of notified tasks
+  // return the number of notified threads
   return ret;
 }
 
 // Runs in a critical section
 bool
-OSTask::eventWaitPrepare(OSEvent_t event)
+OSThread::eventWaitPrepare(OSEvent_t event)
 {
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
-  // Do not wait if the task is interrupted
+  // Do not wait if the thread is interrupted
   if (m_isInterrupted)
     {
       setEventWaitReturn(OSEventWaitReturn::OS_CANCELED);
@@ -371,7 +371,7 @@ OSTask::eventWaitPrepare(OSEvent_t event)
       return false;
     }
 
-  // Mark that the task is waiting on the given event
+  // Mark that the thread is waiting on the given event
   m_event = event;
   m_isWaiting = true;
 

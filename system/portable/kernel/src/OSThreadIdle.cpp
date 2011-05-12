@@ -10,25 +10,25 @@
 
 #include "portable/kernel/include/OS.h"
 
-#include "portable/kernel/include/OSTaskIdle.h"
+#include "portable/kernel/include/OSThreadIdle.h"
 
-OSTaskIdle::OSTaskIdle() :
-  OSTask("IDLE", m_stack, sizeof(m_stack), OSTask::IDLE_PRIORITY)
+OSThreadIdle::OSThreadIdle() :
+  OSThread("IDLE", m_stack, sizeof(m_stack), OSThread::IDLE_PRIORITY)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("OSTaskIdle()="));
+    OSDeviceDebug::putString_P(PSTR("OSThreadIdle()="));
     OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
 #endif
   }
 
-void OSTaskIdle::taskMain(void)
+void OSThreadIdle::threadMain(void)
   {
 #if defined(DEBUG)
     // TODO : eventually define and use lockEnter()/lockExit()
     OSCriticalSection::enter();
       {
-        OSDeviceDebug::putString_P(PSTR("OSTaskIdle::taskMain()"));
+        OSDeviceDebug::putString_P(PSTR("OSThreadIdle::threadMain()"));
         OSDeviceDebug::putNewLine();
       }
     OSCriticalSection::exit();
@@ -37,7 +37,7 @@ void OSTaskIdle::taskMain(void)
     for (;;)
       {
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
         if (!enterSleep())
           {
             OSScheduler::ledActiveOff(); // turn activity led off
@@ -52,17 +52,17 @@ void OSTaskIdle::taskMain(void)
       }
   }
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
-bool OSTaskIdle::enterSleep(void)
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+bool OSThreadIdle::enterSleep(void)
   {
-    for (int i = 0; i < OSScheduler::getTasksCount(); ++i)
+    for (int i = 0; i < OSScheduler::getThreadsCount(); ++i)
       {
-        // if any task requests to prevent deep sleep, return
-        if (!OSScheduler::getTask(i)->isAllowDeepSleep())
+        // if any thread requests to prevent deep sleep, return
+        if (!OSScheduler::getThread(i)->isAllowDeepSleep())
         return false;
       }
 
-    // if there are tasks scheduled on the ticks timer, return
+    // if there are threads scheduled on the ticks timer, return
     if (OSScheduler::timerTicks.getCount()> 0)
     return false;
 
@@ -83,7 +83,7 @@ bool OSTaskIdle::enterSleep(void)
 #endif
 
 #ifndef OS_INCLUDE_CUSTOM_IDLE_TASK
-OSTaskIdle idleTask;
+OSThreadIdle idleThread;
 #endif
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */

@@ -36,14 +36,14 @@ OSTimer(&m_array[0], sizeof(m_array)/sizeof(m_array[0]))
     ;
   }
 
-#if defined(OS_INCLUDE_OSTASK_VIRTUALWATCHDOG)
+#if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
 void OSTimerSeconds::checkVirtualWatchdogs(void)
   {
-    for (int i=0; i < OSScheduler::getTasksCount(); ++i)
+    for (int i=0; i < OSScheduler::getThreadsCount(); ++i)
       {
-        OSTask *pTask;
-        pTask = OSScheduler::getTask(i);
-        pTask->virtualWatchdogCheck();
+        OSThread *pThread;
+        pThread = OSScheduler::getThread(i);
+        pThread->virtualWatchdogCheck();
       }
   }
 #endif

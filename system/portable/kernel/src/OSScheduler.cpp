@@ -17,23 +17,23 @@ unsigned char volatile OSSchedulerLock::ms_nestingLevel;
 // ----- OSScheduler static variables -----------------------------------------
 
 // Used in contextSave/Restore.
-// It points to the address of the m_pStack field of the current running task.
+// It points to the address of the m_pStack field of the current running thread.
 // This approach is used in order to make code faster.
 volatile OSStack_t** volatile OSScheduler::ms_ppCurrentStack;
 
-OSTask* OSScheduler::ms_pTaskIdle;
-OSTask* volatile OSScheduler::ms_pTaskRunning;
+OSThread* OSScheduler::ms_pThreadIdle;
+OSThread* volatile OSScheduler::ms_pThreadRunning;
 
 bool OSScheduler::ms_isRunning;
 bool OSScheduler::ms_isPreemptive;
 
-unsigned char OSScheduler::ms_tasksCount;
+unsigned char OSScheduler::ms_threadsCount;
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
 unsigned char OSScheduler::ms_notifyIndex;
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 
-// The +1 is here to reserve space for the idle task.
-OSTask *OSScheduler::ms_tasks[OS_CFGINT_TASKS_TABLE_SIZE + 1];
+// The +1 is here to reserve space for the idle thread.
+OSThread *OSScheduler::ms_threads[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 
 OSSchedulerLock OSScheduler::lock;
 OSCriticalSection OSScheduler::critical;
@@ -46,14 +46,14 @@ OSTimerTicks OSScheduler::timerTicks;
 OSTimerSeconds OSScheduler::timerSeconds;
 #endif /* defined(OS_INCLUDE_OSTIMERSECONDS) */
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
 bool OSScheduler::ms_allowDeepSleep;
-#endif /* defined(OS_INCLUDE_OSTASK_SLEEP) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
 
-// ----- OSActiveTasks static variables ---------------------------------------
+// ----- OSActiveThreads static variables ---------------------------------------
 
-unsigned char OSActiveTasks::ms_count;
-OSTask *OSActiveTasks::ms_array[OS_CFGINT_TASKS_TABLE_SIZE + 1];
+unsigned char OSActiveThreads::ms_count;
+OSThread *OSActiveThreads::ms_array[OS_CFGINT_TASKS_TABLE_SIZE + 1];
 
 // ============================================================================
 
@@ -87,17 +87,17 @@ OSScheduler::earlyInit(void)
   ms_isPreemptive = false;
 #endif /* !defined(OS_EXCLUDE_PREEMPTION) */
 
-#if defined(OS_INCLUDE_OSTASK_SLEEP)
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   ms_allowDeepSleep = true;
-#endif /* defined(OS_INCLUDE_OSTASK_SLEEP) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
 
   OSCriticalSection::ms_nestingLevel = 0;
 
-  // pIdleTask = 0;      // will be set by IdleTask constructor
+  // pIdleThread = 0;      // will be set by IdleThread constructor
   // do not reset if not run before any constructor (<=.init6)
-  // since task constructors can increment it
+  // since thread constructors can increment it
 
-  ms_tasksCount = 0;
+  ms_threadsCount = 0;
 
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
   ms_notifyIndex = 0;
@@ -118,43 +118,43 @@ OSScheduler::OSScheduler()
 void
 OSScheduler::start(void)
 {
-  // Insert all tasks in the ready list; equal priority tasks
+  // Insert all threads in the ready list; equal priority threads
   // will have the same order as they were defined.
   // Interrupts should be disabled here, no need for critical sections.
   int i;
-  for (i = 0; i < ms_tasksCount; ++i)
+  for (i = 0; i < ms_threadsCount; ++i)
     {
-      OSTask *pt;
-      pt = ms_tasks[i];
+      OSThread *pt;
+      pt = ms_threads[i];
       if (!pt->isSuspended())
-        OSActiveTasks::insert(pt);
+        OSActiveThreads::insert(pt);
 
-      if (pt->getPriority() == OSTask::IDLE_PRIORITY)
-        setTaskIdle(pt);
+      if (pt->getPriority() == OSThread::IDLE_PRIORITY)
+        setThreadIdle(pt);
     }
 
 #if defined(DEBUG)
-  OSActiveTasks::dump();
+  OSActiveThreads::dump();
 #endif /* defined(DEBUG) */
 
-  if (getTaskIdle() == 0)
+  if (getThreadIdle() == 0)
     {
 #if defined(DEBUG)
-      OSDeviceDebug::putString_P(PSTR("No IDLE task"));
+      OSDeviceDebug::putString_P(PSTR("No IDLE thread"));
       OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
     }
   else
     {
-      // Get the task with the highest priority.
-      ms_pTaskRunning = OSActiveTasks::getTop();
+      // Get the thread with the highest priority.
+      ms_pThreadRunning = OSActiveThreads::getTop();
       // Prepare the global value with the pointer to the m_pStack.
       OSScheduler::ms_ppCurrentStack
-          = (volatile OSStack_t**) &ms_pTaskRunning->m_pStack;
+          = (volatile OSStack_t**) &ms_pThreadRunning->m_pStack;
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_START)
       OSDeviceDebug::putString_P(PSTR("OSScheduler::start() "));
-      OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
+      OSSchedulerImpl::dumpContextInfo(ms_pThreadRunning);
 
       OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_START) */
@@ -175,8 +175,8 @@ OSScheduler::start(void)
       // Interrupts will be enabled during context restore,
       // after popping the flags/status register,
       OSSchedulerImpl::start();
-      // Execution will continue with the top-most task (guaranteed to exist,
-      // since the idle task was already checked to be there).
+      // Execution will continue with the top-most thread (guaranteed to exist,
+      // since the idle thread was already checked to be there).
     }
 
   // Should never get here.
@@ -189,11 +189,11 @@ OSScheduler::start(void)
     ;
 }
 
-// Release the processor to the next ready task.
+// Release the processor to the next ready thread.
 void
 OSScheduler::yield(void)
 {
-  //ms_pTaskRunning->m_hasReturnValue = false;
+  //ms_pThreadRunning->m_hasReturnValue = false;
   OSSchedulerImpl::yield();
 }
 
@@ -201,7 +201,7 @@ OSScheduler::yield(void)
 OSEventWaitReturn_t
 OSScheduler::eventWait(OSEvent_t event)
 {
-  if (ms_pTaskRunning->eventWaitPrepare(event))
+  if (ms_pThreadRunning->eventWaitPrepare(event))
     {
       OSSchedulerImpl::yield();
 
@@ -209,10 +209,10 @@ OSScheduler::eventWait(OSEvent_t event)
       OSDeviceDebug::putString(" wk ");
 #endif
     }
-  return ms_pTaskRunning->m_eventWaitReturn;
+  return ms_pThreadRunning->m_eventWaitReturn;
 }
 
-// Wake all tasks waiting for the given event.
+// Wake all threads waiting for the given event.
 int
 OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 {
@@ -236,8 +236,8 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
 
-  // Instead of always starting the notification from the first registered task,
-  // the round-robin notification mechanism remembers the first notified task
+  // Instead of always starting the notification from the first registered thread,
+  // the round-robin notification mechanism remembers the first notified thread
   // and next time starts from the next one.
 
   int notifyIndex;
@@ -246,13 +246,13 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 
-  for (i = 0; i < ms_tasksCount; ++i)
+  for (i = 0; i < ms_threadsCount; ++i)
     {
-      OSTask *pt;
+      OSThread *pt;
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
-      pt = ms_tasks[notifyIndex];
+      pt = ms_threads[notifyIndex];
 #else /* !defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
-      pt = ms_tasks[i];
+      pt = ms_threads[i];
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 
       if (pt != 0)
@@ -260,7 +260,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
           int r;
           r = pt->eventNotify(event, ret);
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
-          // Remember the first notified task index
+          // Remember the first notified thread index
           if (firstNotified == -1 && r != 0)
           firstNotified = notifyIndex;
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
@@ -270,7 +270,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
       notifyIndex++;
-      if (notifyIndex >= ms_tasksCount)
+      if (notifyIndex >= ms_threadsCount)
       notifyIndex = 0;
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
     }
@@ -282,7 +282,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
       ms_notifyIndex = firstNotified;
 
       ms_notifyIndex++;
-      if (ms_notifyIndex >= ms_tasksCount)
+      if (ms_notifyIndex >= ms_threadsCount)
         {
           ms_notifyIndex = 0;
         }
@@ -290,7 +290,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
   OSCriticalSection::exit();
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 
-  // Return the number of notified tasks
+  // Return the number of notified threads
   return cnt;
 }
 
@@ -305,27 +305,27 @@ OSScheduler::isContextSwitchRequired()
   OSCPU::watchdogReset();
 
   bool bRequire;
-  bRequire = (ms_isPreemptive || (ms_pTaskRunning == ms_pTaskIdle))
-      && (OSActiveTasks::getCount() > 1);
+  bRequire = (ms_isPreemptive || (ms_pThreadRunning == ms_pThreadIdle))
+      && (OSActiveThreads::getCount() > 1);
 
   return bRequire;
 }
 
 // Perform the context switch operations.
-// At exit the static variable ms_pTaskRunning points to the new
-// running task and the global variable OSScheduler::ms_ppCurrentStack to the
-// tasks context to be restored.
+// At exit the static variable ms_pThreadRunning points to the new
+// running thread and the global variable OSScheduler::ms_ppCurrentStack to the
+// threads context to be restored.
 
 void
 OSScheduler::performContextSwitch()
 {
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH)
     {
-      //if (ms_pTaskRunning->m_isPreempted)
+      //if (ms_pThreadRunning->m_isPreempted)
       //  OSDeviceDebug::putChar('*');
 
       OSDeviceDebug::putChar('<');
-      OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
+      OSSchedulerImpl::dumpContextInfo(ms_pThreadRunning);
     }
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH) */
 
@@ -337,20 +337,20 @@ OSScheduler::performContextSwitch()
     {
       OSCriticalSection::enter();
         {
-          OSTask* pTask;
-          pTask = ms_pTaskRunning;
+          OSThread* pThread;
+          pThread = ms_pThreadRunning;
 
-          // Remove the running task from the ready list
-          OSActiveTasks::remove(pTask);
+          // Remove the running thread from the ready list
+          OSActiveThreads::remove(pThread);
 
           // Eventually reinsert it at the end of the list (round robin)
-          if (!pTask->isSuspended() && !pTask->isWaiting())
-            OSActiveTasks::insert(pTask);
+          if (!pThread->isSuspended() && !pThread->isWaiting())
+            OSActiveThreads::insert(pThread);
 
-          // Select the running task from the top of the list
-          pTask = ms_pTaskRunning = OSActiveTasks::getTop();
+          // Select the running thread from the top of the list
+          pThread = ms_pThreadRunning = OSActiveThreads::getTop();
           // Prepare the global variable with the pointer to the m_pStack.
-          ms_ppCurrentStack = (volatile OSStack_t**) &pTask->m_pStack;
+          ms_ppCurrentStack = (volatile OSStack_t**) &pThread->m_pStack;
         }
       OSCriticalSection::exit();
     }
@@ -360,54 +360,54 @@ OSScheduler::performContextSwitch()
       OSDeviceDebug::putChar('L');
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH) */
       // if scheduler is locked, return OS_LOCKED
-      ms_pTaskRunning->m_eventWaitReturn = OSEventWaitReturn::OS_LOCKED;
+      ms_pThreadRunning->m_eventWaitReturn = OSEventWaitReturn::OS_LOCKED;
     }
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH)
-  //OSActiveTasks::dump();
+  //OSActiveThreads::dump();
   OSDeviceDebug::putChar('>');
-  OSSchedulerImpl::dumpContextInfo(ms_pTaskRunning);
+  OSSchedulerImpl::dumpContextInfo(ms_pThreadRunning);
   OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH) */
 }
 
-// Get the address of the task registered under 'id' in tasks array,
+// Get the address of the thread registered under 'id' in threads array,
 // or NULL if 'id' is too high.
-OSTask *
-OSScheduler::getTask(int id)
+OSThread *
+OSScheduler::getThread(int id)
 {
-  if (id < ms_tasksCount)
-    return ms_tasks[id];
+  if (id < ms_threadsCount)
+    return ms_threads[id];
   else
-    return (OSTask *)0;
+    return (OSThread *)0;
 }
 
 // Internal methods
 unsigned char
-OSScheduler::taskRegister(OSTask *pTask)
+OSScheduler::threadRegister(OSThread *pThread)
 {
   unsigned char id;
   id = 0xFF;
 
   OSCriticalSection::enter();
     {
-      if (ms_tasksCount < (sizeof(ms_tasks) / sizeof(ms_tasks[0])))
+      if (ms_threadsCount < (sizeof(ms_threads) / sizeof(ms_threads[0])))
         {
-          id = ms_tasksCount;
-          ms_tasks[ms_tasksCount++] = pTask;
+          id = ms_threadsCount;
+          ms_threads[ms_threadsCount++] = pThread;
         }
       else
         {
 #if defined(DEBUG)
-          OSDeviceDebug::putString_P(PSTR("task table full"));
+          OSDeviceDebug::putString_P(PSTR("thread table full"));
           OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
         }
 
-      // Initial tasks are inserted in the ready list at start()
-      // later tasks should be inserted when constructed
+      // Initial threads are inserted in the ready list at start()
+      // later threads should be inserted when constructed
       if (id != 0xFF && ms_isRunning)
-        OSActiveTasks::insert(pTask); // insert task in ready list
+        OSActiveThreads::insert(pThread); // insert thread in ready list
     }
   OSCriticalSection::exit();
 
@@ -429,24 +429,24 @@ OSScheduler::taskRegister(OSTask *pTask)
 void
 OSScheduler::interruptTick(void)
 {
-#if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) || defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK) || defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
   int i;
-  for ( i = 0; i < ms_tasksCount; ++i )
+  for ( i = 0; i < ms_threadsCount; ++i )
     {
-      OSTask *pt;
-      pt = ms_tasks[ i ];
-#if defined(OS_INCLUDE_OSTASK_SCHEDULERTICK)
+      OSThread *pt;
+      pt = ms_threads[ i ];
+#if defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK)
       pt->schedulerTick();
-#endif /* defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK) */
 
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
       if (pt->isInterrupted())
-      ISRcancelTask(pt);
-#endif /* defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
+      ISRcancelThread(pt);
+#endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
     }
 
-#endif /* defined(OS_INCLUDE_OSTASK_SCHEDULERTICK) || defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK) || defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
 
 #if defined(OS_INCLUDE_OSREALTIME)
   OSRealTime::interruptTick();
@@ -457,15 +457,15 @@ OSScheduler::interruptTick(void)
 #endif /* defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK) */
 }
 
-#if defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
 // warning: not synchronised
-void OSScheduler::ISRcancelTask(OSTask *pTask)
+void OSScheduler::ISRcancelThread(OSThread *pThread)
   {
-    if (pTask->isWaiting())
+    if (pThread->isWaiting())
       {
         OSEvent_t event;
-        event = pTask->getEvent();
+        event = pThread->getEvent();
 
         // cancel all timer related events
         timerTicks.eventRemove(event);
@@ -476,14 +476,14 @@ void OSScheduler::ISRcancelTask(OSTask *pTask)
       }
   }
 
-#endif /* defined(OS_INCLUDE_OSTASK_INTERRUPTION) */
+#endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
 
 // ============================================================================
 
-OSActiveTasks::OSActiveTasks()
+OSActiveThreads::OSActiveThreads()
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSActiveTasks()="));
+  OSDeviceDebug::putString_P(PSTR("OSActiveThreads()="));
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
@@ -496,26 +496,26 @@ OSActiveTasks::OSActiveTasks()
   ms_count = 0;
 }
 
-// Insert tasks in order of decreasing priority.
+// Insert threads in order of decreasing priority.
 // Must be called in a critical section.
 void
-OSActiveTasks::insert(OSTask *pTask)
+OSActiveThreads::insert(OSThread *pThread)
 {
   int i;
 
   // Check if already in
-  i = find(pTask);
+  i = find(pThread);
   if (i != -1)
     {
       return; // already in, we're done
     }
 
   unsigned int prio;
-  prio = pTask->m_staticPriority;
+  prio = pThread->m_staticPriority;
   for (i = 0; i < ms_count; ++i)
     {
-      // If tasks with identical priority exist, insert at the end
-      // in other words, insert before task with higher priority.
+      // If threads with identical priority exist, insert at the end
+      // in other words, insert before thread with higher priority.
       if (prio > ms_array[i]->m_staticPriority)
         break;
     }
@@ -534,13 +534,13 @@ OSActiveTasks::insert(OSTask *pTask)
 
   // but i might also be == ms_count, i.e. we insert at the end
 
-  ms_array[i] = pTask;
+  ms_array[i] = pThread;
   ms_count++;
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSACTIVETASKS_INSERT)
     {
       OSDeviceDebug::putString_P(PSTR("ins "));
-      OSDeviceDebug::putString(pTask->getName());
+      OSDeviceDebug::putString(pThread->getName());
       OSDeviceDebug::putNewLine();
     }
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSACTIVETASKS_INSERT) */
@@ -548,21 +548,21 @@ OSActiveTasks::insert(OSTask *pTask)
 
 // Must be called in a critical section.
 void
-OSActiveTasks::remove(OSTask * pTask)
+OSActiveThreads::remove(OSThread * pThread)
 {
-  if (pTask == OSScheduler::getTaskIdle())
-    return; // do not remove the idle task
+  if (pThread == OSScheduler::getThreadIdle())
+    return; // do not remove the idle thread
 
   int i;
 
-  // Try to find the task in the active list
-  i = find(pTask);
+  // Try to find the thread in the active list
+  i = find(pThread);
   if (i == -1)
     {
-      return; // task not found, nothing to remove
+      return; // thread not found, nothing to remove
     }
 
-  // Remove the task by copying the list one step to the left
+  // Remove the thread by copying the list one step to the left
   for (; i < ms_count - 1; ++i)
     {
       ms_array[i] = ms_array[i + 1];
@@ -572,32 +572,32 @@ OSActiveTasks::remove(OSTask * pTask)
 #if defined(DEBUG) && defined(OS_DEBUG_OSACTIVETASKS_REMOVE)
     {
       OSDeviceDebug::putString_P(PSTR("rem "));
-      OSDeviceDebug::putString(pTask->getName());
+      OSDeviceDebug::putString(pThread->getName());
       OSDeviceDebug::putNewLine();
     }
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSACTIVETASKS_REMOVE) */
 }
 
-// Return index of given task, or -1
+// Return index of given thread, or -1
 int
-OSActiveTasks::find(OSTask *pTask)
+OSActiveThreads::find(OSThread *pThread)
 {
   int i;
   for (i = 0; i < ms_count; ++i)
     {
-      if (ms_array[i] == pTask)
+      if (ms_array[i] == pThread)
         return i;
     }
 
-  return -1; // task not found
+  return -1; // thread not found
 }
 
 #if defined(DEBUG)
 void
-OSActiveTasks::dump(void)
+OSActiveThreads::dump(void)
 {
   int i;
-  OSDeviceDebug::putString_P(PSTR("Tasks: "));
+  OSDeviceDebug::putString_P(PSTR("Threads: "));
   for (i = 0; i < ms_count; ++i)
     {
       OSDeviceDebug::putChar('\'');

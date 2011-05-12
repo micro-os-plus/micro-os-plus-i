@@ -90,14 +90,14 @@ OS::resetHandler(void)
   OSDeviceDebug::earlyInit();
 #endif /* defined(DEBUG) */
 
-  // will call OSScheduler::earlyInit() to init registered tasks count
+  // will call OSScheduler::earlyInit() to init registered threads count
   OS::earlyInit();
 
   OS::staticConstructorsInit();
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-  // Tasks were created and registered by class constructors
+  // Threads were created and registered by class constructors
   // We're ready to rock...
   OSScheduler::start();
 
@@ -220,7 +220,7 @@ OS::earlyInit(void)
 #endif /* defined(DEBUG) */
 
 #if defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING)
-  OSDeviceDebug::putString_P(PSTR("Multitasking: disabled"));
+  OSDeviceDebug::putString_P(PSTR("Multithreading: disabled"));
   OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING) */
 

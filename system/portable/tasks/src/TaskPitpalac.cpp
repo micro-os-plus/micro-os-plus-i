@@ -13,13 +13,13 @@
 #include "portable/tasks/include/TaskPitpalac.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Thread constructor.
+ * Initialise system thread object and store parameters in private members.
  *
  */
 
 TaskPitpalac::TaskPitpalac(const char *pName, schedTicks_t rate) :
-  OSTask(pName, m_stack, sizeof(m_stack))
+  OSThread(pName, m_stack, sizeof(m_stack))
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSSchedulerLock::enter();
@@ -35,7 +35,7 @@ TaskPitpalac::TaskPitpalac(const char *pName, schedTicks_t rate) :
   }
 
 /*
- * Task main code.
+ * Thread main code.
  * Initialise led and progressively toggle it using the rate,
  * giving the feeling of a live heart beat.
  *
@@ -43,13 +43,13 @@ TaskPitpalac::TaskPitpalac(const char *pName, schedTicks_t rate) :
  *
  */
 
-void TaskPitpalac::taskMain(void)
+void TaskPitpalac::threadMain(void)
   {
 
 #if defined(DEBUG)
     OSSchedulerLock::enter();
       {
-        OSDeviceDebug::putString_P(PSTR("TaskPitpalac::TaskMain()"));
+        OSDeviceDebug::putString_P(PSTR("TaskPitpalac::ThreadMain()"));
         OSDeviceDebug::putNewLine();
       }
     OSSchedulerLock::exit();
@@ -62,7 +62,7 @@ void TaskPitpalac::taskMain(void)
       ;
     --n; // compute n = sqrt(m_rate / 4);
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
         unsigned int i;

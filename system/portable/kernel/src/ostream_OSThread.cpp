@@ -6,19 +6,19 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_OSTREAM_OSTASK)
+#if defined(OS_INCLUDE_OSTREAM_OSTHREAD)
 
 #include "portable/kernel/include/OS.h"
 
-#include "portable/kernel/include/ostream_OSTask.h"
+#include "portable/kernel/include/ostream_OSThread.h"
 
-ostream & operator <<(ostream & out, OSTask& pt)
+ostream & operator <<(ostream & out, OSThread& pt)
   {
     out << dec << pt.getID();
     out << ' '<< showbase << hex << ( unsigned int ) &pt;
     out << ' '<< pt.getName();
     out << ", pri="<< dec << ( unsigned short ) pt.getPriority();
-#if defined(OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER)
+#if defined(OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER)
     out << ", PC="<< pt.getProgramCounter();
 #endif
     out << ", stk="<< hex << ( unsigned int ) pt.getStackBottom();

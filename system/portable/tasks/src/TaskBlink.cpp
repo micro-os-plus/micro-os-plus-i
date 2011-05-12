@@ -11,14 +11,14 @@
 #include "portable/tasks/include/TaskBlink.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Thread constructor.
+ * Initialise system thread object and store parameters in private members.
  *
  */
 
 TaskBlink::TaskBlink(const char *pName, schedTicks_t rate) :
 
-  OSTask(pName, m_stack, sizeof(m_stack)), m_timerSeconds((OSTimer*)
+  OSThread(pName, m_stack, sizeof(m_stack)), m_timerSeconds((OSTimer*)
       &OSScheduler::timerSeconds)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -36,19 +36,19 @@ TaskBlink::TaskBlink(const char *pName, schedTicks_t rate) :
   }
 
 /*
- * Task main code.
+ * Thread main code.
  * Initialise led and toggle it using the rate.
  *
  * Used mainly to show the device is stil alive.
  *
  */
 
-void TaskBlink::taskMain(void)
+void TaskBlink::threadMain(void)
   {
 #if defined(DEBUG)
     OSSchedulerLock::enter();
       {
-        OSDeviceDebug::putString("TaskBlink::TaskMain()");
+        OSDeviceDebug::putString("TaskBlink::ThreadMain()");
         OSDeviceDebug::putNewLine();
       }
     OSSchedulerLock::exit();
@@ -59,10 +59,10 @@ void TaskBlink::taskMain(void)
 
     // for didactic purposes,
     // use a periodic timer instead of sleep()
-    m_timerSeconds.eventSet((OSEvent_t) this); // set event on this task
+    m_timerSeconds.eventSet((OSEvent_t) this); // set event on this thread
     m_timerSeconds.start(m_rate, true); // start periodic timer
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
         m_timerSeconds.eventWait(); // sleep(m_rate);

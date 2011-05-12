@@ -14,7 +14,7 @@
 
 // ----- OSRealTime static variables ------------------------------------------
 
-OSTask* volatile OSRealTime::ms_pTask;
+OSThread* volatile OSRealTime::ms_pThread;
 bool volatile OSRealTime::ms_requestNofication;
 OSEvent_t volatile OSRealTime::ms_event;
 OSEventWaitReturn_t volatile OSRealTime::ms_ret;
@@ -29,7 +29,7 @@ OSRealTime::OSRealTime()
   OSDeviceDebug::putNewLine();
 #endif
 
-  ms_pTask = 0;
+  ms_pThread = 0;
 
   ms_requestNofication = false;
   ms_event = 0;
@@ -37,12 +37,12 @@ OSRealTime::OSRealTime()
 }
 
 void
-OSRealTime::registerTask(OSTask* pTask)
+OSRealTime::registerThread(OSThread* pThread)
 {
-  ms_pTask = pTask;
+  ms_pThread = pThread;
 }
 
-// Wake up this task if it waits for the given event.
+// Wake up this thread if it waits for the given event.
 int
 OSRealTime::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 {
@@ -64,9 +64,9 @@ OSRealTime::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 void
 OSRealTime::interruptTick(void)
 {
-  if (ms_requestNofication && ms_pTask != 0)
+  if (ms_requestNofication && ms_pThread != 0)
     {
-      if (ms_pTask->eventNotify(ms_event, ms_ret) == 1)
+      if (ms_pThread->eventNotify(ms_event, ms_ret) == 1)
         {
           ms_requestNofication = false;
         }

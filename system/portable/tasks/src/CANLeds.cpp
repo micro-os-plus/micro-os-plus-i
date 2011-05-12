@@ -11,14 +11,14 @@
 #include "portable/tasks/include/CANLeds.h"
 
 /*
- * Task constructor. 
- * Initialise system task object, initialise member objects
+ * Thread constructor. 
+ * Initialise system thread object, initialise member objects
  * and store parameters in private members.
  *
  */
 
 CANLeds::CANLeds(const char *pName) :
-  OSTask(pName, m_stack, sizeof(m_stack))
+  OSThread(pName, m_stack, sizeof(m_stack))
   {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
     OSDeviceDebug::putString_P(PSTR("CANLeds()="));
@@ -226,12 +226,12 @@ void CANLedRed::update(bool last)
 
 // ----------------------------------------------------------------------------
 
-void CANLeds::taskMain(void)
+void CANLeds::threadMain(void)
   {
 #if defined(DEBUG)
     OSSchedulerLock::enter();
       {
-        OSDeviceDebug::putString_P(PSTR("CANLeds::taskMain()"));
+        OSDeviceDebug::putString_P(PSTR("CANLeds::threadMain()"));
         OSDeviceDebug::putNewLine();
       }
       OSSchedulerLock::exit();
@@ -241,7 +241,7 @@ void CANLeds::taskMain(void)
 
     //debug.putDec(OSTimer::microsToTicks(50000));
 
-    // task endless loop
+    // thread endless loop
     for (;;)
       {
         OSScheduler::timerTicks.sleep(OSTimerTicks::microsToTicks(50000));

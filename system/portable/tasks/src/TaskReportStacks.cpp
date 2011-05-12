@@ -13,13 +13,13 @@
 #include "portable/tasks/include/TaskReportStacks.h"
 
 /*
- * Task constructor.
- * Initialise system task object and store parameters in private members.
+ * Thread constructor.
+ * Initialise system thread object and store parameters in private members.
  */
 
 TaskReportStacks::TaskReportStacks(const char* pName, schedTicks_t rateSeconds,
     schedTicks_t maxSeconds, unsigned char increaseRate) :
-  OSTask(pName, m_stack, sizeof(m_stack))
+  OSThread(pName, m_stack, sizeof(m_stack))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskReportStacks()=");
@@ -33,19 +33,19 @@ TaskReportStacks::TaskReportStacks(const char* pName, schedTicks_t rateSeconds,
 }
 
 /*
- * Task main code.
+ * Thread main code.
  *
  * The toggle rate is done with sleep().
  */
 
 void
-TaskReportStacks::taskMain(void)
+TaskReportStacks::threadMain(void)
 {
   if (os.isDebug())
     {
       os.sched.lock.enter();
         {
-          debug.putString("Task '");
+          debug.putString("Thread '");
           debug.putString(getName());
           debug.putString("', seconds=");
           debug.putDec(m_rateSeconds);
@@ -64,12 +64,12 @@ TaskReportStacks::taskMain(void)
   unsigned int n;
   n = m_rateSeconds;
 
-  // task endless loop
+  // thread endless loop
   for (;;)
     {
       if (os.isDebug())
         {
-          // Disable all other tasks to write during the display.
+          // Disable all other threads to write during the display.
           // Only the interrupts may write something
           os.sched.lock.enter();
             {
@@ -85,16 +85,16 @@ TaskReportStacks::taskMain(void)
                 }
               if (i == 0)
                 {
-                  int nTasks;
-                  nTasks = os.sched.getTasksCount();
-                  for (int j = 0; j < nTasks; ++j)
+                  int nThreads;
+                  nThreads = os.sched.getThreadsCount();
+                  for (int j = 0; j < nThreads; ++j)
                     {
-                      OSTask* pt;
-                      pt = os.sched.getTask(j);
+                      OSThread* pt;
+                      pt = os.sched.getThread(j);
                       clog << endl;
                       clog << ((pt == this) ? '*' : ' ');
 #if false
-                      clog << *pt; // print task info
+                      clog << *pt; // print thread info
 #else
                       clog << pt->getName() << ' ' << pt->getStackUsed() << '/'
                           << pt->getStackSize();

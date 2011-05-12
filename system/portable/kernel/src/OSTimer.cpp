@@ -42,18 +42,18 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
 
       if (event == 0)
         {
-          // set event on the current task address, return void
-          event = (OSEvent_t) (OSScheduler::getTaskCurrent());
+          // set event on the current thread address, return void
+          event = (OSEvent_t) (OSScheduler::getThreadCurrent());
         }
 
-#if false && defined(OS_INCLUDE_OSTASK_INTERRUPTION)
+#if false && defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
-      if (OSScheduler::getTaskCurrent()->isInterrupted())
+      if (OSScheduler::getThreadCurrent()->isInterrupted())
         {
           ret = OSEventWaitReturn::OS_CANCELED;
         }
       else
-#endif /* OS_INCLUDE_OSTASK_INTERRUPTION */
+#endif /* OS_INCLUDE_OSTHREAD_INTERRUPTION */
         {
 
 #if true
@@ -252,7 +252,7 @@ OSTimer::interruptTick(void)
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
   OSDeviceDebug::putChar('[');
 #endif
-  // decrement timer and eventually wake up related tasks
+  // decrement timer and eventually wake up related threads
   if (m_count > 0) // is there anything in the list?
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
@@ -276,7 +276,7 @@ OSTimer::interruptTick(void)
 
                   pt = p->u.pTimer;
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
-                  OSDeviceDebug::putString("Task ");
+                  OSDeviceDebug::putString("Thread ");
                   OSDeviceDebug::putPtr(pt);
                   OSDeviceDebug::putNewLine();
 #endif
