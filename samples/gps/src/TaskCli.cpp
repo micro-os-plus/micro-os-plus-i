@@ -6,7 +6,7 @@
 
 #include "TaskCli.h"
 
-#include "portable/kernel/include/ostream_OSTask.h"
+#include "portable/kernel/include/ostream_OSThread.h"
 
 #include "GpsPosition.h"
 #include "Application.h"
@@ -14,7 +14,7 @@
 // ----- Task constructor -----------------------------------------------------
 
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(&m_dev),
+  OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(&m_dev),
       m_cout(&m_dev), m_cli(m_cin, m_cout, m_line, sizeof(m_line))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
@@ -90,12 +90,12 @@ TaskCli::commandShowTasks(void)
   ostream& cout = m_cout;
 
   int nTasks;
-  nTasks = os.sched.getTasksCount();
+  nTasks = os.sched.getThreadsCount();
 
   for (int i = 0; i < nTasks; ++i)
     {
-      OSTask *pt;
-      pt = os.sched.getTask(i);
+      OSThread *pt;
+      pt = os.sched.getThread(i);
 
       cout << endl;
       cout << ((pt == this) ? '*' : ' ');
@@ -115,12 +115,12 @@ TaskCli::commandShowStacks(void)
   ostream& cout = m_cout;
 
   int nTasks;
-  nTasks = os.sched.getTasksCount();
+  nTasks = os.sched.getThreadsCount();
 
   for (int i = 0; i < nTasks; ++i)
     {
-      OSTask* pt;
-      pt = os.sched.getTask(i);
+      OSThread* pt;
+      pt = os.sched.getThread(i);
 
       cout << endl;
       cout << ((pt == this) ? '*' : ' ');

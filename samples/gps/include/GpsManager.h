@@ -12,7 +12,7 @@
 #include "GpsPosition.h"
 
 
-class GpsManager : public OSTask
+class GpsManager : public OSThread
 {
 public:
   static const OSEventFlagsBits_t OS_REQUEST_GPS_POSITION = 0x1;
@@ -31,7 +31,7 @@ public:
 
 private:
   // members
-  OSStack_t m_stack[(OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
+  OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
   OSDeviceCharacter& m_dev;
 
   OSEventFlags m_eventFlags;

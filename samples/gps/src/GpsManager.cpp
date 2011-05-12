@@ -7,10 +7,10 @@
 #include "GpsManager.h"
 #include "Application.h"
 
-//#include "portable/kernel/include/ostream_OSTask.h"
+//#include "portable/kernel/include/ostream_OSThread.h"
 
 GpsManager::GpsManager(const char *pName, OSDeviceCharacter& dev) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_dev(dev)
+  OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("GpsManager()=");

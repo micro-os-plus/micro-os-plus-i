@@ -9,7 +9,7 @@
 
 #include "portable/kernel/include/uOS.h"
 
-class TaskCli : public OSTask
+class TaskCli : public OSThread
 {
 public:
   // task constructor
@@ -37,7 +37,7 @@ private:
   recurse(cliToken_t* p);
 
   // members
-  OSStack_t m_stack[(OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
+  OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
   OSDeviceCharacter & m_dev;
 
   istream m_cin;
