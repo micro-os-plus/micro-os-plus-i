@@ -17,7 +17,7 @@ extern int resourceAccessNum[];
  */
 
 TaskReport::TaskReport(const char *pName, schedTicks_t seconds) :
-  OSTask(pName, m_stack, sizeof(m_stack))
+  OSThread(pName, m_stack, sizeof(m_stack))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskReport()=");
@@ -42,7 +42,7 @@ TaskReport::taskMain(void)
     {
       os.sched.lock.enter();
         {
-          debug.putString("Task '");
+          debug.putString("Thread '");
           debug.putString(getName());
           debug.putString("', seconds=");
           debug.putDec(m_rate);

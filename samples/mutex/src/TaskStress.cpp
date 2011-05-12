@@ -20,7 +20,7 @@ unsigned int TaskStress::ms_rand;
  */
 
 TaskStress::TaskStress(const char *pName, int taskId) :
-  OSTask(pName, m_stack, sizeof(m_stack))
+  OSThread(pName, m_stack, sizeof(m_stack))
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskStress()=");
@@ -44,7 +44,7 @@ TaskStress::taskMain(void)
     {
       os.sched.lock.enter();
         {
-          debug.putString("Task '");
+          debug.putString("Thread '");
           debug.putString(getName());
           debug.putString("', id=");
           debug.putDec((unsigned short) m_taskId);
@@ -82,7 +82,7 @@ TaskStress::taskMain(void)
           os.sched.timerTicks.sleep(rand() % m_maxActivityTicks);
 
           // Check if the task is the current owner of the mutex
-          if (this != mutex.getOwnerTask())
+          if (this != mutex.getOwnerThread())
             resourceAccessNum[m_taskId] = APP_CONFIG_ERROR_CODE;
         }
       mutex.release();

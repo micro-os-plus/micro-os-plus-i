@@ -39,7 +39,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/TEMPLATE_ARCH|hal/arch/avr8/at90can/devices|hal/arch/avr8/at90usb/devices|hal/arch/avr8/devices/character|hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -6112,7 +6112,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/TEMPLATE_ARCH|hal/arch/avr8/at90can/devices|hal/arch/avr8/at90usb/devices|hal/arch/avr8/devices/character|hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -12181,7 +12181,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/TEMPLATE_ARCH|hal/arch/avr8/at90can/devices|hal/arch/avr8/at90usb/devices|hal/arch/avr8/devices/character|hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -18238,7 +18238,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/TEMPLATE_ARCH|hal/arch/avr8/at90can/devices|hal/arch/avr8/at90usb/devices|hal/arch/avr8/devices/character|hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -24301,7 +24301,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/TEMPLATE_ARCH|hal/arch/avr8/at90can/devices|hal/arch/avr8/at90usb/devices|hal/arch/avr8/devices/character|hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -30415,7 +30415,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/TEMPLATE_ARCH|hal/arch/avr8/at90can/devices|hal/arch/avr8/at90usb/devices|hal/arch/avr8/devices/character|hal/arch/avr32/uc3/lib/src/trampolin.cpp|portable/tasks/src|hal/arch/avr32/uc3/devices/usb/src/OSUsbDevice_Implementation.cpp|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/devices/usb/src|portable/devices/sdi12/src|portable/devices/misc/src|portable/devices/character/src|portable/devices/block/src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -48807,7 +48807,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32|hal/arch/arm_cortex_m3|portable/tasks|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="hal/arch/TEMPLATE_ARCH|hal/arch/avr8/at90can/devices|hal/arch/avr8/at90usb/devices|hal/arch/avr8/devices/character|hal/arch/avr32|hal/arch/arm_cortex_m3|portable/tasks|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

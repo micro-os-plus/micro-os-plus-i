@@ -46,7 +46,7 @@
 // the mutex used to protect the shared variables
 
 #if defined(OS_INCLUDE_OSMUTEX_WAITING_TASKS)
-  OSTask* waitingTasksArray[APP_CONFIG_RESOURCES_ARRAY_SIZE];
+  OSThread* waitingTasksArray[APP_CONFIG_RESOURCES_ARRAY_SIZE];
 #if defined(APP_INCLUDE_OSMUTEX_WAITING_TASKS)
   OSMutex mutex(waitingTasksArray, sizeof(waitingTasksArray)/sizeof(waitingTasksArray[0]));
 #else

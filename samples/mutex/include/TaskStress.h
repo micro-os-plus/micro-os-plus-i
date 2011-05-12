@@ -10,7 +10,7 @@
 
 #include "portable/kernel/include/uOS.h"
 
-class TaskStress : public OSTask
+class TaskStress : public OSThread
   {
 public:
   // task constructor
@@ -25,7 +25,7 @@ public:
 
 private:
   // members
-  OSStack_t m_stack[ (OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
+  OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
 
   // the numeric id of the task, used as index in resourceAccessNum
   int m_taskId;

@@ -7,6 +7,8 @@
 #ifndef OS_APP_DEFINES_H_
 #define OS_APP_DEFINES_H_
 
+// ----- Portable Definitions -------------------------------------------------
+
 // override the board definitions, if needed
 //#define OS_CFGLONG_OSCILLATOR_HZ                        (16000000UL)
 
@@ -19,30 +21,41 @@
 #define OS_INCLUDE_OSTIMERSECONDS                       (1)
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
-//#define OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR               (1)
-
-#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
+//#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 #define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
 
-//#define OS_INCLUDE_OSTASK_SCHEDULERTICK                 (1)
+//#define OS_INCLUDE_OSTHREAD_SCHEDULERTICK                 (1)
 //#define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
 
 #define OS_CFGINT_IDLE_TASK_STACK_SIZE                  (800)
 
 #define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
-#define OS_INCLUDE_OSTASK_GETSTACKUSED                  1
-//#define OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER             1
+#define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
+//#define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
 #define OS_INCLUDE_CLOG                                 1
 #define OS_INCLUDE_OSTREAM                              1
-#define OS_INCLUDE_OSTREAM_OSTASK                       1
+#define OS_INCLUDE_OSTREAM_OSTHREAD                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
 
 // used for activating the mutex mechanism
 #define OS_INCLUDE_OSMUTEX                              (1)
 //#define OS_INCLUDE_OSMUTEX_WAITING_TASKS                (1)
 #define OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY       (1)
+
+// ----- Board Definitions ----------------------------------------------------
+
+#if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+
+#define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK          (1)
+#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
+
+#elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
+
+#endif /* OS_CONFIG_BOARD_* */
+
+// ----- Debug Definitions ----------------------------------------------------
 
 #if defined(DEBUG)
 
