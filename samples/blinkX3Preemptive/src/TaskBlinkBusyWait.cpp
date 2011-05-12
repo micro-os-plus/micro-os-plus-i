@@ -12,7 +12,7 @@
  */
 
 TaskBlinkBusyWait::TaskBlinkBusyWait(const char *pName, unsigned int iLed, unsigned int rate) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
+  OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskBlinkBusyWait()=");
@@ -37,12 +37,12 @@ TaskBlinkBusyWait::taskMain(void)
     {
       os.sched.lock.enter();
         {
-          debug.putString("Task '");
+          debug.putString("Thread '");
           debug.putString(getName());
           debug.putString("', led=");
-          debug.putDec(m_oLed.bitNumber());
+          debug.putDec((unsigned short)m_oLed.bitNumber());
           debug.putString(", millis=");
-          debug.putDec(m_rate);
+          debug.putDec((unsigned short)m_rate);
           debug.putNewLine();
         }
       os.sched.lock.exit();

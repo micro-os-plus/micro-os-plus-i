@@ -23,6 +23,8 @@
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    1
 
+#define OS_EXCLUDE_STACK_USAGE                          (1)
+
 // ----------------------------------------------------------------------------
 
 #if defined(DEBUG)
