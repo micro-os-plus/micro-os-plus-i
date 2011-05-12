@@ -28,6 +28,8 @@
 
 #elif defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 
+#elif defined(OS_CONFIG_BOARD_TEMPLATE)
+
 #else
 #error "Missing OS_CONFIG_BOARD_* board definition"
 #endif
