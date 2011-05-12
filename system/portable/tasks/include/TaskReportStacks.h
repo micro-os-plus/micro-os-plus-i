@@ -9,20 +9,20 @@
 
 #include "portable/kernel/include/uOS.h"
 
-class TaskReportStacks : public OSTask
+class TaskReportStacks : public OSThread
 {
 public:
-  // task constructor
+  // thread constructor
   TaskReportStacks(const char *pName, schedTicks_t rateSeconds,
       schedTicks_t maxSeconds, unsigned char increaseRate);
 
-  // actual task main code
+  // actual thread main code
   virtual void
-  taskMain(void);
+  threadMain(void);
 
 private:
   // members
-  OSStack_t m_stack[(OSTask::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
+  OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
 
   schedTicks_t m_rateSeconds;
   schedTicks_t m_maxSeconds;
