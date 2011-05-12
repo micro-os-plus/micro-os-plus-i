@@ -18,8 +18,8 @@
 #define OS_INCLUDE_CIRCULARBYTEBUFFER_DUMP              1
 
 
-#define OS_INCLUDE_OSTASK_GETSTACKUSED                  1
-//#define OS_INCLUDE_OSTASK_GETPROGRAMCOUNTER             1
+#define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
+//#define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
 
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG             1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE           1
@@ -29,13 +29,13 @@
 #define OS_INCLUDE_CLOG                                 1
 //#define OS_INCLUDE_OSTREAM                              1
 //#define OS_INCLUDE_ISTREAM                              1
-#define OS_INCLUDE_OSTREAM_OSTASK                       1
+#define OS_INCLUDE_OSTREAM_OSTHREAD                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
 //#define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          1
 #endif
 
 #define OS_INCLUDE_SIMPLECLI                            1
-
+#define OS_INCLUDE_SIMPLECLI_PARSER                     1
 
 #define OS_INCLUDE_TASKBLINK                            1
 
