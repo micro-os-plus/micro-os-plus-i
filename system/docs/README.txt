@@ -19,23 +19,23 @@ Scheduler
 ---------
 
 The preemptive scheduler uses both static priorities and round robin
-strategies to schedule tasks. Priorities range between 01-FF, with higher 
+strategies to schedule threads. Priorities range between 01-FF, with higher 
 values representing higher priorities. If no special priority policies 
-are needed, tasks are created with default priority. When multiple tasks 
+are needed, threads are created with default priority. When multiple threads 
 with equal priorities are detected, the scheduler uses round robin 
-for these tasks, i.e. a task is always inserted in the running list *after*
-all tasks with equal priority inserted before, so equal priority tasks are 
+for these threads, i.e. a thread is always inserted in the running list *after*
+all threads with equal priority inserted before, so equal priority threads are 
 given a more or less fair access to the CPU.
 
 Synchronization primitives are based on Unix sleep/wakeup mechanism,
 but the functions were named to more meaningfull eventWait()/eventNotify().
 
-eventWait() puts the current task to sleep, waiting for the event to occur.
-The task is removed from the running list and will not be scheduled to
+eventWait() puts the current thread to sleep, waiting for the event to occur.
+The thread is removed from the running list and will not be scheduled to
 run.
 
-eventNotify() notifies all tasks waiting to the given event. Notified
-tasks are inserted in the running list and will wait their turn to the CPU.
+eventNotify() notifies all threads waiting to the given event. Notified
+threads are inserted in the running list and will wait their turn to the CPU.
 A return value can be specified, and this value will be returned by eventWait().
 
 Device drivers
@@ -78,9 +78,9 @@ Samples
 Several samples are provided:
 
 - the 'minimal' sample is the simplest code and does... nothing;
-- 'blinkX3' shows how to run 3 instances of the same task to blink 3
+- 'blinkX3' shows how to run 3 instances of the same thread to blink 3
 different leds with different blink rates;
-- 'blinkX3Sync' defines 4 different tasks and shows some simple task
+- 'blinkX3Sync' defines 4 different threads and shows some simple thread
 synchronization methods;
 - 'calibrateBusyWait' helps determine the busyWait loop constants.
 

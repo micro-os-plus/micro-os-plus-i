@@ -48,9 +48,9 @@ according to build target and project preprocessor definitions.
 Major additions
 ---------------
 
-- interruptible tasks. 
+- interruptible threads. 
 
-Tasks can now be forced into an 'interrupted' state, when further blocking system 
+Threads can now be forced into an 'interrupted' state, when further blocking system 
 calls are returned immediatelly and timer sleeps are cancelled. This allows deep
 nested code to be terminated in an orderly manner.
 
@@ -61,7 +61,7 @@ force a soft reset if not re-armed in a certain period.
 
 - sleep and deep sleep modes
 
-For low power devices, if no more active tasks exists and no tasks are waiting
+For low power devices, if no more active threads exists and no threads are waiting
 for timer wakeups, the processor will enter sleep mode, and only selected
 events will wake the processor.
 
