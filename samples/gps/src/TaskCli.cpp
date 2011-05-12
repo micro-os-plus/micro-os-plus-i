@@ -11,7 +11,7 @@
 #include "GpsPosition.h"
 #include "Application.h"
 
-// ----- Task constructor -----------------------------------------------------
+// ----- Active object constructor -----------------------------------------------------
 
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(&m_dev),
@@ -36,7 +36,7 @@ const cliToken_t cliCommands[] =
 
 const cliToken_t cliCommandsShow[] =
   {
-    { "tasks", 0, (pCliMethod_t) & TaskCli::commandShowTasks },
+    { "threads", 0, (pCliMethod_t) & TaskCli::commandShowThreads },
     { "stacks", 0, (pCliMethod_t) & TaskCli::commandShowStacks },
     { "position", 0, (pCliMethod_t) & TaskCli::commandShowPosition },
     { 0, 0, 0 } };
@@ -44,20 +44,20 @@ const cliToken_t cliCommandsShow[] =
 // ----------------------------------------------------------------------------
 
 /*
- * Task main code. 
+ * Thread main code. 
  * Open device, output greeting and in a loop read and process lines.
  * I/O is done via standard streams routed to the attached device.
  *
  */
 
 void
-TaskCli::taskMain(void)
+TaskCli::threadMain(void)
 {
   if (os.isDebug())
     {
       os.sched.lock.enter();
         {
-          clog << "TaskCli::taskMain()" << endl;
+          clog << "TaskCli::threadMain()" << endl;
         }
       os.sched.lock.exit();
     }
@@ -68,7 +68,7 @@ TaskCli::taskMain(void)
   // Register the commands to the CLI
   cli.setCommands((cliToken_t*) cliCommands, (pCliClass_t*) this);
 
-  // Task endless loop
+  // Thread endless loop
   for (;;)
     {
       dev.open(); // wait for dtr
@@ -82,17 +82,17 @@ TaskCli::taskMain(void)
 
 // ----- Commands implementation ----------------------------------------------
 
-// Show tasks
+// Show threads
 
 OSReturn_t
-TaskCli::commandShowTasks(void)
+TaskCli::commandShowThreads(void)
 {
   ostream& cout = m_cout;
 
-  int nTasks;
-  nTasks = os.sched.getThreadsCount();
+  int nThreads;
+  nThreads = os.sched.getThreadsCount();
 
-  for (int i = 0; i < nTasks; ++i)
+  for (int i = 0; i < nThreads; ++i)
     {
       OSThread *pt;
       pt = os.sched.getThread(i);
@@ -100,7 +100,7 @@ TaskCli::commandShowTasks(void)
       cout << endl;
       cout << ((pt == this) ? '*' : ' ');
 
-      // Print the task info
+      // Print the thread info
       cout << *pt;
     }
 
@@ -114,10 +114,10 @@ TaskCli::commandShowStacks(void)
 {
   ostream& cout = m_cout;
 
-  int nTasks;
-  nTasks = os.sched.getThreadsCount();
+  int nThreads;
+  nThreads = os.sched.getThreadsCount();
 
-  for (int i = 0; i < nTasks; ++i)
+  for (int i = 0; i < nThreads; ++i)
     {
       OSThread* pt;
       pt = os.sched.getThread(i);

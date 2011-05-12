@@ -18,12 +18,12 @@ public:
   static const OSEventFlagsBits_t OS_REQUEST_GPS_POSITION = 0x1;
   static const OSEventFlagsBits_t OS_ALL_FLAGS = OS_REQUEST_GPS_POSITION;
 
-  // task constructor
+  // active object constructor
   GpsManager(const char *pName, OSDeviceCharacter& dev);
 
-  // actual task main code
+  // actual thread main code
   virtual void
-  taskMain(void);
+  threadMain(void);
 
   OSReturn_t requestGpsPosition(void);
 

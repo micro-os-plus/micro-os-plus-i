@@ -12,15 +12,15 @@
 class TaskCli : public OSThread
 {
 public:
-  // task constructor
+  // active object constructor
   TaskCli(const char *pName, OSDeviceCharacter& dev);
 
-  // actual task main code
+  // actual thread main code
   virtual void
-  taskMain(void);
+  threadMain(void);
 
   OSReturn_t
-  commandShowTasks(void);
+  commandShowThreads(void);
   OSReturn_t
   commandShowStacks(void);
   OSReturn_t

@@ -20,20 +20,20 @@ GpsManager::GpsManager(const char *pName, OSDeviceCharacter& dev) :
 }
 
 void
-GpsManager::taskMain(void)
+GpsManager::threadMain(void)
 {
   if (os.isDebug())
     {
       os.sched.lock.enter();
         {
-          clog << "GpsManager::taskMain()" << endl;
+          clog << "GpsManager::threadMain()" << endl;
         }
       os.sched.lock.exit();
     }
 
   //OSDeviceCharacter& dev = m_dev;
 
-  // task endless loop
+  // thread endless loop
   for (;;)
     {
       m_eventFlags.clear(OS_ALL_FLAGS);
