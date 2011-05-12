@@ -19,12 +19,12 @@ allLevels(void);
 // ----------------------------------------------------------------------------
 
 /*
- * This is a test of the loging facility.
+ * This is a test of the logging facility.
  * 
  * It does not need multitasking
  */
 
-Logger logger("root");
+OSLogger logger("root");
 
 void
 allLevels(void)
@@ -49,10 +49,10 @@ OS::main()
 {
   allLevels();
 
-  logger.setLevel(LogLevel::OS_ALL);
+  logger.setLevel(OSLogLevel::OS_ALL);
   allLevels();
 
-  logger.setLevel(LogLevel::OS_OFF);
+  logger.setLevel(OSLogLevel::OS_OFF);
   allLevels();
 
   OSDeviceDebug::putString("--- done ---");

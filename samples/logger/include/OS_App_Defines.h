@@ -19,7 +19,7 @@
 //#define OS_CFGINT_TASKS_TABLE_SIZE                      (2)
 #define OS_EXCLUDE_MULTITASKING                         (1)
 
-#define OS_INCLUDE_LOGGER                               (1)
+#define OS_INCLUDE_OSLOGGER                               (1)
 
 // ----------------------------------------------------------------------------
 
