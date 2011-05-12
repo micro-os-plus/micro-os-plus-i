@@ -10,7 +10,7 @@
 
 OSResetBits_t OSCPU::ms_resetBits;
 
-OSRealTimeCriticalSection OSRealTime::critical;
+//OSRealTimeCriticalSection OSRealTime::critical;
 
 // ----------------------------------------------------------------------------
 
