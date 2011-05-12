@@ -12,7 +12,7 @@
 #include "portable/devices/character/include/OSDeviceCharacter.h"
 #include "portable/misc/include/SimpleCli.h"
 
-class TaskCli : public OSTask
+class TaskCli : public OSThread
   {
 public:
   // task constructor
@@ -27,7 +27,7 @@ private:
   int xorCheck(unsigned char *pc);
 
   // members
-  unsigned char m_stack[OSTask::STACK_MINIMAL_SIZE + 400];
+  unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 400];
   OSDeviceCharacter & m_dev;
 
   istream m_cin;
