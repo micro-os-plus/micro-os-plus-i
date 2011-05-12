@@ -24,7 +24,7 @@ static TaskBlinkNested *pTaskBlinkNested;
 
 TaskBlinkNested::TaskBlinkNested(const char *pName, unsigned char iLed,
     schedTicks_t rate) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
+  OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   debug.putString("TaskBlinkNested()=");
@@ -46,18 +46,18 @@ TaskBlinkNested::TaskBlinkNested(const char *pName, unsigned char iLed,
  */
 
 void
-TaskBlinkNested::taskMain(void)
+TaskBlinkNested::threadMain(void)
 {
   if (os.isDebug())
     {
       os.sched.lock.enter();
         {
-          debug.putString("Task '");
+          debug.putString("Thread '");
           debug.putString(getName());
           debug.putString("', led=");
-          debug.putDec(m_oLed.bitNumber());
+          debug.putDec((unsigned short)m_oLed.bitNumber());
           debug.putString(", divider=");
-          debug.putDec(m_rate);
+          debug.putDec((unsigned short)m_rate);
           debug.putNewLine();
         }
       os.sched.lock.exit();
@@ -160,11 +160,11 @@ TaskBlinkNested::interruptInit(void)
 
 #if defined(DEBUG)
 
-  OSDeviceDebug::putDec(APP_CFGINT_TASKBLINKNESTED_TIMERPRESCALLER);
+  OSDeviceDebug::putDec((unsigned short)APP_CFGINT_TASKBLINKNESTED_TIMERPRESCALLER);
   OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putDec(T_DIVIDER);
+  OSDeviceDebug::putDec((unsigned short)T_DIVIDER);
   OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putDec(nCounter);
+  OSDeviceDebug::putDec((unsigned short)nCounter);
   OSDeviceDebug::putNewLine();
 
 #endif
