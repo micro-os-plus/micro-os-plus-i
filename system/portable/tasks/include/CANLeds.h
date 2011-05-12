@@ -77,20 +77,20 @@ private:
 
   };
 
-class CANLeds : public OSTask
+class CANLeds : public OSThread
   {
 public:
   CANLeds(const char *pName);
 
-  // actual task main code
-  virtual void taskMain(void);
+  // actual thread main code
+  virtual void threadMain(void);
 
   CANLedGreen green;
   CANLedRed red;
 
 private:
   // members
-  unsigned char m_stack[OSTask::STACK_MINIMAL_SIZE + 150];
+  unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 150];
 
   unsigned char m_semiperiods;
 
