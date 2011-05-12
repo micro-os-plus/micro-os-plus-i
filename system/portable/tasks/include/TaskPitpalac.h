@@ -13,14 +13,14 @@
 #define OS_CFGINT_TASKPITPALAC_STACK_SIZE       150
 #endif
 
-class TaskPitpalac: public OSTask
+class TaskPitpalac: public OSThread
   {
 public:
-  // task constructor
+  // thread constructor
   TaskPitpalac(const char *pName, schedTicks_t rate = 1);
 
-  // actual task main code
-  virtual void taskMain(void);
+  // actual thread main code
+  virtual void threadMain(void);
 
   void ledInit(void);
   void ledOn(void);
@@ -30,7 +30,7 @@ private:
   void waitAndToggle(schedTicks_t t1, schedTicks_t t2);
 
   // members
-  OSStack_t m_stack[(OSTask::STACK_MINIMAL_SIZE + 150) / sizeof(OSStack_t)];
+  OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 150) / sizeof(OSStack_t)];
   schedTicks_t m_rate;
 
   };
