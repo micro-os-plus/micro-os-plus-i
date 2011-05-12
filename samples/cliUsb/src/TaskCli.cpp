@@ -6,7 +6,7 @@
 
 #include "TaskCli.h"
 
-#include "portable/kernel/include/ostream_OSTask.h"
+#include "portable/kernel/include/ostream_OSThread.h"
 
 /*
  * Task constructor. 
@@ -16,7 +16,7 @@
  */
 
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
-  OSTask(pName, m_stack, sizeof(m_stack)), m_dev(dev),
+  OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev),
 #if true
   m_cin(&m_dev), m_cout(&m_dev),
 #endif
@@ -306,12 +306,12 @@ TaskCli::lineProcess()
       if (c == 't')
         {
           int cnt;
-          cnt = os.sched.getTasksCount();
+          cnt = os.sched.getThreadsCount();
 
           for (int i = 0; i < cnt; ++i)
             {
-              OSTask *pt;
-              pt = os.sched.getTask(i);
+              OSThread *pt;
+              pt = os.sched.getThread(i);
 
               cout << endl;
               if (pt == this)
