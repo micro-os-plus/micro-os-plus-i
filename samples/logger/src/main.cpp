@@ -7,11 +7,11 @@
 #include "portable/kernel/include/uOS.h"
 
 // ----------------------------------------------------------------------------
-// Here include headers for other object required by tasks,
+// Here include headers for other object required by active objects,
 // like local objects (system objects should be visible via uOS.h)
 
 // ----------------------------------------------------------------------------
-// Here include headers for local tasks
+// Here include headers for local active objects
 
 void
 allLevels(void);
