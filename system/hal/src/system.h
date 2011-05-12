@@ -26,9 +26,9 @@
 //#error "Missing OS_CONFIG_ARCH_* definition"
 //#endif
 
-#include "portable/kernel/src/OSTask.cpp"
+#include "portable/kernel/src/OSThread.cpp"
 
-#include "portable/kernel/src/OSTaskIdle.cpp"
+#include "portable/kernel/src/OSThreadIdle.cpp"
 
 #include "portable/kernel/src/OSTimer.cpp"
 #include "portable/kernel/src/OSTimerTicks.cpp"
@@ -147,8 +147,8 @@
 
 //#if defined(OS_INCLUDE_OSTREAM)
 #include "portable/stdlib/src/ostream.cpp"
-//#if defined(OS_INCLUDE_OSTREAM_OSTASK)
-#include "portable/kernel/src/ostream_OSTask.cpp"
+//#if defined(OS_INCLUDE_OSTREAM_OSTHREAD)
+#include "portable/kernel/src/ostream_OSThread.cpp"
 //#endif
 //#if defined(OS_INCLUDE_OSTREAM_PROGRAMPTR)
 //#if defined(OS_INCLUDE_OSTREAM_PROGRAMPTR)
@@ -186,7 +186,7 @@
 //#endif
 
 //#if defined(OS_INCLUDE_CLOG)
-// debug stream used to display task messages
+// debug stream used to display thread messages
 //ostream clog( &debug );
 //#endif
 
