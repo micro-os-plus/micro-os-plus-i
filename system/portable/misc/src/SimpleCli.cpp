@@ -14,11 +14,7 @@
 
 SimpleCli::SimpleCli(unsigned char *pLine, unsigned short iSize)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("SimpleCli()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("SimpleCli"), this);
 
   m_pLine = pLine;
   m_iSize = iSize;

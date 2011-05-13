@@ -25,11 +25,7 @@ DeviceCharacterBufferedUsart0::DeviceCharacterBufferedUsart0(
   DeviceCharacterBufferedUsartBase(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf,
       rxBufSize, rxHWM, rxLWM)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterBufferedUsart0()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterBufferedUsart0"), this);
 
   ms_pThis = this;
 }
@@ -40,11 +36,7 @@ DeviceCharacterBufferedUsart0::DeviceCharacterBufferedUsart0(
     unsigned short rxBufSize) :
   DeviceCharacterBufferedUsartBase(pTxBuf, txBufSize, pRxBuf, rxBufSize)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterBufferedUsart0()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterBufferedUsart0"), this);
 
   ms_pThis = this;
 }

@@ -15,11 +15,7 @@
 OSThreadIdle::OSThreadIdle() :
   OSThread("IDLE", m_stack, sizeof(m_stack), OSThread::IDLE_PRIORITY)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("OSThreadIdle()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("OSThreadIdle"), this);
   }
 
 void OSThreadIdle::threadMain(void)

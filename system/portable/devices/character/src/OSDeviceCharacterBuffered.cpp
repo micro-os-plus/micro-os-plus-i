@@ -21,11 +21,8 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
   m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM), m_txBuf(pTxBuf, txBufSize, txHWM,
       txLWM)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSDeviceCharacterBuffered"), this);
+
   m_sending = false;
 }
 
@@ -34,11 +31,8 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
   m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4), m_txBuf(pTxBuf,
       txBufSize, txBufSize * 3 / 4, txBufSize / 4)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSDeviceCharacterBuffered"), this);
+
   m_sending = false;
 }
 

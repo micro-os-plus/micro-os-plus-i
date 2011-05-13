@@ -113,16 +113,7 @@ threadAcquire(pNameAcquire, (OSThreadMainPtr_t) staticMainAcquire, (void*) this,
 threadPeriodic(pNamePeriodic, (OSThreadMainPtr_t) staticMainPeriodic,
     (void*) this, pStackPeriodic, stackSizePeriodic, priorityPeriodic)
   {
-
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSSchedulerLock::enter();
-      {
-        OSDeviceDebug::putString("SDI12Sensor()=");
-        OSDeviceDebug::putPtr(this);
-        OSDeviceDebug::putNewLine();
-      }
-    OSSchedulerLock::exit();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("SDI12Sensor"), this);
 
     //ms_bInitialised = false;
 

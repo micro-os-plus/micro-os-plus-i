@@ -24,11 +24,7 @@ OSDeviceCAN::OSDeviceCAN(CANPacket *pRxBuf, unsigned short rxBufSize,
     unsigned short rxHWM, unsigned short rxLWM, CANPacket *pTxBuf,
     unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("OSDeviceCAN()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("OSDeviceCAN"), this);
 
     m_rxBuf.init((unsigned char*)pRxBuf, sizeof(CANPacket), rxBufSize, rxHWM,
         rxLWM);

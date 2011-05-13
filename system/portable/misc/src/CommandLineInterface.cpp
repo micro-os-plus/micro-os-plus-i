@@ -17,11 +17,7 @@ CommandLineInterface::CommandLineInterface(istream& cin, ostream& cout,
     unsigned char *pLine, unsigned short iSize) :
   m_cin(cin), m_cout(cout)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("CommandLineInterface()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("CommandLineInterface"), this);
 
   m_pLine = pLine;
   m_iSize = iSize;

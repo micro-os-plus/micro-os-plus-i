@@ -15,22 +15,14 @@
 
 CircularBlockBuffer::CircularBlockBuffer()
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("CircularBlockBuffer()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("CircularBlockBuffer"), this);
   }
 
 CircularBlockBuffer::CircularBlockBuffer(unsigned char *pBuf,
     unsigned short blklen, unsigned short blocks, unsigned short highWM,
     unsigned short lowWM)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("CircularBlockBuffer()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("CircularBlockBuffer"), this);
 
     init(pBuf, blklen, blocks, highWM, lowWM);
   }

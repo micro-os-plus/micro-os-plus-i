@@ -17,11 +17,8 @@
 
 Timer::Timer(OSTimer *pTimer)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("Timer()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("Timer"), this);
+
     m_event = OSEvent::OS_NONE;
     m_ret = OSEventWaitReturn::OS_VOID;
     m_ticks = 0;

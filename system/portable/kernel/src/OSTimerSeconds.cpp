@@ -24,11 +24,8 @@ OSTime_t OSTimerSeconds::ms_uptime;
 OSTimerSeconds::OSTimerSeconds() :
 OSTimer(&m_array[0], sizeof(m_array)/sizeof(m_array[0]))
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("OSTimerSeconds()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("OSTimerSeconds"), this);
+
     ms_schedulerTicks = 0;
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
     ms_uptime = 0;

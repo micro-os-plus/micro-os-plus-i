@@ -20,22 +20,15 @@
 CANLeds::CANLeds(const char *pName) :
   OSThread(pName, m_stack, sizeof(m_stack))
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("CANLeds()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("CANLeds"), this);
   }
 
 // ----------------------------------------------------------------------------
 
 CANLed::CANLed()
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("CANLed()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("CANLed"), this);
+
     m_status = STATUS_OFF;
     m_crtStatus = STATUS_OFF;
     m_count = 0;
@@ -55,11 +48,8 @@ void CANLed::setStatus(unsigned char status)
 
 CANLedGreen::CANLedGreen()
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("CANLedGreen()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("CANLedGreen"), this);
+
     init();
   }
 
@@ -142,11 +132,8 @@ void CANLedGreen::update(bool last)
 
 CANLedRed::CANLedRed()
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("CANLedRed()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("CANLedRed"), this);
+
     init();
   }
 

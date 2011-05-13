@@ -31,11 +31,7 @@
 
 DeviceMemCard::DeviceMemCard()
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("DeviceMemCard()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("DeviceMemCard"), this);
 
     // default, compute as 10 * (TAAC+NSAC) and set it later
     m_waitCycles = 10000;

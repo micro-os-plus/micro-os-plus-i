@@ -14,21 +14,13 @@
 
 CircularByteBuffer::CircularByteBuffer()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("CircularByteBuffer()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("CircularByteBuffer"), this);
 }
 
 CircularByteBuffer::CircularByteBuffer(unsigned char *pBuf,
     unsigned short size, unsigned short highWM, unsigned short lowWM)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("CircularByteBuffer()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("CircularByteBuffer"), this);
 
   init(pBuf, size, highWM, lowWM);
 }

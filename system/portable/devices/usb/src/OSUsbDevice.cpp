@@ -26,9 +26,7 @@
 OSUsbDevice::OSUsbDevice()
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("OSUsbDevice()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putConstructor_P(PSTR("OSUsbDevice"), this);
 #endif
 }
 

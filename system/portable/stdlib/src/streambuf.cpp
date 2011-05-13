@@ -14,11 +14,8 @@
 
 streambuf::streambuf()
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("streambuf()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("streambuf"), this);
+
     //mgbeg = mgnext = mgend = mpbeg = mpnext = mpend = 0;
     //openedFor = 0;
   }

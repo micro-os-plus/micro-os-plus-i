@@ -21,11 +21,7 @@ TaskReportStacks::TaskReportStacks(const char* pName, schedTicks_t rateSeconds,
     schedTicks_t maxSeconds, unsigned char increaseRate) :
   OSThread(pName, m_stack, sizeof(m_stack))
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("TaskReportStacks()=");
-  debug.putPtr(this);
-  debug.putNewLine();
-#endif
+  debug.putConstructor_P(PSTR("TaskReportStacks"), this);
 
   m_rateSeconds = rateSeconds;
   m_maxSeconds = maxSeconds;

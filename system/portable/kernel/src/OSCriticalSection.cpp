@@ -18,11 +18,7 @@ OSStack_t volatile OSCriticalSection::ms_nestingLevel;
 #if defined(DEBUG)
 OSCriticalSection::OSCriticalSection()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSCriticalSection()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSCriticalSection"), this);
 }
 #endif
 
@@ -78,11 +74,7 @@ OSCriticalSection::exit(void)
 #if defined(DEBUG)
 OSRealTimeCriticalSection::OSRealTimeCriticalSection()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSRealTimeCriticalSection()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSRealTimeCriticalSection"), this);
 }
 #endif
 

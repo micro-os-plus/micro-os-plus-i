@@ -18,20 +18,12 @@ OSResetBits_t OSCPU::ms_resetBits;
 
 OS::OS()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OS()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif /* defined(DEBUG) */
+  OSDeviceDebug::putConstructor_P(PSTR("OS"), this);
 }
 
 OSCPU::OSCPU()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSCPU()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif /* defined(DEBUG) */
+  OSDeviceDebug::putConstructor_P(PSTR("OSCPU"), this);
 }
 
 #endif /* defined(DEBUG) */

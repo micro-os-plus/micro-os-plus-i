@@ -14,11 +14,7 @@
 
 Parser::Parser()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("Parser()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("Parser"), this);
 
   m_pSeparators = (unsigned char*) "\0";
   m_pSpaces = 0;

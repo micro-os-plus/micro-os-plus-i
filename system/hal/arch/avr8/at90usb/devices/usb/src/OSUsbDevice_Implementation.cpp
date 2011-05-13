@@ -35,11 +35,7 @@ unsigned char OSUsbDeviceImpl::usb_configuration_nb;
 
 OSUsbDeviceImpl::OSUsbDeviceImpl()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("OSUsbDeviceImpl()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSUsbDeviceImpl"), this);
 }
 
 // ----------------------------------------------------------------------------

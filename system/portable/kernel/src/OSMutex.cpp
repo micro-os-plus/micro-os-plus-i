@@ -18,11 +18,7 @@ OSMutex::OSMutex()
   m_waitingThreads(0, 0)
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("OSMutex()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSMutex"), this);
 
   m_isAcquired = false;
   m_pOwnerThread = 0;
@@ -37,11 +33,7 @@ OSMutex::OSMutex(OSThread* pWaitingThreadsArray[], int waitingThreadsArraySize)
   m_waitingThreads(pWaitingThreadsArray, waitingThreadsArraySize)
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("OSMutex()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSMutex"), this);
 
   m_isAcquired = false;
   m_pOwnerThread = 0;
@@ -194,11 +186,8 @@ OSMutex::release(OSThread * pThread)
 OSMutexWaitingThreads::OSMutexWaitingThreads(OSThread** pWaitingThreadsArray,
     int waitingThreadsArraySize)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("OSMutexWaitingThreads()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSMutexWaitingThreads"), this);
+
   m_pWaitingThreadsArray = pWaitingThreadsArray;
   m_waitingThreadsArraySize = waitingThreadsArraySize;
   m_waitingThreadsCount = 0;

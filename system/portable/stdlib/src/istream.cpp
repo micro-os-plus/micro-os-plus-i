@@ -17,11 +17,7 @@ void __skipws(istream& is);
 
 istream::istream(streambuf* sb)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("istream()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("istream"), this);
     
     count_last_ufmt_input = 0;
     init(sb /*, 0, 0 */);
@@ -30,11 +26,7 @@ istream::istream(streambuf* sb)
 #if 0
 istream::istream( OSDeviceCharacter * dev )
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString( "istream()=" );
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("istream"), this);
     
     count_last_ufmt_input = 0;
     init( 0 /*, dev, 0 */);

@@ -21,18 +21,9 @@ TaskBlink::TaskBlink(const char *pName, schedTicks_t rate) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_timerSeconds((OSTimer*)
       &OSScheduler::timerSeconds)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSSchedulerLock::enter();
-      {
-        OSDeviceDebug::putString("TaskBlink()=");
-        OSDeviceDebug::putPtr(this);
-        OSDeviceDebug::putNewLine();
-      }
-    OSSchedulerLock::exit();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("TaskBlink"), this);
 
     m_rate = rate;
-
   }
 
 /*

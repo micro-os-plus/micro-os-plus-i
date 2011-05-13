@@ -13,11 +13,8 @@
 
 OSTimer::OSTimer(OSTimerStruct_t *pArray, int size)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSTimer()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif  /* OS_DEBUG_CONSTRUCTORS */
+  OSDeviceDebug::putConstructor_P(PSTR("OSTimer"), this);
+
   m_pArray = pArray;
   m_size = size;
   m_count = 0;

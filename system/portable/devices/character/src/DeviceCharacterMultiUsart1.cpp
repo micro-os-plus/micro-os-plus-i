@@ -26,11 +26,7 @@ DeviceCharacterMultiUsart1::DeviceCharacterMultiUsart1(unsigned char *pTxBuf,
 DeviceCharacterUsart(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf, rxBufSize,
     rxHWM, rxLWM)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("DeviceCharacterMultiUsart1()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterMultiUsart1"), this);
 
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART)
     ms_pThis = this;
@@ -42,11 +38,7 @@ DeviceCharacterMultiUsart1::DeviceCharacterMultiUsart1(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned char *pRxBuf, unsigned short rxBufSize) :
 DeviceCharacterUsart(pTxBuf, txBufSize, pRxBuf, rxBufSize)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("DeviceCharacterMultiUsart1()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterMultiUsart1"), this);
 
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART)
     ms_pThis = this;

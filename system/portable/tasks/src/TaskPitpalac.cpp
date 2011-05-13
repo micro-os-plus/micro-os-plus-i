@@ -21,15 +21,7 @@
 TaskPitpalac::TaskPitpalac(const char *pName, schedTicks_t rate) :
   OSThread(pName, m_stack, sizeof(m_stack))
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSSchedulerLock::enter();
-      {
-        OSDeviceDebug::putString_P(PSTR("TaskPitpalac()="));
-        OSDeviceDebug::putPtr(this);
-        OSDeviceDebug::putNewLine();
-      }
-    OSSchedulerLock::exit();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("TaskPitpalac"), this);
 
     m_rate = OS_CFGINT_TICK_RATE_HZ * 2* rate;
   }

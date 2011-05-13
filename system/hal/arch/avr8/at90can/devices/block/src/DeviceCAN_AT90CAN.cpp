@@ -23,11 +23,7 @@ DeviceCAN_AT90CAN::DeviceCAN_AT90CAN(CANPacket *pRxBuf,
     unsigned short txLWM) :
   OSDeviceCAN(pRxBuf, rxBufSize, rxHWM, rxLWM, pTxBuf, txBufSize, txHWM, txLWM)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString_P(PSTR("DeviceCAN_AT90CAN()="));
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("DeviceCAN_AT90CAN"), this);
 
     pThis = this;
   }

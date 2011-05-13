@@ -37,11 +37,7 @@ ios_base::Init::~Init()
 ios_base::ios_base() :
   m_format(dec | unitbuf), m_state(goodbit), m_precision( 6), m_width( 0)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("ios_base()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("ios_base"), this);
   }
 
 ios_base::~ios_base()
@@ -70,11 +66,8 @@ ios::ios()
 
 ios::ios(streambuf * sb)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("ios()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("ios"), this);
+
     init(sb/*, 0 , 0 */);
   }
 

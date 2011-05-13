@@ -20,11 +20,7 @@ DeviceCharacterBufferedUsartBase::DeviceCharacterBufferedUsartBase(
   OSDeviceCharacterBuffered(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf, rxBufSize,
       rxHWM, rxLWM)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterBufferedUsartBase()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterBufferedUsartBase"), this);
 }
 
 // use default 3/4 high and 1/4 low water marks
@@ -33,11 +29,7 @@ DeviceCharacterBufferedUsartBase::DeviceCharacterBufferedUsartBase(
     unsigned short rxBufSize) :
   OSDeviceCharacterBuffered(pTxBuf, txBufSize, pRxBuf, rxBufSize)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterBufferedUsartBase()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterBufferedUsartBase"), this);
 }
 
 #endif /* defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE) */

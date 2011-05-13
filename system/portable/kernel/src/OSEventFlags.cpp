@@ -14,11 +14,8 @@
 
 OSEventFlags::OSEventFlags()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("OSEventFlags()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSEventFlags"), this);
+
   m_flags = 0;
 }
 

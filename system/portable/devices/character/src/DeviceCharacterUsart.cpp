@@ -24,11 +24,7 @@ DeviceCharacterUsart * DeviceCharacterUsart::ms_pThis;
 
 DeviceCharacterUsart::DeviceCharacterUsart(void)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("DeviceCharacterUsart()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterUsart"), this);
   }
 
 void DeviceCharacterUsart::init(unsigned char *pTxBuf,
@@ -52,11 +48,7 @@ DeviceCharacterUsart::DeviceCharacterUsart(unsigned char *pTxBuf,
 m_txBuf(pTxBuf, txBufSize, txHWM, txLWM), m_rxBuf(pRxBuf, rxBufSize, rxHWM,
     rxLWM)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("DeviceCharacterUsart()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterUsart"), this);
 
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART)
     ms_pThis = this;
@@ -69,11 +61,7 @@ DeviceCharacterUsart::DeviceCharacterUsart(unsigned char *pTxBuf,
 m_txBuf(pTxBuf, txBufSize, txBufSize * 3/ 4, txBufSize / 4), m_rxBuf(pRxBuf,
     rxBufSize, rxBufSize * 3/ 4, rxBufSize / 4)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("DeviceCharacterUsart()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterUsart"), this);
 
 #if !defined(OS_INCLUDE_DEVICECHARACTERMULTIUSART)
     ms_pThis = this;

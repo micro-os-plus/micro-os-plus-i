@@ -23,11 +23,7 @@ OSEventWaitReturn_t volatile OSRealTime::ms_ret;
 
 OSRealTime::OSRealTime()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("OSRealTime()=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSRealTime"), this);
 
   ms_pThread = 0;
 

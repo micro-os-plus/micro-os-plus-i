@@ -60,11 +60,7 @@ OSThread *OSActiveThreads::ms_array[OS_CFGINT_THREADS_TABLE_SIZE + 1];
 #if defined(DEBUG)
 OSSchedulerLock::OSSchedulerLock()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSSchedulerLock()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSSchedulerLock"), this);
 }
 #endif /* defined(DEBUG) */
 
@@ -107,11 +103,7 @@ OSScheduler::earlyInit(void)
 #if defined(DEBUG)
 OSScheduler::OSScheduler()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSScheduler()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif /* defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS) */
+  OSDeviceDebug::putConstructor_P(PSTR("OSScheduler"), this);
 }
 #endif /* defined(DEBUG) */
 
@@ -482,11 +474,7 @@ void OSScheduler::ISRcancelThread(OSThread *pThread)
 
 OSActiveThreads::OSActiveThreads()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSActiveThreads()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSActiveThreads"), this);
 
   int i;
   for (i = 0; i < OS_CFGINT_THREADS_TABLE_SIZE + 1; ++i)

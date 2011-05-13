@@ -21,11 +21,7 @@ DeviceCAN_MCP2510::DeviceCAN_MCP2510(CANPacket *pRxBuf,
     unsigned short txLWM) :
   OSDeviceCAN(pRxBuf, rxBufSize, rxHWM, rxLWM, pTxBuf, txBufSize, txHWM, txLWM)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    OSDeviceDebug::putString("DeviceCAN_MCP2510()=");
-    OSDeviceDebug::putPtr(this);
-    OSDeviceDebug::putNewLine();
-#endif
+    OSDeviceDebug::putConstructor_P(PSTR("DeviceCAN_MCP2510"), this);
 
     pThis = this;
   }

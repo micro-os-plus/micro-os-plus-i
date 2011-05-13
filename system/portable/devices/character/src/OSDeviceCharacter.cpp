@@ -14,11 +14,7 @@
 
 OSDeviceCharacter::OSDeviceCharacter()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSDeviceCharacter"), this);
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
   m_pOpenTimer = &OSScheduler::timerTicks;

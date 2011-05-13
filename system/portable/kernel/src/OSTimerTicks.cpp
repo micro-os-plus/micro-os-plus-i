@@ -21,13 +21,7 @@ OSTimerStruct_t OSTimerTicks::m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
 OSTimerTicks::OSTimerTicks() :
   OSTimer(&m_array[0], sizeof(m_array) / sizeof(m_array[0]))
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSTimerTicks()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
-  // TODO: delete if not needed
-  // ms_secondTicks = 0;
+  OSDeviceDebug::putConstructor_P(PSTR("OSTimerTicks"), this);
 }
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
