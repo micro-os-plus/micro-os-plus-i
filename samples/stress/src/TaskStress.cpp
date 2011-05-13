@@ -17,11 +17,7 @@ TaskStress::TaskStress(const char *pName, unsigned int minMicros,
     unsigned int maxMicros, unsigned int minTicks, unsigned int maxTicks) :
   OSThread(pName, m_stack, sizeof(m_stack))
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("TaskStress()=");
-  debug.putPtr(this);
-  debug.putNewLine();
-#endif
+  debug.putConstructor_P(PSTR("TaskStress"), this);
 
   m_minMicros = minMicros;
   m_maxMicros = maxMicros;
