@@ -35,10 +35,17 @@ public:
   // Output, on debug interface, a string.
   static void
   putString(const char *pc);
+
+  static void
+  putConstructor(const char* pc, const void* p);
+
 #if defined(OS_CONFIG_ARCH_AVR8)
   // Output, on debug interface, the bytes at pc address,
   // until the first zero byte.
   static void putString_P(const char * PROGMEM pc);
+
+  static void putConstructor_P(const char* PROGMEM pc, const void* p);
+
 #endif
   // Output, on debug interface, the hex value of a byte;
   // i.e. 2 hexadecimal characters.
@@ -144,6 +151,15 @@ private:
 #error "Missing OS_CONFIG_DEBUG_DEVICE_* definition"
 #endif
 
+#if !defined(OS_DEBUG_CONSTRUCTORS)
+
+    inline void
+    OSDeviceDebug::putConstructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)) )
+    {
+    }
+
+#endif /* !defined(OS_DEBUG_CONSTRUCTORS) */
+
 #else /* !DEBUG */
 
 // define empty functions for Release
@@ -155,14 +171,26 @@ inline void OSDeviceDebug::putNewLine(void)
   {
   }
 
-inline void OSDeviceDebug::putString(const char __attribute__( ( unused ) ) * pc)
+inline void OSDeviceDebug::putString(const char __attribute__((unused)) * pc)
   {
   }
 
+inline void
+putConstructor(const char* __attribute__((unused)) pc, const void* __attribute__((unused)) p)
+{
+}
+
 #if defined(OS_INCLUDE_SEPARATE_PROGMEM)
-inline void OSDeviceDebug::putString_P(const char __attribute__( ( unused) ) * PROGMEM pc)
+
+inline void OSDeviceDebug::putString_P(const char* __attribute__((unused)) PROGMEM pc)
   {
   }
+
+inline void
+putConstructor_P(const char* __attribute__((unused)) PROGMEM pc, const void* __attribute__((unused)) p)
+{
+}
+
 #endif
 
 inline void OSDeviceDebug::putHex(unsigned char __attribute__( ( unused ) ) c)

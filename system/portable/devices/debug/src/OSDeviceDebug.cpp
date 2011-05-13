@@ -13,11 +13,7 @@
 
 OSDeviceDebug::OSDeviceDebug()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString_P(PSTR("OSDeviceDebug()="));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructor_P(PSTR("OSDeviceDebug"), this);
 }
 #endif /*OS_EXCLUDE_MULTITASKING*/
 
@@ -34,7 +30,7 @@ void OSDeviceDebug::nakedEarlyInit(void)
 
 #endif
 
-extern const char greeting[] __attribute__( ( weak ) );
+extern const char greeting[] __attribute__((weak));
 
 // Default greeeting message
 const char greeting[] = APP_CFGSTR_GREETING;
@@ -78,6 +74,24 @@ OSDeviceDebug::commonPutBytes(const char *s, unsigned int n)
 
   return implPutBytes(s, n);
 }
+
+#if defined(OS_DEBUG_CONSTRUCTORS)
+
+// display constructor name and object address
+void
+OSDeviceDebug::putConstructor(const char *pc, const void *p)
+{
+  OSCriticalSection::enter();
+    {
+      putString(pc);
+      putString("()=");
+      putPtr(p);
+      putNewLine();
+    }
+  OSCriticalSection::exit();
+}
+
+#endif /* defined(OS_DEBUG_CONSTRUCTORS) */
 
 void
 OSDeviceDebug::putChar(unsigned char c)
@@ -397,34 +411,35 @@ OSDeviceDebug::putDec(unsigned short w, unsigned short n)
 
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
 
-void OSDeviceDebug::putDec(unsigned long w, unsigned short n)
-  {
-    int i;
-    unsigned char buff[ 10 ];
+void
+OSDeviceDebug::putDec(unsigned long w, unsigned short n)
+{
+  int i;
+  unsigned char buff[10];
 
-    for (i = sizeof(buff ) - 1; i >= 0; i--)
-      {
-        buff[ i ] = (w % 10 ) + '0';
-        w /= 10;
-      }
+  for (i = sizeof(buff) - 1; i >= 0; i--)
+    {
+      buff[i] = (w % 10) + '0';
+      w /= 10;
+    }
 
-    if ( 0 < n && n <= ( int ) sizeof(buff ) )
-    i = ( int ) sizeof(buff ) - n;
-    else
-      {
-        for (i = 0; i < ( int ) sizeof(buff ) - 1; ++i)
-        if (buff[ i ] != '0')
-        break;
-      }
-    if (i < ( int ) sizeof(buff ))
-      {
-        OSCriticalSection::enter();
-          {
-            commonPutBytes( (const char*)&buff[ i ], ( int ) sizeof(buff ) - i);
-          }
-        OSCriticalSection::exit();
-      }
-  }
+  if (0 < n && n <= (int) sizeof(buff))
+    i = (int) sizeof(buff) - n;
+  else
+    {
+      for (i = 0; i < (int) sizeof(buff) - 1; ++i)
+        if (buff[i] != '0')
+          break;
+    }
+  if (i < (int) sizeof(buff))
+    {
+      OSCriticalSection::enter();
+        {
+          commonPutBytes((const char*) &buff[i], (int) sizeof(buff) - i);
+        }
+      OSCriticalSection::exit();
+    }
+}
 #endif /*OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG*/
 
 void
