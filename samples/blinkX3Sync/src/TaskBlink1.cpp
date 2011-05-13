@@ -14,11 +14,7 @@
 TaskBlink1::TaskBlink1(const char *pName, unsigned char iLed, schedTicks_t rate) :
   OSThread(pName, m_stack, sizeof(m_stack )), m_oLed(iLed)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-        debug.putString("TaskBlink1()=");
-        debug.putPtr(this);
-        debug.putNewLine();
-#endif
+    debug.putString_P(PSTR("TaskBlink1"), this);
 
     m_rate = rate;
     m_bBusyWait = false;

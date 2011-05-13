@@ -14,11 +14,7 @@
 TaskBlink4::TaskBlink4(const char *pName, schedTicks_t rate, TaskBlink1& thread) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_thread(thread)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    debug.putString("TaskBlink4()=");
-    debug.putPtr(this);
-    debug.putNewLine();
-#endif
+    debug.putString_P(PSTR("TaskBlink4"), this);
 
     m_rate = rate;
     m_bToggleBusyWait = true;

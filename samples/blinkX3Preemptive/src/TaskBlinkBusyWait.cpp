@@ -14,11 +14,7 @@
 TaskBlinkBusyWait::TaskBlinkBusyWait(const char *pName, unsigned int iLed, unsigned int rate) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("TaskBlinkBusyWait()=");
-  debug.putPtr(this);
-  debug.putNewLine();
-#endif
+  debug.putString_P(PSTR("TaskBlinkBusyWait"), this);
 
   m_rate = rate;
 }

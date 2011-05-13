@@ -14,11 +14,7 @@
 TaskBlink3::TaskBlink3(const char *pName, unsigned char iLed) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
   {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-    debug.putString("TaskBlink3()=");
-    debug.putPtr(this);
-    debug.putNewLine();
-#endif
+    debug.putString_P(PSTR("TaskBlink3"), this);
   }
 
 /*

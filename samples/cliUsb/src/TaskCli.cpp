@@ -22,11 +22,7 @@ TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
 #endif
   m_cli(m_line, sizeof(m_line))
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("TaskCli()=");
-  debug.putPtr(this);
-  debug.putNewLine();
-#endif
+  debug.putString_P(PSTR("TaskCli"), this);
 }
 
 // ----------------------------------------------------------------------------
