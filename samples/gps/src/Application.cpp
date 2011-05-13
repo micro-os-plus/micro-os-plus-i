@@ -11,9 +11,5 @@ Application::Application():
       devUsart0(tx_store, sizeof(tx_store), rx_store, sizeof(rx_store)),
       gps("gps", devUsart0)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("Application()=");
-  debug.putPtr(this);
-  debug.putNewLine();
-#endif
+  debug.putString("Application", this);
 }

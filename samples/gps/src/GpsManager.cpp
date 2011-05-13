@@ -12,11 +12,7 @@
 GpsManager::GpsManager(const char *pName, OSDeviceCharacter& dev) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("GpsManager()=");
-  debug.putPtr(this);
-  debug.putNewLine();
-#endif
+  debug.putString("GpsManager", this);
 }
 
 void

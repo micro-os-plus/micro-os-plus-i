@@ -8,11 +8,7 @@
 
 CommunicationProxy::CommunicationProxy()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("CommunicationProxy()=");
-  debug.putPtr(this);
-  debug.putNewLine();
-#endif
+  debug.putString("CommunicationProxy", this);
 }
 
 OSReturn_t

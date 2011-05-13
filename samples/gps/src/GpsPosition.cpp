@@ -10,11 +10,7 @@
 
 GpsCoordinate::GpsCoordinate()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("GpsCoordinate()=");
-  debug.putPtr(this);
-  debug.putNewLine();
-#endif
+  debug.putString("GpsCoordinate", this);
 }
 
 GpsCoordinate::~GpsCoordinate()
@@ -39,11 +35,7 @@ operator <<(ostream& out, GpsCoordinate& c)
 
 GpsPosition::GpsPosition()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("GpsPosition()=");
-  debug.putPtr(this);
-  debug.putNewLine();
-#endif
+  debug.putString("GpsPosition", this);
 }
 
 GpsPosition::~GpsPosition()
