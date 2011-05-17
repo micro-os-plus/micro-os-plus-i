@@ -38,4 +38,4 @@ public:
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*DEVICELM74SELECT_H_*/
+#endif /* DEVICELM74SELECT_H_ */

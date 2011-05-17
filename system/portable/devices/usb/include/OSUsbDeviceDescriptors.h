@@ -137,7 +137,7 @@ typedef struct
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
 #if true
   S_usb_interface_descriptor ifc0b;
-  unsigned char CS_INTERFACEb[ 19 ];
+  unsigned char CS_INTERFACEb[19];
   S_usb_endpoint_descriptor ep3b;
 #endif
   S_usb_interface_descriptor ifc1b;

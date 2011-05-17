@@ -20,4 +20,4 @@
 #define OS_CONFIG_RTC4574_FCON_PORT                PORTC
 #define OS_CONFIG_RTC4574_FCON_BIT                 4
 
-#endif /*DEVICERTC4574_DEFINES_H_*/
+#endif /* DEVICERTC4574_DEFINES_H_ */

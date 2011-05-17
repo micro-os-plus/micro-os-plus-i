@@ -181,7 +181,7 @@ protected:
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
-  unsigned char *m_pReadMatchArray;
+  unsigned char* m_pReadMatchArray;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
   int m_countToRead;
@@ -237,7 +237,7 @@ private:
   OSTimerTicks_t m_readTimeout;
   OSTimerTicks_t m_writeTimeout;
 
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
   // Events for open/read/write methods. By default they contain
   // exactly their addresses.
@@ -379,14 +379,14 @@ OSDeviceCharacter::getWriteTimer(void)
     return m_pWriteTimer;
   }
 
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
 #if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
 inline deviceCharacterType_t
-OSDeviceCharacter::getDeviceType( void )
+OSDeviceCharacter::getDeviceType(void)
   {
     return m_type;
   }
 #endif
 
-#endif /*OSDEVICECHARACTER_H_*/
+#endif /* OSDEVICECHARACTER_H_ */

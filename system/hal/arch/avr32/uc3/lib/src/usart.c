@@ -877,7 +877,7 @@ int usart_getchar(volatile avr32_usart_t *usart)
 }
 
 
-void usart_write_line(volatile avr32_usart_t *usart, const char *string)
+void usart_write_line(volatile avr32_usart_t *usart, const char* string)
 {
   while (*string != '\0')
     usart_putchar(usart, *string++);

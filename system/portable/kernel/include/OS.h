@@ -251,12 +251,12 @@ public:
 #endif
 #else
   // Used when multitasking is disabled
-  static void main(void) __attribute__( ( noreturn ) );
+  static void main(void) __attribute__((noreturn));
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 
 #if defined(OS_INCLUDE_NAKED_INIT)
   // Naked version for the earlyInit function.
-  static void nakedEarlyInit(void) __attribute__( ( naked, section( ".init6" ) ) );
+  static void nakedEarlyInit(void) __attribute__((naked, section(".init6")));
 #endif /* defined(OS_INCLUDE_NAKED_INIT) */
 
   // Performs early initialisations.

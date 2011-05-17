@@ -69,4 +69,4 @@ inline unsigned char BlinkLed::bitNumber(void)
     return OS_CONFIG_BLINK_LED_BIT;
   }
 
-#endif /*BLINKLED_H_*/
+#endif /* BLINKLED_H_ */

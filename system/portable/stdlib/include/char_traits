@@ -21,32 +21,32 @@ struct traits
     //-- typedef char_traits_off_type pos_type;
     //typedef char state_type;
 
-    inline static void assign( char & c, const char & d )
+    inline static void assign(char& c, const char& d)
     {
       c = d;
     }
 
-    static bool eq( const char& c1, const char& c2 )
+    static bool eq(const char& c1, const char& c2)
     {
-      if ( c1 == c2 )
+      if (c1 == c2)
         return true;
       else
         return false;
     }
 
-    static char to_char( const int & i )
+    static char to_char(const int& i)
     {
-      return ( char ) i;
+      return (char) i;
     }
 
-    inline static int to_int( const char & c )
+    inline static int to_int(const char& c)
     {
-      return ( short int ) ( unsigned char ) c;
+      return (short int) (unsigned char) c;
     }
 
-    inline static bool eq_int( const int & a, const int & b )
+    inline static bool eq_int(const int& a, const int& b)
     {
-      if ( a == b )
+      if (a == b)
         {
           return true;
         }
@@ -55,9 +55,9 @@ struct traits
     }
 
 
-    inline static bool lt( const char& c1, const char& c2 )
+    inline static bool lt(const char& c1, const char& c2)
     {
-      if ( strncmp( &c1, &c2, 1 ) < 0 )
+      if (strncmp(&c1, &c2, 1) < 0)
         {
           return true;
         }
@@ -65,37 +65,37 @@ struct traits
       return false;
     }
 
-    inline static char* move( char* s1, const char* s2, size_t n )
+    inline static char* move(char* s1, const char* s2, size_t n)
     {
-      return ( char* ) memmove( s1, s2, n );
+      return (char*) memmove(s1, s2, n);
     }
 
-    inline static char* copy( char* s1, const char* s2, size_t n )
+    inline static char* copy(char* s1, const char* s2, size_t n)
     {
-      for ( unsigned long int i = 0; i < n; ++i )
+      for (unsigned long int i = 0; i < n; ++i)
         {
-          assign( s1[ i ], s2[ i ] );
+          assign(s1[i], s2[i]);
         }
 
       return s1 + n;
     }
 
-    inline static char* assign( char* s, size_t n, char a )
+    inline static char* assign(char* s, size_t n, char a)
     {
-      return ( char * ) memset( s, a, n );
+      return (char*) memset(s, a, n);
     }
 
-    inline static int compare( const char* s1, const char* s2, size_t n )
+    inline static int compare(const char* s1, const char* s2, size_t n)
     {
-      return strncmp( s1, s2, n );
+      return strncmp(s1, s2, n);
     }
 
-    inline static size_t length( const char* s )
+    inline static size_t length(const char* s)
     {
-      return strlen( s );
+      return strlen(s);
     }
 
-    static const char* find( const char* s, int n, const char& a );
+    static const char* find(const char* s, int n, const char& a);
 
     inline static char eos()
     {
@@ -107,9 +107,9 @@ struct traits
       return -1;
     }
 
-    inline static int not_eof( const int & i )
+    inline static int not_eof(const int& i)
     {
-      if ( i == -1 )
+      if (i == -1)
         {
           return 0;
         }
@@ -120,7 +120,7 @@ struct traits
     }
 
     #if 0
-    static state_type get_state( pos_type p )
+    static state_type get_state(pos_type p)
     {
       p = p;
       state_type a;
@@ -130,4 +130,4 @@ struct traits
 
   };
 
-#endif /*CHAR_TRAITS_H_*/
+#endif /* CHAR_TRAITS_H_ */

@@ -28,7 +28,7 @@ public:
   // 27.6.1.1.1 Constructor/destructor:
 
   explicit istream(streambuf* sb);
-  //explicit istream( OSDeviceCharacter * dev );
+  //explicit istream(OSDeviceCharacter* dev);
 
   virtual ~istream();
 
@@ -38,9 +38,9 @@ public:
 
   // 27.6.1.2 Formatted input:
 
-  istream& operator>>(istream&( *pf ) ( istream& ));
-  istream& operator>>(ios&( *pf ) ( ios& ));
-  istream& operator>>(ios_base&( *pf ) ( ios_base& ));
+  istream& operator>>(istream&(*pf) (istream&));
+  istream& operator>>(ios&(*pf) (ios&));
+  istream& operator>>(ios_base&(*pf) (ios_base&));
 
   istream& operator>>(bool& n);
   istream& operator>>(short& n);
@@ -50,16 +50,16 @@ public:
 
 #if defined(OS_INCLUDE_ISTREAM_LONG)
 
-  istream& operator>>( long& n );
-  istream& operator>>( unsigned long& n );
+  istream& operator>>(long& n);
+  istream& operator>>(unsigned long& n);
 
 #endif
 
 #if defined(OS_INCLUDE_ISTREAM_FLOAT)
 
-  istream& operator>>( float& f );
-  istream& operator>>( double& f );
-  istream& operator>>( long double& f );
+  istream& operator>>(float& f);
+  istream& operator>>(double& f);
+  istream& operator>>(long double& f);
 
 #endif
 
@@ -106,7 +106,7 @@ class istream::sentry
   {
   public:
 
-    explicit sentry( istream& is, bool noskipws = false );
+    explicit sentry(istream& is, bool noskipws = false);
     ~sentry();
 
     operator bool();
@@ -125,7 +125,7 @@ istream& operator>>(istream&, char*);
 istream& operator>>(istream&, unsigned char*);
 istream& operator>>(istream&, signed char*);
 
-istream& ws(istream &is);
+istream& ws(istream& is);
 
 inline streamsize istream::gcount() const
   {
@@ -139,4 +139,4 @@ inline istream::sentry::operator bool()
   }
 #endif
 
-#endif /*ISTREAM_*/
+#endif /* ISTREAM_ */

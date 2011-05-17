@@ -98,7 +98,7 @@ unsigned short DeviceADC::measure(void)
 #if defined(OS_INCLUDE_DEVICEADC_ISR)
 
 extern "C"
-void ADC_vect( void ) __attribute__( ( signal ) );
+void ADC_vect(void) __attribute__((signal));
 
 void ADC_vect(void)
   {
@@ -113,6 +113,6 @@ namespace DeviceADC
 
 #endif
 
-#endif /*OS_INCLUDE_DEVICEADC*/
-#endif /*OS_CONFIG_ARCH_AVR8*/
+#endif /* OS_INCLUDE_DEVICEADC */
+#endif /* OS_CONFIG_ARCH_AVR8 */
 

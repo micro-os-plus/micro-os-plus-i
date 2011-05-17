@@ -23,4 +23,4 @@ inline void DeviceRTC4574Select::implSelectDisable(void)
     OS_CONFIG_RTC4574_SELECT_PORT &= ~_BV(OS_CONFIG_RTC4574_SELECT_BIT);
   }
 
-#endif /*DEVICERTC4574SELECT_INLINES_H_*/
+#endif /* DEVICERTC4574SELECT_INLINES_H_ */

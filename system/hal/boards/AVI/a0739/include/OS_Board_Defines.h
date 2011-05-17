@@ -85,4 +85,4 @@
 #define OS_CONFIG_DEBUG_LED3_BIT                        PINB2
 #endif
 
-#endif /*HAL_BOARD_OS_DEFINES_H_*/
+#endif /* HAL_BOARD_OS_DEFINES_H_ */

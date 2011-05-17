@@ -37,4 +37,4 @@ and everything else needed.
 My suggestion is to keep the interruptServiceRoutine() static;
 if non-static objects need to be accessed, static pointers to that
 objects are necessary.
-  
+

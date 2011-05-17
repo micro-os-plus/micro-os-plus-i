@@ -82,7 +82,7 @@ OSSchedulerImpl::registersSave(void)
         :
         :
         :
-    );
+  );
   }
 
 /*
@@ -132,7 +132,7 @@ OSSchedulerImpl::registersRestore(void)
         :
         :
         :
-    );
+  );
   }
 
 inline bool
@@ -157,7 +157,7 @@ OSSchedulerImpl::stackPointerSave(void)
         :
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         :
-    );
+  );
   }
 
 inline void
@@ -175,7 +175,7 @@ OSSchedulerImpl::stackPointerRestore(void)
         :
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         :
-    );
+  );
   }
 
 #if false
@@ -201,7 +201,7 @@ OSCriticalSection::enter(void)
         :
         :
         :
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -222,7 +222,7 @@ OSCriticalSection::exit(void)
         :
         :
         :
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }

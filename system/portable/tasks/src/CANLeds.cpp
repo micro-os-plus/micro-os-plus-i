@@ -17,7 +17,7 @@
  *
  */
 
-CANLeds::CANLeds(const char *pName) :
+CANLeds::CANLeds(const char* pName) :
   OSThread(pName, m_stack, sizeof(m_stack))
   {
     OSDeviceDebug::putConstructor_P(PSTR("CANLeds"), this);
@@ -279,5 +279,5 @@ void CANLeds::threadMain(void)
       }
   }
 
-#endif /*OS_INCLUDE_CANLEDS*/
+#endif /* OS_INCLUDE_CANLEDS */
 

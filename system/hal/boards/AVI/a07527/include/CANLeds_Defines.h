@@ -15,4 +15,4 @@
 #define OS_CONFIG_CANLEDS_RED_PORT              PORTD
 #define OS_CONFIG_CANLEDS_RED_BIT               1
 
-#endif /*CANLEDS_DEFINES_H_*/
+#endif /* CANLEDS_DEFINES_H_ */

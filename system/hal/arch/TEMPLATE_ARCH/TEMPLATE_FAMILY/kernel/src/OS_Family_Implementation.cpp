@@ -26,7 +26,7 @@ OSImpl::familyEarlyInit(void)
 
   OSDeviceDebug::putString("UID=");
   //for (int* p = (int*) 0x80800204; p < (int*) 0x80800212; ++p)
-  //  OSDeviceDebug::putPtr((void *) *p);
+  //  OSDeviceDebug::putPtr((void*)*p);
   OSDeviceDebug::putNewLine();
 
   OSDeviceDebug::putString("CPU=");

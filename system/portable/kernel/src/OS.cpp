@@ -109,7 +109,7 @@ OS::resetHandler(void)
   OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
 
-#endif /*OS_EXCLUDE_MULTITASKING*/
+#endif /* OS_EXCLUDE_MULTITASKING */
 
   // noreturn
   for (;;)
@@ -138,7 +138,8 @@ extern unsigned long __os_bss_end;
 void
 OS::dataInit(void)
 {
-  unsigned long *pSrc, *pDest;
+  unsigned long* pSrc;
+  unsigned long* pDest;
 
   /* Copy the data segment initialisers from flash to SRAM */
   pSrc = &__os_data_load_start;
@@ -152,7 +153,7 @@ OS::dataInit(void)
 void
 OS::bssInit(void)
 {
-  unsigned long *pDest;
+  unsigned long* pDest;
 
   /* Zero fill the bss segment. */
   for (pDest = &__os_bss_start; pDest < &__os_bss_end;)
@@ -173,7 +174,7 @@ typedef void
 void
 OS::staticConstructorsInit(void)
 {
-  unsigned long *p;
+  unsigned long* p;
   void
   (*pFunc)(void);
 
@@ -302,23 +303,23 @@ OS::busyWaitMicros(unsigned int n)
 
 #warning "malloc() and free() are not thread safe!"
 
-void *operator
-new( unsigned int n )
+void* operator
+new(unsigned int n)
   {
-    return malloc( n );
+    return malloc(n);
   }
 
 void operator
-delete( void *p )
+delete(void* p)
   {
-    return free( p );
+    return free(p);
   }
 
 #else
 
 void
 operator
-delete(void *p __attribute__( ( unused ) ) )
+delete(void* p __attribute__((unused)))
 {
 #if defined(DEBUG)
   ; // dummy, refered by virtual destructors

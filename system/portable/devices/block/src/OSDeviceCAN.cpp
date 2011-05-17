@@ -61,7 +61,7 @@ int OSDeviceCAN::readPacket(CANPacket *p)
         break;
 
 #if (false)
-        if (getReadTimeout() == OS_TIMEOUT_IMMEDIATELY )
+        if (getReadTimeout() == OS_TIMEOUT_IMMEDIATELY)
         return OS_ERROR_WOULD_BLOCK;
 #endif
 
@@ -79,14 +79,14 @@ int OSDeviceCAN::readPacket(CANPacket *p)
         if (ret == OSEventWaitReturn::OS_TIMEOUT)
           {
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_READBYTE)
-            OSDeviceDebug::putString( "OSDeviceCAN::readPacket() return timeout" );
+            OSDeviceDebug::putString("OSDeviceCAN::readPacket() return timeout");
             OSDeviceDebug::putNewLine();
 #endif
             return OSReturn::OS_TIMEOUT;
           }
       }
 
-    if ( !isConnected() )
+    if (!isConnected())
     return OSReturn::OS_DISCONNECTED;
 
     int c;
@@ -132,4 +132,4 @@ int OSDeviceCAN::writePacket(CANPacket *p)
 // ---
 
 
-#endif /*OS_INCLUDE_OSDEVICECAN*/
+#endif /* OS_INCLUDE_OSDEVICECAN */

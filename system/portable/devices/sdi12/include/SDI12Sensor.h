@@ -51,11 +51,11 @@ public:
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
 
-  SDI12Sensor(const char *pNameAcquire, const unsigned char *pStackAcquire,
+  SDI12Sensor(const char* pNameAcquire, const unsigned char* pStackAcquire,
       unsigned short stackSizeAcquire, OSThreadPriority_t priorityAcquire,
-      const char *pNamePeriodic, const unsigned char *pStackPeriodic,
+      const char* pNamePeriodic, const unsigned char* pStackPeriodic,
       unsigned short stackSizePeriodic, OSThreadPriority_t priorityPeriodic,
-      const char *pNameSDI12, const unsigned char *pStackSDI12,
+      const char* pNameSDI12, const unsigned char* pStackSDI12,
       unsigned short stackSizeSDI12, OSThreadPriority_t prioritySDI12);
 
   virtual ~SDI12Sensor();
@@ -73,14 +73,14 @@ public:
       unsigned char count);
   static void storeStartMeasurementDelay(unsigned short delay);
 
-  virtual bool prepareResponseExtendedCommands(const char *pBuf,
+  virtual bool prepareResponseExtendedCommands(const char* pBuf,
       unsigned int count) = 0;
 
   static bool storeUnsignedResponse(unsigned long l, unsigned short n = 0);
   static bool storeFloatResponse(float f, unsigned short precision = 6,
       bool bPlus = false);
 
-  static unsigned char *parseString(unsigned char *pStr, unsigned short len);
+  static unsigned char* parseString(unsigned char* pStr, unsigned short len);
   static float parseFloat(void);
 
   virtual void storeAddressToNonVolatileMemory(unsigned char newAddress) = 0;
@@ -117,7 +117,7 @@ public:
   static bool
   storeCharResponse(unsigned char ch);
   static bool
-  storeStringResponse(const char *pStr, unsigned short n = 0);
+  storeStringResponse(const char* pStr, unsigned short n = 0);
 #if defined(OS_INCLUDE_SDI12SENSOR)
   static bool storeUnsignedResponse(unsigned short w, unsigned short n = 0);
 #endif
@@ -133,7 +133,7 @@ public:
   getOutputBufferSize(void);
 
   static void
-  parseInit(const char *p);
+  parseInit(const char* p);
   static unsigned char
   parsePeek(void); // return '\0' at end
   static unsigned char
@@ -249,14 +249,14 @@ private:
 
   static void transmitResponse(void);
 
-  static void staticMainSDI12(SDI12Sensor * pt);
-  static void staticMainAcquire(SDI12Sensor * pt);
-  static void staticMainPeriodic(SDI12Sensor * pt);
+  static void staticMainSDI12(SDI12Sensor* pt);
+  static void staticMainAcquire(SDI12Sensor* pt);
+  static void staticMainPeriodic(SDI12Sensor* pt);
 
   void threadMainSDI12(void);
   bool processCommand(void);
 
-  static unsigned char* putFloat(unsigned char *pBuf, unsigned char* pMax,
+  static unsigned char* putFloat(unsigned char* pBuf, unsigned char* pMax,
       float f, unsigned char prec = 6);
 
   // --------------------------------------------
@@ -323,7 +323,7 @@ public:
 
   // count of chars in ms_buf
   static volatile unsigned short ms_bufCount;
-  static unsigned char *ms_pParse;
+  static unsigned char* ms_pParse;
 
 #if !defined(OS_EXCLUDE_PCINT3_VECT)
   unsigned char ms_prevValue3;
@@ -336,8 +336,8 @@ public:
 #endif
 
 private:
-  static volatile unsigned char *ms_pBuf;
-  static volatile unsigned char *ms_pBufMax;
+  static volatile unsigned char* ms_pBuf;
+  static volatile unsigned char* ms_pBufMax;
 
   static unsigned char ms_tmp[OS_CFGINT_SDI12SENSOR_TMP_SIZE];
 
@@ -355,8 +355,8 @@ private:
 
   static unsigned char ms_doReset;
 
-  static OSThread *ms_pThread;
-  static OSThread *ms_pThreadA;
+  static OSThread* ms_pThread;
+  static OSThread* ms_pThreadA;
 
   static volatile OSTimerTicks_t ms_exclamationTicks;
 
@@ -430,4 +430,4 @@ inline unsigned char SDI12Sensor::getAddress(void)
 #error "Missing OS_CONFIG_BOARD_* definition"
 #endif
 
-#endif /*SDI12SENSOR_H_*/
+#endif /* SDI12SENSOR_H_ */

@@ -60,4 +60,4 @@ inline OSEventFlagsBits_t OSEventFlags::get(void)
     return m_flags;
   }
 
-#endif /*OSEVENTFLAGS_H_*/
+#endif /* OSEVENTFLAGS_H_ */

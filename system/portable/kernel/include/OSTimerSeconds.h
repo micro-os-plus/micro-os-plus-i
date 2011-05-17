@@ -58,7 +58,7 @@ protected:
   implAcknowledgeInterrupt(void);
 
 private:
-  // contain the timeouts( expressed in ticks) for every alarm
+  // contain the timeouts(expressed in ticks) for every alarm
   static OSTimerStruct_t m_array[OS_CFGINT_OSTIMERSECONDS_SIZE];
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)

@@ -18,9 +18,9 @@ public:
   init(void);
 
   static unsigned char
-  readBytes(unsigned char addr, unsigned char *pBuf, unsigned char len);
+  readBytes(unsigned char addr, unsigned char* pBuf, unsigned char len);
   static void
-  writeBytes(unsigned char addr, unsigned char *pBuf, unsigned char len);
+  writeBytes(unsigned char addr, unsigned char* pBuf, unsigned char len);
 
 private:
   static void
@@ -69,4 +69,4 @@ private:
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*DEVICERTC4574_H_*/
+#endif /* DEVICERTC4574_H_ */

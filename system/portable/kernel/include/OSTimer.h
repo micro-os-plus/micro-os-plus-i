@@ -32,7 +32,7 @@ class OSTimer
   {
 public:
   // constructor
-  OSTimer(OSTimerStruct_t *pArray, int size);
+  OSTimer(OSTimerStruct_t* pArray, int size);
 
   // sleep for the number of timer ticks
   OSEventWaitReturn_t sleep(OSTimerTicks_t ticks, OSEvent_t event = 0);
@@ -64,7 +64,7 @@ protected:
   void remove(int i);
 
   // the array of timeouts
-  OSTimerStruct_t *m_pArray;
+  OSTimerStruct_t* m_pArray;
 
   // the size of m_pArray
   int m_size;
@@ -91,4 +91,4 @@ inline int OSTimer::getCount(void)
     return m_count;
   }
 
-#endif /*OSTIMER_H_*/
+#endif /* OSTIMER_H_ */

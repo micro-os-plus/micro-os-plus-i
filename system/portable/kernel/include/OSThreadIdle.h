@@ -40,4 +40,4 @@ private:
   OSStack_t m_stack[OS_CFGINT_IDLE_THREAD_STACK_SIZE / sizeof(OSStack_t)];
   };
 
-#endif /*OSTHREADIDLE_H_*/
+#endif /* OSTHREADIDLE_H_ */

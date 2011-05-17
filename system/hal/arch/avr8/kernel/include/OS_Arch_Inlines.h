@@ -10,7 +10,7 @@
 inline void
 OSCPUImpl::returnFromInterrupt(void)
 {
-  asm volatile( "reti":: );
+  asm volatile("reti"::);
   for (;;)
     ; // noreturn
 }
@@ -18,7 +18,7 @@ OSCPUImpl::returnFromInterrupt(void)
 inline void
 OSCPUImpl::returnFromSubroutine(void)
 {
-  asm volatile( "ret":: );
+  asm volatile("ret"::);
   for (;;)
     ; // noreturn
 }
@@ -26,21 +26,21 @@ OSCPUImpl::returnFromSubroutine(void)
 inline void
 OSCPUImpl::idle(void)
 {
-  set_sleep_mode( SLEEP_MODE_IDLE);
+  set_sleep_mode(SLEEP_MODE_IDLE);
   sleep_cpu();
 }
 
 inline void
 OSCPUImpl::sleep(void)
 {
-  set_sleep_mode( SLEEP_MODE_EXT_STANDBY);
+  set_sleep_mode(SLEEP_MODE_EXT_STANDBY);
   sleep_cpu();
 }
 
 inline void
 OSCPUImpl::deepSleep(void)
 {
-  set_sleep_mode( SLEEP_MODE_PWR_SAVE);
+  set_sleep_mode(SLEEP_MODE_PWR_SAVE);
   sleep_cpu();
 }
 
@@ -53,7 +53,7 @@ OSCPUImpl::watchdogReset(void)
 inline void
 OSCPUImpl::nop(void)
 {
-  asm volatile( "nop":: );
+  asm volatile("nop"::);
 }
 
 // as per manual, JMP 0 is not recommended since
@@ -61,7 +61,7 @@ OSCPUImpl::nop(void)
 inline void
 OSCPUImpl::softReset(void)
 {
-  wdt_enable( WDTO_15MS);
+  wdt_enable(WDTO_15MS);
   cli();
   for (;;)
     ; // trigger WD
@@ -117,7 +117,7 @@ OSCPUImpl::stackPush(OSStack_t reg)
       :
       : [R] "r" (tmp)
       :
-  );
+);
 }
 
 inline OSStack_t
@@ -132,7 +132,7 @@ OSCPUImpl::stackPop(void)
       : [R] "=r" (tmp)
       :
       :
-  );
+);
   return tmp;
 }
 
@@ -148,7 +148,7 @@ OSCPUImpl::getInterruptsMask(void)
       : [R] "=r" (tmp)
       :
       :
-  );
+);
 
   return tmp;
 }
@@ -167,7 +167,7 @@ OSCPUImpl::setInterruptsMask(OSInterruptsMask_t mask)
       :
       : [R] "r" (tmp)
       :
-  );
+);
 }
 
 #endif /* HAL_OS_ARCH_INLINES_H_ */

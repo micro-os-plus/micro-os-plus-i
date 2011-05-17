@@ -15,4 +15,4 @@ class streambuf;
 class istream;
 class ostream;
 
-#endif /*IOSFWD_*/
+#endif /* IOSFWD_ */

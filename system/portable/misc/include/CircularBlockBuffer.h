@@ -13,20 +13,20 @@ class CircularBlockBuffer
 {
 public:
   CircularBlockBuffer(void);
-  CircularBlockBuffer(unsigned char *pc, unsigned short blklen,
+  CircularBlockBuffer(unsigned char* pc, unsigned short blklen,
       unsigned short blocks, unsigned short highWM, unsigned short lowWM);
 
   void
-  init(unsigned char *pc, unsigned short blklen, unsigned short blocks,
+  init(unsigned char* pc, unsigned short blklen, unsigned short blocks,
       unsigned short highWM, unsigned short lowWM);
 
   void
   clear(void);
 
   void
-  put(unsigned char *pc);
-  unsigned char *
-  get(unsigned char *pc);
+  put(unsigned char* pc);
+  unsigned char* 
+  get(unsigned char* pc);
   bool
   isEmpty(void);
   bool
@@ -42,14 +42,14 @@ public:
   size(void);
 
 private:
-  unsigned char *m_pBuf;
+  unsigned char* m_pBuf;
   unsigned short m_blkLen;
   unsigned short m_szBlks;
   unsigned short m_len;
   unsigned short m_highWM;
   unsigned short m_lowWM;
-  unsigned char *m_pPut;
-  unsigned char *m_pGet;
+  unsigned char* m_pPut;
+  unsigned char* m_pGet;
 };
 
 inline bool
@@ -88,4 +88,4 @@ CircularBlockBuffer::size(void)
   return m_szBlks;
 }
 
-#endif /*CIRCULARBLOCKBUFFER_H_ */
+#endif /* CIRCULARBLOCKBUFFER_H_ */

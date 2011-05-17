@@ -38,7 +38,7 @@ void OSTimerSeconds::checkVirtualWatchdogs(void)
   {
     for (int i=0; i < OSScheduler::getThreadsCount(); ++i)
       {
-        OSThread *pThread;
+        OSThread* pThread;
         pThread = OSScheduler::getThread(i);
         pThread->virtualWatchdogCheck();
       }

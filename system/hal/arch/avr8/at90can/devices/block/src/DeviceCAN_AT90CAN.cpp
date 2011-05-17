@@ -162,7 +162,7 @@ void DeviceCAN_AT90CAN::interruptServiceRoutine(void)
                       }
 #endif
 
-                    if ( !m_rxBuf.isFull() )
+                    if (!m_rxBuf.isFull())
                       {
                         m_rxBuf.put((unsigned char*)&can_packet);
                       }
@@ -218,7 +218,7 @@ bool DeviceCAN_AT90CAN::implCanWrite(void)
 
 int DeviceCAN_AT90CAN::implReadPacket(CANPacket *p)
   {
-    m_rxBuf.get((unsigned char *)p);
+    m_rxBuf.get((unsigned char*)p);
     return 0;
   }
 
@@ -250,7 +250,7 @@ void DeviceCAN_AT90CAN::implTransmit(void)
   }
 
 extern "C"
-void  CANIT_vect( void ) __attribute__( ( signal, naked ) );
+void  CANIT_vect(void) __attribute__((signal, naked));
 
 void CANIT_vect(void)
   {
@@ -262,4 +262,4 @@ void CANIT_vect(void)
     // interrupts enabled after this point
   }
 
-#endif /*OS_INCLUDE_DEVICECAN_AT90CAN*/
+#endif /* OS_INCLUDE_DEVICECAN_AT90CAN */

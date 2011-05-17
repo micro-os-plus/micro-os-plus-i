@@ -11,7 +11,7 @@
 #include "portable/kernel/include/OS.h"
 
 
-OSTimer::OSTimer(OSTimerStruct_t *pArray, int size)
+OSTimer::OSTimer(OSTimerStruct_t* pArray, int size)
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSTimer"), this);
 
@@ -70,7 +70,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
 #else
           OSCriticalSection::enter();
             {
-              if ( insert(ticks, event, OSEventWaitReturn::OS_VOID))
+              if (insert(ticks, event, OSEventWaitReturn::OS_VOID))
                 ret = OSScheduler::eventWait(event);
               else
                 ret = OSEventWaitReturn::OS_FAILED;
@@ -117,7 +117,7 @@ OSTimer::eventRemove(OSEvent_t event)
       int cnt;
       cnt = m_count;
 
-      OSTimerStruct_t *p;
+      OSTimerStruct_t* p;
       p = m_pArray;
 
       int i;
@@ -175,7 +175,7 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
       return false;
     }
 
-  OSTimerStruct_t *p;
+  OSTimerStruct_t* p;
   p = m_pArray;
 
   int i;
@@ -196,7 +196,7 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
       // may be count, i.e. not found, end of array
 
       // move right to make space
-      OSTimerStruct_t *q;
+      OSTimerStruct_t* q;
       int j;
       for (j = cnt, q = &m_pArray[j]; j > i; j--, q--)
         {
@@ -230,7 +230,7 @@ OSTimer::remove(int i)
     {
       if (cnt > 1)
         {
-          OSTimerStruct_t *p;
+          OSTimerStruct_t* p;
           p = &m_pArray[i];
 
           for (; i < cnt - 1; i++, p++)
@@ -255,7 +255,7 @@ OSTimer::interruptTick(void)
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
       OSDeviceDebug::putChar('*');
 #endif
-      OSTimerStruct_t *p;
+      OSTimerStruct_t* p;
       p = m_pArray;
 
       if (--(p->ticks) == 0)

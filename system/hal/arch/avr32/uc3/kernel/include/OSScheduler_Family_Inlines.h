@@ -109,7 +109,7 @@ inline unsigned int getSP(void)
         : [RET] "=r" (ret)
         :
         :
-    );
+  );
 
     return ret;
   }
@@ -117,7 +117,7 @@ inline unsigned int getSP(void)
 inline void
 OSSchedulerImpl::stackPointerSave(void)
   {
-    *OSScheduler::ms_ppCurrentStack = (OSStack_t *)getSP();
+    *OSScheduler::ms_ppCurrentStack = (OSStack_t* )getSP();
   }
 
 #else
@@ -140,7 +140,7 @@ OSSchedulerImpl::stackPointerSave(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         :
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -151,7 +151,7 @@ OSSchedulerImpl::stackPointerSave(void)
 
 unsigned int setSP(void) __attribute__ ((always_inline));
 
-inline void setSP(OSStack_t * p)
+inline void setSP(OSStack_t* p)
   {
     asm volatile
     (
@@ -159,7 +159,7 @@ inline void setSP(OSStack_t * p)
         :
         : [R] "r" (p)
         :
-    );
+  );
   }
 
 inline void
@@ -192,7 +192,7 @@ OSSchedulerImpl::stackPointerRestore(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         : "sp"
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -221,7 +221,7 @@ OSSchedulerImpl::criticalSectionNestingSave(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
         :
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -248,7 +248,7 @@ OSSchedulerImpl::criticalSectionNestingRestore(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
         : "sp"
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -267,7 +267,7 @@ OSSchedulerImpl::registersSave(void)
         :
         :
         : "sp"
-    );
+  );
   }
 
 /*
@@ -284,7 +284,7 @@ OSSchedulerImpl::registersRestore(void)
         :
         :
         : "sp" // r0-r7 were also changed
-    );
+  );
   }
 
 /*
@@ -316,7 +316,7 @@ inline unsigned int getSRfromStack(void)
         : [RET] "=r" (ret)
         :
         :
-    );
+  );
 
     return ret;
   }
@@ -377,7 +377,7 @@ OSSchedulerImpl::FirstThread_contextRestore(void)
       :
       : [SR] "i" (AVR32_SR)
       : "r0", "sp"
-  );
+);
 
 }
 
@@ -440,7 +440,7 @@ SCALL_contextSave(void)
       :
       :
       :
-  );
+);
 
   OSSchedulerImpl::criticalSectionNestingSave();
 
@@ -461,7 +461,7 @@ SCALL_contextSave(void)
       // TODO: define a configuration macro for the MASK
       : [MASK] "i" (0x0F << 1), [SR] "i" (AVR32_SR)
       :
-  );
+);
 #else
   register OSStack_t tmp;
 
@@ -519,7 +519,7 @@ SCALL_contextRestore(void)
       :
       :
       :
-  );
+);
 }
 
 /*
@@ -535,7 +535,7 @@ OSSchedulerImpl::yield(void)
       :
       :
       :
-  );
+);
 }
 
 #endif /* HAL_FAMILY_OSSCHEDULER_INLINES_H_ */

@@ -15,7 +15,7 @@ inline void OSImpl::returnFromInterrupt(void)
         " bx lr                 \n"
         " nop                   \n"
         ::
-    );
+  );
     for (;;)
       ; // noreturn
   }
@@ -27,14 +27,14 @@ inline void OSImpl::returnFromSubroutine(void)
         " bx lr                 \n"
         " nop                   \n"
         ::
-    );
+  );
     for (;;)
       ; // noreturn
   }
 
 inline void OSImpl::NOP(void)
   {
-    asm volatile( " nop":: );
+    asm volatile(" nop"::);
   }
 
 inline void OSImpl::interruptsEnable(void)
@@ -43,7 +43,7 @@ inline void OSImpl::interruptsEnable(void)
     (
         " cpsie i       \n"
         :::
-    );
+  );
   }
 
 inline void OSImpl::interruptsDisable(void)
@@ -52,7 +52,7 @@ inline void OSImpl::interruptsDisable(void)
     (
         " cpsid i       \n"
         :::
-    );
+  );
   }
 
 inline void OSImpl::interruptsClearMask(void)
@@ -62,7 +62,7 @@ inline void OSImpl::interruptsClearMask(void)
         " mov r0, #0            \n"
         " msr basepri, r0       \n"
         :::"r0"
-    );
+  );
   }
 
 inline void OSImpl::interruptsSetMask(void)
@@ -72,7 +72,7 @@ inline void OSImpl::interruptsSetMask(void)
         " mov r0, %0            \n"
         " msr basepri, r0       \n"
         ::"i"(configMAX_SYSCALL_INTERRUPT_PRIORITY):"r0"
-    );
+  );
   }
 
-#endif /*HAL_ARCH_OS_INLINES_H_*/
+#endif /* HAL_ARCH_OS_INLINES_H_ */

@@ -27,10 +27,10 @@ unsigned char SDI12Sensor::ms_buf[OS_CFGINT_SDI12SENSOR_BUFFER_SIZE
 
 volatile unsigned short SDI12Sensor::ms_bufCount;
 
-volatile unsigned char *SDI12Sensor::ms_pBuf;
-volatile unsigned char *SDI12Sensor::ms_pBufMax;
+volatile unsigned char* SDI12Sensor::ms_pBuf;
+volatile unsigned char* SDI12Sensor::ms_pBufMax;
 
-unsigned char *SDI12Sensor::ms_pParse;
+unsigned char* SDI12Sensor::ms_pParse;
 
 unsigned char SDI12Sensor::ms_tmp[OS_CFGINT_SDI12SENSOR_TMP_SIZE];
 
@@ -67,8 +67,8 @@ volatile OSTimerTicks_t SDI12Sensor::ms_periodicSeconds;
 
 unsigned char SDI12Sensor::ms_delayedMode;
 
-OSThread *SDI12Sensor::ms_pThread;
-OSThread *SDI12Sensor::ms_pThreadA;
+OSThread* SDI12Sensor::ms_pThread;
+OSThread* SDI12Sensor::ms_pThreadA;
 
 unsigned char SDI12Sensor::ms_doReset;
 
@@ -95,12 +95,12 @@ unsigned char SDI12Sensor::ms_prevValue3;
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
 
-SDI12Sensor::SDI12Sensor(const char *pNameAcquire,
-    const unsigned char *pStackAcquire, unsigned short stackSizeAcquire,
-    OSThreadPriority_t priorityAcquire, const char *pNamePeriodic,
-    const unsigned char *pStackPeriodic, unsigned short stackSizePeriodic,
-    OSThreadPriority_t priorityPeriodic, const char *pNameSDI12,
-    const unsigned char *pStackSDI12, unsigned short stackSizeSDI12,
+SDI12Sensor::SDI12Sensor(const char* pNameAcquire,
+    const unsigned char* pStackAcquire, unsigned short stackSizeAcquire,
+    OSThreadPriority_t priorityAcquire, const char* pNamePeriodic,
+    const unsigned char* pStackPeriodic, unsigned short stackSizePeriodic,
+    OSThreadPriority_t priorityPeriodic, const char* pNameSDI12,
+    const unsigned char* pStackSDI12, unsigned short stackSizeSDI12,
     OSThreadPriority_t prioritySDI12)
 
 :
@@ -298,10 +298,10 @@ void SDI12Sensor::threadMainSDI12(void)
     bool bIsCcmd;
     bIsCcmd = false;
 
-    OSThread *pThread;
+    OSThread* pThread;
     pThread = OSScheduler::getThreadCurrent();
 
-    OSThread *pThreadIdle;
+    OSThread* pThreadIdle;
     pThreadIdle = OSScheduler::getThreadIdle();
 
     bool bIdleAllowDeepSleep;
@@ -534,7 +534,7 @@ void SDI12Sensor::threadMainSDI12(void)
 #if defined(DEBUG)
                     OSDeviceDebug::putString(" srv ");
 #endif
-                    unsigned char *pBuf;
+                    unsigned char* pBuf;
                     pBuf = &ms_buf[0];
                     *pBuf++ = ms_ownAddress;
                     *pBuf++ = '\r';
@@ -568,7 +568,7 @@ void SDI12Sensor::threadMainSDI12(void)
                 if (ms_doReset == '1')
                   {
                     // TODO: portability
-                    eeprom_write_byte((uint8_t *) 0, 0xFF);
+                    eeprom_write_byte((uint8_t* ) 0, 0xFF);
                   }
                 OS::SOFTreset();
               }
@@ -751,7 +751,7 @@ bool SDI12Sensor::processCommand(void)
     cmdDigit = 0;
 
     // add string terminating mark
-    //unsigned char *ms_pBuf;
+    //unsigned char* ms_pBuf;
     ms_pBuf = &ms_buf[0];
 
     *ms_pBuf++ = ms_ownAddress;
@@ -765,7 +765,7 @@ bool SDI12Sensor::processCommand(void)
 #if OS_CFGBOOL_SDI12SENSOR_SUPPORT_WILD_CARD_ADDRESS
         && (addr != '?')
 #endif
-    )
+  )
     return false; // bad address
 
     if (cnt == 1)
@@ -920,7 +920,7 @@ bool SDI12Sensor::processCommand(void)
                     ms_pBufMax -= 3; // reserve space for crc
 
                     // pack response
-                    SDI12Value_t *pv;
+                    SDI12Value_t* pv;
                     pv = &ms_dValues[ms_dIndex];
                     //Led1::on();
 
@@ -982,7 +982,7 @@ bool SDI12Sensor::processCommand(void)
                 if (ms_rCount != 0)
                   {
                     // pack response
-                    SDI12Value_t *pv;
+                    SDI12Value_t* pv;
                     pv = &ms_rValues[0];
 
                     for (unsigned int i = 0; i < ms_rCount; ++i, pv++)
@@ -1046,7 +1046,7 @@ bool SDI12Sensor::processCommand(void)
         unsigned short crc;
         crc = 0;
 
-        unsigned char *p;
+        unsigned char* p;
         for (p = &ms_buf[0]; p < ms_pBuf; ++p)
         crc = crc16(crc, *p);
 
@@ -1078,7 +1078,7 @@ bool SDI12Sensor::processSystemXCommand(void)
     unsigned char cnt;
     cnt = ms_bufCount;
 
-    parseInit((const char *) &ms_buf[4]);
+    parseInit((const char*) &ms_buf[4]);
     if (syscmd == 'H')
       {
         storeStringResponse("TN,TS,TP,Tn,U,V,R,B");
@@ -1088,7 +1088,7 @@ bool SDI12Sensor::processSystemXCommand(void)
         int cThreads;
         cThreads = OSScheduler::getThreadsCount();
 
-        OSThread *pt;
+        OSThread* pt;
         syscmd = ms_buf[4];
         if (syscmd == 'N' || syscmd == 'S' || syscmd == 'P')
           {
@@ -1205,10 +1205,10 @@ bool SDI12Sensor::processSystemXCommand(void)
     return true;
   }
 
-unsigned char * SDI12Sensor::parseString(unsigned char *pStr,
+unsigned char*  SDI12Sensor::parseString(unsigned char* pStr,
     unsigned short len)
   {
-    unsigned char *p;
+    unsigned char* p;
     p = pStr;
 
     len--;
@@ -1316,7 +1316,7 @@ void SDI12Sensor::threadMainAcquire(void)
     // wait for initializations to complete
     ms_flags.wait(INITIALIZED);
 
-    OSThread *pThread;
+    OSThread* pThread;
     pThread = OSScheduler::getThreadCurrent();
 
     // thread endless loop
@@ -1331,7 +1331,7 @@ void SDI12Sensor::threadMainAcquire(void)
         ticksBegin = OSScheduler::timerSeconds.getTicks();
 
 #if defined(DEBUG)
-        OSDeviceDebug::putString(" [ ");
+        OSDeviceDebug::putString(" [");
         OSDeviceDebug::putChar(ms_dCmd);
         OSDeviceDebug::putChar(ms_dDigit + '0');
         OSDeviceDebug::putChar(' ');
@@ -1423,8 +1423,8 @@ void SDI12Sensor::storeStartMeasurementResponse(unsigned int seconds,
 bool SDI12Sensor::storeUnsignedResponse(unsigned long l, unsigned short n)
   {
 
-    unsigned char *pSave;
-    pSave = (unsigned char *) ms_pBuf;
+    unsigned char* pSave;
+    pSave = (unsigned char*) ms_pBuf;
 
     int i;
 
@@ -1461,8 +1461,8 @@ bool SDI12Sensor::storeFloatResponse(float f, unsigned short prec, bool bPlus)
   {
     //OSDebugLed1::off();
 
-    unsigned char *pSave;
-    pSave = (unsigned char *) ms_pBuf;
+    unsigned char* pSave;
+    pSave = (unsigned char*) ms_pBuf;
 
     bool minus;
     long l;
@@ -1529,7 +1529,7 @@ bool SDI12Sensor::storeFloatResponse(float f, unsigned short prec, bool bPlus)
     l = 9999999l;
 
     //OSDebugLed1::on();
-    unsigned char *p;
+    unsigned char* p;
     unsigned int nDigits;
     for (p = &ms_tmp[sizeof(ms_tmp) - 1], nDigits = 0; p > &ms_tmp[0]; p--)
       {
@@ -1546,7 +1546,7 @@ bool SDI12Sensor::storeFloatResponse(float f, unsigned short prec, bool bPlus)
             //OSDebugLed1::toggle();
             nDigits++;
           }
-        //OSDeviceDebug::putChar( *p );
+        //OSDeviceDebug::putChar(*p);
       }
     //OSDebugLed1::on();
 
@@ -1628,7 +1628,7 @@ void SDI12Sensor::threadMainPeriodic(void)
     // wait for things to settle down and start with second 1
     OSScheduler::timerSeconds.sleep(1);
 
-    OSThread *pThread;
+    OSThread* pThread;
     pThread = OSScheduler::getThreadCurrent();
 
     // thread endless loop
@@ -1832,7 +1832,7 @@ void SDI12Sensor::interruptTxServiceRoutine(void)
 #if defined(DEBUG)
         // show transmitted char on debug
         OSDeviceDebug::putChar(ch);
-        //OSDeviceDebug::putChar( '_' );
+        //OSDeviceDebug::putChar('_');
 #endif
         usartWriteByte(ch);
       }
@@ -1845,7 +1845,7 @@ void SDI12Sensor::interruptTxServiceRoutine(void)
 
 void SDI12Sensor::interruptTxCompleteServiceRoutine(void)
   {
-    //OSDeviceDebug::putChar( ']' );
+    //OSDeviceDebug::putChar(']');
 
     interruptTxCompleteDisable();
 
@@ -1973,10 +1973,10 @@ bool SDI12Sensor::storeCharResponse(unsigned char ch)
     return true;
   }
 
-bool SDI12Sensor::storeStringResponse(const char *pStr, unsigned short n)
+bool SDI12Sensor::storeStringResponse(const char* pStr, unsigned short n)
   {
-    unsigned char *pSave;
-    pSave = (unsigned char *) ms_pBuf;
+    unsigned char* pSave;
+    pSave = (unsigned char*) ms_pBuf;
 
     bool b;
     b = true;
@@ -1993,8 +1993,8 @@ bool SDI12Sensor::storeStringResponse(const char *pStr, unsigned short n)
 #if defined(OS_INCLUDE_SDI12SENSOR)
 bool SDI12Sensor::storeUnsignedResponse(unsigned short w, unsigned short n)
   {
-    unsigned char *pSave;
-    pSave = (unsigned char *) ms_pBuf;
+    unsigned char* pSave;
+    pSave = (unsigned char*) ms_pBuf;
 
     int i;
 
@@ -2048,7 +2048,7 @@ bool SDI12Sensor::storeHexResponse(unsigned short w)
   }
 #endif
 
-void SDI12Sensor::parseInit(const char *p)
+void SDI12Sensor::parseInit(const char* p)
   {
     ms_pParse = (unsigned char*) p;
 #if true
@@ -2148,15 +2148,15 @@ unsigned short SDI12Sensor::parseHex(void)
     unsigned char c;
 
     w = 0;
-    while ( (c = *ms_pParse) != '\0')
+    while ((c = *ms_pParse) != '\0')
       {
         c = toupper(c);
-        if ( '0' <= c && c <= '9')
+        if ('0' <= c && c <= '9')
           {
             w <<= 4;
             w |= (unsigned char)(c - '0');
           }
-        else if ( 'A' <= c && c <= 'F')
+        else if ('A' <= c && c <= 'F')
           {
             w <<= 4;
             w |= (unsigned char)(c - 'A' + 10);
@@ -2326,8 +2326,8 @@ bool SDI12Sensor::writeResponse(void)
         unsigned short crc;
         crc = 0;
 
-        unsigned char *p;
-        for (p = &ms_buf[ 0 ]; p < ms_pBuf; ++p)
+        unsigned char* p;
+        for (p = &ms_buf[0]; p < ms_pBuf; ++p)
         crc = crc16(crc, *p);
 
         *ms_pBuf++ = (crc >> 12) | 0x40;

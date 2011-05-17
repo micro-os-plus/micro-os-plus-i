@@ -99,4 +99,4 @@
 #define OS_CONFIG_DEBUG_LED2_BIT                        9
 #endif
 
-#endif /*HAL_BOARD_OS_DEFINES_H_*/
+#endif /* HAL_BOARD_OS_DEFINES_H_ */

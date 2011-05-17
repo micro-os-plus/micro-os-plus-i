@@ -83,7 +83,7 @@ inline void SDI12Sensor::timerInit(void)
   {
     TCCR2A = 0; // Normal (counter) mode
     TCCR2B = 3; // clk/32 = 1024Hz
-    ASSR = _BV( AS2 ); // Timer2 clocked from crystal
+    ASSR = _BV(AS2); // Timer2 clocked from crystal
     TIMSK2 = 0; // no interrupts enabled   
   }
 
@@ -128,7 +128,7 @@ inline bool SDI12Sensor::pinChangedIsHigh(void)
 
 inline bool SDI12Sensor::pinChanged(unsigned char crt, unsigned char prev)
   {
-    return ( ((crt ^ prev) & _BV(PIND0) ) != 0);
+    return (((crt ^ prev) & _BV(PIND0)) != 0);
   }
 
 inline bool SDI12Sensor::pinChangedIsHigh(unsigned char crt)
@@ -158,4 +158,4 @@ inline void SDI12Sensor::interruptTxCompleteDisable(void)
   }
 #endif
 
-#endif /*HAL_BOARD_SDI12SENSOR_INLINES_H_*/
+#endif /* HAL_BOARD_SDI12SENSOR_INLINES_H_ */

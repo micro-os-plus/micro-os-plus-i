@@ -16,10 +16,10 @@
 
 #if (OS_CFGBOOL_DEVICECHARACTERUSART_TX_CONTEXT_SWITCH)
 
-extern "C" void USART1_UDRE_vect( void ) __attribute__( ( signal, naked ) );
+extern "C" void USART1_UDRE_vect(void) __attribute__((signal, naked));
 
 void
-USART1_UDRE_vect( void )
+USART1_UDRE_vect(void)
   {
     // interrupts disabled in here
     OSScheduler::interruptEnter();
@@ -33,7 +33,7 @@ USART1_UDRE_vect( void )
 #else
 
 extern "C"
-void USART1_UDRE_vect( void ) __attribute__( ( signal ) );
+void USART1_UDRE_vect(void) __attribute__((signal));
 
 void USART1_UDRE_vect(void)
   {
@@ -42,14 +42,14 @@ void USART1_UDRE_vect(void)
     DeviceCharacterUsart::ms_pThis->interruptTxServiceRoutine();
   }
 
-#endif /*OS_CFGBOOL_DEVICECHARACTERUSART_TX_CONTEXT_SWITCH*/
+#endif /* OS_CFGBOOL_DEVICECHARACTERUSART_TX_CONTEXT_SWITCH */
 
 #if (OS_CFGBOOL_DEVICECHARACTERUSART_RX_CONTEXT_SWITCH)
 
-extern "C" void USART1_RX_vect( void ) __attribute__( ( signal, naked ) );
+extern "C" void USART1_RX_vect(void) __attribute__((signal, naked));
 
 void
-USART1_RX_vect( void )
+USART1_RX_vect(void)
   {
     // interrupts disabled in here
     OSScheduler::interruptEnter();
@@ -63,7 +63,7 @@ USART1_RX_vect( void )
 #else
 
 extern "C"
-void USART1_RX_vect( void ) __attribute__( ( signal ) );
+void USART1_RX_vect(void) __attribute__((signal));
 
 void USART1_RX_vect(void)
   {
@@ -72,6 +72,6 @@ void USART1_RX_vect(void)
     DeviceCharacterUsart::ms_pThis->interruptRxServiceRoutine();
   }
 
-#endif /*OS_CFGBOOL_DEVICECHARACTERUSART_RX_CONTEXT_SWITCH*/
+#endif /* OS_CFGBOOL_DEVICECHARACTERUSART_RX_CONTEXT_SWITCH */
 
 #endif

@@ -34,7 +34,7 @@ void DeviceCharacterMultiUsart0::implPortInit(void)
     OSCriticalSection::enter();
       {
         OSDeviceDebug::putString("Baud constant=");
-        OSDeviceDebug::putDec( ( unsigned short ) DEVICECHARACTERMULTIUSART0_BAUD_CONSTANT, 0);
+        OSDeviceDebug::putDec((unsigned short) DEVICECHARACTERMULTIUSART0_BAUD_CONSTANT, 0);
         OSDeviceDebug::putNewLine();
       }
     OSCriticalSection::exit();
@@ -52,7 +52,7 @@ void DeviceCharacterMultiUsart0::implPortInit(void)
     UCSR0B = _BV(RXCIE1) | _BV(RXEN1) | _BV(TXEN1);
 
     /* Set 2-bit stop and the data bits to 8. */
-    UCSR0C = ( ( 1 << USBS1 ) | ( 3 << UCSZ10 ));
+    UCSR0C = ((1 << USBS1) | (3 << UCSZ10));
   }
 
 unsigned char DeviceCharacterMultiUsart0::implPortRead(void)
@@ -79,10 +79,10 @@ void DeviceCharacterMultiUsart0::implInterruptTxDisable(void)
 
 #if (OS_CFGBOOL_DEVICECHARACTERMULTIUSART0_TX_CONTEXT_SWITCH)
 
-extern "C" void USART0_UDRE_vect( void ) __attribute__( ( signal, naked ) );
+extern "C" void USART0_UDRE_vect(void) __attribute__((signal, naked));
 
 void
-USART0_UDRE_vect( void )
+USART0_UDRE_vect(void)
   {
     // interrupts disabled in here
     OSScheduler::interruptEnter();
@@ -96,7 +96,7 @@ USART0_UDRE_vect( void )
 #else
 
 extern "C"
-void USART0_UDRE_vect( void ) __attribute__( ( signal ) );
+void USART0_UDRE_vect(void) __attribute__((signal));
 
 void USART0_UDRE_vect(void)
   {
@@ -105,14 +105,14 @@ void USART0_UDRE_vect(void)
     DeviceCharacterMultiUsart0::ms_pThis->interruptTxServiceRoutine();
   }
 
-#endif /*OS_CFGBOOL_DEVICECHARACTERMULTIUSART0_TX_CONTEXT_SWITCH*/
+#endif /* OS_CFGBOOL_DEVICECHARACTERMULTIUSART0_TX_CONTEXT_SWITCH */
 
 #if (OS_CFGBOOL_DEVICECHARACTERMULTIUSART0_RX_CONTEXT_SWITCH)
 
-extern "C" void USART0_RX_vect( void ) __attribute__( ( signal, naked ) );
+extern "C" void USART0_RX_vect(void) __attribute__((signal, naked));
 
 void
-USART0_RX_vect( void )
+USART0_RX_vect(void)
   {
     // interrupts disabled in here
     OSScheduler::interruptEnter();
@@ -126,7 +126,7 @@ USART0_RX_vect( void )
 #else
 
 extern "C"
-void USART0_RX_vect( void ) __attribute__( ( signal ) );
+void USART0_RX_vect(void) __attribute__((signal));
 
 void USART0_RX_vect(void)
   {
@@ -135,7 +135,7 @@ void USART0_RX_vect(void)
     DeviceCharacterMultiUsart0::ms_pThis->interruptRxServiceRoutine();
   }
 
-#endif /*OS_CFGBOOL_DEVICECHARACTERMULTIUSART0_RX_CONTEXT_SWITCH*/
+#endif /* OS_CFGBOOL_DEVICECHARACTERMULTIUSART0_RX_CONTEXT_SWITCH */
 
 
-#endif /*OS_INCLUDE_DEVICECHARACTERMULTIUSART0*/
+#endif /* OS_INCLUDE_DEVICECHARACTERMULTIUSART0 */

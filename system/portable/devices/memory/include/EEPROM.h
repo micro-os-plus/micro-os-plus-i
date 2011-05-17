@@ -23,8 +23,8 @@ public:
   readWord(unsigned short offset);
   static float
   readFloat(unsigned short offset);
-  static unsigned char *
-  readString(unsigned short offset, unsigned char *pStr, unsigned short len);
+  static unsigned char* 
+  readString(unsigned short offset, unsigned char* pStr, unsigned short len);
 
   static void
   writeByte(unsigned short offset, unsigned char b);
@@ -33,7 +33,7 @@ public:
   static void
   writeFloat(unsigned short offset, float f);
   static void
-  writeString(unsigned short offset, const unsigned char *pStr,
+  writeString(unsigned short offset, const unsigned char* pStr,
       unsigned short len);
 
   // --- implementation methods
@@ -42,14 +42,14 @@ public:
   static unsigned short
   implReadWord(unsigned short offset);
   static void
-  implReadBlock(unsigned short offset, void *pointer_ram, size_t n);
+  implReadBlock(unsigned short offset, void* pointer_ram, size_t n);
 
   static void
   implWriteByte(unsigned short offset, unsigned char b);
   static void
   implWriteWord(unsigned short offset, unsigned short w);
   static void
-  implWriteBlock(unsigned short offset, void *pointer_ram, size_t n);
+  implWriteBlock(unsigned short offset, void* pointer_ram, size_t n);
 
 };
 
@@ -71,4 +71,4 @@ inline void EEPROM::writeByte(unsigned short offset, unsigned char b)
   }
 #endif
 
-#endif /*EEPROM_H_*/
+#endif /* EEPROM_H_ */

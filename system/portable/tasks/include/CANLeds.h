@@ -80,7 +80,7 @@ private:
 class CANLeds : public OSThread
   {
 public:
-  CANLeds(const char *pName);
+  CANLeds(const char* pName);
 
   // actual thread main code
   virtual void threadMain(void);
@@ -112,4 +112,4 @@ private:
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*TASKCANLEDS_H_*/
+#endif /* TASKCANLEDS_H_ */

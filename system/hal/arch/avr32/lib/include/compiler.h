@@ -716,7 +716,7 @@ typedef struct
 #elif (defined __ICCAVR32__)
   #define Reset_CPU() \
   {\
-    extern void *volatile __program_start;\
+    extern void* volatile __program_start;\
     __asm__ __volatile__ (\
       "mov     r7, LWRD(__program_start)\n\t"\
       "orh     r7, HWRD(__program_start)\n\t"\

@@ -14,7 +14,7 @@
 #include "portable/misc/include/ASCII.h"
 
 CommandLineInterface::CommandLineInterface(istream& cin, ostream& cout,
-    unsigned char *pLine, unsigned short iSize) :
+    unsigned char* pLine, unsigned short iSize) :
   m_cin(cin), m_cout(cout)
 {
   OSDeviceDebug::putConstructor_P(PSTR("CommandLineInterface"), this);
@@ -85,7 +85,7 @@ CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
 int
 CommandLineInterface::readLine()
 {
-  unsigned char * pc;
+  unsigned char*  pc;
   int c;
 
   istream& cin = m_cin;
@@ -137,7 +137,7 @@ CommandLineInterface::readLine()
             }
         }
     }
-  //*pc++ = ' ';
+  // *pc++ = ' ';
   *pc = '\0';
 
   return pc - m_pLine;

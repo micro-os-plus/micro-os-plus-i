@@ -73,7 +73,7 @@ public:
   // start the scheduler.
   // the scheduler cannot be stopped if it was started.
   static void
-  start(void) __attribute__( ( noreturn ) );
+  start(void) __attribute__((noreturn));
 
   // return true if the the scheduler was started
   static bool
@@ -211,7 +211,7 @@ public:
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
   // Notifies a thread which is waiting for time events
   // (something like kill command in linux - SIGKILL)
-  static void ISRcancelThread(OSThread *pThread);
+  static void ISRcancelThread(OSThread* pThread);
 #endif
 
   // pointer to the active thread (running thread)
@@ -232,7 +232,7 @@ private:
   setThreadIdle(OSThread*);
 
   // TODO: remove if no longer needed
-  //static void timerISR(void) __attribute__( ( naked ) );
+  //static void timerISR(void) __attribute__((naked));
   //  static void
   //  timerISR(void);
 
@@ -296,7 +296,7 @@ public:
 #endif
 
   // TODO: remove if no longer needed
-  //static void dumpContextInfo(void *pContext);
+  //static void dumpContextInfo(void* pContext);
 
   // dump context info to the device debug
   static void
@@ -441,7 +441,7 @@ OSSchedulerLock::exit(void)
 
 // ============================================================================
 
-inline OSThread *
+inline OSThread* 
 OSActiveThreads::getTop(void)
 {
   return ms_array[0];
@@ -475,20 +475,20 @@ OSScheduler::isPreemptive(void)
 #endif
 }
 
-inline OSThread *
+inline OSThread* 
 OSScheduler::getThreadCurrent(void)
 {
   return ms_pThreadRunning;
 }
 
-inline OSThread *
+inline OSThread* 
 OSScheduler::getThreadIdle(void)
 {
   return ms_pThreadIdle;
 }
 
 inline void
-OSScheduler::setThreadIdle(OSThread * pt)
+OSScheduler::setThreadIdle(OSThread* pt)
 {
   ms_pThreadIdle = pt;
 }

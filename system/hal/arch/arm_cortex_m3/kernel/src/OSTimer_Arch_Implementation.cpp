@@ -61,8 +61,8 @@ void OSTimerSeconds::init(void)
 #if defined(OS_INCLUDE_32KHZ_TIMER)
     TCCR2A = 0; // Normal (counter) mode
     TCCR2B = 5; // clk/128
-    ASSR = _BV( AS2 ); // Timer2 clocked from crystal
-    TIMSK2 = _BV( TOIE2 );
+    ASSR = _BV(AS2); // Timer2 clocked from crystal
+    TIMSK2 = _BV(TOIE2);
 #endif
   }
 

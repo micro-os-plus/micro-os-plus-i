@@ -50,4 +50,4 @@ inline unsigned char OSDebugLed2::bitNumber(void)
     return OS_CONFIG_DEBUG_LED2_BIT;
   }
 
-#endif /*OSDEBUGLED2_INLINES_H_*/
+#endif /* OSDEBUGLED2_INLINES_H_ */

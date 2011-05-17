@@ -26,4 +26,4 @@ inline void TaskPitpalac::ledOff(void)
     BlinkLed::off();
   }
 
-#endif /*TASKPITPALAC_INLINES_H_*/
+#endif /* TASKPITPALAC_INLINES_H_ */

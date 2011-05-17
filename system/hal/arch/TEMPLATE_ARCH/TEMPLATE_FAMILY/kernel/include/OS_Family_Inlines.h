@@ -16,7 +16,7 @@ OSCPUImpl::stackInit(void)
       :
       :
       :
-  );
+);
 }
 
 inline OSResetBits_t
@@ -34,7 +34,7 @@ OSCPUImpl::returnFromInterrupt(void)
       :
       :
       :
-  );
+);
   for (;;)
     ; // noreturn
 }
@@ -49,7 +49,7 @@ OSCPUImpl::returnFromSubroutine(void)
       :
       :
       :
-  );
+);
   for (;;)
     ; // noreturn
 }
@@ -64,7 +64,7 @@ OSCPUImpl::nop(void)
       :
       :
       :
-  );
+);
 }
 
 inline void
@@ -77,7 +77,7 @@ OSCPUImpl::interruptsEnable(void)
       :
       :
       :
-  );
+);
 }
 
 inline void
@@ -90,7 +90,7 @@ OSCPUImpl::interruptsDisable(void)
       :
       :
       :
-  );
+);
 }
 
 inline void
@@ -103,7 +103,7 @@ OSCPUImpl::idle(void)
       :
       :
       :
-  );
+);
 }
 
 inline void
@@ -116,7 +116,7 @@ OSCPUImpl::sleep(void)
       :
       :
       :
-  );
+);
 }
 
 inline void
@@ -129,7 +129,7 @@ OSCPUImpl::deepSleep(void)
       :
       :
       :
-  );
+);
 }
 
 inline void
@@ -165,7 +165,7 @@ OSCPUImpl::stackPush(OSStack_t reg)
       :
       : [R] "r" (tmp)
       : "sp"
-  );
+);
 }
 
 inline OSStack_t
@@ -180,7 +180,7 @@ OSCPUImpl::stackPop(void)
       : [R] "=r" (tmp)
       :
       : "sp"
-  );
+);
   return tmp;
 }
 
@@ -196,7 +196,7 @@ OSCPUImpl::getInterruptsMask(void)
       : [R] "=r" (tmp)
       :
       :
-  );
+);
 
   return tmp;
 }
@@ -215,7 +215,7 @@ OSCPUImpl::setInterruptsMask(OSInterruptsMask_t mask)
       :
       : [R] "r" (tmp)
       :
-  );
+);
 }
 
 #endif /* HAL_FAMILY_OS_INLINES_H_ */

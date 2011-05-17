@@ -9,7 +9,7 @@
 
 // ----------------------------------------------------------------------------
 
-#define PGM_VOID_P      void *
+#define PGM_VOID_P      void*
 
 // ----------------------------------------------------------------------------
 
@@ -288,9 +288,9 @@ Wr_bits(AVR32_USBB_uecfgx(ep), AVR32_USBB_UECFGX_EPTYPE_MASK |\
                                AVR32_USBB_UECFGX_EPSIZE_MASK |\
                                AVR32_USBB_UECFGX_EPBK_MASK,   \
         (((U32)(type) << AVR32_USBB_UECFGX_EPTYPE_OFFSET) & AVR32_USBB_UECFGX_EPTYPE_MASK) |\
-        (((U32)(dir ) << AVR32_USBB_UECFGX_EPDIR_OFFSET ) & AVR32_USBB_UECFGX_EPDIR_MASK ) |\
-        ( (U32)AVR32_usb_format_endpoint_size(size) << AVR32_USBB_UECFGX_EPSIZE_OFFSET         ) |\
-        (((U32)(bank) << AVR32_USBB_UECFGX_EPBK_OFFSET  ) & AVR32_USBB_UECFGX_EPBK_MASK  )),\
+        (((U32)(dir) << AVR32_USBB_UECFGX_EPDIR_OFFSET) & AVR32_USBB_UECFGX_EPDIR_MASK) |\
+        ((U32)AVR32_usb_format_endpoint_size(size) << AVR32_USBB_UECFGX_EPSIZE_OFFSET       ) |\
+        (((U32)(bank) << AVR32_USBB_UECFGX_EPBK_OFFSET) & AVR32_USBB_UECFGX_EPBK_MASK)),\
 AVR32_usb_allocate_memory(ep),\
 \
 AVR32_is_usb_endpoint_configured(ep)\

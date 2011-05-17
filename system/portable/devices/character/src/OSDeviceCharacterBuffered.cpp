@@ -14,9 +14,9 @@
 
 // ----- constructors ---------------------------------------------------------
 
-OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
+OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char* pRxBuf,
     unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
-    unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
+    unsigned char* pTxBuf, unsigned short txBufSize, unsigned short txHWM,
     unsigned short txLWM) :
   m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM), m_txBuf(pTxBuf, txBufSize, txHWM,
       txLWM)
@@ -26,8 +26,8 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
   m_sending = false;
 }
 
-OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
-    unsigned short rxBufSize, unsigned char *pTxBuf, unsigned short txBufSize) :
+OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char* pRxBuf,
+    unsigned short rxBufSize, unsigned char* pTxBuf, unsigned short txBufSize) :
   m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4), m_txBuf(pTxBuf,
       txBufSize, txBufSize * 3 / 4, txBufSize / 4)
 {
@@ -37,9 +37,9 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char *pRxBuf,
 }
 
 void
-OSDeviceCharacterBuffered::init(unsigned char *pTxBuf,
+OSDeviceCharacterBuffered::init(unsigned char* pTxBuf,
     unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM,
-    unsigned char *pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
+    unsigned char* pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
     unsigned short rxLWM)
 {
 #if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
@@ -201,7 +201,7 @@ OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
         {
           // if there is enough space, check if the character is
           // in the given array
-          unsigned char *p;
+          unsigned char* p;
           for (p = m_pReadMatchArray; *p != '\0'; ++p)
             {
               if (*p == c)

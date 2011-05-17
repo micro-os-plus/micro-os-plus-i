@@ -35,7 +35,7 @@ int DeviceCharacterUsart0::implPortInit(void)
       {
         OSDeviceDebug::putString_P(PSTR("Baud constant="));
         OSDeviceDebug::putDec(
-            ( unsigned short ) DEVICECHARACTERUSART0_BAUD_CONSTANT, 0);
+            (unsigned short) DEVICECHARACTERUSART0_BAUD_CONSTANT, 0);
         OSDeviceDebug::putNewLine();
       }
     OSCriticalSection::exit();
@@ -53,7 +53,7 @@ int DeviceCharacterUsart0::implPortInit(void)
     UCSR0B = _BV(RXCIE1) | _BV(RXEN1) | _BV(TXEN1);
 
     /* Set 2-bit stop and the data bits to 8. */
-    UCSR0C = ( ( 1 << USBS1 ) | ( 3 << UCSZ10 ));
+    UCSR0C = ((1 << USBS1) | (3 << UCSZ10));
     
     return 0;
   }
@@ -83,7 +83,7 @@ void DeviceCharacterUsart0::implInterruptTxDisable(void)
 #if (OS_CFGBOOL_DEVICECHARACTERUSART0_TX_CONTEXT_SWITCH)
 
 extern "C"
-void  USART0_UDRE_vect( void ) __attribute__( ( signal, naked ) );
+void  USART0_UDRE_vect(void) __attribute__((signal, naked));
 
 void USART0_UDRE_vect(void)
   {
@@ -99,7 +99,7 @@ void USART0_UDRE_vect(void)
 #else
 
 extern "C"
-void USART0_UDRE_vect( void ) __attribute__( ( signal ) );
+void USART0_UDRE_vect(void) __attribute__((signal));
 
 void USART0_UDRE_vect(void)
   {
@@ -108,12 +108,12 @@ void USART0_UDRE_vect(void)
     DeviceCharacterUsart0::ms_pThis->interruptTxServiceRoutine();
   }
 
-#endif /*OS_CFGBOOL_DEVICECHARACTERUSART1_TX_CONTEXT_SWITCH*/
+#endif /* OS_CFGBOOL_DEVICECHARACTERUSART1_TX_CONTEXT_SWITCH */
 
 #if (OS_CFGBOOL_DEVICECHARACTERUSART0_RX_CONTEXT_SWITCH)
 
 extern "C"
-void  USART0_RX_vect( void ) __attribute__( ( signal, naked ) );
+void  USART0_RX_vect(void) __attribute__((signal, naked));
 
 void USART0_RX_vect(void)
   {
@@ -129,7 +129,7 @@ void USART0_RX_vect(void)
 #else
 
 extern "C"
-void USART0_RX_vect( void ) __attribute__( ( signal ) );
+void USART0_RX_vect(void) __attribute__((signal));
 
 void USART0_RX_vect(void)
   {
@@ -138,6 +138,6 @@ void USART0_RX_vect(void)
     DeviceCharacterUsart0::ms_pThis->interruptRxServiceRoutine();
   }
 
-#endif /*OS_CFGBOOL_DEVICECHARACTERUSART0_RX_CONTEXT_SWITCH*/
+#endif /* OS_CFGBOOL_DEVICECHARACTERUSART0_RX_CONTEXT_SWITCH */
 
-#endif /*OS_INCLUDE_DEVICECHARACTERUSART0*/
+#endif /* OS_INCLUDE_DEVICECHARACTERUSART0 */

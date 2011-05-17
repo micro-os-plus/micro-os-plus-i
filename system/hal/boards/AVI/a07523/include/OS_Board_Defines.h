@@ -64,4 +64,4 @@
 
 #include "hal/boards/AVI/include/DebugLeds_B3B1B2_Defines.h"
 
-#endif /*HAL_BOARD_OS_DEFINES_H_*/
+#endif /* HAL_BOARD_OS_DEFINES_H_ */

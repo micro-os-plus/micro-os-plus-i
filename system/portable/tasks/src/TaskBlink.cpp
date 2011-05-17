@@ -16,7 +16,7 @@
  *
  */
 
-TaskBlink::TaskBlink(const char *pName, schedTicks_t rate) :
+TaskBlink::TaskBlink(const char* pName, schedTicks_t rate) :
 
   OSThread(pName, m_stack, sizeof(m_stack)), m_timerSeconds((OSTimer*)
       &OSScheduler::timerSeconds)

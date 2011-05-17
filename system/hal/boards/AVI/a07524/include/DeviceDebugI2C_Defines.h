@@ -11,4 +11,4 @@
 
 #include "hal/boards/AVI/include/DeviceDebugI2CAddr_Defines.h"
 
-#endif /*HAL_BOARD_DEVICEDEBUGI2C_DEFINES_H_*/
+#endif / *HAL_BOARD_DEVICEDEBUGI2C_DEFINES_H_ */

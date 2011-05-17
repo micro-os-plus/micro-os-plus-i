@@ -40,7 +40,7 @@ public:
   static void
   processDelayedActions(void);
   static void
-  threadMain(void) __attribute__( ( noreturn ) );
+  threadMain(void) __attribute__((noreturn));
 
   static unsigned char ms_doReset;
   static unsigned short ms_addr;
@@ -62,4 +62,4 @@ public:
 
 };
 
-#endif /*SDI12BOOTLOADER_H_*/
+#endif /* SDI12BOOTLOADER_H_ */

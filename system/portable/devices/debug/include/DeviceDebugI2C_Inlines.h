@@ -72,7 +72,7 @@ masterSdaSynchronize(void);
 extern void
 masterStart(void);
 extern void
-masterDelay(int n) __attribute__( ( noinline ) );
+masterDelay(int n) __attribute__((noinline));
 
 extern void
 masterPutAddress(unsigned char addr, unsigned char mode);
@@ -301,7 +301,7 @@ OSDeviceDebug::implPutByte(unsigned char c)
 }
 
 inline int
-OSDeviceDebug::implPutBytes(const char *s, unsigned int n)
+OSDeviceDebug::implPutBytes(const char* s, unsigned int n)
 {
   unsigned int i;
 #if defined(OS_INCLUDE_DEVICEDEBUGI2C_SINGLE_BYTE)
@@ -336,4 +336,4 @@ OSDeviceDebug::implPutBytes(const char *s, unsigned int n)
   return n;
 }
 
-#endif /*DEVICEDEBUGI2C_INLINES_H_*/
+#endif /* DEVICEDEBUGI2C_INLINES_H_ */

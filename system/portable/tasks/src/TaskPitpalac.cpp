@@ -18,7 +18,7 @@
  *
  */
 
-TaskPitpalac::TaskPitpalac(const char *pName, schedTicks_t rate) :
+TaskPitpalac::TaskPitpalac(const char* pName, schedTicks_t rate) :
   OSThread(pName, m_stack, sizeof(m_stack))
   {
     OSDeviceDebug::putConstructor_P(PSTR("TaskPitpalac"), this);

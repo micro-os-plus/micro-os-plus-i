@@ -36,4 +36,4 @@ public:
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*DEVICECANTRANSCEIVER_H_*/
+#endif /* DEVICECANTRANSCEIVER_H_ */

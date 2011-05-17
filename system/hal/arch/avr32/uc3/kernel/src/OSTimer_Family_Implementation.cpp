@@ -114,7 +114,7 @@ OSTimerTicks::implInit(void)
   OSDeviceDebug::putDec(COUNTER);
   OSDeviceDebug::putNewLine();
 
-#endif /*defined(DEBUG)*/
+#endif /* defined(DEBUG) */
 
   // set RC value
   tc_reg->channel[OS_CFGINT_TIMER_CHANNEL].RC.rc = COUNTER;
@@ -132,7 +132,7 @@ OSTimerTicks::implInit(void)
   //register the interrupt
   INTC_register_interrupt(SysTick_contextHandler, COUNT_IRQ_NUM,
       OS_CFGINT_TIMER_IRQ_LEVEL);
-#endif /*defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER)*/
+#endif /* defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER) */
 }
 
 
@@ -143,13 +143,13 @@ SysTick_contextHandler(void)
   OSScheduler::interruptEnter();
 #else
   OSScheduler::ISR_ledActiveOn();
-#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)*/
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
     {
       OSScheduler::timerTicks.interruptServiceRoutine();
     }
 #if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
   OSScheduler::interruptExit();
-#endif /*!defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)*/
+#endif /* !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
 }
 
 void
@@ -160,7 +160,7 @@ OSTimerTicks::implAcknowledgeInterrupt(void)
 #else
   Set_system_register(AVR32_COMPARE, OS_CFGLONG_OSCILLATOR_HZ
       /OS_CFGINT_TICK_RATE_HZ);
-#endif /*defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER)*/
+#endif /* defined(OS_INCLUDE_OSTIMERTICKS_IMPLINIT_TIMERCOUNTER) */
 }
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
@@ -178,7 +178,7 @@ OSTimerSeconds::init(void)
 #if defined(DEBUG)
         OSDeviceDebug::putChar('Q');
         OSDeviceDebug::putNewLine();
-#endif /*defined(DEBUG)*/
+#endif /* defined(DEBUG) */
       }
     else
       {
@@ -187,7 +187,7 @@ OSTimerSeconds::init(void)
 #if defined(DEBUG)
         OSDeviceDebug::putChar('R');
         OSDeviceDebug::putNewLine();
-#endif /*defined(DEBUG)*/
+#endif /* defined(DEBUG) */
       }
 
     rtc_enable_wake_up(rtc_reg);
@@ -196,7 +196,7 @@ OSTimerSeconds::init(void)
     INTC_register_interrupt(SysSeconds_contextHandler, AVR32_RTC_IRQ,
         OS_CFGINT_TIMER_IRQ_LEVEL);
     rtc_enable_interrupt(rtc_reg);
-#endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
+#endif /* defined(OS_INCLUDE_32KHZ_TIMER) */
   }
 
 void
@@ -204,7 +204,7 @@ OSTimerSeconds::implAcknowledgeInterrupt(void)
   {
 #if defined(OS_INCLUDE_32KHZ_TIMER)
     rtc_clear_interrupt(&AVR32_RTC);
-#endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
+#endif /* defined(OS_INCLUDE_32KHZ_TIMER) */
   }
 
 #if defined(OS_INCLUDE_32KHZ_TIMER)
@@ -215,17 +215,17 @@ SysSeconds_contextHandler(void)
     OSScheduler::interruptEnter();
 #else
     OSScheduler::ISR_ledActiveOn();
-#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION) */
       {
         OSScheduler::timerSeconds.interruptServiceRoutine();
       }
 #if !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION)
     OSScheduler::interruptExit();
-#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION) */
   }
-#endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
+#endif /* defined(OS_INCLUDE_32KHZ_TIMER) */
 
-#endif /*defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)*/
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
 

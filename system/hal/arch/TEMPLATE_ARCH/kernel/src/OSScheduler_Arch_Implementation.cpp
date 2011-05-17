@@ -10,9 +10,9 @@
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-OSStack_t *
-OSSchedulerImpl::stackInitialise(OSStack_t * pStackTop, void
-(*pCode)(void *), void *pParams, unsigned char id)
+OSStack_t* 
+OSSchedulerImpl::stackInitialise(OSStack_t* pStackTop, void
+(*pCode)(void*), void* pParams, unsigned char id)
 {
   /* The value on the right is the offset from the thread stack pointer */
 
@@ -60,7 +60,7 @@ OSSchedulerImpl::stackInitialise(OSStack_t * pStackTop, void
       OSDeviceDebug::putString(" PC=");
       OSDeviceDebug::putPtr((void*) pCode);
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_DUMPSTACK)
-      OSStack_t *p;
+      OSStack_t* p;
       int i;
       for (p = pStackTop, i = 0; i < STACK_WORD_COUNT; p++, i++)
         {
@@ -95,12 +95,12 @@ OSSchedulerImpl::start(void)
 #if defined(DEBUG)
 
 void
-OSSchedulerImpl::dumpContextInfo(OSThread * pThread)
+OSSchedulerImpl::dumpContextInfo(OSThread* pThread)
 {
   OSDeviceDebug::putChar('\'');
   OSDeviceDebug::putString(pThread->getName());
 
-  OSStack_t * pStack;
+  OSStack_t* pStack;
   pStack = pThread->getStack();
   OSDeviceDebug::putString("' SP=");
   OSDeviceDebug::putPtr(pStack);
@@ -109,7 +109,7 @@ OSSchedulerImpl::dumpContextInfo(OSThread * pThread)
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_DUMPSTACK)
 
-  const char * sRegNames[] =
+  const char*  sRegNames[] =
     { "R7", "R6", "R5", "R4", "R3", "R2", "R1", "R0", "SR", "PC", "LR",
       "R12", "R11", "R10", "R9", "R8", "X"};
 

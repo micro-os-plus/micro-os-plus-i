@@ -109,4 +109,4 @@ OSDeviceCAN::setPowered(bool flag)
   m_isPowered = flag;
 }
 
-#endif /*OSDEVICECAN_H_*/
+#endif /* OSDEVICECAN_H_ */

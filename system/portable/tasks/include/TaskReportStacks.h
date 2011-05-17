@@ -13,7 +13,7 @@ class TaskReportStacks : public OSThread
 {
 public:
   // thread constructor
-  TaskReportStacks(const char *pName, schedTicks_t rateSeconds,
+  TaskReportStacks(const char* pName, schedTicks_t rateSeconds,
       schedTicks_t maxSeconds, unsigned char increaseRate);
 
   // actual thread main code

@@ -16,7 +16,7 @@ inline unsigned char Flash::getUninitialisedValue(void)
 
 inline unsigned char Flash::implReadByte(unsigned short offset)
   {
-    return pgm_read_byte((const uint8_t *)offset) ;
+    return pgm_read_byte((const uint8_t* )offset) ;
   }
 
 inline void Flash::implPageErase(FlashAddress_t addr)
@@ -49,4 +49,4 @@ inline void Flash::implEnableRead(void)
     boot_rww_enable();
   }
 
-#endif /*HAL_FLASH_INLINES_H_*/
+#endif /* HAL_FLASH_INLINES_H_ */

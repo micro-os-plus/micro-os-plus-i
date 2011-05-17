@@ -216,7 +216,7 @@ void DeviceCAN_MCP2510::interruptServiceRoutine(void)
           {
             // Transmit Buffer 1
 #ifdef CAN_TX1_ISR_INCLUDED
-            if ( tx1_isr(&can_packet) )
+            if (tx1_isr(&can_packet))
               {
                 put_TX1(&can_packet);
 #ifdef _DEBUG
@@ -242,7 +242,7 @@ void DeviceCAN_MCP2510::interruptServiceRoutine(void)
           {
             // Transmit Buffer 2
 #ifdef CAN_TX2_ISR_INCLUDED
-            if ( tx2_isr(&can_packet) )
+            if (tx2_isr(&can_packet))
               {
                 put_TX2(&can_packet);
                 // clear INTF but leave INTE enabled
@@ -281,7 +281,7 @@ void DeviceCAN_MCP2510::interruptServiceRoutine(void)
             dump(&can_packet);
 #endif
 
-            if ( !m_rxBuf.isFull() )
+            if (!m_rxBuf.isFull())
               {
                 m_rxBuf.put((unsigned char*)&can_packet);
               }
@@ -304,7 +304,7 @@ void DeviceCAN_MCP2510::interruptServiceRoutine(void)
             dump(&can_packet);
 #endif
 
-            if ( !m_rxBuf.isFull() )
+            if (!m_rxBuf.isFull())
               {
                 m_rxBuf.put((unsigned char*)&can_packet);
               }
@@ -340,7 +340,7 @@ bool DeviceCAN_MCP2510::implCanWrite(void)
 
 int DeviceCAN_MCP2510::implReadPacket(CANPacket *p)
   {
-    m_rxBuf.get((unsigned char *)p);
+    m_rxBuf.get((unsigned char*)p);
     return 0;
   }
 
@@ -420,7 +420,7 @@ void DeviceCAN_MCP2510::get_RX0(CANPacket *pc)
   {
     unsigned char i, j, len;
     unsigned short id;
-    unsigned char *p;
+    unsigned char* p;
 
     i = _get_reg(DeviceMCP2510::RXB0SIDH);
     id = i << 8;
@@ -452,7 +452,7 @@ void DeviceCAN_MCP2510::get_RX1(CANPacket *pc)
   {
     unsigned char i, j, len;
     unsigned short id;
-    unsigned char *p;
+    unsigned char* p;
 
     i = _get_reg(DeviceMCP2510::RXB1SIDH);
     id = i << 8;
@@ -499,7 +499,7 @@ void DeviceCAN_MCP2510::put_TX0(CANPacket *pc)
   {
     unsigned char i, j;
     unsigned short id;
-    unsigned char *p;
+    unsigned char* p;
 
     id = pc->id << 5;
     _put_reg(DeviceMCP2510::TXB0SIDH, id >> 8);
@@ -520,4 +520,4 @@ void DeviceCAN_MCP2510::put_TX0(CANPacket *pc)
 
 #endif /* CAN_PUT_TX0_INCLUDED */
 
-#endif /*OS_INCLUDE_DEVICECAN_MCP2510*/
+#endif /* OS_INCLUDE_DEVICECAN_MCP2510 */

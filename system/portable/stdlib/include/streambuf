@@ -24,11 +24,11 @@ public:
 
   // 27.5.2.2.2 buffer and positioning:
 #if 0
-  streambuf* pubsetbuf( char* s, streamsize n );
-  pos_type pubseekoff( off_type off, ios_base::seekdir way,
-      ios_base::openmode which = ios_base::in | ios_base::out );
-  pos_type pubseekpos( pos_type sp,
-      ios_base::openmode which = ios_base::in | ios_base::out );
+  streambuf* pubsetbuf(char* s, streamsize n);
+  pos_type pubseekoff(off_type off, ios_base::seekdir way,
+      ios_base::openmode which = ios_base::in | ios_base::out);
+  pos_type pubseekpos(pos_type sp,
+      ios_base::openmode which = ios_base::in | ios_base::out);
 #endif
   int pubsync();
 
@@ -44,25 +44,25 @@ public:
 
   // 27.5.2.2.4 Putback:
 #if 0
-  int sputbackc( char c );
+  int sputbackc(char c);
   int sungetc();
 #endif
   // 27.5.2.2.5 Put area:
 
-  int sputc(char c) __attribute__( ( noinline ) );
-  int sputn(const char* s, streamsize n) __attribute__( ( noinline ) );
+  int sputc(char c) __attribute__((noinline));
+  int sputn(const char* s, streamsize n) __attribute__((noinline));
 
 protected:
 #if 0
   //Pointers for the "get" buffers
-  char * mgbeg;
-  char * mgnext;
-  char * mgend;
+  char*  mgbeg;
+  char*  mgnext;
+  char*  mgend;
 
   //Pointers for the "put" buffers
-  char * mpbeg;
-  char * mpnext;
-  char * mpend;
+  char*  mpbeg;
+  char*  mpnext;
+  char*  mpend;
 
   //In the event of null buffers Lets us know what the buffer is opened for
   ios_base::openmode openedFor;
@@ -75,16 +75,16 @@ protected:
   char* eback() const;
   char* gptr() const;
   char* egptr() const;
-  void gbump( int n );
-  void setg( char* gbeg, char* gnext, char* gend );
+  void gbump(int n);
+  void setg(char* gbeg, char* gnext, char* gend);
 
   // 27.5.2.3.2 Put area:
 
   char* pbase() const;
   char* pptr() const;
   char* epptr() const;
-  void pbump( int n );
-  void setp( char* pbeg, char* pend );
+  void pbump(int n);
+  void setp(char* pbeg, char* pend);
 #endif
   // 27.5.2.4 virtual functions:
 
@@ -132,7 +132,7 @@ inline char* streambuf::egptr() const
     return mgend;
   }
 
-inline void streambuf::gbump( int n )
+inline void streambuf::gbump(int n)
   {
     mgnext += n;
   }
@@ -152,26 +152,26 @@ inline char* streambuf::epptr() const
     return mpend;
   }
 
-inline void streambuf::pbump( int n )
+inline void streambuf::pbump(int n)
   {
     mpnext += n;
   }
 
-inline streambuf* streambuf::pubsetbuf( char* s, streamsize n )
+inline streambuf* streambuf::pubsetbuf(char* s, streamsize n)
   {
-    return setbuf( s, n );
+    return setbuf(s, n);
   }
 
-inline pos_type streambuf::pubseekoff( off_type off, ios_base::seekdir way,
-    ios_base::openmode which )
+inline pos_type streambuf::pubseekoff(off_type off, ios_base::seekdir way,
+    ios_base::openmode which)
   {
-    return seekoff( off, way, which );
+    return seekoff(off, way, which);
   }
 
-inline pos_type streambuf::pubseekpos( pos_type sp,
-    ios_base::openmode which )
+inline pos_type streambuf::pubseekpos(pos_type sp,
+    ios_base::openmode which)
   {
-    return seekpos( sp, which );
+    return seekpos(sp, which);
   }
 
 #endif
@@ -181,4 +181,4 @@ inline int streambuf::pubsync()
     return sync();
   }
 
-#endif /*STREAMBUF_*/
+#endif /* STREAMBUF_ */

@@ -76,4 +76,4 @@ inline  void OSTimerTicks::interruptContextHandler(void)
   // the current interrupt level enabled after this point
 }
 
-#endif /*OSTIMERTICKS_H_*/
+#endif /* OSTIMERTICKS_H_ */

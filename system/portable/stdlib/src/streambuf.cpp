@@ -28,7 +28,7 @@ streambuf::~streambuf()
 #if 0
 
 void
-streambuf::setg( char* gbeg, char* gnext, char* gend )
+streambuf::setg(char* gbeg, char* gnext, char* gend)
   {
     mgbeg = gbeg;
     mgnext = gnext;
@@ -36,7 +36,7 @@ streambuf::setg( char* gbeg, char* gnext, char* gend )
   }
 
 void
-streambuf::setp( char* pbeg, char* pend )
+streambuf::setp(char* pbeg, char* pend)
   {
     mpbeg = pbeg;
     mpnext = pbeg;
@@ -47,7 +47,7 @@ streambuf::setp( char* pbeg, char* pend )
 streamsize streambuf::in_avail()
   {
 #if 0
-    if ( mgend != 0 && mgnext != 0 )
+    if (mgend != 0 && mgnext != 0)
       {
         return mgend - mgnext;
       }
@@ -58,15 +58,15 @@ streamsize streambuf::in_avail()
 int streambuf::sbumpc()
   {
 #if 0
-    if ( mgbeg == 0 )
+    if (mgbeg == 0)
     return traits::eof();
 
-    if ( mgnext == mgend )
+    if (mgnext == mgend)
       {
         return uflow();
       }
-    int retval = traits::to_int( *gptr() );
-    gbump( 1 );
+    int retval = traits::to_int(*gptr());
+    gbump(1);
     return retval;
 #else
 
@@ -77,7 +77,7 @@ int streambuf::sbumpc()
 int streambuf::snextc()
   {
 #if 0
-    if ( sbumpc() == traits::eof() )
+    if (sbumpc() == traits::eof())
       {
         return traits::eof();
       }
@@ -88,11 +88,11 @@ int streambuf::snextc()
 int streambuf::sgetc()
   {
 #if 0
-    if ( mgbeg == 0 || mgnext == mgend )
+    if (mgbeg == 0 || mgnext == mgend)
       {
         return underflow();
       }
-    return traits::to_int( *gptr() );
+    return traits::to_int(*gptr());
 #else
 
     return underflow();
@@ -103,58 +103,58 @@ int streambuf::sgetc()
 #if 0
 
 int
-streambuf::sputbackc( char c )
+streambuf::sputbackc(char c)
   {
-    if ( mgbeg == 0 || mgnext == mgbeg || !traits::eq( c, gptr() [ -1 ] ) )
+    if (mgbeg == 0 || mgnext == mgbeg || !traits::eq(c, gptr() [-1]))
       {
-        return pbackfail( traits::to_int( c ) );
+        return pbackfail(traits::to_int(c));
       }
-    gbump( -1 );
-    return traits::to_int( *gptr() );
+    gbump(-1);
+    return traits::to_int(*gptr());
   }
 
 int
 streambuf::sungetc()
   {
-    if ( mgbeg == 0 || mgnext == mgbeg )
+    if (mgbeg == 0 || mgnext == mgbeg)
       {
         return ios_base::failbit;
       }
-    gbump( -1 );
-    return traits::to_int( *gptr() );
+    gbump(-1);
+    return traits::to_int(*gptr());
   }
 #endif
 
 int streambuf::sputc(char c)
   {
 #if 0
-    if ( openedFor & ios_base::app )
+    if (openedFor & ios_base::app)
       {
-        seekoff( 0, ios_base::end, ios_base::out );
+        seekoff(0, ios_base::end, ios_base::out);
       }
-    if ( mpnext < mpend )
+    if (mpnext < mpend)
       {
         *mpnext = c;
         ++mpnext;
       }
     else
       {
-        return overflow( traits::to_int( c ) );
+        return overflow(traits::to_int(c));
       }
-    return traits::to_int( c );
+    return traits::to_int(c);
 
 #else
 
-    return overflow(traits::to_int(c) );
+    return overflow(traits::to_int(c));
 #endif
   }
 
 int streambuf::sputn(const char* s, streamsize n)
   {
 #if 0
-    if ( openedFor & ios_base::app )
+    if (openedFor & ios_base::app)
       {
-        seekoff( 0, ios_base::end, ios_base::out );
+        seekoff(0, ios_base::end, ios_base::out);
       }
 #endif
     return xsputn(s, n);
@@ -167,18 +167,18 @@ int streambuf::sgetn(char* s, streamsize n)
 
 //----- virtual methods ------------------------------------------------------
 
-streambuf* streambuf::setbuf(char* s __attribute__( ( unused ) ), streamsize n __attribute__( ( unused ) ) )
+streambuf* streambuf::setbuf(char* s __attribute__((unused)), streamsize n __attribute__((unused)))
   {
     return 0;
   }
 
-pos_type streambuf::seekoff(off_type off __attribute__( ( unused ) ), ios_base::seekdir way __attribute__( ( unused ) ),
-    ios_base::openmode which __attribute__( ( unused ) ) )
+pos_type streambuf::seekoff(off_type off __attribute__((unused)), ios_base::seekdir way __attribute__((unused)),
+    ios_base::openmode which __attribute__((unused)))
   {
     return 0;
   }
 
-pos_type streambuf::seekpos(pos_type sp __attribute__( ( unused ) ), ios_base::openmode which __attribute__( ( unused ) ) )
+pos_type streambuf::seekpos(pos_type sp __attribute__((unused)), ios_base::openmode which __attribute__((unused)))
   {
     return 0;
   }
@@ -195,7 +195,7 @@ int streambuf::showmanyc()
     return 0;
   }
 
-streamsize streambuf::xsgetn(char* s __attribute__( ( unused ) ), streamsize n __attribute__( ( unused ) ) )
+streamsize streambuf::xsgetn(char* s __attribute__((unused)), streamsize n __attribute__((unused)))
   {
     return 0;
   }
@@ -212,8 +212,8 @@ int streambuf::uflow()
     int ret = underflow();
 #if 0
 
-    if ( !traits::eq_int( ret, traits::eof() ) )
-    gbump( 1 );
+    if (!traits::eq_int(ret, traits::eof()))
+    gbump(1);
 #endif
 
     return ret;
@@ -233,7 +233,7 @@ streamsize streambuf::xsputn(const char* s, streamsize n)
     //This function is designed to be replaced by subclasses
     for (streamsize i = 0; i < n; ++i)
       {
-        if (sputc(s[ i ]) == traits::eof() )
+        if (sputc(s[i]) == traits::eof())
           {
             return i;
           }

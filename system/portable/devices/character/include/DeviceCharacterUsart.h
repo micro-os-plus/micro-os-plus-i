@@ -44,7 +44,7 @@
 #define OS_CFGBOOL_DEVICECHARACTERUSART_RX_CONTEXT_SWITCH		(1)
 #endif
 
-#endif /*OS_INCLUDE_DEVICECHARACTERMULTIUSART*/
+#endif /* OS_INCLUDE_DEVICECHARACTERMULTIUSART */
 
 class DeviceCharacterUsart : public OSDeviceCharacter
 {
@@ -52,16 +52,16 @@ public:
   DeviceCharacterUsart(void);
 
   void
-  init(unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
-      unsigned short txLWM, unsigned char *pRxBuf, unsigned short rxBufSize,
+  init(unsigned char* pTxBuf, unsigned short txBufSize, unsigned short txHWM,
+      unsigned short txLWM, unsigned char* pRxBuf, unsigned short rxBufSize,
       unsigned short rxHWM, unsigned short rxLWM);
 
-  DeviceCharacterUsart(unsigned char *pTxBuf, unsigned short txBufSize,
-      unsigned short txHWM, unsigned short txLWM, unsigned char *pRxBuf,
+  DeviceCharacterUsart(unsigned char* pTxBuf, unsigned short txBufSize,
+      unsigned short txHWM, unsigned short txLWM, unsigned char* pRxBuf,
       unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM);
 
-  DeviceCharacterUsart(unsigned char *pTxBuf, unsigned short txBufSize,
-      unsigned char *pRxBuf, unsigned short rxBufSize);
+  DeviceCharacterUsart(unsigned char* pTxBuf, unsigned short txBufSize,
+      unsigned char* pRxBuf, unsigned short rxBufSize);
 
   //static DeviceCharacterUsart *ms_pThis;
 
@@ -121,7 +121,7 @@ private:
   implPortWrite(unsigned char b);
 
 public:
-  static DeviceCharacterUsart *ms_pThis;
+  static DeviceCharacterUsart* ms_pThis;
 
 #else
   // forward port implementation routines to children class
@@ -142,6 +142,6 @@ public:
 
 #endif
 
-#endif /*OS_INCLUDE_DEVICECHARACTERMULTIUSART*/
+#endif /* OS_INCLUDE_DEVICECHARACTERMULTIUSART */
 
-#endif /*DEVICECHARACTERUSART_H_*/
+#endif /* DEVICECHARACTERUSART_H_ */

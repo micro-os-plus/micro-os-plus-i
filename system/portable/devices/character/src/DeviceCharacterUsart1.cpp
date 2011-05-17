@@ -14,14 +14,14 @@
 
 // ----- static data ---------------------------------------------------------
 
-DeviceCharacterUsart1 * DeviceCharacterUsart1::ms_pThis;
+DeviceCharacterUsart1* DeviceCharacterUsart1::ms_pThis;
 
 // ----- constructors --------------------------------------------------------
 
 // set custom high/low water marks
-DeviceCharacterUsart1::DeviceCharacterUsart1(unsigned char *pRxBuf,
+DeviceCharacterUsart1::DeviceCharacterUsart1(unsigned char* pRxBuf,
     unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
-    unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
+    unsigned char* pTxBuf, unsigned short txBufSize, unsigned short txHWM,
     unsigned short txLWM) :
 OSDeviceCharacterBuffered(pRxBuf, rxBufSize, rxHWM, rxLWM, pTxBuf, txBufSize,
     txHWM, txLWM)
@@ -32,8 +32,8 @@ OSDeviceCharacterBuffered(pRxBuf, rxBufSize, rxHWM, rxLWM, pTxBuf, txBufSize,
   }
 
 // use default 3/4 high and 1/4 low water marks
-DeviceCharacterUsart1::DeviceCharacterUsart1(unsigned char *pRxBuf,
-    unsigned short rxBufSize, unsigned char *pTxBuf, unsigned short txBufSize) :
+DeviceCharacterUsart1::DeviceCharacterUsart1(unsigned char* pRxBuf,
+    unsigned short rxBufSize, unsigned char* pTxBuf, unsigned short txBufSize) :
 OSDeviceCharacterBuffered(pRxBuf, rxBufSize, pTxBuf, txBufSize)
   {
     OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterUsart1"), this);
@@ -41,4 +41,4 @@ OSDeviceCharacterBuffered(pRxBuf, rxBufSize, pTxBuf, txBufSize)
     ms_pThis = this;
   }
 
-#endif /*OS_INCLUDE_DEVICECHARACTERUSART1*/
+#endif /* OS_INCLUDE_DEVICECHARACTERUSART1 */

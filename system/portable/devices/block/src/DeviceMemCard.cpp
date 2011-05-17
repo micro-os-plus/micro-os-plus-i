@@ -150,11 +150,11 @@ int DeviceMemCard::open(unsigned short vhs)
     icmd = 0;
     ires = 0;
 
-    sendCommand(SDC_SEND_IF_COND, ( unsigned long ) vhs);
+    sendCommand(SDC_SEND_IF_COND, (unsigned long) vhs);
     r1 = receiveR1();
     l = receiveLong();
 
-    if ( (r1 & ~MMC_R1_IN_IDLE_STATE ) == 0)
+    if ((r1 & ~MMC_R1_IN_IDLE_STATE) == 0)
       {
         // no error, v2.0 SD Card or later
 #if defined(OS_INCLUDE_MEMCARD_MEMBER_VHS)
@@ -166,7 +166,7 @@ int DeviceMemCard::open(unsigned short vhs)
 
 #if defined(OS_INCLUDE_MEMCARD_VALIDATEVOLTAGE)
 
-        if ( !validateVoltage(l) )
+        if (!validateVoltage(l))
           {
             res = MEMCARD_ERROR_VOLTAGE;
             goto out;
@@ -179,13 +179,13 @@ int DeviceMemCard::open(unsigned short vhs)
         r1 = receiveR1();
         l = receiveLong();
 
-        if ( (r1 & ~MMC_R1_IN_IDLE_STATE ) == 0)
+        if ((r1 & ~MMC_R1_IN_IDLE_STATE) == 0)
           {
             // no error, v2.0 SD
 
             OSDeviceDebug::putString("OCR=");
-            OSDeviceDebug::putHex( ( unsigned short ) (l >> 16) );
-            OSDeviceDebug::putHex( ( unsigned short ) l );
+            OSDeviceDebug::putHex((unsigned short) (l >> 16));
+            OSDeviceDebug::putHex((unsigned short) l);
             OSDeviceDebug::putNewLine();
 
 #if defined(OS_INCLUDE_MEMCARD_OCR)
@@ -196,7 +196,7 @@ int DeviceMemCard::open(unsigned short vhs)
             m_capabilities |= MEMCARD_CAPABILITIES_SDC;
             m_capabilities |= MEMCARD_CAPABILITIES_SDC2;
 
-            if ( (l & SDC_OCR_CAPACITY ) != 0)
+            if ((l & SDC_OCR_CAPACITY) != 0)
               {
                 OSDeviceDebug::putString("SD Card v2.0 HC");
                 OSDeviceDebug::putNewLine();
@@ -220,7 +220,7 @@ int DeviceMemCard::open(unsigned short vhs)
             goto out;
           }
       }
-    else if ( (r1 & MMC_R1_ILLEGAL_COMMAND ) != 0)
+    else if ((r1 & MMC_R1_ILLEGAL_COMMAND) != 0)
       {
         OSDeviceDebug::putString("SD Card v1.x or MMC");
         OSDeviceDebug::putNewLine();
@@ -229,14 +229,14 @@ int DeviceMemCard::open(unsigned short vhs)
         r1 = receiveR1();
         l = receiveLong();
 
-        if ( (r1 & ~MMC_R1_IN_IDLE_STATE ) == 0)
+        if ((r1 & ~MMC_R1_IN_IDLE_STATE) == 0)
           {
             OSDeviceDebug::putString("SD Card v1.x or MMC v1.3");
             OSDeviceDebug::putNewLine();
 
             OSDeviceDebug::putString("OCR=");
-            OSDeviceDebug::putHex( ( unsigned short ) (l >> 16) );
-            OSDeviceDebug::putHex( ( unsigned short ) l );
+            OSDeviceDebug::putHex((unsigned short) (l >> 16));
+            OSDeviceDebug::putHex((unsigned short) l);
             OSDeviceDebug::putNewLine();
 
 #if defined(OS_INCLUDE_MEMCARD_OCR)
@@ -248,7 +248,7 @@ int DeviceMemCard::open(unsigned short vhs)
               {
                 sendCommand(SDC_APP_CMD, 0L);
                 r1 = receiveR1();
-                if ( (r1 & ~MMC_R1_IN_IDLE_STATE ) != 0)
+                if ((r1 & ~MMC_R1_IN_IDLE_STATE) != 0)
                   {
                     // illegal CMD55, must be MMC
                     OSDeviceDebug::putString("MM1.3 Card a");
@@ -265,7 +265,7 @@ int DeviceMemCard::open(unsigned short vhs)
                 if (r1 == 0)
                 break;
 
-                if ( (r1 & ~MMC_R1_IN_IDLE_STATE ) != 0)
+                if ((r1 & ~MMC_R1_IN_IDLE_STATE) != 0)
                   {
                     // illegal ACMD41, must be MMC
                     // SanDisk MMCs come here
@@ -276,9 +276,9 @@ int DeviceMemCard::open(unsigned short vhs)
                     res = MEMCARD_OPEN_MMC13;
                     goto exit_idle_mmc;
                   }
-                if ( (i % 10) == 0)
+                if ((i % 10) == 0)
                   {
-                    OS::busyWaitMillis( 1);
+                    OS::busyWaitMillis(1);
                   }
 
                 OSDeviceDebug::putString("CMD R1=");
@@ -294,7 +294,7 @@ int DeviceMemCard::open(unsigned short vhs)
             res = MEMCARD_OPEN_SDC1;
             goto out;
           }
-        else if ( (r1 & MMC_R1_ILLEGAL_COMMAND ) != 0)
+        else if ((r1 & MMC_R1_ILLEGAL_COMMAND) != 0)
           {
             // illegal CMD58, must be old MMC
             OSDeviceDebug::putString("MM Card");
@@ -337,7 +337,7 @@ int DeviceMemCard::open(unsigned short vhs)
           {
             sendCommand(SDC_APP_CMD, 0L);
             r1 = receiveR1();
-            if ( (r1 & ~MMC_R1_IN_IDLE_STATE ) != 0)
+            if ((r1 & ~MMC_R1_IN_IDLE_STATE) != 0)
               {
                 OSDeviceDebug::putHex(r1);
 
@@ -351,14 +351,14 @@ int DeviceMemCard::open(unsigned short vhs)
         if (r1 == 0)
         break;
 
-        if ( (r1 & ~MMC_R1_IN_IDLE_STATE ) != 0)
+        if ((r1 & ~MMC_R1_IN_IDLE_STATE) != 0)
           {
             res = ires; // CMD1 error
             goto out;
           }
-        if ( (i % 10) == 0)
+        if ((i % 10) == 0)
           {
-            OS::busyWaitMillis( 1);
+            OS::busyWaitMillis(1);
           }
 
         OSDeviceDebug::putString("CMD");
@@ -406,7 +406,7 @@ int DeviceMemCard::enterIdle(void)
         if (r1 == MMC_R1_IN_IDLE_STATE)
         break; // no errors & idle state detected
 
-        if ( (i % 10) == 0)
+        if ((i % 10) == 0)
           {
             OS::busyWaitMillis(1);
           }
@@ -436,7 +436,7 @@ int DeviceMemCard::enterIdle(void)
 #if false
 // template to be used for user code
 bool
-DeviceMemCard::validateVoltage( unsigned long l )
+DeviceMemCard::validateVoltage(unsigned long l)
   {
     l = l;
     return true;
@@ -453,19 +453,19 @@ int DeviceMemCard::close(void)
 /*
  * read control structures CID/CSD
  */
-int DeviceMemCard::readCtrl(unsigned char cmd, unsigned char * pbuf,
+int DeviceMemCard::readCtrl(unsigned char cmd, unsigned char*  pbuf,
     unsigned short len)
   {
     return execCmd(cmd, 0L, pbuf, len);
   }
 
-int DeviceMemCard::readBuffer(memCardAddr_t addr, unsigned char * pbuf,
+int DeviceMemCard::readBuffer(memCardAddr_t addr, unsigned char*  pbuf,
     unsigned short len)
   {
     return execCmd(MMC_READ_SINGLE_BLOCK, addr, pbuf, len);
   }
 
-int DeviceMemCard::writeBuffer(memCardAddr_t addr, unsigned char * pbuf,
+int DeviceMemCard::writeBuffer(memCardAddr_t addr, unsigned char*  pbuf,
     unsigned short len)
   {
     return execCmd(MMC_WRITE_BLOCK, addr, pbuf, len);
@@ -492,7 +492,7 @@ int DeviceMemCard::erase(void)
  * MMC_WRITE_BLOCK
  */
 int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
-    unsigned char *pbuf, unsigned short len)
+    unsigned char* pbuf, unsigned short len)
   {
     OSDeviceDebug::putString(" cmd=");
     OSDeviceDebug::putDec(cmd);
@@ -594,7 +594,7 @@ int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
         unsigned short crc;
         crc = 0;
 
-        unsigned char *p;
+        unsigned char* p;
         unsigned int i;
         for (i = 0, p = pbuf; i < maxlen; ++i, ++p)
           {
@@ -635,7 +635,7 @@ int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
         ; // wait for first busy response
 
         // not mandatory, but safer
-        for (i = 8; (((r = spiRead()) ) == 0x00) && (i != 0); --i)
+        for (i = 8; (((r = spiRead())) == 0x00) && (i != 0); --i)
         ;
 
       }
@@ -655,7 +655,7 @@ int DeviceMemCard::execCmd(unsigned char cmd, unsigned long arg,
         unsigned short crc;
         crc = 0;
 
-        unsigned char *p;
+        unsigned char* p;
         unsigned int i;
         for (i = 0, p = pbuf; i < maxlen + 2; ++i, ++p) // +2 crc
 
@@ -736,7 +736,7 @@ unsigned char DeviceMemCard::crc7(unsigned char crc, unsigned char b)
     for (i = 0; i < 8; ++i)
       {
         crc <<= 1;
-        if ( ( (b << i ) ^ crc ) & 0x80)
+        if (((b << i) ^ crc) & 0x80)
         crc ^= 0x09;
       }
     return crc;
@@ -753,7 +753,7 @@ unsigned short DeviceMemCard::crc16(unsigned short crc, unsigned char b)
   {
     int i;
 
-    crc = crc ^ ( ( unsigned short ) b << 8);
+    crc = crc ^ ((unsigned short) b << 8);
     for (i = 0; i < 8; i++)
       {
         if (crc & 0x8000)
@@ -816,7 +816,7 @@ unsigned char DeviceMemCard::receiveR1(void)
 
     // Ncr in [1..8]
     // Get first response byte with bit7 = 0
-    for (i = 8 + 1; ( ( (r = spiRead() ) & 0x80) == 0x80) && (i != 0); --i)
+    for (i = 8 + 1; (((r = spiRead()) & 0x80) == 0x80) && (i != 0); --i)
       {
         ;
       }
@@ -850,11 +850,11 @@ unsigned char DeviceMemCard::receiveDataBlock(void)
     int i;
     int j;
 
-    for (i = m_waitCycles, j = 0; ( (r = spiRead() ) != 0xFE) && (i != 0); --i,
+    for (i = m_waitCycles, j = 0; ((r = spiRead()) != 0xFE) && (i != 0); --i,
         ++j)
       {
         // 0xE0/0x1F are from MMC manual
-        if ( ( (r & 0xE0) == 0x00) && ( (r & 0x1F) != 0x00))
+        if (((r & 0xE0) == 0x00) && ((r & 0x1F) != 0x00))
           {
             return r; // Data Error Token
           }

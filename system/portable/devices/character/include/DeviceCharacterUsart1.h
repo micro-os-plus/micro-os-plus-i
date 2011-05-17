@@ -28,12 +28,12 @@
 class DeviceCharacterUsart1 : public OSDeviceCharacterBuffered
 {
 public:
-  DeviceCharacterUsart1(unsigned char *pRxBuf, unsigned short rxBufSize,
-      unsigned short rxHWM, unsigned short rxLWM, unsigned char *pTxBuf,
+  DeviceCharacterUsart1(unsigned char* pRxBuf, unsigned short rxBufSize,
+      unsigned short rxHWM, unsigned short rxLWM, unsigned char* pTxBuf,
       unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM);
 
-  DeviceCharacterUsart1(unsigned char *pRxBuf, unsigned short rxBufSize,
-      unsigned char *pTxBuf, unsigned short txBufSize);
+  DeviceCharacterUsart1(unsigned char* pRxBuf, unsigned short rxBufSize,
+      unsigned char* pTxBuf, unsigned short txBufSize);
 
 private:
   virtual int
@@ -48,7 +48,7 @@ private:
   implPortWrite(unsigned char b);
 
 public:
-  static DeviceCharacterUsart1 *ms_pThis;
+  static DeviceCharacterUsart1* ms_pThis;
 };
 
-#endif /*DEVICECHARACTERUSART1_H_*/
+#endif /* DEVICECHARACTERUSART1_H_ */

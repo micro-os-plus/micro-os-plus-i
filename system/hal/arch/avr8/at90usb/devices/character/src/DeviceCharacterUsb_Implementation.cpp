@@ -203,7 +203,7 @@ DeviceCharacterUsb::implReadByte(void)
 
     }
   OSCriticalSection::exit();
-  // OS_CONFIG_USBINT_LED_PORT &= ~_BV( PORTD0 );
+  // OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
   return c;
 }
 
@@ -215,7 +215,7 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
   if (UEINT & _BV(RX_EP))
     {
 #if defined(OS_CONFIG_USBINT_LED_PORT)
-      OS_CONFIG_USBINT_LED_PORT |= _BV( OS_CONFIG_USBINT_LED_BIT );
+      OS_CONFIG_USBINT_LED_PORT |= _BV(OS_CONFIG_USBINT_LED_BIT);
 #endif
 
       OSUsbDevice::endpointSelect(RX_EP);
@@ -233,11 +233,11 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
   if (UEINT & _BV(RXb_EP))
     {
 #if defined(OS_CONFIG_USBINT_LED_PORT)
-      OS_CONFIG_USBINT_LED_PORT |= _BV( OS_CONFIG_USBINT_LED_BIT );
+      OS_CONFIG_USBINT_LED_PORT |= _BV(OS_CONFIG_USBINT_LED_BIT);
 #endif
 
       OSUsbDevice::endpointSelect(RXb_EP);
-      if (OSUsbDevice::isInterruptReceiveOut() && OSUsbDevice::isInterruptReceiveOutEnabled() )
+      if (OSUsbDevice::isInterruptReceiveOut() && OSUsbDevice::isInterruptReceiveOutEnabled())
         {
           OSDeviceDebug::putString("Vo b");
           OSDeviceDebug::putNewLine();
@@ -256,7 +256,7 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
 
 bool
 DeviceCharacterUsb::specificCdcProcessReadRequest(
-    unsigned char __attribute__( ( unused ) ) type, unsigned char request)
+    unsigned char __attribute__((unused)) type, unsigned char request)
 {
   // TODO: for multi-interface devices, determine pointer
   DeviceCharacterUsb *pDev = g_usb0;
@@ -546,7 +546,7 @@ DeviceCharacterUsb::cdcSetControlLineState()
 
 void
 DeviceCharacterUsb::specificCdcEndpointInit(
-    unsigned char __attribute__( ( unused ) ) conf_nb)
+    unsigned char __attribute__((unused)) conf_nb)
 {
   OSUsbDevice::usb_configure_endpoint(INT_EP, TYPE_INTERRUPT, DIRECTION_IN,
       SIZE_32, ONE_BANK, NYET_ENABLED);

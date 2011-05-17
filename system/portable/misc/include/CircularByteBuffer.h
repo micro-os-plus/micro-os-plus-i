@@ -13,11 +13,11 @@ class CircularByteBuffer
 {
 public:
   CircularByteBuffer();
-  CircularByteBuffer(unsigned char *pc, unsigned short size,
+  CircularByteBuffer(unsigned char* pc, unsigned short size,
       unsigned short highWM, unsigned short lowWM);
 
   void
-  init(unsigned char *pc, unsigned short size, unsigned short highWM,
+  init(unsigned char* pc, unsigned short size, unsigned short highWM,
       unsigned short lowWM);
 
   void
@@ -51,13 +51,13 @@ public:
   dump(void);
 
 private:
-  unsigned char *m_pBuf;
+  unsigned char* m_pBuf;
   unsigned short m_sz;
   unsigned short m_len;
   unsigned short m_highWM;
   unsigned short m_lowWM;
-  unsigned char *m_pPut;
-  unsigned char *m_pGet;
+  unsigned char* m_pPut;
+  unsigned char* m_pGet;
 };
 
 inline bool
@@ -96,4 +96,4 @@ CircularByteBuffer::size(void)
   return m_sz;
 }
 
-#endif /*CIRCULARBYTEBUFFER_H_ */
+#endif /* CIRCULARBYTEBUFFER_H_ */

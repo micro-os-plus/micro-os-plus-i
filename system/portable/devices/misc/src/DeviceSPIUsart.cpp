@@ -27,5 +27,5 @@ unsigned char DeviceSPIUsart::spiReadWrite(unsigned char c)
     return implSpiReadWrite(c);
   }
 
-#endif /*OS_INCLUDE_DEVICESPIUSART*/
+#endif /* OS_INCLUDE_DEVICESPIUSART */
 

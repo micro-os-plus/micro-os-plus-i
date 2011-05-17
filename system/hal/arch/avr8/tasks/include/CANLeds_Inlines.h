@@ -39,4 +39,4 @@ inline void CANLedRed::off(void)
     OS_CONFIG_CANLEDS_RED_PORT &= ~_BV(OS_CONFIG_CANLEDS_RED_BIT);
   }
 
-#endif /*CANLEDS_INLINES_H_*/
+#endif /* CANLEDS_INLINES_H_ */

@@ -8,7 +8,7 @@
 #define HAL_ARCH_OS_DEFS_H_
 
 typedef unsigned long OSStack_t;
-typedef unsigned long *pfnVector_t;
+typedef unsigned long* pfnVector_t;
 
 #if !defined(OS_CFGINT_BUSYWAIT_CALIBRATION)
 #if defined(DEBUG)
@@ -19,7 +19,7 @@ typedef unsigned long *pfnVector_t;
 #endif
 
 #define PROGMEM
-#define PSTR(_S_) ((const char *)_S_)
+#define PSTR(_S_) ((const char*)_S_)
 
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG            (1)
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT             (1)
@@ -46,4 +46,4 @@ extern "C" void Sys_Default_Handler(void) __attribute__((interrupt));
 
 extern "C" void Reset_Handler(void) __attribute__((noreturn));
 
-#endif /*HAL_ARCH_OS_DEFS_H_*/
+#endif /* HAL_ARCH_OS_DEFS_H_ */

@@ -46,7 +46,7 @@ Parser::skipTokens(unsigned short nTokens)
 }
 
 OSReturn_t
-Parser::skipTokens(unsigned short nTokens, unsigned char *pSeparators)
+Parser::skipTokens(unsigned short nTokens, unsigned char* pSeparators)
 {
   OSReturn_t ret;
 
@@ -98,7 +98,7 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
       else
         {
           // Then check if a separator, like COMMA is encountered
-          for (unsigned char *q = pSeparators; q && *q && !bFound; ++q)
+          for (unsigned char* q = pSeparators; q && *q && !bFound; ++q)
             {
               if (*q == c)
                 {
@@ -117,7 +117,7 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
                   bSpaceFound = false;
 
                   // Check if a special space character is encountered
-                  for (unsigned char *q = pSpaces; q && *q && !bSpaceFound; ++q)
+                  for (unsigned char* q = pSpaces; q && *q && !bSpaceFound; ++q)
                     {
                       if (*q == c)
                         {
@@ -157,7 +157,7 @@ Parser::parseSubstring(unsigned short len)
   if (len == 0)
     return OSReturn::OS_BAD_PARAMETER;
 
-  unsigned char *p;
+  unsigned char* p;
   p = m_pToken;
   *p = '\0';
 

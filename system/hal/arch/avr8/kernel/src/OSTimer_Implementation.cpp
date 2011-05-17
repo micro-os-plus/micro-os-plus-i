@@ -41,17 +41,17 @@ void OSTimerTicks::implInit(void)
 
 #endif
 
-    timer_freq = TIMER_CLOCK_HZ / ( timer_constant + 1 );
+    timer_freq = TIMER_CLOCK_HZ / (timer_constant + 1);
     if (timer_freq > OS_CFGINT_TICK_RATE_HZ)
-      timer_precision = (timer_freq - OS_CFGINT_TICK_RATE_HZ ) * 100
+      timer_precision = (timer_freq - OS_CFGINT_TICK_RATE_HZ) * 100
           / OS_CFGINT_TICK_RATE_HZ;
     else
-      timer_precision = ( OS_CFGINT_TICK_RATE_HZ - timer_freq ) * 100
+      timer_precision = (OS_CFGINT_TICK_RATE_HZ - timer_freq) * 100
           / OS_CFGINT_TICK_RATE_HZ;
     if (timer_precision > 3)
       {
         OSDeviceDebug::putDec(timer_freq);
-        OSDeviceDebug::putChar( ' ');
+        OSDeviceDebug::putChar(' ');
         OSDeviceDebug::putDec(timer_precision);
         OSDeviceDebug::putNewLine();
       }
@@ -69,14 +69,14 @@ void OSTimerTicks::implInit(void)
     TCCR1A = 0;
 
     /* CTC (wgm=4), clk */
-    TCCR1B = _BV( WGM12 ) | ( OS_CFGINT_TIMER_CLOCK_SELECT << CS10 );
+    TCCR1B = _BV(WGM12) | (OS_CFGINT_TIMER_CLOCK_SELECT << CS10);
 
     /* force output compare for channel A */
-    TCCR1C = _BV( FOC1A );
+    TCCR1C = _BV(FOC1A);
 
     /* Enable the interrupt - this is okay as interrupt are currently globally
      disabled. */
-    TIMSK1 |= _BV( OCIE1A );
+    TIMSK1 |= _BV(OCIE1A);
 
 #else
 
@@ -99,7 +99,7 @@ void OSTimerTicks::implInit(void)
     /* Enable the compare match A interrupt;
      * this is okay as interrupts are currently globally disabled.
      */
-    TIMSK0 |= _BV(OCIE0A );
+    TIMSK0 |= _BV(OCIE0A);
 
 #endif
 
@@ -225,8 +225,8 @@ void OSTimerSeconds::init(void)
 #if defined(OS_INCLUDE_32KHZ_TIMER)
     TCCR2A = 0; // Normal (counter) mode
     TCCR2B = 5; // clk/128
-    ASSR = _BV( AS2 ); // Timer2 clocked from crystal
-    TIMSK2 = _BV( TOIE2 );
+    ASSR = _BV(AS2); // Timer2 clocked from crystal
+    TIMSK2 = _BV(TOIE2);
 #endif
   }
 

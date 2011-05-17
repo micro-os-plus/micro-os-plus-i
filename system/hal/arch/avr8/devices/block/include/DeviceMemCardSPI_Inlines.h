@@ -34,7 +34,7 @@ inline void DeviceMemCardSPI::implSpiInit(void)
 inline unsigned char DeviceMemCardSPI::implSpiReadWrite(unsigned char c)
   {
     SPDR = c;
-    while ( !(SPSR & _BV(SPIF) ))
+    while (!(SPSR & _BV(SPIF)))
       ; // no WDTreset() here to catch SPI lock
 
     return SPDR;

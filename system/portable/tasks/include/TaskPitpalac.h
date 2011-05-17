@@ -17,7 +17,7 @@ class TaskPitpalac: public OSThread
   {
 public:
   // thread constructor
-  TaskPitpalac(const char *pName, schedTicks_t rate = 1);
+  TaskPitpalac(const char* pName, schedTicks_t rate = 1);
 
   // actual thread main code
   virtual void threadMain(void);
@@ -41,4 +41,4 @@ private:
 #include "App_TaskPitpalac_Inlines.h"
 #endif
 
-#endif /*TASKPITPALAC_H_*/
+#endif /* TASKPITPALAC_H_ */

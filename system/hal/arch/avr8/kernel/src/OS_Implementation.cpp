@@ -38,7 +38,7 @@
 // earliest moment we can use C code to initialise processor,
 // before constructors
 extern "C" void processor_init(void)
-__attribute__( ( naked, section( ".init3" ) ) );
+__attribute__((naked, section(".init3")));
 
 void processor_init(void)
   {

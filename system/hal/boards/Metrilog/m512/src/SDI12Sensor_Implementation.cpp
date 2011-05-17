@@ -47,13 +47,13 @@ void SDI12Sensor::init(void)
 
     UBRR0 = SDI_USART_BAUD_CONSTANT;
 
-    //debug.putDec( SDI_USART_BAUD_CONSTANT );
+    //debug.putDec(SDI_USART_BAUD_CONSTANT);
     //debug.putNewLine();
 
 #if defined(OS_SDI12SENSOR_CFGINT_USART_DOUBLE_SPEED)
 
-    //debug.putChar( 'd' );
-    UCSR0A = _BV( U2X0 );
+    //debug.putChar('d');
+    UCSR0A = _BV(U2X0);
 #else
 
     UCSR0A = 0;
@@ -66,7 +66,7 @@ void SDI12Sensor::init(void)
 #endif
 
     /* Set even parity, 1-bit stop and the data bits to 7. */
-    UCSR0C = ( ( 2 << UPM00 ) | ( 2 << UCSZ00 ));
+    UCSR0C = ((2 << UPM00) | (2 << UCSZ00));
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
 #if !defined(OS_EXCLUDE_PCINT3_VECT)
@@ -92,7 +92,7 @@ void SDI12Sensor::init(void)
 #if !defined(OS_EXCLUDE_PCINT3_VECT)
 
 extern "C"
-void  PCINT3_vect( void ) __attribute__( ( signal, naked ) );
+void  PCINT3_vect(void) __attribute__((signal, naked));
 
 void PCINT3_vect(void)
   {
@@ -112,7 +112,7 @@ void PCINT3_vect(void)
 
         PinChangeDispatchers::ms_prevValue3 = crt;
 
-        if (OSScheduler::requireContextSwitch() )
+        if (OSScheduler::requireContextSwitch())
           {
             OSScheduler::contextSwitch(true);
           }
@@ -124,14 +124,14 @@ void PCINT3_vect(void)
 #endif
 
 extern "C"
-void USART0_RX_vect( void ) __attribute__( ( signal, naked ) );
+void USART0_RX_vect(void) __attribute__((signal, naked));
 
 void USART0_RX_vect(void)
   {
     OSScheduler::contextSave(); // interrupts disabled in here
 
       {
-        //OSDeviceDebug::putChar( '@' );
+        //OSDeviceDebug::putChar('@');
 
         OSScheduler::ISRledActiveOn();
 
@@ -148,7 +148,7 @@ void USART0_RX_vect(void)
   }
 
 extern "C"
-void USART0_UDRE_vect( void ) __attribute__( ( signal ) );
+void USART0_UDRE_vect(void) __attribute__((signal));
 
 void USART0_UDRE_vect(void)
   {
@@ -156,7 +156,7 @@ void USART0_UDRE_vect(void)
   }
 
 extern "C"
-void USART0_TX_vect( void ) __attribute__( ( signal ) );
+void USART0_TX_vect(void) __attribute__((signal));
 
 void USART0_TX_vect(void)
   {

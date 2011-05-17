@@ -228,4 +228,4 @@ inline void DeviceCAN_MCP2510::_tx2_transmit(void)
     _set_CANINTE_bits(DeviceMCP2510::TX2IE);
   }
 
-#endif /*DEVICECAN_MCP2510_H_*/
+#endif /* DEVICECAN_MCP2510_H_ */

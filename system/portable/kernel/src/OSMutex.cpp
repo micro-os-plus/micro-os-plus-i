@@ -123,7 +123,7 @@ OSMutex::acquire(bool doNotBlock)
 }
 
 int
-OSMutex::release(OSThread * pThread)
+OSMutex::release(OSThread* pThread)
 {
   if (pThread == 0)
     pThread = OSScheduler::getThreadCurrent();

@@ -58,7 +58,7 @@ inline void masterInit(void)
         delay = 500000;
         while (delay)
           {
-            asm volatile( "nop":: );
+            asm volatile("nop"::);
             delay--;
           }
 
@@ -126,4 +126,4 @@ inline void masterSdaSynchronize(void)
         IWDG_ReloadCounter();
       }
   }
-#endif /*HAL_DEVICEDEBUGI2CEMUMASTER_INLINES_H_*/
+#endif /* HAL_DEVICEDEBUGI2CEMUMASTER_INLINES_H_ */

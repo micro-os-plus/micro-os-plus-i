@@ -8,9 +8,9 @@
 
 #if defined(OS_CONFIG_ARCH_AVR8)
 
-OSStack_t *
-OSSchedulerImpl::stackInitialise(OSStack_t * pStackTop, void
-(*pCode)(void *), void *pParams, unsigned char id)
+OSStack_t* 
+OSSchedulerImpl::stackInitialise(OSStack_t* pStackTop, void
+(*pCode)(void*), void* pParams, unsigned char id)
 {
   /* The value on the right is the offset from the thread stack pointer */
 
@@ -89,7 +89,7 @@ OSSchedulerImpl::stackInitialise(OSStack_t * pStackTop, void
       OSDeviceDebug::putString(" C=");
       OSDeviceDebug::putHex((unsigned short) pCode);
         {
-          unsigned char *p;
+          unsigned char* p;
           int i;
           for (p = pStackTop, i = 0; i < 40; p++, i++)
             {
@@ -119,13 +119,13 @@ OSSchedulerImpl::start(void)
 #if defined(DEBUG)
 
 #if false
-void OSScheduler::dumpContextInfo(void *pCurrentContext __attribute__( ( unused ) ) )
+void OSScheduler::dumpContextInfo(void* pCurrentContext __attribute__((unused)))
   {
-    unsigned char * q;
+    unsigned char*  q;
     OSDeviceDebug::putHex(
-        (unsigned short) *((unsigned short *) pCurrentContext));
+        (unsigned short) *((unsigned short*) pCurrentContext));
     OSDeviceDebug::putChar('/');
-    q = ((unsigned char *) *((unsigned short *) g_pCurrentContext) + 34);
+    q = ((unsigned char*) *((unsigned short*) g_pCurrentContext) + 34);
     unsigned short w;
     w = (q[0] << 8) | q[1];
     OSDeviceDebug::putPC(w);
@@ -133,21 +133,21 @@ void OSScheduler::dumpContextInfo(void *pCurrentContext __attribute__( ( unused 
 #endif
 
 void
-OSSchedulerImpl::dumpContextInfo(OSThread * pThread)
+OSSchedulerImpl::dumpContextInfo(OSThread* pThread)
 {
   OSDeviceDebug::putChar('\'');
   OSDeviceDebug::putString(pThread->getName());
 
-  OSStack_t * pStack;
+  OSStack_t* pStack;
   pStack = pThread->getStack();
   OSDeviceDebug::putString("' SP=");
   OSDeviceDebug::putPtr(pStack);
   OSDeviceDebug::putString(" PC=");
-  unsigned char * q;
-  q = ((unsigned char *) *((unsigned short *) OSScheduler::ms_ppCurrentStack) + 34);
+  unsigned char*  q;
+  q = ((unsigned char*) *((unsigned short*) OSScheduler::ms_ppCurrentStack) + 34);
   unsigned short w;
   w = (q[0] << 8) | q[1];
-  OSDeviceDebug::putPC((const char *) w);
+  OSDeviceDebug::putPC((const char*) w);
 
   //OSDeviceDebug::putHex(pStack[STACK_PCL_WORD_OFFSET]);
 

@@ -55,7 +55,7 @@ private:
   static bool Can_isMobDisabled(void);
   static unsigned short Can_get_std_id(void);
   static unsigned char Can_get_dlc(void);
-  static void can_get_data(unsigned char * p_can_message_data);
+  static void can_get_data(unsigned char*  p_can_message_data);
   
   static const unsigned char NB_MOB = 15;
   static const unsigned char NB_DATA_MAX = 8;
@@ -135,7 +135,7 @@ inline unsigned char DeviceCAN_AT90CAN::Can_get_dlc(void)
     return (CANCDMOB & 0xF);
   }
 
-inline void DeviceCAN_AT90CAN::can_get_data(unsigned char * p_can_message_data)
+inline void DeviceCAN_AT90CAN::can_get_data(unsigned char*  p_can_message_data)
 {
   unsigned char data_index;
 
@@ -191,4 +191,4 @@ inline void DeviceCAN_AT90CAN::interruptDisable(void)
     CANGIE &= ~_BV(ENIT);
   }
 
-#endif /*DEVICECAN_AT90CAN_H_*/
+#endif /* DEVICECAN_AT90CAN_H_ */

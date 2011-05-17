@@ -23,11 +23,11 @@ public:
   setSpaces(unsigned char* pSpaces);
 
   void
-  setTokenBuffer(unsigned char *pToken, unsigned short tokenSize);
+  setTokenBuffer(unsigned char* pToken, unsigned short tokenSize);
 
   // Deprecated
   void
-  setToken(unsigned char *pToken, unsigned short tokenSize);
+  setToken(unsigned char* pToken, unsigned short tokenSize);
   unsigned char*
   getToken(void);
 
@@ -40,12 +40,12 @@ public:
   OSReturn_t
   skipTokens(unsigned short nTokens);
   OSReturn_t
-  skipTokens(unsigned short nTokens, unsigned char *pSeparators);
+  skipTokens(unsigned short nTokens, unsigned char* pSeparators);
 
   OSReturn_t
   parseToken(void);
   OSReturn_t
-  parseToken(unsigned char *pSeparators, unsigned char *pSpaces);
+  parseToken(unsigned char* pSeparators, unsigned char* pSpaces);
 
   OSReturn_t
   parseSubstring(unsigned short len);
@@ -105,7 +105,7 @@ protected:
 
 // ----------------------------------------------------------------------------
 
-inline unsigned char *
+inline unsigned char* 
 Parser::getToken(void)
 {
   return m_pToken;
@@ -118,27 +118,27 @@ Parser::getSeparator(void)
 }
 
 inline void
-Parser::setTokenBuffer(unsigned char *pToken, unsigned short tokenSize)
+Parser::setTokenBuffer(unsigned char* pToken, unsigned short tokenSize)
 {
   m_pToken = pToken;
   m_tokenSize = tokenSize;
 }
 
 inline void
-Parser::setToken(unsigned char *pToken, unsigned short tokenSize)
+Parser::setToken(unsigned char* pToken, unsigned short tokenSize)
 {
   m_pToken = pToken;
   m_tokenSize = tokenSize;
 }
 
 inline void
-Parser::setSeparators(unsigned char *pSeparators)
+Parser::setSeparators(unsigned char* pSeparators)
 {
   m_pSeparators = pSeparators;
 }
 
 inline void
-Parser::setSpaces(unsigned char *pSpaces)
+Parser::setSpaces(unsigned char* pSpaces)
 {
   m_pSpaces = pSpaces;
 }

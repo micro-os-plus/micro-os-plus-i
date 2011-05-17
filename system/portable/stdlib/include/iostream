@@ -18,4 +18,4 @@ public:
   virtual ~iostream();
   };
 
-#endif /*IOSTREAM_*/
+#endif /* IOSTREAM_ */

@@ -11,7 +11,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-void OSDeviceDebug::putString_P(const char * PROGMEM pc)
+void OSDeviceDebug::putString_P(const char* PROGMEM pc)
   {
     if (pc == 0)
       return;
@@ -26,18 +26,18 @@ void OSDeviceDebug::putString_P(const char * PROGMEM pc)
           {
             if (i == sizeof(buff))
               {
-                commonPutBytes((const char *)buff, i);
+                commonPutBytes((const char*)buff, i);
                 i = 0;
               }
           }
 
         if (i > 1)
           {
-            commonPutBytes((const char *)buff, i);
+            commonPutBytes((const char*)buff, i);
           }
       }
     OSCriticalSection::exit();
   }
 
-#endif /*DEBUG*/
-#endif /*OS_CONFIG_ARCH_ARM_CORTEX_M3*/
+#endif /* defined(DEBUG) */
+#endif /* defined(OS_CONFIG_ARCH_ARM_CORTEX_M3) */

@@ -34,7 +34,7 @@ _trampoline(void)
       :
       : [ORG] "i" (PROGRAM_START_OFFSET), [START] "i" (OS::resetHandler)
       :
-  );
+);
   for (;;)
     ; // noreturn
 }
@@ -76,7 +76,7 @@ OSImpl::familyEarlyInit(void)
 
   OSDeviceDebug::putString("UID=");
   for (int* p = (int*) 0x80800204; p < (int*) 0x80800212; ++p)
-    OSDeviceDebug::putPtr((void *) *p);
+    OSDeviceDebug::putPtr((void*)*p);
   OSDeviceDebug::putNewLine();
 
   OSDeviceDebug::putString("CPU/HSB=");
@@ -99,10 +99,10 @@ OSImpl::familyEarlyInit(void)
 
 // common point for all exceptions
 extern "C" void
-os_exception_handler(unsigned short n, const char *s);
+os_exception_handler(unsigned short n, const char* s);
 
 void
-os_exception_handler(unsigned short n, const char *s = NULL)
+os_exception_handler(unsigned short n, const char* s = NULL)
 {
 #if defined(DEBUG)
 
@@ -136,7 +136,7 @@ os_exception_handler(unsigned short n, const char *s = NULL)
 }
 
 extern "C" void
-os_scall_handler(void) __attribute__( ( naked ));
+os_scall_handler(void) __attribute__((naked));
 
 void
 os_scall_handler(void)
@@ -157,7 +157,7 @@ os_scall_handler(void)
 
 // Unrecoverable Exception.
 extern "C" void
-os_ex_unrecover(void) __attribute__( ( naked ));
+os_ex_unrecover(void) __attribute__((naked));
 
 void
 os_ex_unrecover(void)
@@ -167,7 +167,7 @@ os_ex_unrecover(void)
 
 // TLB Multiple Hit.
 extern "C" void
-os_ex_tbl_mult_hit(void) __attribute__( ( naked ));
+os_ex_tbl_mult_hit(void) __attribute__((naked));
 
 void
 os_ex_tbl_mult_hit(void)
@@ -177,7 +177,7 @@ os_ex_tbl_mult_hit(void)
 
 // Bus Error Data Fetch.
 extern "C" void
-os_ex_bus_err_data_fetch(void) __attribute__( ( naked ));
+os_ex_bus_err_data_fetch(void) __attribute__((naked));
 
 void
 os_ex_bus_err_data_fetch(void)
@@ -187,7 +187,7 @@ os_ex_bus_err_data_fetch(void)
 
 // Bus Error Instruction Fetch.
 extern "C" void
-os_ex_bus_err_inst_fetch(void) __attribute__( ( naked ));
+os_ex_bus_err_inst_fetch(void) __attribute__((naked));
 
 void
 os_ex_bus_err_inst_fetch(void)
@@ -197,7 +197,7 @@ os_ex_bus_err_inst_fetch(void)
 
 // NMI.
 extern "C" void
-os_ex_nmi(void) __attribute__( ( naked ));
+os_ex_nmi(void) __attribute__((naked));
 
 void
 os_ex_nmi(void)
@@ -207,7 +207,7 @@ os_ex_nmi(void)
 
 // Instruction Address.
 extern "C" void
-os_ex_inst_add(void) __attribute__( ( naked ));
+os_ex_inst_add(void) __attribute__((naked));
 
 void
 os_ex_inst_add(void)
@@ -217,7 +217,7 @@ os_ex_inst_add(void)
 
 // ITLB Protection.
 extern "C" void
-os_ex_itlb_prot(void) __attribute__( ( naked ));
+os_ex_itlb_prot(void) __attribute__((naked));
 
 void
 os_ex_itlb_prot(void)
@@ -227,7 +227,7 @@ os_ex_itlb_prot(void)
 
 // Breakpoint.
 extern "C" void
-os_ex_brk_point(void) __attribute__( ( naked ));
+os_ex_brk_point(void) __attribute__((naked));
 
 void
 os_ex_brk_point(void)
@@ -237,7 +237,7 @@ os_ex_brk_point(void)
 
 // Illegal Opcode.
 extern "C" void
-os_ex_illegal_opcode(void) __attribute__( ( naked ));
+os_ex_illegal_opcode(void) __attribute__((naked));
 
 void
 os_ex_illegal_opcode(void)
@@ -247,7 +247,7 @@ os_ex_illegal_opcode(void)
 
 // Unimplemented Instruction.
 extern "C" void
-os_ex_unimpl_inst(void) __attribute__( ( naked ));
+os_ex_unimpl_inst(void) __attribute__((naked));
 
 void
 os_ex_unimpl_inst(void)
@@ -257,7 +257,7 @@ os_ex_unimpl_inst(void)
 
 // Privilege Violation.
 extern "C" void
-os_ex_privilege_violaton(void) __attribute__( ( naked ));
+os_ex_privilege_violaton(void) __attribute__((naked));
 
 void
 os_ex_privilege_violaton(void)
@@ -267,7 +267,7 @@ os_ex_privilege_violaton(void)
 
 // Data Address (Read).
 extern "C" void
-os_ex_data_rd(void) __attribute__( ( naked ));
+os_ex_data_rd(void) __attribute__((naked));
 
 void
 os_ex_data_rd(void)
@@ -277,7 +277,7 @@ os_ex_data_rd(void)
 
 // Data Address (Write).
 extern "C" void
-os_ex_data_wr(void) __attribute__( ( naked ));
+os_ex_data_wr(void) __attribute__((naked));
 
 void
 os_ex_data_wr(void)
@@ -287,7 +287,7 @@ os_ex_data_wr(void)
 
 // DTLB Protection (Read).
 extern "C" void
-os_ex_dtlb_protect_rd(void) __attribute__( ( naked ));
+os_ex_dtlb_protect_rd(void) __attribute__((naked));
 
 void
 os_ex_dtlb_protect_rd(void)
@@ -297,7 +297,7 @@ os_ex_dtlb_protect_rd(void)
 
 // DTLB Protection (Write).
 extern "C" void
-os_ex_dtlb_protect_wr(void) __attribute__( ( naked ));
+os_ex_dtlb_protect_wr(void) __attribute__((naked));
 
 void
 os_ex_dtlb_protect_wr(void)
@@ -307,7 +307,7 @@ os_ex_dtlb_protect_wr(void)
 
 // ITLB Miss.
 extern "C" void
-os_ex_itlb_miss(void) __attribute__( ( naked ));
+os_ex_itlb_miss(void) __attribute__((naked));
 
 void
 os_ex_itlb_miss(void)
@@ -317,7 +317,7 @@ os_ex_itlb_miss(void)
 
 // DTLB Miss (Read).
 extern "C" void
-os_ex_dtlb_miss_rd(void) __attribute__( ( naked ));
+os_ex_dtlb_miss_rd(void) __attribute__((naked));
 
 void
 os_ex_dtlb_miss_rd(void)
@@ -327,7 +327,7 @@ os_ex_dtlb_miss_rd(void)
 
 // DTLB Miss (Write).
 extern "C" void
-os_ex_dtlb_miss_wr(void) __attribute__( ( naked ));
+os_ex_dtlb_miss_wr(void) __attribute__((naked));
 
 void
 os_ex_dtlb_miss_wr(void)

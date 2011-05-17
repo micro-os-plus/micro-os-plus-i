@@ -32,7 +32,7 @@ inline void DeviceCharacterUsart::implPortInit(void)
     OSCriticalSection::enter();
       {
         OSDeviceDebug::putString("Baud constant=");
-        OSDeviceDebug::putDec( ( unsigned short ) DEVICECHARACTERUSART_BAUD_CONSTANT, 0);
+        OSDeviceDebug::putDec((unsigned short) DEVICECHARACTERUSART_BAUD_CONSTANT, 0);
         OSDeviceDebug::putNewLine();
       }
     OSCriticalSection::exit();
@@ -50,7 +50,7 @@ inline void DeviceCharacterUsart::implPortInit(void)
     UCSR1B = _BV(RXCIE1) | _BV(RXEN1) | _BV(TXEN1);
 
     /* Set 2-bit stop and the data bits to 8. */
-    UCSR1C = ( ( 1 << USBS1 ) | ( 3 << UCSZ10 ));
+    UCSR1C = ((1 << USBS1) | (3 << UCSZ10));
   }
 
 inline unsigned char DeviceCharacterUsart::implPortRead(void)
@@ -74,4 +74,4 @@ inline void DeviceCharacterUsart::implInterruptTxDisable(void)
   }
 #endif
 
-#endif /*HAL_DEVICECHARACTERUSART_INLINES_H_*/
+#endif /* HAL_DEVICECHARACTERUSART_INLINES_H_ */

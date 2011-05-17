@@ -217,4 +217,4 @@ private:
 
 };
 
-#endif /*DEVICEMCP2510_H_*/
+#endif /* DEVICEMCP2510_H_ */

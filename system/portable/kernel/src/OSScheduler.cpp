@@ -33,7 +33,7 @@ unsigned char OSScheduler::ms_notifyIndex;
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 
 // The +1 is here to reserve space for the idle thread.
-OSThread *OSScheduler::ms_threads[OS_CFGINT_THREADS_TABLE_SIZE + 1];
+OSThread* OSScheduler::ms_threads[OS_CFGINT_THREADS_TABLE_SIZE + 1];
 
 OSSchedulerLock OSScheduler::lock;
 OSCriticalSection OSScheduler::critical;
@@ -53,7 +53,7 @@ bool OSScheduler::ms_allowDeepSleep;
 // ----- OSActiveThreads static variables ---------------------------------------
 
 unsigned char OSActiveThreads::ms_count;
-OSThread *OSActiveThreads::ms_array[OS_CFGINT_THREADS_TABLE_SIZE + 1];
+OSThread* OSActiveThreads::ms_array[OS_CFGINT_THREADS_TABLE_SIZE + 1];
 
 // ============================================================================
 
@@ -116,7 +116,7 @@ OSScheduler::start(void)
   int i;
   for (i = 0; i < ms_threadsCount; ++i)
     {
-      OSThread *pt;
+      OSThread* pt;
       pt = ms_threads[i];
       if (!pt->isSuspended())
         OSActiveThreads::insert(pt);
@@ -209,11 +209,11 @@ int
 OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_EVENTNOTIFY)
-  OSDeviceDebug::putString( "eventNotify(" );
+  OSDeviceDebug::putString("eventNotify(");
   OSDeviceDebug::putHex((unsigned short)event);
-  OSDeviceDebug::putString( "," );
+  OSDeviceDebug::putString(",");
   OSDeviceDebug::putHex((unsigned short)ret);
-  OSDeviceDebug::putString( ")" );
+  OSDeviceDebug::putString(")");
   OSDeviceDebug::putNewLine();
 #endif
 #if false
@@ -240,7 +240,7 @@ OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 
   for (i = 0; i < ms_threadsCount; ++i)
     {
-      OSThread *pt;
+      OSThread* pt;
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
       pt = ms_threads[notifyIndex];
 #else /* !defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
@@ -365,18 +365,18 @@ OSScheduler::performContextSwitch()
 
 // Get the address of the thread registered under 'id' in threads array,
 // or NULL if 'id' is too high.
-OSThread *
+OSThread* 
 OSScheduler::getThread(int id)
 {
   if (id < ms_threadsCount)
     return ms_threads[id];
   else
-    return (OSThread *)0;
+    return (OSThread* )0;
 }
 
 // Internal methods
 unsigned char
-OSScheduler::threadRegister(OSThread *pThread)
+OSScheduler::threadRegister(OSThread* pThread)
 {
   unsigned char id;
   id = 0xFF;
@@ -424,10 +424,10 @@ OSScheduler::interruptTick(void)
 #if defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK) || defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
   int i;
-  for ( i = 0; i < ms_threadsCount; ++i )
+  for (i = 0; i < ms_threadsCount; ++i)
     {
-      OSThread *pt;
-      pt = ms_threads[ i ];
+      OSThread* pt;
+      pt = ms_threads[i];
 #if defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK)
       pt->schedulerTick();
 #endif /* defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK) */
@@ -452,7 +452,7 @@ OSScheduler::interruptTick(void)
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
 // warning: not synchronised
-void OSScheduler::ISRcancelThread(OSThread *pThread)
+void OSScheduler::ISRcancelThread(OSThread* pThread)
   {
     if (pThread->isWaiting())
       {
@@ -487,7 +487,7 @@ OSActiveThreads::OSActiveThreads()
 // Insert threads in order of decreasing priority.
 // Must be called in a critical section.
 void
-OSActiveThreads::insert(OSThread *pThread)
+OSActiveThreads::insert(OSThread* pThread)
 {
   int i;
 
@@ -536,7 +536,7 @@ OSActiveThreads::insert(OSThread *pThread)
 
 // Must be called in a critical section.
 void
-OSActiveThreads::remove(OSThread * pThread)
+OSActiveThreads::remove(OSThread* pThread)
 {
   if (pThread == OSScheduler::getThreadIdle())
     return; // do not remove the idle thread
@@ -568,7 +568,7 @@ OSActiveThreads::remove(OSThread * pThread)
 
 // Return index of given thread, or -1
 int
-OSActiveThreads::find(OSThread *pThread)
+OSActiveThreads::find(OSThread* pThread)
 {
   int i;
   for (i = 0; i < ms_count; ++i)

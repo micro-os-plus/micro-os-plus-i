@@ -40,7 +40,7 @@ void PinChangeDispatchers::init(void)
 #if defined(OS_INCLUDE_PINCHANGEDISPATCHERS_REG2)
 
 extern "C"
-void PCINT2_vect( void ) __attribute__( ( signal, naked ) );
+void PCINT2_vect(void) __attribute__((signal, naked));
 
 void PCINT2_vect(void)
   {
@@ -62,7 +62,7 @@ void PCINT2_vect(void)
 
 #if defined(OS_INCLUDE_PINCHANGEDISPATCHERS_REG3)
 extern "C"
-void PCINT3_vect( void ) __attribute__( ( signal, naked ) );
+void PCINT3_vect(void) __attribute__((signal, naked));
 
 void PCINT3_vect(void)
   {

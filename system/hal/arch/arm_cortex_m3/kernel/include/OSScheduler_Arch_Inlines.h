@@ -34,7 +34,7 @@ inline void OSScheduler::contextSave(void)
         "                       \n"
         " push {r3, lr}         \n" /* save return addr on caller Stack */
         :::"r0", "r2", "r3"
-    );
+  );
   }
 
 /*
@@ -55,7 +55,7 @@ inline void OSScheduler::contextRestore(void)
         " ldmia r0!, {r4-r11}   \n" /* pop new thread registers */
         " msr psp, r0           \n" /* restore process stack */
         :::"r0", "r2", "r3"
-    );
+  );
   }
 
 
@@ -76,7 +76,7 @@ inline void OSScheduler::criticalEnter(void)
         " push {r0}             \n"
         " cpsid i               \n"
         : : : "r0"
-    );
+  );
 #endif
   }
 
@@ -91,7 +91,7 @@ inline void OSScheduler::criticalExit(void)
         " pop {r0}              \n"
         " msr primask, r0       \n"
         : : : "r0"
-    );
+  );
 #endif
   }
 
@@ -102,7 +102,7 @@ inline void OSScheduler::yieldImpl(void)
     (
         " svc 0                 \n"
         :::
-    );
+  );
   }
 
-#endif /*HAL_ARCH_OSSCHEDULER_INLINES_H_*/
+#endif /* HAL_ARCH_OSSCHEDULER_INLINES_H_ */

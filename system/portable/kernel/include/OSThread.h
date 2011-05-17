@@ -14,7 +14,7 @@ class OSScheduler;
 typedef unsigned char OSThreadPriority_t;
 
 typedef void
-(*OSThreadMainPtr_t)(void *);
+(*OSThreadMainPtr_t)(void*);
 
 class OSThread
 {
@@ -32,12 +32,12 @@ public:
   static const OSStack_t STACK_FILL_BYTE = 0x5A;
 
   // Constructor; run static threadMain (C++ style).
-  OSThread(const char *pName, const OSStack_t *pStack, unsigned short stackSize,
+  OSThread(const char* pName, const OSStack_t* pStack, unsigned short stackSize,
       OSThreadPriority_t priority = OSThread::DEFAULT_PRIORITY);
 
   // Constructor; run given entryPoint function (C style).
-  OSThread(const char *pName, OSThreadMainPtr_t entryPoint, void *pParameters,
-      const OSStack_t *pStack, unsigned short stackSize,
+  OSThread(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameters,
+      const OSStack_t* pStack, unsigned short stackSize,
       OSThreadPriority_t priority = OSThread::DEFAULT_PRIORITY);
 
   // Thread main() function.
@@ -78,13 +78,13 @@ public:
   // Return the address of the stack bottom.
   // Stack grows from high address to low address,
   // so this is the maximum address the stack can grow.
-  unsigned char *
+  unsigned char* 
   getStackBottom(void);
 
   // Return the current stack pointer of the thread.
   // This value is stored only during context switch,
   // so the running thread will not get the actual value.
-  OSStack_t *
+  OSStack_t* 
   getStack(void);
 
   // Return the stack size given at thread creation.
@@ -100,7 +100,7 @@ public:
   getID(void);
 
   // Return the thread's context.
-  void *
+  void*
   getContext(void);
 
   // Return thread priority.
@@ -145,7 +145,7 @@ public:
 
   // The SP is saved in this variable at contextSave 
   // and restored from here at contextRestore.
-  OSStack_t *m_pStack;
+  OSStack_t* m_pStack;
 
   // Prepare the thread to enter the wait state
   bool
@@ -181,20 +181,20 @@ private:
 
   // Initialise thread's environment.
   void
-  init(const char *pName, OSThreadMainPtr_t entryPoint, void *pParameters,
-      const OSStack_t *pStackBottom, unsigned short stackSize,
+  init(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameters,
+      const OSStack_t* pStackBottom, unsigned short stackSize,
       OSThreadPriority_t priority);
 
   // Redirect to virtual function (threadMain).
   static void
-  staticMain(OSThread * pt);
+  staticMain(OSThread* pt);
 
   static void
   yield(void);
 
 #if defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK)
   // Warning: no longer run in critical section!
-  virtual void schedulerTick( void );
+  virtual void schedulerTick(void);
 #endif
 
   // members
@@ -222,16 +222,16 @@ private:
   unsigned char m_id;
 
   // Thread's name.
-  const char *m_pName;
+  const char* m_pName;
 
   // Thread's entry point (i.e. the function executed by this thread).
   OSThreadMainPtr_t m_entryPoint;
 
   // Data passed to this thread.
-  void *m_pParameters;
+  void* m_pParameters;
 
   // The bottom of the thread's stack (lowest address).
-  unsigned char *m_pStackBottom;
+  unsigned char* m_pStackBottom;
 
   // The size of the thread's stack, in bytes.
   unsigned short m_stackSize;
@@ -297,13 +297,13 @@ OSThread::getName(void)
   return m_pName;
 }
 
-inline unsigned char *
+inline unsigned char* 
 OSThread::getStackBottom(void)
 {
   return m_pStackBottom;
 }
 
-inline OSStack_t *
+inline OSStack_t* 
 OSThread::getStack(void)
 {
   return m_pStack;
@@ -319,10 +319,10 @@ OSThread::getStackSize(void)
 // the 'context' in simply a pointer to the stack (the address below
 // the deepest register pushed; for offsets to registers please see
 // OSScheduler::stackInitialise()).
-inline void *
+inline void*
 OSThread::getContext(void)
 {
-  return (void *) &m_pStack;
+  return (void*) &m_pStack;
 }
 
 inline void

@@ -56,4 +56,4 @@ inline void OSScheduler::ledActiveOff(void)
     OSCriticalSection::exit();
     }
 
-#endif /*HAL_FAMILY_OSSCHEDULER_INLINES_H_*/
+#endif /* HAL_FAMILY_OSSCHEDULER_INLINES_H_ */

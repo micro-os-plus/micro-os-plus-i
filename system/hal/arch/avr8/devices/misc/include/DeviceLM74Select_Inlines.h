@@ -23,4 +23,4 @@ inline void DeviceLM74Select::implSelectDisable(void)
     OS_CONFIG_LM74_SELECT_PORT |= _BV(OS_CONFIG_LM74_SELECT_BIT);
   }
 
-#endif /*DEVICELM74SELECT_INLINES_H_*/
+#endif /* DEVICELM74SELECT_INLINES_H_ */

@@ -34,7 +34,7 @@ public:
   putNewLine(void);
   // Output, on debug interface, a string.
   static void
-  putString(const char *pc);
+  putString(const char* pc);
 
   static void
   putConstructor(const char* pc, const void* p);
@@ -42,7 +42,7 @@ public:
 #if defined(OS_CONFIG_ARCH_AVR8)
   // Output, on debug interface, the bytes at pc address,
   // until the first zero byte.
-  static void putString_P(const char * PROGMEM pc);
+  static void putString_P(const char*  PROGMEM pc);
 
   static void putConstructor_P(const char* PROGMEM pc, const void* p);
 
@@ -78,15 +78,15 @@ public:
 #endif
   // Output, on debug interface, the address p, in hexadecimal.
   static void
-  putPtr(const void *p);
+  putPtr(const void* p);
   // Output, on debug interface, the address p from program memory, in hexadecimal.
   static void
-  putPC(const char * PROGMEM pc);
+  putPC(const char*  PROGMEM pc);
   // Output, on debug interface, function name, file name,
   // line number and expression string.
   // It is used to in case of a failed assertion.
   static void
-  __assert(const char *func, const char *file, int lineno, const char *sexp);
+  __assert(const char* func, const char* file, int lineno, const char* sexp);
 
 #if defined(DEBUG)
   // Watchdog reset; implementation specific.
@@ -102,14 +102,14 @@ private:
 #if defined(DEBUG)
 #if defined(OS_INCLUDE_NAKED_INIT)
   // Initialise the debug interface.
-  static void nakedEarlyInit() __attribute__( ( naked, section( ".init5" ) ) );
+  static void nakedEarlyInit() __attribute__((naked, section(".init5")));
 #endif
   // Send one byte to debug interface.
   static int
   commonPutByte(unsigned char c);
   // Send the given buffer to debug interface.
   static int
-  commonPutBytes(const char *pc, unsigned int n);
+  commonPutBytes(const char* pc, unsigned int n);
 
   // implementation code, defined in separated files
   // Initialise debug interface.
@@ -120,7 +120,7 @@ private:
   implPutByte(unsigned char c);
   // Ouput the given buffer on the debug interface.
   static int
-  implPutBytes(const char *s, unsigned int n);
+  implPutBytes(const char* s, unsigned int n);
   // Return true if the debug interface can output now.
   static bool
   implCanTransmit(void);
@@ -154,7 +154,7 @@ private:
 #if !defined(OS_DEBUG_CONSTRUCTORS)
 
     inline void
-    OSDeviceDebug::putConstructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)) )
+    OSDeviceDebug::putConstructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
     {
     }
 
@@ -163,7 +163,7 @@ private:
 #else /* !DEBUG */
 
 // define empty functions for Release
-inline void OSDeviceDebug::putChar(unsigned char __attribute__( ( unused ) ) c)
+inline void OSDeviceDebug::putChar(unsigned char __attribute__((unused)) c)
   {
   }
 
@@ -193,27 +193,27 @@ putConstructor_P(const char* __attribute__((unused)) PROGMEM pc, const void* __a
 
 #endif
 
-inline void OSDeviceDebug::putHex(unsigned char __attribute__( ( unused ) ) c)
+inline void OSDeviceDebug::putHex(unsigned char __attribute__((unused)) c)
   {
   }
 
-inline void OSDeviceDebug::putHex(unsigned short __attribute__( ( unused ) ) w)
+inline void OSDeviceDebug::putHex(unsigned short __attribute__((unused)) w)
   {
   }
 
-inline void OSDeviceDebug::putDec(unsigned short __attribute__( ( unused ) ) w, unsigned short
-    __attribute__( ( unused ) ) n)
+inline void OSDeviceDebug::putDec(unsigned short __attribute__((unused)) w, unsigned short
+    __attribute__((unused)) n)
   {
   }
 
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
-inline void OSDeviceDebug::putDec(unsigned long __attribute__( ( unused ) ) l, unsigned short
-    __attribute__( ( unused ) ) n)
+inline void OSDeviceDebug::putDec(unsigned long __attribute__((unused)) l, unsigned short
+    __attribute__((unused)) n)
   {
   }
 #endif
 
-inline void OSDeviceDebug::putPC(const char * PROGMEM __attribute__((unused)) pc)
+inline void OSDeviceDebug::putPC(const char*  PROGMEM __attribute__((unused)) pc)
   {
     pc = pc;
   }
@@ -225,4 +225,4 @@ inline void OSDeviceDebug::__assert(const char __attribute__((unused)) *func, co
 
 #endif
 
-#endif /*OSDEVICEDEBUG_H_*/
+#endif /* OSDEVICEDEBUG_H_ */

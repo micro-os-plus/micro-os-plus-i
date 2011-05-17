@@ -31,4 +31,4 @@ public:
 #endif
 };
 
-#endif /*DEVICEADC_H_*/
+#endif /* DEVICEADC_H_ */

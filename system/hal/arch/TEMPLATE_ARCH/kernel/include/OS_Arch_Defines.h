@@ -9,10 +9,10 @@
 
 #if !defined (OS_BUILD_ASSEMBLY_CODE)
 typedef unsigned long OSStack_t;
-typedef unsigned long *pfnVector_t;
+typedef unsigned long* pfnVector_t;
 
 typedef unsigned long OSResetBits_t;
-typedef void *OSProgramPtr_t;
+typedef void* OSProgramPtr_t;
 
 typedef unsigned long OSInterruptsMask_t;
 
@@ -20,7 +20,7 @@ typedef unsigned long OSInterruptsMask_t;
 
 
 #define PROGMEM
-#define PSTR(_S_) ((const char *)_S_)
+#define PSTR(_S_) ((const char*)_S_)
 #define putString_P putString
 
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG            (1)

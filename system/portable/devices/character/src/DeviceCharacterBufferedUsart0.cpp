@@ -19,8 +19,8 @@ DeviceCharacterBufferedUsart0 * DeviceCharacterBufferedUsart0::ms_pThis;
 
 // set custom high/low water marks
 DeviceCharacterBufferedUsart0::DeviceCharacterBufferedUsart0(
-    unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
-    unsigned short txLWM, unsigned char *pRxBuf, unsigned short rxBufSize,
+    unsigned char* pTxBuf, unsigned short txBufSize, unsigned short txHWM,
+    unsigned short txLWM, unsigned char* pRxBuf, unsigned short rxBufSize,
     unsigned short rxHWM, unsigned short rxLWM) :
   DeviceCharacterBufferedUsartBase(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf,
       rxBufSize, rxHWM, rxLWM)
@@ -32,7 +32,7 @@ DeviceCharacterBufferedUsart0::DeviceCharacterBufferedUsart0(
 
 // use default 3/4 high and 1/4 low water marks
 DeviceCharacterBufferedUsart0::DeviceCharacterBufferedUsart0(
-    unsigned char *pTxBuf, unsigned short txBufSize, unsigned char *pRxBuf,
+    unsigned char* pTxBuf, unsigned short txBufSize, unsigned char* pRxBuf,
     unsigned short rxBufSize) :
   DeviceCharacterBufferedUsartBase(pTxBuf, txBufSize, pRxBuf, rxBufSize)
 {

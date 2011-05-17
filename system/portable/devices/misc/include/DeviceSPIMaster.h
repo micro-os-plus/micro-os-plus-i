@@ -26,4 +26,4 @@ protected:
   implSpiReadWrite(unsigned char c);
 };
 
-#endif /*DEVICESPIMASTER_H_*/
+#endif /* DEVICESPIMASTER_H_ */

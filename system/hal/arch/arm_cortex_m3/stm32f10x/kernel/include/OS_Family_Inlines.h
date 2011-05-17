@@ -54,4 +54,4 @@ inline void OSImpl::SOFTreset(void)
       ; // trigger WD
   }
 
-#endif /*HAL_FAMILY_OS_INLINES_H_*/
+#endif /* HAL_FAMILY_OS_INLINES_H_ */

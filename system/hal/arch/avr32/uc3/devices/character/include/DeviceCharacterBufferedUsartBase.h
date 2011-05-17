@@ -14,13 +14,13 @@
 class DeviceCharacterBufferedUsartBase : public OSDeviceCharacterBuffered
 {
 public:
-  DeviceCharacterBufferedUsartBase(unsigned char *pRxBuf,
+  DeviceCharacterBufferedUsartBase(unsigned char* pRxBuf,
       unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
-      unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
+      unsigned char* pTxBuf, unsigned short txBufSize, unsigned short txHWM,
       unsigned short txLWM);
 
-      DeviceCharacterBufferedUsartBase(unsigned char *pRxBuf,
-          unsigned short rxBufSize, unsigned char *pTxBuf,
+      DeviceCharacterBufferedUsartBase(unsigned char* pRxBuf,
+          unsigned short rxBufSize, unsigned char* pTxBuf,
           unsigned short txBufSize);
 
   // Used to set actual port address

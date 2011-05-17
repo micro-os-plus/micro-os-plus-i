@@ -77,6 +77,6 @@ OSEventWaitReturn_t Timer::eventWait()
       return OSEventWaitReturn::OS_NONE;
   }
 
-#endif /*OS_INCLUDE_TIMER*/
+#endif /* OS_INCLUDE_TIMER */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */

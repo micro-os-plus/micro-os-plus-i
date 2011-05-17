@@ -35,7 +35,7 @@ void DeviceCharacterMultiUsart1::implPortInit(void)
       {
         OSDeviceDebug::putString("Baud constant=");
         OSDeviceDebug::putDec(
-            ( unsigned short ) DEVICECHARACTERMULTIUSART1_BAUD_CONSTANT, 0);
+            (unsigned short) DEVICECHARACTERMULTIUSART1_BAUD_CONSTANT, 0);
         OSDeviceDebug::putNewLine();
       }
     OSCriticalSection::exit();
@@ -53,7 +53,7 @@ void DeviceCharacterMultiUsart1::implPortInit(void)
     UCSR1B = _BV(RXCIE1) | _BV(RXEN1) | _BV(TXEN1);
 
     /* Set 2-bit stop and the data bits to 8. */
-    UCSR1C = ( ( 1 << USBS1 ) | ( 3 << UCSZ10 ));
+    UCSR1C = ((1 << USBS1) | (3 << UCSZ10));
   }
 
 unsigned char DeviceCharacterMultiUsart1::implPortRead(void)
@@ -81,7 +81,7 @@ void DeviceCharacterMultiUsart1::implInterruptTxDisable(void)
 #if (OS_CFGBOOL_DEVICECHARACTERMULTIUSART1_TX_CONTEXT_SWITCH)
 
 extern "C"
-void  USART1_UDRE_vect( void ) __attribute__( ( signal, naked ) );
+void  USART1_UDRE_vect(void) __attribute__((signal, naked));
 
 void USART1_UDRE_vect(void)
   {
@@ -97,7 +97,7 @@ void USART1_UDRE_vect(void)
 #else
 
 extern "C"
-void USART1_UDRE_vect( void ) __attribute__( ( signal ) );
+void USART1_UDRE_vect(void) __attribute__((signal));
 
 void USART1_UDRE_vect(void)
   {
@@ -106,12 +106,12 @@ void USART1_UDRE_vect(void)
     ((DeviceCharacterMultiUsart1 *)DeviceCharacterMultiUsart1::ms_pThis)->interruptTxServiceRoutine();
   }
 
-#endif /*OS_CFGBOOL_DEVICECHARACTERMULTIUSART1_TX_CONTEXT_SWITCH*/
+#endif /* OS_CFGBOOL_DEVICECHARACTERMULTIUSART1_TX_CONTEXT_SWITCH */
 
 #if (OS_CFGBOOL_DEVICECHARACTERMULTIUSART1_RX_CONTEXT_SWITCH)
 
 extern "C"
-void  USART1_RX_vect( void ) __attribute__( ( signal, naked ) );
+void  USART1_RX_vect(void) __attribute__((signal, naked));
 
 void USART1_RX_vect(void)
   {
@@ -127,7 +127,7 @@ void USART1_RX_vect(void)
 #else
 
 extern "C"
-void USART1_RX_vect( void ) __attribute__( ( signal ) );
+void USART1_RX_vect(void) __attribute__((signal));
 
 void USART1_RX_vect(void)
   {
@@ -136,6 +136,6 @@ void USART1_RX_vect(void)
     ((DeviceCharacterMultiUsart1 *)DeviceCharacterMultiUsart1::ms_pThis)->interruptRxServiceRoutine();
   }
 
-#endif /*OS_CFGBOOL_DEVICECHARACTERMULTIUSART1_RX_CONTEXT_SWITCH*/
+#endif /* OS_CFGBOOL_DEVICECHARACTERMULTIUSART1_RX_CONTEXT_SWITCH */
 
-#endif /*OS_INCLUDE_DEVICECHARACTERMULTIUSART1*/
+#endif /* OS_INCLUDE_DEVICECHARACTERMULTIUSART1 */

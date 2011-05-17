@@ -16,7 +16,7 @@
 void CANPacket::dump(void)
   {
     unsigned char i;
-    unsigned char *p;
+    unsigned char* p;
 
     i = len & 0x0F;
     OSDeviceDebug::putHex(id);
@@ -29,6 +29,6 @@ void CANPacket::dump(void)
       }
     OSDeviceDebug::putNewLine();
   }
-#endif /*DEBUG*/
+#endif /* defined(DEBUG) */
 
-#endif /*OS_INCLUDE_OSDEVICECAN*/
+#endif /* defined(OS_INCLUDE_OSDEVICECAN) */

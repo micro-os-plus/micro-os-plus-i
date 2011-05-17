@@ -22,4 +22,4 @@ const static unsigned short BLOCK_WRITE_MILLIS = 5;
 
 #endif
 
-#endif /*HAL_FLASH_CONSTANTS_H_*/
+#endif /* HAL_FLASH_CONSTANTS_H_ */

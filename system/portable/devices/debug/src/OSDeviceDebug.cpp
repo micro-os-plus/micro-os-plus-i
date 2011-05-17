@@ -15,7 +15,7 @@ OSDeviceDebug::OSDeviceDebug()
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceDebug"), this);
 }
-#endif /*OS_EXCLUDE_MULTITASKING*/
+#endif /* OS_EXCLUDE_MULTITASKING */
 
 #if defined(DEBUG)
 
@@ -32,7 +32,7 @@ void OSDeviceDebug::nakedEarlyInit(void)
 
 extern const char greeting[] __attribute__((weak));
 
-// Default greeeting message
+// Default greeting message
 const char greeting[] = APP_CFGSTR_GREETING;
 
 void
@@ -64,7 +64,7 @@ OSDeviceDebug::commonPutByte(unsigned char c)
 }
 
 int
-OSDeviceDebug::commonPutBytes(const char *s, unsigned int n)
+OSDeviceDebug::commonPutBytes(const char* s, unsigned int n)
 {
   if (!implDevicePresent())
     return -1;
@@ -79,12 +79,12 @@ OSDeviceDebug::commonPutBytes(const char *s, unsigned int n)
 
 // display constructor name and object address
 void
-OSDeviceDebug::putConstructor(const char *pc, const void *p)
+OSDeviceDebug::putConstructor(const char* pc, const void* p)
 {
   OSCriticalSection::enter();
     {
       putString(pc);
-      putString("()=");
+      putString("() @");
       putPtr(p);
       putNewLine();
     }
@@ -115,7 +115,7 @@ OSDeviceDebug::putNewLine(void)
 }
 
 void
-OSDeviceDebug::putString(const char *pc)
+OSDeviceDebug::putString(const char* pc)
 {
   if (pc == 0)
     return;
@@ -266,7 +266,7 @@ OSDeviceDebug::putHex(unsigned int l)
 #endif
 
 void
-OSDeviceDebug::putPC(const char * PROGMEM pc)
+OSDeviceDebug::putPC(const char*  PROGMEM pc)
 {
   unsigned char c;
   unsigned char b;
@@ -275,11 +275,11 @@ OSDeviceDebug::putPC(const char * PROGMEM pc)
   i = 0;
 
 #if defined(OS_CONFIG_ARCH_AVR8)
-  unsigned char buff[ 5 ];
+  unsigned char buff[5];
   unsigned short l;
   l = (unsigned short)pc;
 
-  c = ( (l >> 15 ) & 0x01 );
+  c = ((l >> 15) & 0x01);
   buff[i++] = c + '0';
 
   l <<= 1;
@@ -325,7 +325,7 @@ OSDeviceDebug::putPC(const char * PROGMEM pc)
 }
 
 void
-OSDeviceDebug::putPtr(const void *p)
+OSDeviceDebug::putPtr(const void* p)
 {
   unsigned char c;
   unsigned char b;
@@ -334,7 +334,7 @@ OSDeviceDebug::putPtr(const void *p)
   i = 0;
 
 #if (__SIZEOF_POINTER__ == 2)
-  unsigned char buff[ 4 ];
+  unsigned char buff[4];
   unsigned short v;
   v = (unsigned short)p;
 
@@ -440,11 +440,11 @@ OSDeviceDebug::putDec(unsigned long w, unsigned short n)
       OSCriticalSection::exit();
     }
 }
-#endif /*OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG*/
+#endif /* OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG */
 
 void
-OSDeviceDebug::__assert(const char *func, const char *file, int lineno,
-    const char *sexp)
+OSDeviceDebug::__assert(const char* func, const char* file, int lineno,
+    const char* sexp)
 {
   OSCriticalSection::enter();
     {
@@ -496,9 +496,9 @@ OSDeviceDebug::xsputn(const char* s, streamsize n)
 #else
 
   return -1;
-#endif /*DEBUG*/
+#endif /* defined(DEBUG) */
 }
 
-#endif /* OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF */
+#endif /* defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF) */
 
-#endif /* DEBUG */
+#endif /* defined(DEBUG) */

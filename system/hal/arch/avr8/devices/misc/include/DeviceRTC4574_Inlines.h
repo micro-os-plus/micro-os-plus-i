@@ -65,4 +65,4 @@ inline void DeviceRTC4574::fconLow(void)
   }
 
 
-#endif /*DEVICERTC4574_INLINES_H_*/
+#endif /* DEVICERTC4574_INLINES_H_ */

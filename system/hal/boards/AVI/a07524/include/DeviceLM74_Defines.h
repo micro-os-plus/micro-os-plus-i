@@ -16,4 +16,4 @@
 #define OS_CONFIG_LM74_DATA_PORT_READ           PINA
 #define OS_CONFIG_LM74_DATA_BIT                 4
 
-#endif /*DEVICELM74_DEFINES_H_*/
+#endif /* DEVICELM74_DEFINES_H_ */

@@ -36,4 +36,4 @@ public:
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*DEVICEMEMCARDSELECT_H_*/
+#endif /* DEVICEMEMCARDSELECT_H_ */

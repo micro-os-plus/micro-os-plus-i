@@ -36,4 +36,4 @@ protected:
 
 #include "hal/arch/avr8/devices/block/include/DeviceMemCardSPI_Inlines.h"
 
-#endif /*DEVICEMEMCARDSPI_H_*/
+#endif /* DEVICEMEMCARDSPI_H_ */

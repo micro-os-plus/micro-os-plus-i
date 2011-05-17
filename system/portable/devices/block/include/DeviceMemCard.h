@@ -104,16 +104,16 @@ public:
   close(void);
 
   static int
-  execCmd(unsigned char cmd, unsigned long arg, unsigned char *pbuf,
+  execCmd(unsigned char cmd, unsigned long arg, unsigned char* pbuf,
       unsigned short len);
   static int
   setBlkLen(unsigned short blen);
   static int
-  readCtrl(unsigned char cmd, unsigned char *pbuf, unsigned short len);
+  readCtrl(unsigned char cmd, unsigned char* pbuf, unsigned short len);
   static int
-  readBuffer(memCardAddr_t addr, unsigned char *pbuf, unsigned short len);
+  readBuffer(memCardAddr_t addr, unsigned char* pbuf, unsigned short len);
   static int
-  writeBuffer(memCardAddr_t addr, unsigned char *pbuf, unsigned short len);
+  writeBuffer(memCardAddr_t addr, unsigned char* pbuf, unsigned short len);
 
   static int
   tagEraseStart(memCardAddr_t addr);
@@ -127,7 +127,7 @@ public:
 
 #if defined(OS_INCLUDE_MEMCARD_VALIDATEVOLTAGE)
 
-  static bool validateVoltage( unsigned long l );
+  static bool validateVoltage(unsigned long l);
 #endif
 
   static int
@@ -192,11 +192,11 @@ DeviceMemCard::isOpened(void)
 
 // MMC 1.0 CID
 typedef struct
-__attribute__ ( ( __packed__ ) )
+__attribute__ ((__packed__))
   {
     unsigned long manufacturerID:
     24;
-    unsigned char productName[ 7 ];
+    unsigned char productName[7];
     unsigned char hwRevision:
     4;
     unsigned char fwRevision:
@@ -214,13 +214,13 @@ memCardCID_mmc10_t;
 
 // MMC 1.3 CID
 typedef struct
-__attribute__ ( ( __packed__ ) )
+__attribute__ ((__packed__))
   {
     unsigned int manufacturerID:
     8; // [0]
     unsigned int applicationID:
     16; // [1]
-    unsigned char productName[ 6 ]; // [3]
+    unsigned char productName[6]; // [3]
     unsigned char productRevision:
     8; // [9]
     unsigned long serialNumber:
@@ -234,13 +234,13 @@ memCardCID_mmc13_t;
 
 // SDC CID
 typedef struct
-__attribute__ ( ( __packed__ ) )
+__attribute__ ((__packed__))
   {
     unsigned int manufacturerID:
     8; // [0]
     unsigned int applicationID:
     16; // [1]
-    unsigned char productName[ 5 ]; // [3]
+    unsigned char productName[5]; // [3]
     unsigned char productRevision:
     8; // [8]
     unsigned long serialNumber:
@@ -256,4 +256,4 @@ __attribute__ ( ( __packed__ ) )
   }
 memCardCID_sdc_t;
 
-#endif /*DEVICEMEMCARD_H_*/
+#endif /* DEVICEMEMCARD_H_ */

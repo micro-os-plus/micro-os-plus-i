@@ -16,7 +16,7 @@
 
 // ----- static data ---------------------------------------------------------
 
-DeviceCharacterUsart * DeviceCharacterUsart::ms_pThis;
+DeviceCharacterUsart* DeviceCharacterUsart::ms_pThis;
 
 #endif
 
@@ -27,9 +27,9 @@ DeviceCharacterUsart::DeviceCharacterUsart(void)
     OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterUsart"), this);
   }
 
-void DeviceCharacterUsart::init(unsigned char *pTxBuf,
+void DeviceCharacterUsart::init(unsigned char* pTxBuf,
     unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM,
-    unsigned char *pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
+    unsigned char* pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
     unsigned short rxLWM)
   {
 #if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
@@ -41,9 +41,9 @@ void DeviceCharacterUsart::init(unsigned char *pTxBuf,
   }
 
 // set custom high/low water marks
-DeviceCharacterUsart::DeviceCharacterUsart(unsigned char *pTxBuf,
+DeviceCharacterUsart::DeviceCharacterUsart(unsigned char* pTxBuf,
     unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM,
-    unsigned char *pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
+    unsigned char* pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
     unsigned short rxLWM) :
 m_txBuf(pTxBuf, txBufSize, txHWM, txLWM), m_rxBuf(pRxBuf, rxBufSize, rxHWM,
     rxLWM)
@@ -56,8 +56,8 @@ m_txBuf(pTxBuf, txBufSize, txHWM, txLWM), m_rxBuf(pRxBuf, rxBufSize, rxHWM,
   }
 
 // use default 3/4 high and 1/4 low water marks
-DeviceCharacterUsart::DeviceCharacterUsart(unsigned char *pTxBuf,
-    unsigned short txBufSize, unsigned char *pRxBuf, unsigned short rxBufSize) :
+DeviceCharacterUsart::DeviceCharacterUsart(unsigned char* pTxBuf,
+    unsigned short txBufSize, unsigned char* pRxBuf, unsigned short rxBufSize) :
 m_txBuf(pTxBuf, txBufSize, txBufSize * 3/ 4, txBufSize / 4), m_rxBuf(pRxBuf,
     rxBufSize, rxBufSize * 3/ 4, rxBufSize / 4)
   {
@@ -213,5 +213,5 @@ void DeviceCharacterUsart::interruptRxServiceRoutine(void)
     OSScheduler::eventNotify(getReadEvent());
   }
 
-#endif /*OS_INCLUDE_DEVICECHARACTERUSART*/
+#endif /* OS_INCLUDE_DEVICECHARACTERUSART */
 

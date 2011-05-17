@@ -29,10 +29,10 @@ inline unsigned char DeviceSPIUsart::implSpiReadWrite(unsigned char c)
       ; // wait for empty transmit buffer
 
     UDR1 = c;
-    while ( (UCSR1A & _BV(RXC1)) == 0)
+    while ((UCSR1A & _BV(RXC1)) == 0)
       ; // wait for data to be received
 
     return UDR1;
   }
 
-#endif /*DEVICESPIUSART_INLINES_H_*/
+#endif /* DEVICESPIUSART_INLINES_H_ */

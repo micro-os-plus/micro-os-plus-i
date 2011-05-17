@@ -30,4 +30,4 @@ protected:
 
 #include "hal/arch/avr8/at90usb/devices/misc/include/DeviceSPIUsart_Inlines.h"
 
-#endif /*DEVICESPIUSART_H_*/
+#endif /* DEVICESPIUSART_H_ */

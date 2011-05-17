@@ -19,7 +19,7 @@ public:
   OSReturn_t
   add(OSThread* pThread);
   OSReturn_t
-  remove(OSThread * pThread);
+  remove(OSThread* pThread);
   OSThread*
   getItem(int i);
 
@@ -60,10 +60,10 @@ public:
 
   // release owned mutex
   int
-  release(OSThread * pThread = 0);
+  release(OSThread* pThread = 0);
 
   // return the thread owner of the mutex
-  OSThread *
+  OSThread* 
   getOwnerThread(void);
 
   // return the event used for notification the acquire and release of the mutex
@@ -80,7 +80,7 @@ public:
 
 private:
   // the thread which uses this mutex
-  OSThread * m_pOwnerThread;
+  OSThread* m_pOwnerThread;
 
   // true if the mutex is currently acquired
   bool m_isAcquired;
@@ -97,7 +97,7 @@ private:
 
 };
 
-inline OSThread *
+inline OSThread* 
 OSMutex::getOwnerThread(void)
 {
   return m_pOwnerThread;

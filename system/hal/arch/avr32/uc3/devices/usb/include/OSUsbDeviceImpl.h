@@ -57,9 +57,9 @@ public:
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
   static int
-  readBuffer(void *buf, int count);
+  readBuffer(void* buf, int count);
   static int
-  writeBuffer(void *buf, int count);
+  writeBuffer(void* buf, int count);
   static void
   Usb_reset_endpoint_fifo_access(unsigned char ep);
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */

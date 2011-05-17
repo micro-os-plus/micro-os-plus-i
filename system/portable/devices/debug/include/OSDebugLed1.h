@@ -58,4 +58,4 @@ OSDebugLed1::OSDebugLed1()
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*OSDEBUGLED1_H_*/
+#endif /* OSDEBUGLED1_H_ */

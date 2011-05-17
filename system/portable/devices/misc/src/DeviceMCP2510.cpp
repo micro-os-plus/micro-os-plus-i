@@ -164,5 +164,5 @@ void DeviceMCP2510::cmdRts(unsigned char channel)
     implSelectDisable();
   }
 
-#endif /*OS_INCLUDE_DEVICEMCP2510*/
+#endif /* OS_INCLUDE_DEVICEMCP2510 */
 

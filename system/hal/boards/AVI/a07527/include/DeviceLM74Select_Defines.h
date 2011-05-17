@@ -11,4 +11,4 @@
 #define OS_CONFIG_LM74_SELECT_PORT              PORTA
 #define OS_CONFIG_LM74_SELECT_BIT               3
 
-#endif /*DEVICELM74SELECT_DEFINES_H_*/
+#endif /* DEVICELM74SELECT_DEFINES_H_ */

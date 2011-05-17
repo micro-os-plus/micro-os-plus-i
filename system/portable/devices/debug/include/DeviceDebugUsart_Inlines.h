@@ -22,7 +22,7 @@
 #endif
 
 inline int
-OSDeviceDebug::implPutBytes(const char *s, unsigned int n)
+OSDeviceDebug::implPutBytes(const char* s, unsigned int n)
 {
   unsigned int i;
   for (i = 0; i < n; ++i)
@@ -31,4 +31,4 @@ OSDeviceDebug::implPutBytes(const char *s, unsigned int n)
   return n;
 }
 
-#endif /*DEVICEDEBUGUSART_INLINES_H_*/
+#endif /* DEVICEDEBUGUSART_INLINES_H_ */

@@ -54,4 +54,4 @@ void OSDebugLed1::off(void)
     return OS_CONFIG_DEBUG_LED1_BIT;
   }
 
-#endif /*OSDEBUGLED1_INLINES_H_*/
+#endif /* OSDEBUGLED1_INLINES_H_ */

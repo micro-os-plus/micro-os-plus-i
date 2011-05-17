@@ -128,4 +128,4 @@ inline void PinChangeDispatchers::interruptPinChange29disable()
   }
 #endif
 
-#endif /*PINCHANGEDISPATCHERS_H_*/
+#endif /* PINCHANGEDISPATCHERS_H_ */

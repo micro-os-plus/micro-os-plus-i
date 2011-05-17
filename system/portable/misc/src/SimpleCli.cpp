@@ -12,7 +12,7 @@
 
 #include "portable/misc/include/SimpleCli.h"
 
-SimpleCli::SimpleCli(unsigned char *pLine, unsigned short iSize)
+SimpleCli::SimpleCli(unsigned char* pLine, unsigned short iSize)
 {
   OSDeviceDebug::putConstructor_P(PSTR("SimpleCli"), this);
 
@@ -29,7 +29,7 @@ SimpleCli::~SimpleCli()
 int
 SimpleCli::readLine(istream& cin, ostream& cout)
 {
-  unsigned char * pc;
+  unsigned char*  pc;
   int c;
 
   for (pc = m_pLine;;)
@@ -76,7 +76,7 @@ SimpleCli::readLine(istream& cin, ostream& cout)
             }
         }
     }
-  //*pc++ = ' ';
+  // *pc++ = ' ';
   *pc = '\0';
 
   return pc - m_pLine;
@@ -89,10 +89,10 @@ SimpleCli::parseReset(void)
   m_pNext = m_pLine;
 }
 
-unsigned char *
+unsigned char* 
 SimpleCli::parseNext(void)
 {
-  unsigned char * pc;
+  unsigned char*  pc;
   unsigned char c;
 
   for (; c = *m_pNext, c == ' ' || c == '\t'; ++m_pNext)
@@ -117,7 +117,7 @@ SimpleCli::parseNext(void)
 #ifdef OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE
 
 char
-SimpleCli::parseHexNibble(unsigned char *p, unsigned char *pc)
+SimpleCli::parseHexNibble(unsigned char* p, unsigned char* pc)
 {
   unsigned char ch, tmp;
 
@@ -145,21 +145,21 @@ SimpleCli::parseHexNibble(unsigned char *p, unsigned char *pc)
 
 // Convert two ascii characters to hex
 char
-SimpleCli::parseHex( unsigned char *p, unsigned char *pc )
+SimpleCli::parseHex(unsigned char* p, unsigned char* pc)
   {
     unsigned char ch, i, tmp;
 
     ch = 0;
-    for ( i = 2; i != 0; --i )
+    for (i = 2; i != 0; --i)
       {
         ch <<= 4;
         tmp = *p;
-        if ( '0' <= tmp && tmp <= '9' )
-        ch |= ( tmp - '0' );
-        else if ( 'a' <= tmp && tmp <= 'f' )
-        ch |= ( tmp - ( unsigned char ) 'a' + 10 );
-        else if ( 'A' <= tmp && tmp <= 'F' )
-        ch |= ( tmp - ( unsigned char ) 'A' + 10 );
+        if ('0' <= tmp && tmp <= '9')
+        ch |= (tmp - '0');
+        else if ('a' <= tmp && tmp <= 'f')
+        ch |= (tmp - (unsigned char) 'a' + 10);
+        else if ('A' <= tmp && tmp <= 'F')
+        ch |= (tmp - (unsigned char) 'A' + 10);
         else
         return -1;
 
@@ -173,21 +173,21 @@ SimpleCli::parseHex( unsigned char *p, unsigned char *pc )
 
 #ifdef OS_INCLUDE_SIMPLECLI_PARSE_HEX_SHORT
 
-char SimpleCli::parseHex(unsigned char *p, unsigned short *pw)
+char SimpleCli::parseHex(unsigned char* p, unsigned short* pw)
   {
     unsigned char tmp;
     unsigned short sh;
 
     sh = 0;
-    while ( (tmp = *p ) != '\0')
+    while ((tmp = *p) != '\0')
       {
         sh <<= 4;
-        if ( '0' <= tmp && tmp <= '9')
-        sh |= (tmp - '0' );
-        else if ( 'a' <= tmp && tmp <= 'f')
-        sh |= (tmp - ( unsigned char ) 'a' + 10 );
-        else if ( 'A' <= tmp && tmp <= 'F')
-        sh |= (tmp - ( unsigned char ) 'A' + 10 );
+        if ('0' <= tmp && tmp <= '9')
+        sh |= (tmp - '0');
+        else if ('a' <= tmp && tmp <= 'f')
+        sh |= (tmp - (unsigned char) 'a' + 10);
+        else if ('A' <= tmp && tmp <= 'F')
+        sh |= (tmp - (unsigned char) 'A' + 10);
         else
         return -1;
         ++p;
@@ -201,7 +201,7 @@ char SimpleCli::parseHex(unsigned char *p, unsigned short *pw)
 #ifdef OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG
 
 char
-SimpleCli::parseHex(unsigned char *p, unsigned long *pl)
+SimpleCli::parseHex(unsigned char* p, unsigned long* pl)
 {
   unsigned char tmp;
   unsigned long lh;
@@ -229,17 +229,17 @@ SimpleCli::parseHex(unsigned char *p, unsigned long *pl)
 #ifdef OS_INCLUDE_SIMPLECLI_PARSE_UNSIGNED_SHORT
 
 char
-SimpleCli::parseUnsigned( unsigned char *p, unsigned short *pw )
+SimpleCli::parseUnsigned(unsigned char* p, unsigned short* pw)
   {
     unsigned short sh;
     unsigned char tmp;
 
     sh = 0;
-    while ( ( tmp = *p ) != '\0' )
+    while ((tmp = *p) != '\0')
       {
         sh *= 10;
-        if ( '0' <= tmp && tmp <= '9' )
-        sh += ( tmp - '0' );
+        if ('0' <= tmp && tmp <= '9')
+        sh += (tmp - '0');
         else
         return -1;
         ++p;

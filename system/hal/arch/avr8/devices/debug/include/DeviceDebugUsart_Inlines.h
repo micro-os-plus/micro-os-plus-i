@@ -40,16 +40,16 @@ inline void OSDeviceDebug::implEarlyInit(void)
 
 #if (OS_CONFIG_DEBUG_USART_DOUBLE_SPEED)
 
-    UCSR1A = _BV( U2X1 );
+    UCSR1A = _BV(U2X1);
 #else
 
     UCSR1A = 0;
 #endif
     /* Enable the Rx and Tx. */
-    UCSR1B = _BV( TXEN1 );
+    UCSR1B = _BV(TXEN1);
 
     /* Set 2-bit stop and the data bits to 8. */
-    UCSR1C = ( ( 1 << USBS1 ) | ( 3 << UCSZ10 ) );
+    UCSR1C = ((1 << USBS1) | (3 << UCSZ10));
 
   }
 
@@ -60,7 +60,7 @@ inline bool OSDeviceDebug::implDevicePresent(void)
 
 inline bool OSDeviceDebug::implCanTransmit(void)
   {
-    return ( (UCSR1A & _BV( UDRE1 ) ) != 0 );
+    return ((UCSR1A & _BV(UDRE1)) != 0);
   }
 
 inline void OSDeviceDebug::implPutByte(unsigned char b)
@@ -73,4 +73,4 @@ inline void OSDeviceDebug::implWDReset(void)
     wdt_reset()
 ;}
 
-#endif /*HAL_DEVICEDEBUGUSART_INLINES_H_*/
+#endif /* HAL_DEVICEDEBUGUSART_INLINES_H_ */

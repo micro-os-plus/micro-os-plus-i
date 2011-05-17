@@ -56,4 +56,4 @@ private:
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*DEVICELM74_H_*/
+#endif /* DEVICELM74_H_ */

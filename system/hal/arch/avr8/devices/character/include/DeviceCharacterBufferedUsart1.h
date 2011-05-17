@@ -12,12 +12,12 @@
 class DeviceCharacterBufferedUsart1 : public DeviceCharacterBufferedUsartBase
 {
 public:
-  DeviceCharacterBufferedUsart1(unsigned char *pRxBuf, unsigned short rxBufSize,
-      unsigned short rxHWM, unsigned short rxLWM, unsigned char *pTxBuf,
+  DeviceCharacterBufferedUsart1(unsigned char* pRxBuf, unsigned short rxBufSize,
+      unsigned short rxHWM, unsigned short rxLWM, unsigned char* pTxBuf,
       unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM);
 
-  DeviceCharacterBufferedUsart1(unsigned char *pRxBuf, unsigned short rxBufSize,
-      unsigned char *pTxBuf, unsigned short txBufSize);
+  DeviceCharacterBufferedUsart1(unsigned char* pRxBuf, unsigned short rxBufSize,
+      unsigned char* pTxBuf, unsigned short txBufSize);
 
 private:
 

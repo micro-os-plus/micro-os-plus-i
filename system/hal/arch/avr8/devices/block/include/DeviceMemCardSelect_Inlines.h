@@ -27,4 +27,4 @@ inline void DeviceMemCardSelect::implSelectDisable(void)
         |= _BV(OS_CONFIG_DEVICEMEMCARDSELECT_PORT_BIT);
   }
 
-#endif /*HAL_DEVICEMEMCARDSELECT_INLINES_H_*/
+#endif /* HAL_DEVICEMEMCARDSELECT_INLINES_H_ */

@@ -11,6 +11,6 @@
 
 #include "portable/stdlib/include/ostream"
 
-ostream & operator <<(ostream & out, OSThread& pt);
+ostream& operator <<(ostream& out, OSThread& pt);
 
-#endif /*OSTREAM_OSTHREAD_H_*/
+#endif /* OSTREAM_OSTHREAD_H_ */

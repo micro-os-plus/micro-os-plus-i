@@ -36,4 +36,4 @@
 
 #include "hal/boards/Metrilog/include/DebugLeds_B6B7B5_Defines.h"
 
-#endif /*HAL_BOARD_OS_DEFINES_H_*/
+#endif /* HAL_BOARD_OS_DEFINES_H_ */

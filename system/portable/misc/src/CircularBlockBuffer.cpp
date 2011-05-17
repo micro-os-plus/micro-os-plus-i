@@ -18,7 +18,7 @@ CircularBlockBuffer::CircularBlockBuffer()
     OSDeviceDebug::putConstructor_P(PSTR("CircularBlockBuffer"), this);
   }
 
-CircularBlockBuffer::CircularBlockBuffer(unsigned char *pBuf,
+CircularBlockBuffer::CircularBlockBuffer(unsigned char* pBuf,
     unsigned short blklen, unsigned short blocks, unsigned short highWM,
     unsigned short lowWM)
   {
@@ -27,7 +27,7 @@ CircularBlockBuffer::CircularBlockBuffer(unsigned char *pBuf,
     init(pBuf, blklen, blocks, highWM, lowWM);
   }
 
-void CircularBlockBuffer::init(unsigned char *pBuf, unsigned short blklen,
+void CircularBlockBuffer::init(unsigned char* pBuf, unsigned short blklen,
     unsigned short blocks, unsigned short highWM, unsigned short lowWM)
   {
     m_pBuf = pBuf;
@@ -45,7 +45,7 @@ void CircularBlockBuffer::clear(void)
     m_len = 0;
   }
 
-void CircularBlockBuffer::put(unsigned char *pc)
+void CircularBlockBuffer::put(unsigned char* pc)
   {
     memcpy(m_pPut, pc, m_blkLen);
     m_pPut += m_blkLen;
@@ -56,7 +56,7 @@ void CircularBlockBuffer::put(unsigned char *pc)
     m_len++;
   }
 
-unsigned char *CircularBlockBuffer::get(unsigned char *pc)
+unsigned char* CircularBlockBuffer::get(unsigned char* pc)
   {
     memcpy(pc, m_pGet, m_blkLen);
     m_pGet += m_blkLen;

@@ -124,7 +124,7 @@ bool SDI12BootLoader::processCommand(void)
 
         bUseCRC = true;
 
-        unsigned char *p;
+        unsigned char* p;
 
         unsigned short crc;
         crc = 0;
@@ -340,7 +340,7 @@ bool SDI12BootLoader::processCommand(void)
                 OSDebugLed1::off();
 
                 unsigned short k;
-                for (k = 0; k < ms_len; )
+                for (k = 0; k < ms_len;)
                   {
                     for (unsigned char j = 0; j < 4; ++j)
                       {

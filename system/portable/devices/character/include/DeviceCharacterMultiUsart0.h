@@ -44,12 +44,12 @@
 class DeviceCharacterMultiUsart0 : public DeviceCharacterUsart
 {
 public:
-  DeviceCharacterMultiUsart0(unsigned char *pTxBuf, unsigned short txBufSize,
-      unsigned short txHWM, unsigned short txLWM, unsigned char *pRxBuf,
+  DeviceCharacterMultiUsart0(unsigned char* pTxBuf, unsigned short txBufSize,
+      unsigned short txHWM, unsigned short txLWM, unsigned char* pRxBuf,
       unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM);
 
-  DeviceCharacterMultiUsart0(unsigned char *pTxBuf, unsigned short txBufSize,
-      unsigned char *pRxBuf, unsigned short rxBufSize);
+  DeviceCharacterMultiUsart0(unsigned char* pTxBuf, unsigned short txBufSize,
+      unsigned char* pRxBuf, unsigned short rxBufSize);
 
 private:
   virtual void
@@ -64,7 +64,7 @@ private:
   implPortWrite(unsigned char b);
 
 public:
-  static DeviceCharacterMultiUsart0 *ms_pThis;
+  static DeviceCharacterMultiUsart0* ms_pThis;
 };
 
-#endif /*DEVICECHARACTERMULTIUSART0_H_*/
+#endif /* DEVICECHARACTERMULTIUSART0_H_ */

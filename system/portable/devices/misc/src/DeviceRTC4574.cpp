@@ -29,7 +29,7 @@ void DeviceRTC4574::delay(void)
     OS::NOP();
   }
 
-unsigned char DeviceRTC4574::readBytes(unsigned char addr, unsigned char *pBuf,
+unsigned char DeviceRTC4574::readBytes(unsigned char addr, unsigned char* pBuf,
     unsigned char len)
   {
     unsigned char ret;
@@ -64,7 +64,7 @@ unsigned char DeviceRTC4574::readBytes(unsigned char addr, unsigned char *pBuf,
     return ret;
   }
 
-void DeviceRTC4574::writeBytes(unsigned char addr, unsigned char *pBuf,
+void DeviceRTC4574::writeBytes(unsigned char addr, unsigned char* pBuf,
     unsigned char len)
   {
     if (pBuf != 0 && len != 0)
@@ -131,4 +131,4 @@ unsigned char DeviceRTC4574::readByte(void)
     return c;
   }
 
-#endif /*OS_INCLUDE_DEVICERTC4574*/
+#endif /* OS_INCLUDE_DEVICERTC4574 */

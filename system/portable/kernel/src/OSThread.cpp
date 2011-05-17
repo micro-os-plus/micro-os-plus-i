@@ -30,8 +30,8 @@ OSThread::OSThread(const char* pName, OSThreadMainPtr_t entryPoint,
 
 // The stack size is in multiples of OSStack_t
 void
-OSThread::init(const char *pName, OSThreadMainPtr_t entryPoint, void *pParameters,
-    const OSStack_t *pStack, unsigned short stackSize,
+OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameters,
+    const OSStack_t* pStack, unsigned short stackSize,
     OSThreadPriority_t priority)
 {
   // no stack, sorry...
@@ -175,7 +175,7 @@ OSThread::getStackUsed(void)
 {
   unsigned short i;
   unsigned short r;
-  unsigned char *pc;
+  unsigned char* pc;
 
   r = m_stackSize;
   pc = m_pStackBottom;
@@ -194,12 +194,12 @@ OSThread::getStackUsed(void)
 
 OSProgramPtr_t OSThread::getProgramCounter(void)
   {
-    unsigned char * p;
-    p = ( unsigned char * ) getStack() + 34;
+    unsigned char*  p;
+    p = (unsigned char*) getStack() + 34;
     unsigned short w;
-    w = (p[ 0 ] << 8 ) | p[ 1 ];
+    w = (p[0] << 8) | p[1];
 
-    return ( OSProgramPtr_t ) w;
+    return (OSProgramPtr_t) w;
   }
 
 #else
@@ -258,7 +258,7 @@ void OSThread::virtualWatchdogCheck(void)
 #if defined(OS_INCLUDE_OSTHREAD_SCHEDULERTICK)
 
 void
-OSThread::schedulerTick( void )
+OSThread::schedulerTick(void)
   {
     return;
   }

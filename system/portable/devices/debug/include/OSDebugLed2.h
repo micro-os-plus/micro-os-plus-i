@@ -45,4 +45,4 @@ OSDebugLed2::OSDebugLed2()
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
-#endif /*OSDEBUGLED2_H_*/
+#endif /* OSDEBUGLED2_H_ */

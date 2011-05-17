@@ -179,7 +179,7 @@ OSDeviceCharacter::open(void)
             }
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
         }
-      //OSDeviceDebug::putChar( '!' );
+      //OSDeviceDebug::putChar('!');
     }
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
@@ -195,7 +195,7 @@ int
 OSDeviceCharacter::close(void)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_CLOSE)
-  OSDeviceDebug::putString( "OSDeviceCharacter::close()" );
+  OSDeviceDebug::putString("OSDeviceCharacter::close()");
   OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_CLOSE) */
 
@@ -283,7 +283,7 @@ OSDeviceCharacter::writeByte(unsigned char b)
           OSScheduler::eventWaitClear();
           return OSReturn::OS_WOULD_BLOCK;
         }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
       if (timeout != OSTimeout::OS_NEVER)
@@ -291,7 +291,7 @@ OSDeviceCharacter::writeByte(unsigned char b)
           m_pWriteTimer->eventNotify(timeout, event,
               OSEventWaitReturn::OS_TIMEOUT);
         }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE)
       OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeByte() wait "));
@@ -384,7 +384,7 @@ OSDeviceCharacter::writeBytes(unsigned char* buf, int len)
           OSScheduler::eventWaitClear();
           return OSReturn::OS_WOULD_BLOCK;
         }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
       if (timeout != OSTimeout::OS_NEVER)
@@ -392,7 +392,7 @@ OSDeviceCharacter::writeBytes(unsigned char* buf, int len)
           m_pWriteTimer->eventNotify(timeout, event,
               OSEventWaitReturn::OS_TIMEOUT);
         }
-#endif /*OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS*/
+#endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE)
       OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeByte() wait "));
@@ -792,7 +792,7 @@ OSDeviceCharacter::underflow(void)
   int r;
   r = readByte();
 
-  //OSDeviceDebug::putChar(( unsigned char )r );
+  //OSDeviceDebug::putChar((unsigned char)r);
 
   if (r < 0)
     return traits::eof();

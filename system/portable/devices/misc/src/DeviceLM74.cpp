@@ -43,5 +43,5 @@ signed short DeviceLM74::read(void)
     return (ret >> 3);
   }
 
-#endif /*OS_INCLUDE_DEVICELM74*/
+#endif /* OS_INCLUDE_DEVICELM74 */
 

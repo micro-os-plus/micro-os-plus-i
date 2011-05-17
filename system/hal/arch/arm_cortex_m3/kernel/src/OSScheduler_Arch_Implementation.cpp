@@ -8,8 +8,8 @@
 
 #if defined(OS_CONFIG_ARCH_TEMPLATE)
 
-OSStack_t * OSScheduler::stackInitialise(OSStack_t * pStackTop, void(*pCode)(
-    void *), void *pParams, unsigned char id)
+OSStack_t* OSScheduler::stackInitialise(OSStack_t* pStackTop, void(*pCode)(
+    void*), void* pParams, unsigned char id)
   {
     /* The value on the right is the offset from the thread stack pointer */
 
@@ -55,7 +55,7 @@ OSStack_t * OSScheduler::stackInitialise(OSStack_t * pStackTop, void(*pCode)(
         OSDeviceDebug::putString(" PC=");
         OSDeviceDebug::putPtr((void*) pCode);
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_DUMPSTACK)
-        OSStack_t *p;
+        OSStack_t* p;
         int i;
         for (p = pStackTop, i = 0; i < STACK_WORD_COUNT; p++, i++)
           {
@@ -75,7 +75,7 @@ OSStack_t * OSScheduler::stackInitialise(OSStack_t * pStackTop, void(*pCode)(
   }
 
 #if false
-void OSScheduler::stackSetReturnedValue(OSStack_t * pStack,
+void OSScheduler::stackSetReturnedValue(OSStack_t* pStack,
     OSEventWaitReturn_t ret)
   {
 #if false && defined(DEBUG)
@@ -102,7 +102,7 @@ void OSScheduler::startImpl(void)
     (
         " 		\n" /* Use the NVIC offset register to locate the stack. */
         : : :
-    );
+  );
 
     for (;;)
       ; // noreturn
@@ -115,12 +115,12 @@ void OSScheduler::ISRcontextSwitchRequest(void)
 
 #if defined(DEBUG)
 
-void OSScheduler::dumpContextInfo(OSThread * pThread)
+void OSScheduler::dumpContextInfo(OSThread* pThread)
   {
     OSDeviceDebug::putChar('\'');
     OSDeviceDebug::putString(pThread->getName());
 
-    OSStack_t * pStack;
+    OSStack_t* pStack;
     pStack = pThread->getStack();
     OSDeviceDebug::putString("' SP=");
     OSDeviceDebug::putPtr(pStack);
@@ -129,7 +129,7 @@ void OSScheduler::dumpContextInfo(OSThread * pThread)
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_DUMPSTACK)
 
-    const char * sRegNames[] =
+    const char*  sRegNames[] =
       { "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R0", "R1", "R2",
           "R3", "R12", "LR", "PC", "XPSR", "X" };
 

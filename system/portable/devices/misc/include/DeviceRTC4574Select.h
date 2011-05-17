@@ -34,4 +34,4 @@ public:
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*DEVICERTC4574SELECT_H_*/
+#endif /* DEVICERTC4574SELECT_H_ */

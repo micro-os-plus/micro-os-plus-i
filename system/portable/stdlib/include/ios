@@ -27,29 +27,29 @@ class ios;
 typedef class streambuf streambuf;
 
 // 27.4.6, manipulators:
-ios_base & boolalpha(ios_base & str);
-ios_base & noboolalpha(ios_base & str);
-ios_base & showbase(ios_base & str);
-ios_base & noshowbase(ios_base & str);
-ios_base & showpoint(ios_base & str);
-ios_base & noshowpoint(ios_base & str);
-ios_base & showpos(ios_base & str);
-ios_base & noshowpos(ios_base & str);
-ios_base & skipws(ios_base & str);
-ios_base & noskipws(ios_base & str);
-ios_base & uppercase(ios_base & str);
-ios_base & nouppercase(ios_base & str);
+ios_base& boolalpha(ios_base& str);
+ios_base& noboolalpha(ios_base& str);
+ios_base& showbase(ios_base& str);
+ios_base& noshowbase(ios_base& str);
+ios_base& showpoint(ios_base& str);
+ios_base& noshowpoint(ios_base& str);
+ios_base& showpos(ios_base& str);
+ios_base& noshowpos(ios_base& str);
+ios_base& skipws(ios_base& str);
+ios_base& noskipws(ios_base& str);
+ios_base& uppercase(ios_base& str);
+ios_base& nouppercase(ios_base& str);
 // 27.4.6.2 adjustfield:
-ios_base & internal(ios_base & str);
-ios_base & left(ios_base & str);
-ios_base & right(ios_base & str);
+ios_base& internal(ios_base& str);
+ios_base& left(ios_base& str);
+ios_base& right(ios_base& str);
 // 27.4.6.3 basefield:
-ios_base & dec(ios_base & str);
-ios_base & hex(ios_base & str);
-ios_base & oct(ios_base & str);
+ios_base& dec(ios_base& str);
+ios_base& hex(ios_base& str);
+ios_base& oct(ios_base& str);
 // 27.4.6.4 floatfield:
-ios_base & fixed(ios_base & str);
-ios_base & scientific(ios_base & str);
+ios_base& fixed(ios_base& str);
+ios_base& scientific(ios_base& str);
 
 // 27.4.2 Class ios_base
 
@@ -138,8 +138,8 @@ public:
 #if 0
 
   static int xalloc();
-  long &iword( int index );
-  void *&pword( int index );
+  long& iword(int index);
+  void*& pword(int index);
 #endif
 
   // destructor
@@ -152,11 +152,11 @@ public:
   enum event
     { erase_event, imbue_event, copyfmt_event};
 
-  typedef void( *event_callback ) ( event, ios_base &, int index );
+  typedef void(*event_callback) (event, ios_base&, int index);
 
-  void register_callback( event_callback fn, int index );
+  void register_callback(event_callback fn, int index);
 
-  static bool sync_with_stdio( bool sync = true )
+  static bool sync_with_stdio(bool sync = true)
     {
       return true;
     }
@@ -206,7 +206,7 @@ class ios : public ios_base
 
 public:
 
-  operator void *() const;
+  operator void*() const;
   bool operator !() const;
 
   iostate rdstate() const;
@@ -223,20 +223,20 @@ public:
 
   // 27.4.5.1 Constructor/destructor:
 
-  explicit ios(streambuf * sb);
-  //explicit ios( OSDeviceCharacter * dev );
-  //explicit ios( OSDeviceDebug * dbg );
+  explicit ios(streambuf* sb);
+  //explicit ios(OSDeviceCharacter* dev);
+  //explicit ios(OSDeviceDebug* dbg);
   virtual ~ios();
 
   // 27.4.5.2 Members:
 #if 0
 
-  ostream *tie() const;
-  ostream *tie( ostream * tiestr );
+  ostream* tie() const;
+  ostream* tie(ostream* tiestr);
 #endif
 
-  streambuf *rdbuf() const;
-  streambuf *rdbuf(streambuf * sb);
+  streambuf* rdbuf() const;
+  streambuf* rdbuf(streambuf* sb);
 
   //-- ios & copyfmt(const ios & rhs);
 
@@ -247,13 +247,13 @@ protected:
   char m_fill_char;
   //iostate m_state;
 
-  //ostream *m_tied;
-  streambuf *m_streambuf;
-  //OSDeviceCharacter *m_device;
-  //OSDeviceDebug *m_debug;
+  //ostream* m_tied;
+  streambuf* m_streambuf;
+  //OSDeviceCharacter* m_device;
+  //OSDeviceDebug* m_debug;
 
   ios();
-  void init(streambuf * sb/* , OSDeviceCharacter * dev, OSDeviceDebug * dbg */);
+  void init(streambuf* sb/* , OSDeviceCharacter* dev, OSDeviceDebug* dbg */);
 
   };
 
@@ -276,7 +276,7 @@ inline ios_base::fmtflags ios_base::setf(fmtflags fmtfl)
 
 inline ios_base::fmtflags ios_base::setf(fmtflags fmtfl, fmtflags mask)
   {
-    return flags( (flags() & ~mask ) | (fmtfl & mask ));
+    return flags((flags() & ~mask) | (fmtfl & mask));
   }
 
 inline void ios_base::unsetf(fmtflags mask)
@@ -294,13 +294,13 @@ inline streamsize ios_base::width() const
     return m_width;
   }
 
-inline ios::operator void *() const
+inline ios::operator void*() const
   {
-    if ( fail() )
+    if (fail())
       {
         return 0;
       }
-    return ( void * ) ( 1 ); //Must return a non-NULL pointer(though it can be *any* pointer)
+    return (void*) (1); //Must return a non-NULL pointer(though it can be *any* pointer)
   }
 
 inline bool ios::operator !() const
@@ -341,7 +341,7 @@ inline bool ios::eof() const
 
 inline bool ios::fail() const
   {
-    if (flags() & (failbit | badbit ))
+    if (flags() & (failbit | badbit))
       {
         return true;
       }
@@ -358,19 +358,19 @@ inline bool ios::bad() const
   }
 
 #if 0
-inline ostream *
+inline ostream*
 ios::tie() const
   {
     return m_tied;
   }
 #endif
 
-inline streambuf * ios::rdbuf() const
+inline streambuf* ios::rdbuf() const
   {
     return m_streambuf;
   }
 
-//-- ios & copyfmt(const ios & rhs);
+//-- ios & copyfmt(const ios& rhs);
 
 inline char ios::fill() const
   {
@@ -379,122 +379,122 @@ inline char ios::fill() const
 
 //ios_base manipulators
 
-inline ios_base & boolalpha(ios_base & str)
+inline ios_base& boolalpha(ios_base& str)
   {
     str.setf(ios_base::boolalpha);
     return str;
   }
 
-inline ios_base& noboolalpha(ios_base & str)
+inline ios_base& noboolalpha(ios_base& str)
   {
     str.unsetf(ios_base::boolalpha);
     return str;
   }
 
-inline ios_base& showbase(ios_base & str)
+inline ios_base& showbase(ios_base& str)
   {
     str.setf(ios_base::showbase);
     return str;
   }
 
-inline ios_base& noshowbase(ios_base & str)
+inline ios_base& noshowbase(ios_base& str)
   {
     str.unsetf(ios_base::showbase);
     return str;
   }
 
-inline ios_base& showpoint(ios_base & str)
+inline ios_base& showpoint(ios_base& str)
   {
     str.setf(ios_base::showpoint);
     return str;
   }
 
-inline ios_base& noshowpoint(ios_base & str)
+inline ios_base& noshowpoint(ios_base& str)
   {
     str.unsetf(ios_base::showpoint);
     return str;
   }
 
-inline ios_base& showpos(ios_base & str)
+inline ios_base& showpos(ios_base& str)
   {
     str.setf(ios_base::showpos);
     return str;
   }
 
-inline ios_base& noshowpos(ios_base & str)
+inline ios_base& noshowpos(ios_base& str)
   {
     str.unsetf(ios_base::showpos);
     return str;
   }
 
-inline ios_base & skipws(ios_base & str)
+inline ios_base& skipws(ios_base& str)
   {
     str.setf(ios_base::skipws);
     return str;
   }
 
-inline ios_base & noskipws(ios_base & str)
+inline ios_base& noskipws(ios_base& str)
   {
     str.unsetf(ios_base::skipws);
     return str;
   }
 
-inline ios_base & uppercase(ios_base & str)
+inline ios_base& uppercase(ios_base& str)
   {
     str.setf(ios_base::uppercase);
     return str;
   }
 
-inline ios_base & nouppercase(ios_base & str)
+inline ios_base& nouppercase(ios_base& str)
   {
     str.unsetf(ios_base::uppercase);
     return str;
   }
 
-//inline ios_base & unitbuf(ios_base & str)
+//inline ios_base& unitbuf(ios_base& str)
 //{
 //  str.setf(ios_base::unitbuf);
 //  return str;
 //}
 
-//inline ios_base & nounitbuf(ios_base & str)
+//inline ios_base& nounitbuf(ios_base& str)
 //{
 //  str.unsetf(ios_base::unitbuf);
 //  return str;
 //}
 
 
-inline ios_base & internal(ios_base & str)
+inline ios_base& internal(ios_base& str)
   {
     str.setf(ios_base::internal, ios_base::adjustfield);
     return str;
   }
 
-inline ios_base & left(ios_base & str)
+inline ios_base& left(ios_base& str)
   {
     str.setf(ios_base::left, ios_base::adjustfield);
     return str;
   }
 
-inline ios_base & right(ios_base & str)
+inline ios_base& right(ios_base& str)
   {
     str.setf(ios_base::right, ios_base::adjustfield);
     return str;
   }
 
-inline ios_base & dec(ios_base & str)
+inline ios_base& dec(ios_base& str)
   {
     str.setf(ios_base::dec, ios_base::basefield);
     return str;
   }
 
-inline ios_base & hex(ios_base & str)
+inline ios_base& hex(ios_base& str)
   {
     str.setf(ios_base::hex, ios_base::basefield);
     return str;
   }
 
-inline ios_base & oct(ios_base & str)
+inline ios_base& oct(ios_base& str)
   {
     str.setf(ios_base::oct, ios_base::basefield);
     return str;
@@ -502,19 +502,19 @@ inline ios_base & oct(ios_base & str)
 
 #if defined(OS_INCLUDE_OSTREAM_FLOAT)|| defined(OS_INCLUDE_ISTREAM_FLOAT)
 
-inline ios_base &
-fixed( ios_base & str )
+inline ios_base&
+fixed(ios_base& str)
   {
-    str.setf( ios_base::fixed, ios_base::floatfield );
+    str.setf(ios_base::fixed, ios_base::floatfield);
     return str;
   }
 
-inline ios_base &
-scientific( ios_base & str )
+inline ios_base&
+scientific(ios_base& str)
   {
-    str.setf( ios_base::scientific, ios_base::floatfield );
+    str.setf(ios_base::scientific, ios_base::floatfield);
     return str;
   }
 #endif
 
-#endif /*IOS_ */
+#endif /* IOS_ */

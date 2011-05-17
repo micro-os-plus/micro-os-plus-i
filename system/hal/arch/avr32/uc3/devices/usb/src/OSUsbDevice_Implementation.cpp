@@ -396,7 +396,7 @@ OSUsbDeviceImpl::Usb_reset_endpoint_fifo_access(unsigned char ep)
 #if 0
 
 int
-OSUsbDeviceImpl::writeBuffer(void *pBuf, int bufMaxSize)
+OSUsbDeviceImpl::writeBuffer(void* pBuf, int bufMaxSize)
   {
     unsigned int availableSize, min;
     int status;
@@ -408,7 +408,7 @@ OSUsbDeviceImpl::writeBuffer(void *pBuf, int bufMaxSize)
 
     status = AVR32_is_usb_in_ready(m_selectedEndpoint);
 
-    if( !status )
+    if(!status)
       {
         return 0;
       }
@@ -460,7 +460,7 @@ OSUsbDeviceImpl::writeBuffer(void *pBuf, int bufMaxSize)
 //!
 //! @warning Do not mix calls to this function with calls to indexed macros.
 //!
-U32 usb_read_ep_rxpacket(U8 ep, void *rxbuf, U32 data_length, void **prxbuf)
+U32 usb_read_ep_rxpacket(U8 ep, void* rxbuf, U32 data_length, void** prxbuf)
   {
     // Use aggregated pointers to have several alignments available for a same address
     UnionCVPtr ep_fifo;
@@ -577,7 +577,7 @@ U32 usb_read_ep_rxpacket(U8 ep, void *rxbuf, U32 data_length, void **prxbuf)
 //!
 //! @warning Do not mix calls to this function with calls to indexed macros.
 //!
-U32 usb_write_ep_txpacket(U8 ep, const void *txbuf, U32 data_length, const void **ptxbuf)
+U32 usb_write_ep_txpacket(U8 ep, const void* txbuf, U32 data_length, const void** ptxbuf)
   {
     // Use aggregated pointers to have several alignments available for a same address
     UnionVPtr ep_fifo;
@@ -1002,7 +1002,7 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
 
   if (wLength > data_to_transfer)
     {
-      if ( (data_to_transfer % EP_CONTROL_LENGTH ) == 0)
+      if ((data_to_transfer % EP_CONTROL_LENGTH) == 0)
         {
           zlp = true;
         }
@@ -1013,13 +1013,13 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
     }
   else
     {
-      data_to_transfer = ( unsigned char ) wLength; // send only requested number of data
+      data_to_transfer = (unsigned char) wLength; // send only requested number of data
     }
 
-  while ( (data_to_transfer != 0)
-      && ( !OSUsbDeviceImpl::isInterruptReceiveOut() ))
+  while ((data_to_transfer != 0)
+      && (!OSUsbDeviceImpl::isInterruptReceiveOut()))
     {
-      while ( !OSUsbDeviceImpl::Is_usb_read_control_enabled() )
+      while (!OSUsbDeviceImpl::Is_usb_read_control_enabled())
         {
           ;
         }
@@ -1036,11 +1036,11 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
 #if defined(OS_INCLUDE_SEPARATE_PROGMEM)
           // assumes devices descriptors are stored in the lower 64Kbytes of on-chip flash memory
           OSUsbDeviceImpl::writeByte(PROGMEM_READ_BYTE(pbuffer));
-          //OSUsbDeviceImpl::writeByte(pgm_read_byte_near( ( unsigned int ) pbuffer ));
+          //OSUsbDeviceImpl::writeByte(pgm_read_byte_near((unsigned int) pbuffer));
 #else
-          OSUsbDeviceImpl::writeByte( *(( unsigned char * ) pbuffer) );
+          OSUsbDeviceImpl::writeByte(*((unsigned char*) pbuffer));
 #endif
-          pbuffer = ( unsigned char * ) pbuffer + 1;
+          pbuffer = (unsigned char*) pbuffer + 1;
 
           data_to_transfer--;
         }
@@ -1049,7 +1049,7 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
 
   OSUsbDeviceImpl::Usb_send_control_in();
 
-  if (OSUsbDeviceImpl::isInterruptReceiveOut() )
+  if (OSUsbDeviceImpl::isInterruptReceiveOut())
     {
       OSUsbDeviceImpl::Usb_ack_receive_out();
       return;
@@ -1057,14 +1057,14 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
 
   if (zlp)
     {
-      while ( !OSUsbDeviceImpl::Is_usb_read_control_enabled() )
+      while (!OSUsbDeviceImpl::Is_usb_read_control_enabled())
         {
           ;
         }
       OSUsbDeviceImpl::Usb_send_control_in();
     }
 
-  while ( !OSUsbDeviceImpl::isInterruptReceiveOut() )
+  while (!OSUsbDeviceImpl::isInterruptReceiveOut())
     {
       ;
     }
@@ -1101,7 +1101,7 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
 
 #else
     case CONFIGURATION_DESCRIPTOR:
-    if( Is_usb_full_speed_mode() )
+    if(Is_usb_full_speed_mode())
       {
         data_to_transfer = Usb_get_conf_desc_fs_length(); //!< sizeof(usb_conf_desc_fs);
         pbuffer = Usb_get_conf_desc_fs_pointer();
@@ -1114,7 +1114,7 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
     break;
 
     case OTHER_SPEED_CONFIGURATION_DESCRIPTOR:
-    if( !Is_usb_full_speed_mode() )
+    if(!Is_usb_full_speed_mode())
       {
         data_to_transfer = Usb_get_conf_desc_fs_length(); //!< sizeof(usb_conf_desc_fs);
         pbuffer = Usb_get_conf_desc_fs_pointer();
@@ -1172,15 +1172,15 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
       Usb_reset_endpoint_fifo_access(EP_CONTROL);
 
 #if (USB_HIGH_SPEED_SUPPORT==ENABLED) // To support other descriptors like OTHER_SPEED_CONFIGURATION_DESCRIPTOR
-      if( b_first_data )
+      if(b_first_data)
         {
           b_first_data = FALSE;
-          if( 0!= data_to_transfer )
+          if(0!= data_to_transfer)
             {
               usb_write_ep_txpacket(EP_CONTROL, pbuffer, 1, &pbuffer);
               data_to_transfer--;
             }
-          if( 0!= data_to_transfer )
+          if(0!= data_to_transfer)
             {
               usb_write_ep_txpacket(EP_CONTROL, &descriptor_type, 1, NULL);
               pbuffer = ((const U8*)pbuffer)+1;
@@ -1412,7 +1412,7 @@ OSUsbDeviceImpl::usb_set_feature(void)
 
       if (wValue == FEATURE_ENDPOINT_HALT)
         {
-          wIndex = (OSUsbDeviceImpl::readByte() & MSK_EP_DIR );
+          wIndex = (OSUsbDeviceImpl::readByte() & MSK_EP_DIR);
 
           if (wIndex == EP_CONTROL)
             {
@@ -1426,11 +1426,11 @@ OSUsbDeviceImpl::usb_set_feature(void)
           OSDeviceDebug::putChar(' ');
 
           OSUsbDeviceImpl::endpointSelect(wIndex);
-          if (OSUsbDeviceImpl::Is_usb_endpoint_enabled() )
+          if (OSUsbDeviceImpl::Is_usb_endpoint_enabled())
             {
               OSUsbDeviceImpl::Usb_enable_stall_handshake();
               OSUsbDeviceImpl::endpointSelect(EP_CONTROL);
-              endpoint_status[ wIndex ] = 0x01;
+              endpoint_status[wIndex] = 0x01;
               OSUsbDeviceImpl::Usb_ack_receive_setup();
               OSUsbDeviceImpl::Usb_send_control_in();
             }
@@ -1592,7 +1592,7 @@ OSUsbDeviceImpl::usb_get_status(void)
   case REQUEST_ENDPOINT_STATUS:
 #if TO_BE_PORTED
     OSUsbDeviceImpl::Usb_ack_receive_setup();
-    OSUsbDeviceImpl::writeByte(endpoint_status[ wIndex ]);
+    OSUsbDeviceImpl::writeByte(endpoint_status[wIndex]);
 #else
     Usb_ack_receive_setup();
     Usb_reset_endpoint_fifo_access(EP_CONTROL);
@@ -1660,7 +1660,7 @@ OSUsbDeviceImpl::usb_set_interface(void)
 #if TO_BE_PORTED
   OSUsbDeviceImpl::Usb_ack_receive_setup();
   OSUsbDeviceImpl::Usb_send_control_in(); // send a ZLP for STATUS phase
-  while ( !OSUsbDeviceImpl::Is_usb_in_ready() )
+  while (!OSUsbDeviceImpl::Is_usb_in_ready())
     {
       ;
     }
@@ -1677,7 +1677,7 @@ OSUsbDeviceImpl::usb_set_interface(void)
 
   // Get descriptor
 #if (USB_HIGH_SPEED_SUPPORT==ENABLED)
-  if( Is_usb_full_speed_mode() )
+  if(Is_usb_full_speed_mode())
     {
       data_to_transfer = Usb_get_conf_desc_fs_length(); //!< sizeof(usb_conf_desc_fs);
       pbuffer = Usb_get_conf_desc_fs_pointer();

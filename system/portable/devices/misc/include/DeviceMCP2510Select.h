@@ -34,4 +34,4 @@ public:
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#endif /*DEVICEMCP2510SELECT_H_*/
+#endif /* DEVICEMCP2510SELECT_H_ */

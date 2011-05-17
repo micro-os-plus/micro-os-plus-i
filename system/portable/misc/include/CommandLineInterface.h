@@ -36,7 +36,7 @@ public:
 class CommandLineInterface
 {
 public:
-  CommandLineInterface(istream& cin, ostream& cout, unsigned char *pLine,
+  CommandLineInterface(istream& cin, ostream& cout, unsigned char* pLine,
       unsigned short iSize);
   ~CommandLineInterface();
 

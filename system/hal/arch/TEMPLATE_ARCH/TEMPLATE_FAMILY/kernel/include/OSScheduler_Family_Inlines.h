@@ -56,7 +56,7 @@ OSSchedulerImpl::stackPointerSave(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         :
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -84,7 +84,7 @@ OSSchedulerImpl::stackPointerRestore(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         : "sp"
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -111,7 +111,7 @@ OSSchedulerImpl::criticalSectionNestingSave(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
         :
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -138,7 +138,7 @@ OSSchedulerImpl::criticalSectionNestingRestore(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
         : "sp"
-    );
+  );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -157,7 +157,7 @@ OSSchedulerImpl::registersSave(void)
         :
         :
         : "sp"
-    );
+  );
   }
 
 /*
@@ -174,7 +174,7 @@ OSSchedulerImpl::registersRestore(void)
         :
         :
         : "sp" // r0-r7 were also changed
-    );
+  );
   }
 
 /*
@@ -206,7 +206,7 @@ inline unsigned int getSRfromStack(void)
         : [RET] "=r" (ret)
         :
         :
-    );
+  );
 
     return ret;
   }
@@ -249,7 +249,7 @@ OSSchedulerImpl::FirstThread_contextRestore(void)
       :
       :
       : "r0", "sp"
-  );
+);
 
 }
 
@@ -267,7 +267,7 @@ OSSchedulerImpl::yield(void)
       :
       :
       :
-  );
+);
 }
 
 #endif /* HAL_FAMILY_OSSCHEDULER_INLINES_H_ */

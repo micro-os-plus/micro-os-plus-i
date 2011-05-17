@@ -14,26 +14,26 @@
 
 #if 0
 unsigned char
-masterGetByte( void )
+masterGetByte(void)
   {
     int i;
     unsigned char b = 0;
 
     masterSdaHigh();
-    for ( i = 8; i != 0; --i )
+    for (i = 8; i != 0; --i)
       {
-        masterDelay( OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2 );
+        masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
         masterSclHigh();
         masterSclSynchronize();
-        masterDelay( OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2 );
+        masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
         b <<= 1;
-        if ( !masterSdaIsLow() )
+        if (!masterSdaIsLow())
           {
             b |= 1;
           }
-        masterDelay( OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2 );
+        masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
         masterSclLow();
-        masterDelay( OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2 );
+        masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT / 2);
         ;
       }
     return b;

@@ -71,7 +71,7 @@ OSTimerSeconds::init(void)
 
 ;
 
-#endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
+#endif /* defined(OS_INCLUDE_32KHZ_TIMER) */
   }
 
 void
@@ -79,7 +79,7 @@ OSTimerSeconds::implAcknowledgeInterrupt(void)
   {
 #if defined(OS_INCLUDE_32KHZ_TIMER)
 ;
-#endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
+#endif /* defined(OS_INCLUDE_32KHZ_TIMER) */
   }
 
 #if defined(OS_INCLUDE_32KHZ_TIMER)
@@ -96,11 +96,11 @@ SysSeconds_contextHandler(void)
       }
 #if !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION)
     OSScheduler::interruptExit();
-#endif /*!defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION) */
+#endif /* !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION) */
   }
-#endif /*defined(OS_INCLUDE_32KHZ_TIMER)*/
+#endif /* defined(OS_INCLUDE_32KHZ_TIMER) */
 
-#endif /*defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)*/
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
 

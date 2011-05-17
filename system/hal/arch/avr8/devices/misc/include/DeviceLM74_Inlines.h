@@ -48,4 +48,4 @@ inline bool DeviceLM74::dataIsLow(void)
     return ((OS_CONFIG_LM74_DATA_PORT_READ & _BV(OS_CONFIG_LM74_DATA_BIT)) == 0);
   }
 
-#endif /*DEVICELM74_INLINES_H_*/
+#endif /* DEVICELM74_INLINES_H_ */

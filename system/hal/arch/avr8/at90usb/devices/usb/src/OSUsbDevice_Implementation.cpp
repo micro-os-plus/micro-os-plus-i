@@ -46,7 +46,7 @@ extern void
 interruptGenServiceRoutine(void);
 
 extern "C" void
-USB_GEN_vect(void) __attribute__( ( signal ) );
+USB_GEN_vect(void) __attribute__((signal));
 
 void
 USB_GEN_vect(void)
@@ -58,10 +58,10 @@ USB_GEN_vect(void)
 
 #if (OS_CFGBOOL_OSUSBDEVICE_COM_CONTEXT_SWITCH)
 
-extern "C" void USB_COM_vect( void ) __attribute__( ( signal, naked ) );
+extern "C" void USB_COM_vect(void) __attribute__((signal, naked));
 
 void
-USB_COM_vect( void )
+USB_COM_vect(void)
   {
     OSScheduler::contextSave();
       {
@@ -69,9 +69,9 @@ USB_COM_vect( void )
 
         OSUsbDeviceImpl::interruptComServiceRoutine();
 
-        if ( OSScheduler::requireContextSwitch() )
+        if (OSScheduler::requireContextSwitch())
           {
-            OSScheduler::contextSwitch( true );
+            OSScheduler::contextSwitch(true);
           }
       }
     OSScheduler::contextRestore();
@@ -81,7 +81,7 @@ USB_COM_vect( void )
 #else
 
 extern "C" void
-USB_COM_vect(void) __attribute__( ( signal ) );
+USB_COM_vect(void) __attribute__((signal));
 
 void
 USB_COM_vect(void)
@@ -600,11 +600,11 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
 #if defined(OS_INCLUDE_SEPARATE_PROGMEM)
           // assumes devices descriptors are stored in the lower 64Kbytes of on-chip flash memory
           OSUsbDeviceImpl::writeByte(PROGMEM_READ_BYTE(pbuffer));
-          //OSUsbDeviceImpl::writeByte(pgm_read_byte_near( ( unsigned int ) pbuffer ));
+          //OSUsbDeviceImpl::writeByte(pgm_read_byte_near((unsigned int) pbuffer));
 #else
-          OSUsbDeviceImpl::writeByte( *(( unsigned char * ) pbuffer) );
+          OSUsbDeviceImpl::writeByte(*((unsigned char*) pbuffer));
 #endif
-          pbuffer = (unsigned char *) pbuffer + 1;
+          pbuffer = (unsigned char*) pbuffer + 1;
 
           data_to_transfer--;
         }
@@ -954,21 +954,21 @@ OSUsbDeviceImpl::usb_set_return(unsigned char len, PGM_VOID_P pbuf)
 #define U_WORD(x) U_LOW(x),U_HIGH(x)
 // usb_user_device_descriptor
 PROGMEM S_usb_device_descriptor usb_dev_desc =
-  { sizeof(usb_dev_desc), DEVICE_DESCRIPTOR, U_WORD( USB_SPECIFICATION ),
+  { sizeof(usb_dev_desc), DEVICE_DESCRIPTOR, U_WORD(USB_SPECIFICATION),
       DEVICE_CLASS, DEVICE_SUB_CLASS, DEVICE_PROTOCOL, EP_CONTROL_LENGTH,
-      U_WORD( VENDOR_ID ),
-    U_WORD( PRODUCT_ID ),
-    U_WORD( RELEASE_NUMBER ),  STRING_INDEX_MAN, STRING_INDEX_PROD,
+      U_WORD(VENDOR_ID),
+    U_WORD(PRODUCT_ID),
+    U_WORD(RELEASE_NUMBER),  STRING_INDEX_MAN, STRING_INDEX_PROD,
       STRING_INDEX_SN, NB_CONFIGURATION };
 #if defined(OS_INCLUDE_USB_CDC_DUAL_CONFIGURATION)
 // usb_user_configuration_descriptor FS
 PROGMEM S_usb_user_configuration_descriptor usb_conf_desc =
   {
-      { sizeof( S_usb_configuration_descriptor ), CONFIGURATION_DESCRIPTOR,
+      { sizeof(S_usb_configuration_descriptor), CONFIGURATION_DESCRIPTOR,
         U_WORD(sizeof(usb_conf_desc)),
         NB1_INTERFACE, CONF1_NB, CONF_INDEX, CONF_ATTRIBUTES, MAX_POWER}
     ,
-      { sizeof( S_usb_interface_descriptor ), INTERFACE_DESCRIPTOR, IF0_NB,
+      { sizeof(S_usb_interface_descriptor), INTERFACE_DESCRIPTOR, IF0_NB,
         ALTERNATE0, NB_ENDPOINT0, IF0_CLASS, IF0_SUB_CLASS,
         IF0_PROTOCOL, STRING_INDEX_IF0}
     ,
@@ -994,18 +994,18 @@ PROGMEM S_usb_user_configuration_descriptor usb_conf_desc =
         IF1_NB // 0x01 = slave interface
       }
     ,
-      { sizeof( S_usb_endpoint_descriptor ), ENDPOINT_DESCRIPTOR, EP_NB_3,
-        EP_ATTRIBUTES_3, U_WORD( EP_SIZE_3 ), EP_INTERVAL_3}
+      { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR, EP_NB_3,
+        EP_ATTRIBUTES_3, U_WORD(EP_SIZE_3), EP_INTERVAL_3}
     ,
-      { sizeof( S_usb_interface_descriptor ), INTERFACE_DESCRIPTOR, IF1_NB,
+      { sizeof(S_usb_interface_descriptor), INTERFACE_DESCRIPTOR, IF1_NB,
         ALTERNATE1, NB_ENDPOINT1, IF1_CLASS, IF1_SUB_CLASS,
         IF1_PROTOCOL, STRING_INDEX_IF1}
     ,
-      { sizeof( S_usb_endpoint_descriptor ), ENDPOINT_DESCRIPTOR, EP_NB_1,
-        EP_ATTRIBUTES_1, U_WORD( EP_SIZE_1 ), EP_INTERVAL_1}
+      { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR, EP_NB_1,
+        EP_ATTRIBUTES_1, U_WORD(EP_SIZE_1), EP_INTERVAL_1}
     ,
-      { sizeof( S_usb_endpoint_descriptor ), ENDPOINT_DESCRIPTOR, EP_NB_2,
-        EP_ATTRIBUTES_2, U_WORD( EP_SIZE_2 ), EP_INTERVAL_2}
+      { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR, EP_NB_2,
+        EP_ATTRIBUTES_2, U_WORD(EP_SIZE_2), EP_INTERVAL_2}
   };
 #endif
 
@@ -1041,18 +1041,18 @@ PROGMEM S_usb_user_configuration2_descriptor usb_conf2_desc =
             IF1_NB // 0x01 = slave interface
       },
       { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR, EP_NB_3,
-          EP_ATTRIBUTES_3, U_WORD( EP_SIZE_3 ), EP_INTERVAL_3 },
+          EP_ATTRIBUTES_3, U_WORD(EP_SIZE_3), EP_INTERVAL_3 },
       { sizeof(S_usb_interface_descriptor), INTERFACE_DESCRIPTOR, IF1_NB,
           ALTERNATE1, NB_ENDPOINT1, IF1_CLASS, IF1_SUB_CLASS, IF1_PROTOCOL,
           STRING_INDEX_IF1 },
       { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR, EP_NB_1,
-          EP_ATTRIBUTES_1, U_WORD( EP_SIZE_1 ), EP_INTERVAL_1 },
+          EP_ATTRIBUTES_1, U_WORD(EP_SIZE_1), EP_INTERVAL_1 },
       { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR, EP_NB_2,
-          EP_ATTRIBUTES_2, U_WORD( EP_SIZE_2 ), EP_INTERVAL_2 }
+          EP_ATTRIBUTES_2, U_WORD(EP_SIZE_2), EP_INTERVAL_2 }
 
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
     ,
-      { sizeof( S_usb_interface_descriptor ), INTERFACE_DESCRIPTOR, IF0b_NB,
+      { sizeof(S_usb_interface_descriptor), INTERFACE_DESCRIPTOR, IF0b_NB,
         ALTERNATE0b, NB_ENDPOINT0b, IF0b_CLASS, IF0b_SUB_CLASS,
         IF0b_PROTOCOL, STRING_INDEX_IF0b}
     ,
@@ -1078,18 +1078,18 @@ PROGMEM S_usb_user_configuration2_descriptor usb_conf2_desc =
         IF1b_NB // 0x03 = slave interface
       }
     ,
-      { sizeof( S_usb_endpoint_descriptor ), ENDPOINT_DESCRIPTOR, EP_NB_3b,
-        EP_ATTRIBUTES_3b, U_WORD( EP_SIZE_3b ), EP_INTERVAL_3b}
+      { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR, EP_NB_3b,
+        EP_ATTRIBUTES_3b, U_WORD(EP_SIZE_3b), EP_INTERVAL_3b}
     ,
-      { sizeof( S_usb_interface_descriptor ), INTERFACE_DESCRIPTOR, IF1b_NB,
+      { sizeof(S_usb_interface_descriptor), INTERFACE_DESCRIPTOR, IF1b_NB,
         ALTERNATE1b, NB_ENDPOINT1b, IF1b_CLASS, IF1b_SUB_CLASS,
         IF1b_PROTOCOL, STRING_INDEX_IF1b}
     ,
-      { sizeof( S_usb_endpoint_descriptor ), ENDPOINT_DESCRIPTOR, EP_NB_1b,
-        EP_ATTRIBUTES_1b, U_WORD( EP_SIZE_1b ), EP_INTERVAL_1b}
+      { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR, EP_NB_1b,
+        EP_ATTRIBUTES_1b, U_WORD(EP_SIZE_1b), EP_INTERVAL_1b}
     ,
-      { sizeof( S_usb_endpoint_descriptor ), ENDPOINT_DESCRIPTOR, EP_NB_2b,
-        EP_ATTRIBUTES_2b, U_WORD( EP_SIZE_2b ), EP_INTERVAL_2b}
+      { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR, EP_NB_2b,
+        EP_ATTRIBUTES_2b, U_WORD(EP_SIZE_2b), EP_INTERVAL_2b}
 #endif
 
 }    ;
@@ -1097,7 +1097,7 @@ PROGMEM S_usb_user_configuration2_descriptor usb_conf2_desc =
 // usb_user_language_id
 
 PROGMEM S_usb_language_id usb_user_language_id =
-  { sizeof(usb_user_language_id), STRING_DESCRIPTOR, U_WORD( LANGUAGE_ID )};
+  { sizeof(usb_user_language_id), STRING_DESCRIPTOR, U_WORD(LANGUAGE_ID)};
 
 // usb_user_manufacturer_string_descriptor
 PROGMEM S_usb_manufacturer_string_descriptor

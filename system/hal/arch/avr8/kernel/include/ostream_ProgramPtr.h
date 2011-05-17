@@ -10,6 +10,6 @@
 #include "portable/stdlib/include/ostream"
 #include "portable/kernel/include/OS.h"
 
-ostream & operator <<(ostream & out, OSProgramPtr_t pc);
+ostream& operator <<(ostream& out, OSProgramPtr_t pc);
 
-#endif /*HAL_OSTREAM_PROGRAMPTR_H_*/
+#endif /* HAL_OSTREAM_PROGRAMPTR_H_ */

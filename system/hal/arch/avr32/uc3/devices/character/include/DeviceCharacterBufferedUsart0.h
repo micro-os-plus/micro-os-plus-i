@@ -38,13 +38,13 @@
 class DeviceCharacterBufferedUsart0 : public DeviceCharacterBufferedUsartBase
 {
 public:
-  DeviceCharacterBufferedUsart0(unsigned char *pRxBuf,
+  DeviceCharacterBufferedUsart0(unsigned char* pRxBuf,
       unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
-      unsigned char *pTxBuf, unsigned short txBufSize, unsigned short txHWM,
+      unsigned char* pTxBuf, unsigned short txBufSize, unsigned short txHWM,
       unsigned short txLWM);
 
-      DeviceCharacterBufferedUsart0(unsigned char *pRxBuf,
-          unsigned short rxBufSize, unsigned char *pTxBuf,
+      DeviceCharacterBufferedUsart0(unsigned char* pRxBuf,
+          unsigned short rxBufSize, unsigned char* pTxBuf,
           unsigned short txBufSize);
 
 public:
@@ -59,7 +59,7 @@ __attribute__((interrupt))
 #endif /*!defined(OS_EXCLUDE_DEVICECHARACTERBUFFEREDUSART0_ISR_PREEMPTION)*/
   contextHandler(void);
 
-  static DeviceCharacterBufferedUsart0 * ms_pThis;
+  static DeviceCharacterBufferedUsart0* ms_pThis;
 
 };
 

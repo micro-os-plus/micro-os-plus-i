@@ -30,7 +30,7 @@ extern unsigned long __bss_end;
 
 void __init_data_and_bss(void)
   {
-    unsigned long *pSrc, *pDest;
+    unsigned long* pSrc, *pDest;
 
     /* Copy the data segment initialisers from flash to SRAM */
     pSrc = &__data_load_start;
@@ -56,7 +56,7 @@ typedef void (*pFunc_t)(void);
 
 void __init_static_constructors(void)
   {
-    unsigned long *p;
+    unsigned long* p;
     void (*pFunc)(void);
 
     /* run constructors */

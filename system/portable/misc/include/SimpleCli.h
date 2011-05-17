@@ -15,7 +15,7 @@
 class SimpleCli
 {
 public:
-  SimpleCli(unsigned char *pLine, unsigned short iSize);
+  SimpleCli(unsigned char* pLine, unsigned short iSize);
   ~SimpleCli();
 
   int
@@ -24,26 +24,26 @@ public:
 #if defined(OS_INCLUDE_SIMPLECLI_PARSER)
   void
   parseReset(void);
-  unsigned char *
+  unsigned char* 
   parseNext(void);
 
   char
-  parseHexNibble(unsigned char *p, unsigned char *pch);
+  parseHexNibble(unsigned char* p, unsigned char* pch);
   char
-  parseHex(unsigned char *p, unsigned char *pch);
+  parseHex(unsigned char* p, unsigned char* pch);
   char
-  parseHex(unsigned char *p, unsigned short *psh);
+  parseHex(unsigned char* p, unsigned short* psh);
   char
-  parseHex(unsigned char *p, unsigned long *plh);
+  parseHex(unsigned char* p, unsigned long* plh);
   char
-  parseUnsigned(unsigned char *p, unsigned short *psh);
+  parseUnsigned(unsigned char* p, unsigned short* psh);
 #endif /* defined(OS_INCLUDE_SIMPLECLI_PARSER) */
 
 private:
-  unsigned char *m_pLine;
+  unsigned char* m_pLine;
   unsigned short m_iSize;
 #if defined(OS_INCLUDE_SIMPLECLI_PARSER)
-  unsigned char *m_pNext;
+  unsigned char* m_pNext;
 #endif /* defined(OS_INCLUDE_SIMPLECLI_PARSER) */
 };
 
