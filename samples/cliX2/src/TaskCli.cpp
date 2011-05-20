@@ -19,7 +19,7 @@ TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
   OSThread(pName, m_stack, sizeof(m_stack )), m_dev(dev), m_cin( &m_dev),
       m_cout( &m_dev), m_cli(m_line, sizeof(m_line ))
   {
-    debug.putString_P(PSTR("TaskCli"), this);
+    debug.putConstructor_P(PSTR("TaskCli"), this);
   }
 
 // ---------------------------------------------------------------------------

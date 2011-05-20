@@ -14,7 +14,7 @@ TaskDbgIn::TaskDbgIn(const char *pName, OSDeviceCharacter& outDev,
     OSDeviceCharacter& inDev2) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_outDev(outDev), m_inDev2(inDev2)
 {
-  debug.putString_P(PSTR("TaskDbgIn"), this);
+  debug.putConstructor_P(PSTR("TaskDbgIn"), this);
 }
 
 void

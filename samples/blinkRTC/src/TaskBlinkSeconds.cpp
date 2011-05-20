@@ -14,7 +14,7 @@
 TaskBlinkSeconds::TaskBlinkSeconds(const char *pName, unsigned char iLed, unsigned int rate) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
 {
-  debug.putString_P(PSTR("TaskBlinkSeconds"), this);
+  debug.putConstructor_P(PSTR("TaskBlinkSeconds"), this);
 
   m_rate = rate;
 }

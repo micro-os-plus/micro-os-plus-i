@@ -14,7 +14,7 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
   m_txBuf(pTxBuf, txBufSize, txHWM, txLWM), m_rxBuf(pRxBuf, rxBufSize, rxHWM,
       rxLWM)
 {
-  OSDeviceDebug::putString_P(PSTR("DeviceCharacterI2C"), this);
+  OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterI2C"), this);
 
 #if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
   m_type = DEVICECHARACTER_USART;
@@ -29,7 +29,7 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
   m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4), m_rxBuf(pRxBuf,
       rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4)
 {
-  OSDeviceDebug::putString_P(PSTR("DeviceCharacterI2C"), this);
+  OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterI2C"), this);
 
 #if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
   m_type = DEVICECHARACTER_USART;

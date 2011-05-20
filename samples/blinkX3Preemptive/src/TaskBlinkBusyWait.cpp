@@ -14,7 +14,7 @@
 TaskBlinkBusyWait::TaskBlinkBusyWait(const char *pName, unsigned int iLed, unsigned int rate) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
 {
-  debug.putString_P(PSTR("TaskBlinkBusyWait"), this);
+  debug.putConstructor_P(PSTR("TaskBlinkBusyWait"), this);
 
   m_rate = rate;
 }

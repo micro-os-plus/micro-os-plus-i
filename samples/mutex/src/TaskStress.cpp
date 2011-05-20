@@ -22,7 +22,7 @@ unsigned int TaskStress::ms_rand;
 TaskStress::TaskStress(const char *pName, int threadId) :
   OSThread(pName, m_stack, sizeof(m_stack))
 {
-  debug.putString_P(PSTR("TaskStress"), this);
+  debug.putConstructor_P(PSTR("TaskStress"), this);
 
   m_threadId = threadId;
 }

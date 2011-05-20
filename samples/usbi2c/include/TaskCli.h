@@ -28,7 +28,7 @@ private:
 
   // members
   unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 100];
-  OSDeviceCharacter & m_dev;
+  OSDeviceCharacter& m_dev;
 
   istream m_cin;
   ostream m_cout;

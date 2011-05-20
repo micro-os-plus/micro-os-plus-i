@@ -26,7 +26,7 @@ TaskBlinkNested::TaskBlinkNested(const char *pName, unsigned char iLed,
     schedTicks_t rate) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
 {
-  debug.putString_P(PSTR("TaskBlinkNested"), this);
+  debug.putConstructor_P(PSTR("TaskBlinkNested"), this);
 
   m_rate = rate;
   m_count = 0;

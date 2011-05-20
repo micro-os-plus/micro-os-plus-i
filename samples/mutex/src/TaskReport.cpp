@@ -19,7 +19,7 @@ extern int resourceAccessNum[];
 TaskReport::TaskReport(const char *pName, schedTicks_t seconds) :
   OSThread(pName, m_stack, sizeof(m_stack))
 {
-  debug.putString_P(PSTR("TaskReport"), this);
+  debug.putConstructor_P(PSTR("TaskReport"), this);
 
   m_rate = seconds;
 }
