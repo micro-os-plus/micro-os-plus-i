@@ -171,7 +171,7 @@ OSThread::resume(void)
 #if defined(OS_INCLUDE_OSTHREAD_GETSTACKUSED)
 
 unsigned short
-OSThread::getStackUsed(void)
+OSThread::getStackUsed(void) const
 {
   unsigned short i;
   unsigned short r;

@@ -53,14 +53,14 @@ public:
   resume(void);
   // Check if the thread is suspended.
   bool
-  isSuspended(void);
+  isSuspended(void) const;
   // Check if the thread is waiting on an event.
   bool
-  isWaiting(void);
+  isWaiting(void) const;
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   // Return TRUE if the thread can go to sleep, FALSE otherwise.
-  bool isDeepSleepAllowed();
+  bool isDeepSleepAllowed() const;
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
@@ -73,23 +73,23 @@ public:
 
   // Return the thread name.
   char const *
-  getName(void);
+  getName(void) const;
 
   // Return the address of the stack bottom.
   // Stack grows from high address to low address,
   // so this is the maximum address the stack can grow.
   unsigned char* 
-  getStackBottom(void);
+  getStackBottom(void) const;
 
   // Return the current stack pointer of the thread.
   // This value is stored only during context switch,
   // so the running thread will not get the actual value.
   OSStack_t* 
-  getStack(void);
+  getStack(void) const;
 
   // Return the stack size given at thread creation.
   unsigned short
-  getStackSize(void); /* bytes */
+  getStackSize(void) const; /* bytes */
 
 #if defined(OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER)
   OSProgramPtr_t getProgramCounter(void);
@@ -97,16 +97,16 @@ public:
 
   // Return the thread ID.
   int
-  getID(void);
+  getID(void) const;
 
   // Return the thread's context.
   void*
-  getContext(void);
+  getContext(void) const;
 
   // Return thread priority.
   // Higher means better priority.
   OSThreadPriority_t
-  getPriority(void);
+  getPriority(void) const;
 
   // Set thread priority.
   void
@@ -116,7 +116,7 @@ public:
   // Cancelling a waiting thread can be done by notifying
   // this event with a return value of OS_EVENT_WAIT_RETURN_CANCELED.
   OSEvent_t
-  getEvent(void);
+  getEvent(void) const;
 
   // Set the event the thread is waiting for.
   void
@@ -124,7 +124,7 @@ public:
 
   // Return the maximum usage of the stack, in bytes.
   unsigned short
-  getStackUsed(void);
+  getStackUsed(void) const;
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   // Allow thread to be put to sleep.
@@ -132,7 +132,7 @@ public:
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
-  bool isInterrupted(void);
+  bool isInterrupted(void) const;
   void setInterruption(bool flag);
   void requestInterruption(void);
   void ackInterruption(void);
@@ -169,7 +169,7 @@ public:
 
   // Retrieve the value returned by the last eventWait()
   OSEventWaitReturn_t
-  getEventWaitReturn(void);
+  getEventWaitReturn(void) const;
 
   // Set the value to be returned by getEventWaitReturn()
   void
@@ -271,7 +271,7 @@ OSThread::eventWaitPerform(void)
 }
 
 inline OSEventWaitReturn_t
-OSThread::getEventWaitReturn(void)
+OSThread::getEventWaitReturn(void) const
 {
   return m_eventWaitReturn;
 }
@@ -292,25 +292,25 @@ OSThread::eventWaitClear(void)
 // ---
 
 inline char const *
-OSThread::getName(void)
+OSThread::getName(void) const
 {
   return m_pName;
 }
 
 inline unsigned char* 
-OSThread::getStackBottom(void)
+OSThread::getStackBottom(void) const
 {
   return m_pStackBottom;
 }
 
 inline OSStack_t* 
-OSThread::getStack(void)
+OSThread::getStack(void) const
 {
   return m_pStack;
 }
 
 inline unsigned short
-OSThread::getStackSize(void)
+OSThread::getStackSize(void) const
 {
   return m_stackSize;
 }
@@ -320,7 +320,7 @@ OSThread::getStackSize(void)
 // the deepest register pushed; for offsets to registers please see
 // OSScheduler::stackInitialise()).
 inline void*
-OSThread::getContext(void)
+OSThread::getContext(void) const
 {
   return (void*) &m_pStack;
 }
@@ -338,31 +338,31 @@ OSThread::setEvent(OSEvent_t event)
 }
 
 inline int
-OSThread::getID(void)
+OSThread::getID(void) const
 {
   return m_id;
 }
 
 inline OSEvent_t
-OSThread::getEvent(void)
+OSThread::getEvent(void) const
 {
   return m_event;
 }
 
 inline OSThreadPriority_t
-OSThread::getPriority(void)
+OSThread::getPriority(void) const
 {
   return m_staticPriority;
 }
 
 inline bool
-OSThread::isSuspended(void)
+OSThread::isSuspended(void) const
 {
   return m_isSuspended;
 }
 
 inline bool
-OSThread::isWaiting(void)
+OSThread::isWaiting(void) const
 {
   return m_isWaiting;
 }
@@ -370,7 +370,7 @@ OSThread::isWaiting(void)
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
 
 inline bool
-OSThread::isDeepSleepAllowed(void)
+OSThread::isDeepSleepAllowed(void) const
   {
     return m_allowSleep;
   }
@@ -386,7 +386,7 @@ OSThread::setAllowSleep(bool b)
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
 inline bool
-OSThread::isInterrupted(void)
+OSThread::isInterrupted(void) const
   {
     return m_isInterrupted;
   }

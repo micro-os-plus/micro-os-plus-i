@@ -47,10 +47,10 @@ public:
   int eventRemove(OSEvent_t event);
 
   // return the current number of tick
-  OSTimerTicks_t getTicks(void);
+  OSTimerTicks_t getTicks(void) const;
 
   // return the number of jobs scheduled
-  int getCount(void);
+  int getCount(void) const;
 
   // used in interrupt routines
   void interruptTick(void);
@@ -76,7 +76,7 @@ private:
   OSTimerTicks_t ms_ticks;
   };
 
-inline OSTimerTicks_t OSTimer::getTicks(void)
+inline OSTimerTicks_t OSTimer::getTicks(void) const
   {
     return ms_ticks;
   }
@@ -86,7 +86,7 @@ inline void OSTimer::incrementTicks(void)
     ms_ticks++;
   }
 
-inline int OSTimer::getCount(void)
+inline int OSTimer::getCount(void) const
   {
     return m_count;
   }

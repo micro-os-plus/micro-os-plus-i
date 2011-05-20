@@ -43,14 +43,14 @@ public:
   OSEventWaitReturn_t eventWait(void);
 
   // return true if the timer is set to periodic mode
-  bool isPeriodic();
+  bool isPeriodic() const;
 
   // return the number of ticks set by start()
   // if the timer is stopped, the returned value is zero
-  OSTimerTicks_t getTicksStart();
+  OSTimerTicks_t getTicksStart() const;
 
   // return the current ticks counter of the associated timer
-  OSTimerTicks_t getTicks();
+  OSTimerTicks_t getTicks() const;
 
   // this is the callback invoked by the timer interrupt
   // the default action is notify the event programmed by eventSet()
@@ -72,17 +72,17 @@ protected:
   OSTimer *m_pTimer;
   };
 
-inline bool Timer::isPeriodic()
+inline bool Timer::isPeriodic() const
   {
     return m_periodic;
   }
 
-inline OSTimerTicks_t Timer::getTicksStart()
+inline OSTimerTicks_t Timer::getTicksStart() const
   {
     return m_ticks;
   }
 
-inline OSTimerTicks_t Timer::getTicks()
+inline OSTimerTicks_t Timer::getTicks() const
   {
     return m_pTimer->getTicks();
   }
