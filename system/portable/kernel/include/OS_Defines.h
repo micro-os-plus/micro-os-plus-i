@@ -67,6 +67,9 @@
 #elif defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 #include "hal/boards/Olimex/stm32_h103/include/OS_Board_Defines.h"
 
+#elif defined(OS_CONFIG_BOARD_CUSTOM)
+#include "custom/boards/include/OS_Board_Defines.h"
+
 #else
 #error "Missing OS_CONFIG_BOARD_* definition"
 #endif
