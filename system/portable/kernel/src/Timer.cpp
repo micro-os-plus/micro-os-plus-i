@@ -28,7 +28,7 @@ Timer::Timer(OSTimer *pTimer)
 
 Timer::~Timer()
   {
-    ;
+  OSDeviceDebug::putDestructor_P(PSTR("Timer"), this);
   }
 
 // virtual, may be set to trigger any events

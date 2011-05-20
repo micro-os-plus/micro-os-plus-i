@@ -91,6 +91,21 @@ OSDeviceDebug::putConstructor(const char* pc, const void* p)
   OSCriticalSection::exit();
 }
 
+// display destructor name and object address
+void
+OSDeviceDebug::putDestructor(const char* pc, const void* p)
+{
+  OSCriticalSection::enter();
+    {
+      putChar('~');
+      putString(pc);
+      putString("() @");
+      putPtr(p);
+      putNewLine();
+    }
+  OSCriticalSection::exit();
+}
+
 #endif /* defined(OS_DEBUG_CONSTRUCTORS) */
 
 void

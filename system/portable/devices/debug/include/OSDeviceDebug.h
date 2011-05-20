@@ -38,6 +38,8 @@ public:
 
   static void
   putConstructor(const char* pc, const void* p);
+  static void
+  putDestructor(const char* pc, const void* p);
 
 #if defined(OS_CONFIG_ARCH_AVR8)
   // Output, on debug interface, the bytes at pc address,
@@ -45,6 +47,7 @@ public:
   static void putString_P(const char*  PROGMEM pc);
 
   static void putConstructor_P(const char* PROGMEM pc, const void* p);
+  static void putDestructor_P(const char* PROGMEM pc, const void* p);
 
 #endif
   // Output, on debug interface, the hex value of a byte;
@@ -81,7 +84,7 @@ public:
   putPtr(const void* p);
   // Output, on debug interface, the address p from program memory, in hexadecimal.
   static void
-  putPC(const char*  PROGMEM pc);
+  putPC(const char* PROGMEM pc);
   // Output, on debug interface, function name, file name,
   // line number and expression string.
   // It is used to in case of a failed assertion.
@@ -158,6 +161,11 @@ private:
     {
     }
 
+    inline void
+    OSDeviceDebug::putDestructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
+    {
+    }
+
 #endif /* !defined(OS_DEBUG_CONSTRUCTORS) */
 
 #else /* !DEBUG */
@@ -191,6 +199,11 @@ putConstructor_P(const char* __attribute__((unused)) PROGMEM pc, const void* __a
 {
 }
 
+inline void
+putDestructor_P(const char* __attribute__((unused)) PROGMEM pc, const void* __attribute__((unused)) p)
+{
+}
+
 #endif
 
 inline void OSDeviceDebug::putHex(unsigned char __attribute__((unused)) c)
@@ -213,7 +226,7 @@ inline void OSDeviceDebug::putDec(unsigned long __attribute__((unused)) l, unsig
   }
 #endif
 
-inline void OSDeviceDebug::putPC(const char*  PROGMEM __attribute__((unused)) pc)
+inline void OSDeviceDebug::putPC(const char* PROGMEM __attribute__((unused)) pc)
   {
     pc = pc;
   }

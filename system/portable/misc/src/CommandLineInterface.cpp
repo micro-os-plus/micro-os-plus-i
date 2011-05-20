@@ -27,10 +27,7 @@ CommandLineInterface::CommandLineInterface(istream& cin, ostream& cout,
 
 CommandLineInterface::~CommandLineInterface()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("~CommandLineInterface()");
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putDestructor_P(PSTR("CommandLineInterface"), this);
 }
 
 OSReturn_t

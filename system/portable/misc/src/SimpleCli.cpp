@@ -22,6 +22,7 @@ SimpleCli::SimpleCli(unsigned char* pLine, unsigned short iSize)
 
 SimpleCli::~SimpleCli()
 {
+  OSDeviceDebug::putDestructor_P(PSTR("SimpleCli"), this);
 }
 
 #define CHR_ASCII_BELL 0x07

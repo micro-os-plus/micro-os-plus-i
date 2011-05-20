@@ -132,7 +132,7 @@ threadPeriodic(pNamePeriodic, (OSThreadMainPtr_t) staticMainPeriodic,
 
 SDI12Sensor::~SDI12Sensor()
   {
-    ;
+  OSDeviceDebug::putDestructor_P(PSTR("SDI12Sensor"), this);
   }
 
 void SDI12Sensor::customInit(void)

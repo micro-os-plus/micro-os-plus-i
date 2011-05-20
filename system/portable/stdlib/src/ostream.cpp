@@ -35,7 +35,7 @@ ostream::ostream(OSDeviceCharacter * dev) : ios(dev)
 
 ostream::~ostream()
 {
-  ;
+  OSDeviceDebug::putDestructor_P(PSTR("ostream"), this);
 }
 
 ostream&

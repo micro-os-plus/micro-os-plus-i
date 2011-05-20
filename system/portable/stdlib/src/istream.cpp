@@ -35,7 +35,7 @@ istream::istream(OSDeviceCharacter* dev)
 
 istream::~istream()
   {
-    ;
+  OSDeviceDebug::putDestructor_P(PSTR("istream"), this);
   }
 
 #if 0

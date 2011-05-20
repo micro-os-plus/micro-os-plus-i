@@ -50,7 +50,7 @@ DeviceCharacterUsb::DeviceCharacterUsb(int device)
 
 DeviceCharacterUsb::~DeviceCharacterUsb()
 {
-  ;
+  OSDeviceDebug::putDestructor("DeviceCharacterUsb", this);
 }
 
 void

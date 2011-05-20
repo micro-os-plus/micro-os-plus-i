@@ -42,7 +42,7 @@ ios_base::ios_base() :
 
 ios_base::~ios_base()
   {
-    ;
+  OSDeviceDebug::putDestructor_P(PSTR("ios_base"), this);
   }
 
 streamsize ios_base::precision(streamsize prec)
@@ -82,7 +82,7 @@ ios::ios(OSDeviceCharacter* dev)
 
 ios::ios(OSDeviceDebug* dbg)
   {
-    OSDeviceDebug::putString("ios()=");
+    OSDeviceDebug::putString_P(PSTR("ios()="));
     OSDeviceDebug::putPtr(this);
     OSDeviceDebug::putNewLine();
     init(0 /*, 0, dbg */);
@@ -91,7 +91,7 @@ ios::ios(OSDeviceDebug* dbg)
 
 ios::~ios()
   {
-    ;
+  OSDeviceDebug::putDestructor_P(PSTR("ios"), this);
   }
 
 void ios::init(streambuf* sb /*, OSDeviceCharacter* dev , OSDeviceDebug* dbg*/)

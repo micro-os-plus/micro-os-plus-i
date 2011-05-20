@@ -20,7 +20,7 @@ iostream::iostream(streambuf* sb) :
 
 iostream::~iostream()
   {
-    ;
+  OSDeviceDebug::putDestructor_P(PSTR("iostream"), this);
   }
 
 #endif
