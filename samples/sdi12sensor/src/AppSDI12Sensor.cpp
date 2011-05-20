@@ -17,17 +17,12 @@ AppSDI12Sensor::AppSDI12Sensor(const char *pNameAquire,
       priorityPeriodic, pNameSDI12, m_stackSDI12, sizeof(m_stackSDI12),
       prioritySDI12)
   {
-    if (os.isDebug())
-      {
-        debug.putString("AppSDI12Sensor()=");
-        debug.putPtr(this);
-        debug.putNewLine();
-      }
+    debug.putConstructor_P(PSTR("AppSDI12Sensor"), this);
   }
 
 AppSDI12Sensor::~AppSDI12Sensor()
   {
-    ;
+  debug.putDestructor_P(PSTR("AppSDI12Sensor"), this);
   }
 
 void AppSDI12Sensor::customInit(void)

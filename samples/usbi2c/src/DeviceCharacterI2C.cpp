@@ -40,7 +40,7 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
 
 DeviceCharacterI2C::~DeviceCharacterI2C()
 {
-  ;
+  OSDeviceDebug::putDestructor_P(PSTR("DeviceCharacterI2C"), this);
 }
 
 int
