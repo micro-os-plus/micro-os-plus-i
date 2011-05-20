@@ -29,13 +29,13 @@ public:
   void
   setToken(unsigned char* pToken, unsigned short tokenSize);
   unsigned char*
-  getToken(void);
+  getToken(void) const;
 
   void
   setCurrent(unsigned short index);
 
   bool
-  isEndOfLine(void);
+  isEndOfLine(void) const;
 
   OSReturn_t
   skipTokens(unsigned short nTokens);
@@ -51,7 +51,7 @@ public:
   parseSubstring(unsigned short len);
 
   unsigned short
-  getTokenLength(void);
+  getTokenLength(void) const;
   unsigned char
   getSeparator(void);
 
@@ -106,7 +106,7 @@ protected:
 // ----------------------------------------------------------------------------
 
 inline unsigned char* 
-Parser::getToken(void)
+Parser::getToken(void) const
 {
   return m_pToken;
 }
@@ -144,13 +144,13 @@ Parser::setSpaces(unsigned char* pSpaces)
 }
 
 inline unsigned short
-Parser::getTokenLength(void)
+Parser::getTokenLength(void) const
 {
   return m_len;
 }
 
 inline bool
-Parser::isEndOfLine(void)
+Parser::isEndOfLine(void) const
 {
   return (m_sep == '\0');
 }

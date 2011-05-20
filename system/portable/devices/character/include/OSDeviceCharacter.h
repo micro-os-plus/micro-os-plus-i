@@ -97,19 +97,19 @@ public:
   void
   setReadEvent(OSEvent_t event);
   OSEvent_t
-  getReadEvent(void);
+  getReadEvent(void) const;
 
   // set/get the thread event to be used by write
   void
   setWriteEvent(OSEvent_t event);
   OSEvent_t
-  getWriteEvent(void);
+  getWriteEvent(void) const;
 
   // set/get the thread event to be used by open
   void
   setOpenEvent(OSEvent_t event);
   OSEvent_t
-  getOpenEvent(void);
+  getOpenEvent(void) const;
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
   // set the match array
@@ -125,19 +125,19 @@ public:
   void
   setOpenTimeout(OSTimerTicks_t t);
   OSTimerTicks_t
-  getOpenTimeout(void);
+  getOpenTimeout(void) const;
 
   // set/get the read timeout()
   void
   setReadTimeout(OSTimerTicks_t t);
   OSTimerTicks_t
-  getReadTimeout(void);
+  getReadTimeout(void) const;
 
   // set/get the write timeout()
   void
   setWriteTimeout(OSTimerTicks_t t);
   OSTimerTicks_t
-  getWriteTimeout(void);
+  getWriteTimeout(void) const;
 
   // Set timer to be used by the open function.
   // If the operation doesn't succeed after the open-timeout
@@ -146,7 +146,7 @@ public:
   void
   setOpenTimer(OSTimer *pTimer);
   OSTimer *
-  getOpenTimer(void);
+  getOpenTimer(void) const;
 
   // Set timer to be used by the read functions.
   // If the operation doesn't succeed after the read-timeout
@@ -155,7 +155,7 @@ public:
   void
   setReadTimer(OSTimer *pTimer);
   OSTimer *
-  getReadTimer(void);
+  getReadTimer(void) const;
 
   // Set timer to be used by the write functions.
   // If the operation doesn't succeed after the write-timeout
@@ -164,7 +164,7 @@ public:
   void
   setWriteTimer(OSTimer *pTimer);
   OSTimer *
-  getWriteTimer(void);
+  getWriteTimer(void) const;
 
 #endif
 
@@ -268,7 +268,7 @@ OSDeviceCharacter::setOpenEvent(OSEvent_t event)
 }
 
 inline OSEvent_t
-OSDeviceCharacter::getOpenEvent(void)
+OSDeviceCharacter::getOpenEvent(void) const
 {
   return m_openEvent;
 }
@@ -288,7 +288,7 @@ OSDeviceCharacter::setReadEvent(OSEvent_t event)
 }
 
 inline OSEvent_t
-OSDeviceCharacter::getReadEvent(void)
+OSDeviceCharacter::getReadEvent(void) const
 {
   return m_readEvent;
 }
@@ -300,7 +300,7 @@ OSDeviceCharacter::setWriteEvent(OSEvent_t event)
 }
 
 inline OSEvent_t
-OSDeviceCharacter::getWriteEvent(void)
+OSDeviceCharacter::getWriteEvent(void) const
 {
   return m_writeEvent;
 }
@@ -314,7 +314,7 @@ OSDeviceCharacter::setOpenTimeout(OSTimerTicks_t t)
   }
 
 inline OSTimerTicks_t
-OSDeviceCharacter::getOpenTimeout(void)
+OSDeviceCharacter::getOpenTimeout(void) const
   {
     return m_openTimeout;
   }
@@ -326,7 +326,7 @@ OSDeviceCharacter::setReadTimeout(OSTimerTicks_t t)
   }
 
 inline OSTimerTicks_t
-OSDeviceCharacter::getReadTimeout(void)
+OSDeviceCharacter::getReadTimeout(void) const
   {
     return m_readTimeout;
   }
@@ -338,7 +338,7 @@ OSDeviceCharacter::setWriteTimeout(OSTimerTicks_t t)
   }
 
 inline OSTimerTicks_t
-OSDeviceCharacter::getWriteTimeout(void)
+OSDeviceCharacter::getWriteTimeout(void) const
   {
     return m_writeTimeout;
   }
@@ -350,7 +350,7 @@ OSDeviceCharacter::setOpenTimer(OSTimer *pTimer)
   }
 
 inline OSTimer *
-OSDeviceCharacter::getOpenTimer(void)
+OSDeviceCharacter::getOpenTimer(void) const
   {
     return m_pOpenTimer;
   }
@@ -362,7 +362,7 @@ OSDeviceCharacter::setReadTimer(OSTimer *pTimer)
   }
 
 inline OSTimer *
-OSDeviceCharacter::getReadTimer(void)
+OSDeviceCharacter::getReadTimer(void) const
   {
     return m_pReadTimer;
   }
@@ -374,7 +374,7 @@ OSDeviceCharacter::setWriteTimer(OSTimer *pTimer)
   }
 
 inline OSTimer *
-OSDeviceCharacter::getWriteTimer(void)
+OSDeviceCharacter::getWriteTimer(void) const
   {
     return m_pWriteTimer;
   }
@@ -383,7 +383,7 @@ OSDeviceCharacter::getWriteTimer(void)
 
 #if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
 inline deviceCharacterType_t
-OSDeviceCharacter::getDeviceType(void)
+OSDeviceCharacter::getDeviceType(void) const
   {
     return m_type;
   }

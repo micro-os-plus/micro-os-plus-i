@@ -21,12 +21,12 @@ public:
   OSReturn_t
   remove(OSThread* pThread);
   OSThread*
-  getItem(int i);
+  getItem(int i) const;
 
   int
-  getSize(void);
+  getSize(void) const;
   int
-  getCount(void);
+  getCount(void) const;
 
 private:
   OSThread** m_pWaitingThreadsArray;
@@ -125,19 +125,19 @@ OSMutex::getEventReturn(void) const
 
 // Get the first thread in the array
 inline OSThread*
-OSMutexWaitingThreads::getItem(int i)
+OSMutexWaitingThreads::getItem(int i) const
 {
   return m_pWaitingThreadsArray[i];
 }
 
 inline int
-OSMutexWaitingThreads::getSize(void)
+OSMutexWaitingThreads::getSize(void) const
 {
   return m_waitingThreadsArraySize;
 }
 
 inline int
-OSMutexWaitingThreads::getCount(void)
+OSMutexWaitingThreads::getCount(void) const
 {
   return m_waitingThreadsCount;
 }

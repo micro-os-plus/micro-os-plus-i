@@ -55,10 +55,10 @@ public:
   void
   setPrompt(unsigned char* pPrompt);
   unsigned char*
-  getPrompt(void);
+  getPrompt(void) const;
 
   Parser&
-  getParser(void);
+  getParser(void) const;
 
 private:
   OSReturn_t
@@ -93,13 +93,13 @@ CommandLineInterface::setPrompt(unsigned char* pPrompt)
 }
 
 inline unsigned char*
-CommandLineInterface::getPrompt(void)
+CommandLineInterface::getPrompt(void) const
 {
   return m_pPrompt;
 }
 
 inline Parser&
-CommandLineInterface::getParser(void)
+CommandLineInterface::getParser(void) const
 {
   return m_parser;
 }

@@ -57,10 +57,10 @@ public:
   logInsane(logCode_t code, const char* msg);
 
   const char*
-  getName(void);
+  getName(void) const;
 
   logLevel_t
-  getLevel(void);
+  getLevel(void) const;
   void
   setLevel(logLevel_t level);
 
@@ -80,8 +80,14 @@ private:
   const char* m_name;
 };
 
+inline const char*
+OSLogger::getName(void) const
+{
+  return m_name;
+}
+
 inline logLevel_t
-OSLogger::getLevel(void)
+OSLogger::getLevel(void) const
 {
   return m_minLevel;
 }

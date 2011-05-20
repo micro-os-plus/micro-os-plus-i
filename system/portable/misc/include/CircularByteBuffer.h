@@ -34,18 +34,18 @@ public:
   getBytes(unsigned char* pBuf, unsigned short size);
 
   bool
-  isEmpty(void);
+  isEmpty(void) const;
   bool
-  isFull(void);
+  isFull(void) const;
   bool
-  isAboveHighWM(void);
+  isAboveHighWM(void) const;
   bool
-  isBelowLowWM(void);
+  isBelowLowWM(void) const;
 
   unsigned short
-  length(void);
+  length(void) const;
   unsigned short
-  size(void);
+  size(void) const;
 
   void
   dump(void);
@@ -61,37 +61,37 @@ private:
 };
 
 inline bool
-CircularByteBuffer::isEmpty(void)
+CircularByteBuffer::isEmpty(void) const
 {
   return (m_len == 0);
 }
 
 inline bool
-CircularByteBuffer::isFull(void)
+CircularByteBuffer::isFull(void) const
 {
   return (m_len == m_sz);
 }
 
 inline bool
-CircularByteBuffer::isAboveHighWM(void)
+CircularByteBuffer::isAboveHighWM(void) const
 {
   return (m_len > m_highWM);
 }
 
 inline bool
-CircularByteBuffer::isBelowLowWM(void)
+CircularByteBuffer::isBelowLowWM(void) const
 {
   return (m_len < m_lowWM);
 }
 
 inline unsigned short
-CircularByteBuffer::length(void)
+CircularByteBuffer::length(void) const
 {
   return m_len;
 }
 
 inline unsigned short
-CircularByteBuffer::size(void)
+CircularByteBuffer::size(void) const
 {
   return m_sz;
 }

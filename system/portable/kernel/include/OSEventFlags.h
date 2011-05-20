@@ -43,19 +43,19 @@ public:
   OSReturn_t wait(OSEventFlagsBits_t bits, bool isStrict = true);
 
   // Return the event used for notification
-  OSEvent_t getEvent(void);
+  OSEvent_t getEvent(void) const;
 
 private:
   // Contain the current value of the flags
   volatile OSEventFlagsBits_t m_flags;
   };
 
-inline OSEvent_t OSEventFlags::getEvent(void)
+inline OSEvent_t OSEventFlags::getEvent(void) const
   {
     return (OSEvent_t)this;
   }
 
-inline OSEventFlagsBits_t OSEventFlags::get(void)
+inline OSEventFlagsBits_t OSEventFlags::get(void) const
   {
     return m_flags;
   }
