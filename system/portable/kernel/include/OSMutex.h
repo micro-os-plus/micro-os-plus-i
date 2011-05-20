@@ -64,11 +64,11 @@ public:
 
   // return the thread owner of the mutex
   OSThread* 
-  getOwnerThread(void);
+  getOwnerThread(void) const;
 
   // return the event used for notification the acquire and release of the mutex
   OSEvent_t
-  getEvent(void);
+  getEvent(void) const;
 
   // set the given event used for notification the acquire and release of the mutex
   void
@@ -76,7 +76,7 @@ public:
 
   // return the event return value for notification
   OSEventWaitReturn_t
-  getEventReturn(void);
+  getEventReturn(void) const;
 
 private:
   // the thread which uses this mutex
@@ -98,13 +98,13 @@ private:
 };
 
 inline OSThread* 
-OSMutex::getOwnerThread(void)
+OSMutex::getOwnerThread(void) const
 {
   return m_pOwnerThread;
 }
 
 inline OSEvent_t
-OSMutex::getEvent(void)
+OSMutex::getEvent(void) const
 {
   return m_event;
 }
@@ -116,7 +116,7 @@ OSMutex::setEvent(OSEvent_t event)
 }
 
 inline OSEventWaitReturn_t
-OSMutex::getEventReturn(void)
+OSMutex::getEventReturn(void) const
 {
   return m_eventRet;
 }

@@ -28,7 +28,7 @@ public:
   OSEventFlagsBits_t notify(OSEventFlagsBits_t bits);
 
   // Return the current flags value
-  OSEventFlagsBits_t get(void);
+  OSEventFlagsBits_t get(void) const;
 
   // Clear the given flags.
   // Return the new flags.
