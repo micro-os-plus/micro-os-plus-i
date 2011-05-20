@@ -10,15 +10,12 @@
 
 GpsCoordinate::GpsCoordinate()
 {
-  debug.putString("GpsCoordinate", this);
+  debug.putConstructor("GpsCoordinate", this);
 }
 
 GpsCoordinate::~GpsCoordinate()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("~GpsCoordinate()");
-  debug.putNewLine();
-#endif
+  debug.putDestructor("GpsCoordinate", this);
 }
 
 ostream&
@@ -35,15 +32,12 @@ operator <<(ostream& out, GpsCoordinate& c)
 
 GpsPosition::GpsPosition()
 {
-  debug.putString("GpsPosition", this);
+  debug.putConstructor("GpsPosition", this);
 }
 
 GpsPosition::~GpsPosition()
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  debug.putString("~GpsPosition()");
-  debug.putNewLine();
-#endif
+  debug.putDestructor("GpsPosition", this);
 }
 
 ostream&

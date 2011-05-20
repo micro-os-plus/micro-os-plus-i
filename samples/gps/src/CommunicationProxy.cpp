@@ -8,7 +8,7 @@
 
 CommunicationProxy::CommunicationProxy()
 {
-  debug.putString("CommunicationProxy", this);
+  debug.putConstructor("CommunicationProxy", this);
 }
 
 OSReturn_t

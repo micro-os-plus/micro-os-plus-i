@@ -11,13 +11,13 @@
 #include "GpsPosition.h"
 #include "Application.h"
 
-// ----- Active object constructor -----------------------------------------------------
+// ----- Active object constructor --------------------------------------------
 
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(&m_dev),
       m_cout(&m_dev), m_cli(m_cin, m_cout, m_line, sizeof(m_line))
 {
-  debug.putString("TaskCli", this);
+  debug.putConstructor("TaskCli", this);
 }
 
 // ----- CLI commands ---------------------------------------------------------

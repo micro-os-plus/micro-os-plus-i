@@ -11,5 +11,5 @@ Application::Application():
       devUsart0(tx_store, sizeof(tx_store), rx_store, sizeof(rx_store)),
       gps("gps", devUsart0)
 {
-  debug.putString("Application", this);
+  debug.putConstructor("Application", this);
 }
