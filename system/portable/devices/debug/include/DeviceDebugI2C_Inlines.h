@@ -39,6 +39,10 @@
 
 #elif defined(OS_CONFIG_BOARD_TEMPLATE)
 #include "hal/boards/TEMPLATE_MANUFACTURER/TEMPLATE_BOARD/include/DeviceDebugI2C_Board_Defines.h"
+
+#elif defined(OS_CONFIG_BOARD_CUSTOM)
+#include "custom/include/DeviceDebugI2C_Board_Defines.h"
+
 #else
 #error "Missing OS_CONFIG_BOARD_* definition"
 #endif
