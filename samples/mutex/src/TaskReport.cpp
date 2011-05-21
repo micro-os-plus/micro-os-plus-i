@@ -63,7 +63,7 @@ TaskReport::threadMain(void)
                 {
                   int sum;
                   sum = 0;
-                  clog << endl;
+                  clog << std::endl;
                   clog << resourceValue;
                   clog << " : [ ";
                   for (int j = 0; j < APP_CONFIG_RESOURCES_ARRAY_SIZE; ++j)
@@ -74,7 +74,7 @@ TaskReport::threadMain(void)
                     }
                   clog << "] sum=";
                   clog << sum;
-                  clog << endl;
+                  clog << std::endl;
                 }
               os.sched.lock.exit();
             }

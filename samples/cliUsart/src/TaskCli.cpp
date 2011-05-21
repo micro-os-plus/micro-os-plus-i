@@ -127,7 +127,7 @@ TaskCli::threadMain(void)
           dev.setReadMatchArray((unsigned char*) "1");
           c = dev.readByte();
           if (c < 0)
-            clog << "error -" << dec << (int) (-c) << endl;
+            clog << "error -" << std::dec << (int) (-c) << std::endl;
           else
             dev.writeByte(c);
           dev.flush();
@@ -185,7 +185,7 @@ static const char str_checksum[] = "Checksum?";
 int
 TaskCli::xorCheck(unsigned char *pc)
 {
-  ostream & cout = m_cout;
+  std::ostream& cout = m_cout;
 
   unsigned char c;
   unsigned char xor1, xor2;
@@ -205,9 +205,9 @@ TaskCli::xorCheck(unsigned char *pc)
   if (c == '\0')
     {
       // no xor received, return computed xor
-      cout << endl << ("*");
+      cout << std::endl << ("*");
       cout.width(2);
-      cout << hex << (unsigned short) xor1;
+      cout << std::hex << (unsigned short) xor1;
       cout.flush();
       return -2;
     }
@@ -263,7 +263,7 @@ TaskCli::xorCheck(unsigned char *pc)
   if (xor1 != xor2)
     {
       // crc error
-      cout << endl << str_checksum;
+      cout << std::endl << str_checksum;
       return -2; // return 'crc error'
     }
   //*qq++ = ' ';
@@ -294,7 +294,7 @@ TaskCli::lineProcess()
   pc = m_line;
 
   SimpleCli & cli = m_cli;
-  ostream& cout = m_cout;
+  std::ostream& cout = m_cout;
 
   unsigned char *p;
   unsigned char c;
@@ -324,7 +324,7 @@ TaskCli::lineProcess()
   c = *p | 0x20;
   if (*p == '?')
     {
-      cout << endl << str_help;
+      cout << std::endl << str_help;
     }
   else if (c == 's')
     {
@@ -344,7 +344,7 @@ TaskCli::lineProcess()
               OSThread *pt;
               pt = os.sched.getThread(i);
 
-              cout << endl;
+              cout << std::endl;
               if (pt == this)
                 cout << '*';
               else
@@ -396,16 +396,16 @@ TaskCli::lineProcess()
           if ((p = cli.parseNext()) != 0)
             goto err;
 
-          cout << endl << "uid=00C80A0C";
-          cout << endl << "nmax=0001E9FF";
-          cout << endl << "nbeg=00005F7D";
+          cout << std::endl << "uid=00C80A0C";
+          cout << std::endl << "nmax=0001E9FF";
+          cout << std::endl << "nbeg=00005F7D";
         }
       else if (c == 'e')
         {
           if ((p = cli.parseNext()) == 0)
             goto err;
 
-          cout << endl;
+          cout << std::endl;
         }
       else if (c == 'd' || c == 'c' || c == 'o')
         {
@@ -424,7 +424,7 @@ TaskCli::lineProcess()
               v = 0;
             }
 
-          cout << endl
+          cout << std::endl
               << "$B06F590E0001CF68638921FA30000028438A21F33000827111FA3801AEFF3200827122FA387FFF883100827112FA387FFFFF3200827121FA3801BA863100827101FB3801E0863120537211FA3C1EB6537311FA3C1CF2537411F93C1DB0537511FA3C0054FF00FF00*CD";
         }
       else
@@ -435,8 +435,8 @@ TaskCli::lineProcess()
 
   return;
 
-  err: cout << endl << str_unknown;
-  cout << endl << str_help;
+  err: cout << std::endl << str_unknown;
+  cout << std::endl << str_help;
 }
 #endif
 

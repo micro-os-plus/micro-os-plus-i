@@ -30,8 +30,8 @@ private:
   OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
   OSDeviceCharacter & m_dev;
 #if true
-  istream m_cin;
-  ostream m_cout;
+  std::istream m_cin;
+  std::ostream m_cout;
 #endif
   SimpleCli m_cli;
   unsigned char m_line[ 80 ];

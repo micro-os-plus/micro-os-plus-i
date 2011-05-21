@@ -86,12 +86,12 @@ TaskBlink::threadMain(void)
                     {
                       OSThread *pt;
                       pt = os.sched.getThread(j);
-                      clog << endl;
+                      clog << std::endl;
                       clog << ((pt == this) ? '*' : ' ');
 
                       clog << *pt; // print thread info
                     }
-                  clog << endl;
+                  clog << std::endl;
                 }
               ++i;
             }
