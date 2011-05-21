@@ -53,7 +53,7 @@ TaskCli::threadMain(void)
     {
       os.sched.lock.enter();
         {
-          clog << "TaskCli::threadMain()" << endl;
+          clog << "TaskCli::threadMain()" << std::endl;
         }
       os.sched.lock.exit();
     }
@@ -83,7 +83,7 @@ TaskCli::threadMain(void)
 OSReturn_t
 TaskCli::commandShowThreads(void)
 {
-  ostream& cout = m_cout;
+  std::ostream& cout = m_cout;
 
   int nThreads;
   nThreads = os.sched.getThreadsCount();
@@ -93,7 +93,7 @@ TaskCli::commandShowThreads(void)
       OSThread *pt;
       pt = os.sched.getThread(i);
 
-      cout << endl;
+      cout << std::endl;
       cout << ((pt == this) ? '*' : ' ');
 
       // Print the thread info
@@ -108,7 +108,7 @@ TaskCli::commandShowThreads(void)
 OSReturn_t
 TaskCli::commandShowStacks(void)
 {
-  ostream& cout = m_cout;
+  std::ostream& cout = m_cout;
 
   int nThreads;
   nThreads = os.sched.getThreadsCount();
@@ -118,7 +118,7 @@ TaskCli::commandShowStacks(void)
       OSThread* pt;
       pt = os.sched.getThread(i);
 
-      cout << endl;
+      cout << std::endl;
       cout << ((pt == this) ? '*' : ' ');
 
       // Print the stack used versus size ratio
@@ -134,14 +134,14 @@ TaskCli::commandShowStacks(void)
 OSReturn_t
 TaskCli::commandShowPosition(void)
 {
-  ostream& cout = m_cout;
+  std::ostream& cout = m_cout;
 
   GpsPosition pos;
 
   // Fill in with GPS coordinates
   app.gps.getPosition(&pos);
 
-  cout << endl << pos; // Print the GPS position
+  cout << std::endl << pos; // Print the GPS position
 
   return OSReturn::OS_OK;
 }
@@ -151,7 +151,7 @@ TaskCli::commandShowPosition(void)
 OSReturn_t
 TaskCli::commandTest(void)
 {
-  ostream& cout = m_cout;
+  std::ostream& cout = m_cout;
   CommandLineInterface& cli = m_cli;
   Parser& parser = cli.getParser();
 
@@ -159,7 +159,7 @@ TaskCli::commandTest(void)
 
   if (parser.getTokenLength() == 0)
     {
-      cout << endl << "test 1 ¦ test 2";
+      cout << std::endl << "test 1 ¦ test 2";
 
       return OSReturn::OS_BAD_COMMAND; // no token
     }
@@ -170,11 +170,11 @@ TaskCli::commandTest(void)
 
       if (n == 1)
         {
-          cout << endl << "one";
+          cout << std::endl << "one";
         }
       else if (n == 2)
         {
-          cout << endl << "two";
+          cout << std::endl << "two";
         }
       else
         {

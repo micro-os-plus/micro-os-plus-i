@@ -22,7 +22,7 @@ GpsManager::threadMain(void)
     {
       os.sched.lock.enter();
         {
-          clog << "GpsManager::threadMain()" << endl;
+          clog << "GpsManager::threadMain()" << std::endl;
         }
       os.sched.lock.exit();
     }

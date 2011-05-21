@@ -60,8 +60,8 @@ private:
 
 // ----------------------------------------------------------------------------
 
-ostream&
-operator <<(ostream& out, GpsCoordinate& p);
+std::ostream&
+operator <<(std::ostream& out, GpsCoordinate& p);
 
 // ----------------------------------------------------------------------------
 
@@ -90,8 +90,8 @@ private:
 
 // ----------------------------------------------------------------------------
 
-ostream&
-operator <<(ostream& out, GpsPosition& p);
+std::ostream&
+operator <<(std::ostream& out, GpsPosition& p);
 
 // ----------------------------------------------------------------------------
 

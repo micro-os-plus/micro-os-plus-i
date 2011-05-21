@@ -40,8 +40,8 @@ private:
   OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
   OSDeviceCharacter & m_dev;
 
-  istream m_cin;
-  ostream m_cout;
+  std::istream m_cin;
+  std::ostream m_cout;
 
   CommandLineInterface m_cli;
   Parser m_parser;

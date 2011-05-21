@@ -18,10 +18,10 @@ GpsCoordinate::~GpsCoordinate()
   debug.putDestructor("GpsCoordinate", this);
 }
 
-ostream&
-operator <<(ostream& out, GpsCoordinate& c)
+std::ostream&
+operator <<(std::ostream& out, GpsCoordinate& c)
 {
-  out << c.getHemisphere() << dec << (unsigned) c.getDegrees() << "°"
+  out << c.getHemisphere() << std::dec << (unsigned) c.getDegrees() << "°"
       << (unsigned) c.getMinutesInteger() << "." << c.getMinutesDecimals()
       << "'";
 
@@ -40,8 +40,8 @@ GpsPosition::~GpsPosition()
   debug.putDestructor("GpsPosition", this);
 }
 
-ostream&
-operator <<(ostream& out, GpsPosition& p)
+std::ostream&
+operator <<(std::ostream& out, GpsPosition& p)
 {
   out << *p.getLatitude() << ", " << *p.getLongitude() << ", "
       << p.getAltitude() << "m";
