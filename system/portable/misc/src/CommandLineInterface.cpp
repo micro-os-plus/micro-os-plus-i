@@ -13,7 +13,7 @@
 #include "portable/misc/include/CommandLineInterface.h"
 #include "portable/misc/include/ASCII.h"
 
-CommandLineInterface::CommandLineInterface(istream& cin, ostream& cout,
+CommandLineInterface::CommandLineInterface(std::istream& cin, std::ostream& cout,
     unsigned char* pLine, unsigned short iSize) :
   m_cin(cin), m_cout(cout)
 {
@@ -33,18 +33,18 @@ CommandLineInterface::~CommandLineInterface()
 OSReturn_t
 CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
 {
-  ostream& cout = m_cout;
+  std::ostream& cout = m_cout;
 
   if (greeting != 0)
-    cout << endl << endl << greeting << endl;
+    cout << std::endl << std::endl << greeting << std::endl;
 
   for (; dev.isConnected();)
     {
-      cout << endl << m_pPrompt;
+      cout << std::endl << m_pPrompt;
       int c;
 
       c = readLine();
-      if (c == traits::eof())
+      if (c == std::traits::eof())
         {
 #if defined(DEBUG)
           OSDeviceDebug::putString("disconnected");
@@ -85,8 +85,8 @@ CommandLineInterface::readLine()
   unsigned char*  pc;
   int c;
 
-  istream& cin = m_cin;
-  ostream& cout = m_cout;
+  std::istream& cin = m_cin;
+  std::ostream& cout = m_cout;
 
   for (pc = m_pLine;;)
     {
@@ -145,7 +145,7 @@ static const char str_unknown[] = "Cmd?";
 void
 CommandLineInterface::processLine()
 {
-  ostream& cout = m_cout;
+  std::ostream& cout = m_cout;
   Parser& parser = m_parser;
 
   parser.setInput(m_pLine);
@@ -155,7 +155,7 @@ CommandLineInterface::processLine()
   if (recurse((cliToken_t*) m_pToken) == OSReturn::OS_OK)
     return;
 
-  cout << endl << str_unknown;
+  cout << std::endl << str_unknown;
   //cout << endl << str_help;
 }
 

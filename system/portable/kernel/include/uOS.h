@@ -156,7 +156,7 @@ class OS;
 extern OS os;
 
 #if defined(OS_INCLUDE_CLOG)
-extern ostream clog;
+extern std::ostream clog;
 #endif
 
 extern const char greeting[];

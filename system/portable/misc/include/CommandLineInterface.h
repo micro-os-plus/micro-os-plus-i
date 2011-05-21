@@ -36,7 +36,7 @@ public:
 class CommandLineInterface
 {
 public:
-  CommandLineInterface(istream& cin, ostream& cout, unsigned char* pLine,
+  CommandLineInterface(std::istream& cin, std::ostream& cout, unsigned char* pLine,
       unsigned short iSize);
   ~CommandLineInterface();
 
@@ -58,14 +58,14 @@ public:
   getPrompt(void) const;
 
   Parser&
-  getParser(void) const;
+  getParser(void);
 
 private:
   OSReturn_t
   recurse(cliToken_t* p);
 
-  istream m_cin;
-  ostream m_cout;
+  std::istream m_cin;
+  std::ostream m_cout;
 
   unsigned char* m_pLine;
   unsigned short m_iSize;
@@ -99,7 +99,7 @@ CommandLineInterface::getPrompt(void) const
 }
 
 inline Parser&
-CommandLineInterface::getParser(void) const
+CommandLineInterface::getParser(void)
 {
   return m_parser;
 }

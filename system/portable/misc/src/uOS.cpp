@@ -15,5 +15,5 @@ OSDeviceDebug debug;
 
 #if defined(DEBUG) && defined(OS_INCLUDE_CLOG)
 // high level debug stream used to display thread messages
-ostream clog(&debug);
+std::ostream clog(&debug);
 #endif

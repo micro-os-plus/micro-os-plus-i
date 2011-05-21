@@ -19,7 +19,7 @@ public:
   ~SimpleCli();
 
   int
-  readLine(istream& cin, ostream& cout);
+  readLine(std::istream& cin, std::ostream& cout);
 
 #if defined(OS_INCLUDE_SIMPLECLI_PARSER)
   void

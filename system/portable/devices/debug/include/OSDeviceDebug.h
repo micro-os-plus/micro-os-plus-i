@@ -16,7 +16,7 @@
 // The parent class of all debug classes used for displaying trace messages.
 class OSDeviceDebug
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
-    : public streambuf
+    : public std::streambuf
 #endif
 
 {
@@ -136,10 +136,10 @@ private:
   // streambuf definitions
   // Output, on debug interface, one character.
   virtual int
-  overflow(int c = traits::eof());
+  overflow(int c = std::traits::eof());
   // Output, on debug interface, a buffer.
-  virtual streamsize
-  xsputn(const char* s, streamsize n);
+  virtual std::streamsize
+  xsputn(const char* s, std::streamsize n);
 #endif
 
 };

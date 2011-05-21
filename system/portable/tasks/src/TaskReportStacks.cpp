@@ -87,7 +87,7 @@ TaskReportStacks::threadMain(void)
                     {
                       OSThread* pt;
                       pt = os.sched.getThread(j);
-                      clog << endl;
+                      clog << std::endl;
                       clog << ((pt == this) ? '*' : ' ');
 #if false
                       clog << *pt; // print thread info
@@ -96,7 +96,7 @@ TaskReportStacks::threadMain(void)
                           << pt->getStackSize();
 #endif
                     }
-                  clog << endl;
+                  clog << std::endl;
                 }
               ++i;
             }

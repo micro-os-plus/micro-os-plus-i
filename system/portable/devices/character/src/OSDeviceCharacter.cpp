@@ -775,7 +775,7 @@ OSDeviceCharacter::overflow(int c)
   int r;
   r = writeByte((unsigned char) c);
   if (r < 0)
-    return traits::eof();
+    return std::traits::eof();
   else
     return r;
 }
@@ -795,7 +795,7 @@ OSDeviceCharacter::underflow(void)
   //OSDeviceDebug::putChar((unsigned char)r);
 
   if (r < 0)
-    return traits::eof();
+    return std::traits::eof();
   else
     return r;
 }

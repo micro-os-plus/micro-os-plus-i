@@ -23,7 +23,7 @@ deviceCharacterType_t;
 // TODO: methods for buffered read/write operations must be added.
 class OSDeviceCharacter
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
-: public streambuf
+: public std::streambuf
 #endif
 
 {
@@ -248,7 +248,7 @@ private:
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
   // streambuf definitions
   virtual int
-  overflow(int c = traits::eof());
+  overflow(int c = std::traits::eof());
   virtual int
   showmanyc();
   virtual int

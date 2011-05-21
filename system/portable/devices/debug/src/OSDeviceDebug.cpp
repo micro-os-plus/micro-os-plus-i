@@ -495,8 +495,8 @@ OSDeviceDebug::overflow(int c)
   return r;
 }
 
-streamsize
-OSDeviceDebug::xsputn(const char* s, streamsize n)
+std::streamsize
+OSDeviceDebug::xsputn(const char* s, std::streamsize n)
 {
 #if defined(DEBUG)
 

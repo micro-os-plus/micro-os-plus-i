@@ -28,7 +28,7 @@ SimpleCli::~SimpleCli()
 #define CHR_ASCII_BELL 0x07
 
 int
-SimpleCli::readLine(istream& cin, ostream& cout)
+SimpleCli::readLine(std::istream& cin, std::ostream& cout)
 {
   unsigned char*  pc;
   int c;
