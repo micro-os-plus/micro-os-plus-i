@@ -12,7 +12,7 @@ CommunicationProxy::CommunicationProxy()
 }
 
 OSReturn_t
-CommunicationProxy::sendGpsPosition(gpsPosition_t* p)
+CommunicationProxy::rpcSendGpsPosition(GpsPosition_t& p)
 {
   p = p;
   return OSReturn::OS_OK;

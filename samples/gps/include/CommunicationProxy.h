@@ -9,14 +9,14 @@
 
 #include "portable/kernel/include/uOS.h"
 
-#include "GpsPosition.h"
+#include "portable/misc/include/GpsPosition.h"
 
 class CommunicationProxy
 {
 public:
   CommunicationProxy();
 
-  OSReturn_t sendGpsPosition(gpsPosition_t* pPos);
+  OSReturn_t rpcSendGpsPosition(GpsPosition_t& pPos);
 };
 
 #endif /* COMMUNICATIONPROXY_H_ */

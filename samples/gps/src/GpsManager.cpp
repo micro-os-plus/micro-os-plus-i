@@ -37,8 +37,8 @@ GpsManager::threadMain(void)
 
       if ((m_eventFlags.get() & OS_REQUEST_GPS_POSITION) != 0)
         {
-          getPosition(&m_gpsPosition);
-          app.com.sendGpsPosition(&m_gpsPosition);
+          getPosition(m_gpsPosition);
+          app.com.rpcSendGpsPosition(m_gpsPosition);
         }
     }
 }
@@ -52,27 +52,24 @@ GpsManager::requestGpsPosition(void)
 }
 
 OSReturn_t
-GpsManager::getPosition(gpsPosition_t* p)
+GpsManager::getPosition(GpsPosition_t& p)
 {
-  gpsCoordinate_t* latitude; // N/S
-  gpsCoordinate_t* longitude; // E/W
-
-  latitude = p->getLatitude();
-  longitude = p->getLongitude();
+  GpsLatitude_t& latitude = p.getLatitude(); // N/S
+  GpsLongitude_t& longitude = p.getLongitude(); // E/W
 
 #if defined(APP_INCLUDE_GPSMANAGER_GETPOSITION_SIMULATED)
 
-  latitude->setHemisphere((unsigned char)'N');
-  latitude->setDegrees(45);
-  latitude->setMinutesInteger(35);
-  latitude->setMinutesDecimals(1234);
+  latitude.setHemisphereNorth();
+  latitude.setDegrees(45);
+  latitude.setMinutesInteger(35);
+  latitude.setMinutesDecimals(1234);
 
-  longitude->setHemisphere((unsigned char)'E');
-  longitude->setDegrees(26);
-  longitude->setMinutesInteger(25);
-  longitude->setMinutesDecimals(4321);
+  longitude.setHemisphereEst();
+  longitude.setDegrees(26);
+  longitude.setMinutesInteger(25);
+  longitude.setMinutesDecimals(4321);
 
-  p->setAltitude(-1);
+  p.setAltitude(-1);
 
 #else
 

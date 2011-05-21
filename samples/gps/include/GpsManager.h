@@ -9,7 +9,7 @@
 
 #include "portable/kernel/include/uOS.h"
 
-#include "GpsPosition.h"
+#include "portable/misc/include/GpsPosition.h"
 
 
 class GpsManager : public OSThread
@@ -27,7 +27,7 @@ public:
 
   OSReturn_t requestGpsPosition(void);
 
-  OSReturn_t getPosition(gpsPosition_t* pPos);
+  OSReturn_t getPosition(GpsPosition_t& pPos);
 
 private:
   // members

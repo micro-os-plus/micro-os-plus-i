@@ -8,7 +8,7 @@
 
 #include "portable/kernel/include/ostream_OSThread.h"
 
-#include "GpsPosition.h"
+#include "portable/misc/include/GpsPosition.h"
 #include "Application.h"
 
 // ----- Active object constructor --------------------------------------------
@@ -139,7 +139,7 @@ TaskCli::commandShowPosition(void)
   GpsPosition pos;
 
   // Fill in with GPS coordinates
-  app.gps.getPosition(&pos);
+  app.gps.getPosition(pos);
 
   cout << std::endl << pos; // Print the GPS position
 

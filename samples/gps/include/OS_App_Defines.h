@@ -53,6 +53,9 @@
 
 #define OS_INCLUDE_TASKBLINK                            (1)
 
+#define OS_INCLUDE_GPSPOSITION                          (1)
+#define OS_INCLUDE_OSTREAM_GPSPOSITION                  (1)
+
 //#define OS_INCLUDE_USB_CDC_DUAL_INTERFACE               1
 //#define OS_INCLUDE_USB_CDC_DUAL_CONFIGURATION           1
 
