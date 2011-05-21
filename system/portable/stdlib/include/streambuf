@@ -12,173 +12,197 @@
 #include "portable/stdlib/include/char_traits"
 
 // <streambuf>
+namespace std
+{
+  typedef class streambuf streambuf;
 
-typedef class streambuf streambuf;
-
-class streambuf
+  class streambuf
   {
 
-public:
+  public:
 
-  virtual ~streambuf();
+    virtual
+    ~streambuf();
 
-  // 27.5.2.2.2 buffer and positioning:
+    // 27.5.2.2.2 buffer and positioning:
 #if 0
-  streambuf* pubsetbuf(char* s, streamsize n);
-  pos_type pubseekoff(off_type off, ios_base::seekdir way,
-      ios_base::openmode which = ios_base::in | ios_base::out);
-  pos_type pubseekpos(pos_type sp,
-      ios_base::openmode which = ios_base::in | ios_base::out);
+    streambuf* pubsetbuf(char* s, streamsize n);
+    pos_type pubseekoff(off_type off, ios_base::seekdir way,
+        ios_base::openmode which = ios_base::in | ios_base::out);
+    pos_type pubseekpos(pos_type sp,
+        ios_base::openmode which = ios_base::in | ios_base::out);
 #endif
-  int pubsync();
+    int
+    pubsync();
 
-  // Get and put areas:
+    // Get and put areas:
 
-  // 27.5.2.2.3 Get area:
+    // 27.5.2.2.3 Get area:
 
-  streamsize in_avail();
-  int snextc();
-  int sbumpc();
-  int sgetc();
-  int sgetn(char* s, streamsize n);
+    streamsize
+    in_avail();
+    int
+    snextc();
+    int
+    sbumpc();
+    int
+    sgetc();
+    int
+    sgetn(char* s, streamsize n);
 
-  // 27.5.2.2.4 Putback:
+    // 27.5.2.2.4 Putback:
 #if 0
-  int sputbackc(char c);
-  int sungetc();
+    int sputbackc(char c);
+    int sungetc();
 #endif
-  // 27.5.2.2.5 Put area:
+    // 27.5.2.2.5 Put area:
 
-  int sputc(char c) __attribute__((noinline));
-  int sputn(const char* s, streamsize n) __attribute__((noinline));
+    int
+    sputc(char c) __attribute__((noinline));
+    int
+    sputn(const char* s, streamsize n) __attribute__((noinline));
 
-protected:
+  protected:
 #if 0
-  //Pointers for the "get" buffers
-  char*  mgbeg;
-  char*  mgnext;
-  char*  mgend;
+    //Pointers for the "get" buffers
+    char* mgbeg;
+    char* mgnext;
+    char* mgend;
 
-  //Pointers for the "put" buffers
-  char*  mpbeg;
-  char*  mpnext;
-  char*  mpend;
+    //Pointers for the "put" buffers
+    char* mpbeg;
+    char* mpnext;
+    char* mpend;
 
-  //In the event of null buffers Lets us know what the buffer is opened for
-  ios_base::openmode openedFor;
+    //In the event of null buffers Lets us know what the buffer is opened for
+    ios_base::openmode openedFor;
 #endif
-  streambuf();
+    streambuf();
 
-  // 27.5.2.3.1 Get area:
+    // 27.5.2.3.1 Get area:
 
 #if 0
-  char* eback() const;
-  char* gptr() const;
-  char* egptr() const;
-  void gbump(int n);
-  void setg(char* gbeg, char* gnext, char* gend);
+    char* eback() const;
+    char* gptr() const;
+    char* egptr() const;
+    void gbump(int n);
+    void setg(char* gbeg, char* gnext, char* gend);
 
-  // 27.5.2.3.2 Put area:
+    // 27.5.2.3.2 Put area:
 
-  char* pbase() const;
-  char* pptr() const;
-  char* epptr() const;
-  void pbump(int n);
-  void setp(char* pbeg, char* pend);
+    char* pbase() const;
+    char* pptr() const;
+    char* epptr() const;
+    void pbump(int n);
+    void setp(char* pbeg, char* pend);
 #endif
-  // 27.5.2.4 virtual functions:
+    // 27.5.2.4 virtual functions:
 
-  // 27.5.2.4.2 management and positioning:
+    // 27.5.2.4.2 management and positioning:
 
-  virtual streambuf* setbuf(char* s, streamsize n);
-  virtual pos_type seekoff(off_type off, ios_base::seekdir way,
-      ios_base::openmode which = ios_base::in | ios_base::out);
-  virtual pos_type seekpos(pos_type sp,
-      ios_base::openmode which = ios_base::in | ios_base::out);
+    virtual streambuf*
+    setbuf(char* s, streamsize n);
+    virtual pos_type
+    seekoff(off_type off, ios_base::seekdir way,
+        ios_base::openmode which = ios_base::in | ios_base::out);
+    virtual pos_type
+    seekpos(pos_type sp,
+        ios_base::openmode which = ios_base::in | ios_base::out);
 
-  virtual int sync();
+    virtual int
+    sync();
 
-  // 27.5.2.4.3 Get area:
+    // 27.5.2.4.3 Get area:
 
-  virtual int showmanyc();
-  virtual streamsize xsgetn(char* s, streamsize n);
-  virtual int underflow();
-  virtual int uflow();
+    virtual int
+    showmanyc();
+    virtual streamsize
+    xsgetn(char* s, streamsize n);
+    virtual int
+    underflow();
+    virtual int
+    uflow();
 
-  // 27.5.2.4.4 Putback:
+    // 27.5.2.4.4 Putback:
 
-  virtual int pbackfail(int c = traits::eof());
+    virtual int
+    pbackfail(int c = traits::eof());
 
-  // 27.5.2.2.5 Put area:
+    // 27.5.2.2.5 Put area:
 
-  virtual streamsize xsputn(const char* s, streamsize n);
-  virtual int overflow(int c = traits::eof());
+    virtual streamsize
+    xsputn(const char* s, streamsize n);
+    virtual int
+    overflow(int c = traits::eof());
 
   };
 
 #if 0
-inline char* streambuf::eback() const
-  {
-    return mgbeg;
-  }
+  inline char* streambuf::eback() const
+    {
+      return mgbeg;
+    }
 
-inline char* streambuf::gptr() const
-  {
-    return mgnext;
-  }
+  inline char* streambuf::gptr() const
+    {
+      return mgnext;
+    }
 
-inline char* streambuf::egptr() const
-  {
-    return mgend;
-  }
+  inline char* streambuf::egptr() const
+    {
+      return mgend;
+    }
 
-inline void streambuf::gbump(int n)
-  {
-    mgnext += n;
-  }
+  inline void streambuf::gbump(int n)
+    {
+      mgnext += n;
+    }
 
-inline char* streambuf::pbase() const
-  {
-    return mpbeg;
-  }
+  inline char* streambuf::pbase() const
+    {
+      return mpbeg;
+    }
 
-inline char* streambuf::pptr() const
-  {
-    return mpnext;
-  }
+  inline char* streambuf::pptr() const
+    {
+      return mpnext;
+    }
 
-inline char* streambuf::epptr() const
-  {
-    return mpend;
-  }
+  inline char* streambuf::epptr() const
+    {
+      return mpend;
+    }
 
-inline void streambuf::pbump(int n)
-  {
-    mpnext += n;
-  }
+  inline void streambuf::pbump(int n)
+    {
+      mpnext += n;
+    }
 
-inline streambuf* streambuf::pubsetbuf(char* s, streamsize n)
-  {
-    return setbuf(s, n);
-  }
+  inline streambuf* streambuf::pubsetbuf(char* s, streamsize n)
+    {
+      return setbuf(s, n);
+    }
 
-inline pos_type streambuf::pubseekoff(off_type off, ios_base::seekdir way,
-    ios_base::openmode which)
-  {
-    return seekoff(off, way, which);
-  }
+  inline pos_type streambuf::pubseekoff(off_type off, ios_base::seekdir way,
+      ios_base::openmode which)
+    {
+      return seekoff(off, way, which);
+    }
 
-inline pos_type streambuf::pubseekpos(pos_type sp,
-    ios_base::openmode which)
-  {
-    return seekpos(sp, which);
-  }
+  inline pos_type streambuf::pubseekpos(pos_type sp,
+      ios_base::openmode which)
+    {
+      return seekpos(sp, which);
+    }
 
 #endif
 
-inline int streambuf::pubsync()
+  inline int
+  streambuf::pubsync()
   {
     return sync();
   }
+
+} /* namespace std */
 
 #endif /* STREAMBUF_ */

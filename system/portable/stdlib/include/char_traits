@@ -10,6 +10,8 @@
 
 #include <string.h>
 
+namespace std
+{
 // character traits
 
 struct traits
@@ -129,5 +131,7 @@ struct traits
     #endif
 
   };
+
+} /* namespace std */
 
 #endif /* CHAR_TRAITS_H_ */

@@ -11,11 +11,16 @@
 #include "portable/stdlib/include/istream"
 #include "portable/stdlib/include/ostream"
 
-class iostream : public ostream, public istream
+namespace std
+{
+  class iostream : public ostream, public istream
   {
-public:
-  iostream(streambuf* sb);
-  virtual ~iostream();
+  public:
+    iostream(streambuf* sb);
+    virtual
+    ~iostream();
   };
+
+} /* namespace std */
 
 #endif /* IOSTREAM_ */

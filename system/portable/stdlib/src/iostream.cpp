@@ -12,15 +12,19 @@
 #include "portable/devices/debug/include/OSDeviceDebug.h"
 #include "portable/stdlib/include/iostream"
 
-iostream::iostream(streambuf* sb) :
-  ostream(sb), istream(sb)
+namespace std
   {
-    OSDeviceDebug::putConstructor_P(PSTR("iostream"), this);
-  }
+    iostream::iostream(streambuf* sb) :
+    ostream(sb), istream(sb)
+      {
+        OSDeviceDebug::putConstructor_P(PSTR("iostream"), this);
+      }
 
-iostream::~iostream()
-  {
-  OSDeviceDebug::putDestructor_P(PSTR("iostream"), this);
-  }
+    iostream::~iostream()
+      {
+        OSDeviceDebug::putDestructor_P(PSTR("iostream"), this);
+      }
 
-#endif
+  } /* namespace std */
+
+#endif /* defined(OS_INCLUDE_IOSTREAM) */

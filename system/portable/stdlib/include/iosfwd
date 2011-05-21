@@ -8,11 +8,15 @@
 #ifndef IOSFWD_
 #define IOSFWD_
 
-// 27.2 Forward declarations
-// <iosfwd>
-class ios;
-class streambuf;
-class istream;
-class ostream;
+namespace std
+{
+  // 27.2 Forward declarations
+  // <iosfwd>
+  class ios;
+  class streambuf;
+  class istream;
+  class ostream;
+
+} /* namespace std */
 
 #endif /* IOSFWD_ */
