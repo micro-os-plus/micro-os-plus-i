@@ -24,7 +24,7 @@ public:
   // transform  the microseconds number into ticks number
   // possible issues: the result is approximative, the higher the tick rate the better the approximation
   // and the result should fit the range of OSTimerTicks_t, otherwise results are erroneous
-  inline static OSTimerTicks_t microsToTicks(unsigned short micros) __attribute__((always_inline));
+  inline static OSTimerTicks_t microsToTicks(uint_t micros) __attribute__((always_inline));
 
   // called each time a tick expire
   // increment the current ticks number, and call the OSTimer::interruptTick.
@@ -54,7 +54,7 @@ private:
   };
 
 // transform  the microseconds number into ticks number
-inline OSTimerTicks_t OSTimerTicks::microsToTicks(unsigned short micros)
+inline OSTimerTicks_t OSTimerTicks::microsToTicks(uint_t micros)
   {
     return (((micros)+(OS_CFGINT_TICK_RATE_HZ-1))/OS_CFGINT_TICK_RATE_HZ);
   }

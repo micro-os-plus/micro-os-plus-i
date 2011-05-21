@@ -7,7 +7,29 @@
 #ifndef OS_H_
 #define OS_H_
 
+// ----------------------------------------------------------------------------
+
 #include "portable/kernel/include/OS_Defines.h"
+
+// ----------------------------------------------------------------------------
+// First of all define all usual types.
+#include <stdint.h>
+// From now on, we can use:
+//      uint8_t, int8_t
+//      uint16_t, int16_t
+//      uint32_t, int32_t
+
+// This one are probably less standard, but quite useful
+typedef unsigned char uchar_t;
+typedef unsigned int uint_t;
+
+#include <cstddef>
+// From now on, we can use:
+//      std::size_t
+
+typedef uint16_t OSStackSize_t;
+
+// ----------------------------------------------------------------------------
 
 #include "portable/kernel/include/OSReturn.h"
 
@@ -287,13 +309,13 @@ public:
 #if defined(OS_INCLUDE_OS_BUSYWAITMILLIS)
   // Busy waiting for n milliseconds.
   static void
-  busyWaitMillis(unsigned int n);
+  busyWaitMillis(uint_t n);
 #endif /* defined(OS_INCLUDE_OS_BUSYWAITMILLIS) */
 
 #if defined(OS_INCLUDE_OS_BUSYWAITMICROS)
   // Busy waiting for n microseconds.
   static void
-  busyWaitMicros(unsigned int n);
+  busyWaitMicros(uint_t n);
 #endif /* defined(OS_INCLUDE_OS_BUSYWAITMICROS) */
 
   static void

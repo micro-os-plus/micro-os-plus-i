@@ -8,7 +8,10 @@
 #define OS_DEFINES_H_
 
 // ----------------------------------------------------------------------------
+// Notice: since this is also included in assembly source files,
+// it should not include anything else than preprocessor defines.
 
+// ----------------------------------------------------------------------------
 // Operating System versioning and greeting definitions
 
 // Notice: do not use parenthesis! (the values will be stringified)
@@ -223,15 +226,15 @@
 #define OS_INCLUDE_OSTREAM                              (1)
 #endif
 
-#if !defined(OS_INCLUDE_OSTREAM) && defined(OS_INCLUDE_SIMPLECLI)
+#if !defined(OS_INCLUDE_OSTREAM) && (defined(OS_INCLUDE_SIMPLECLI) || defined(OS_INCLUDE_COMMANDLINEINTERFACE))
 #define OS_INCLUDE_OSTREAM                              (1)
 #endif
 
-#if !defined(OS_INCLUDE_ISTREAM) && defined(OS_INCLUDE_SIMPLECLI)
+#if !defined(OS_INCLUDE_ISTREAM) && (defined(OS_INCLUDE_SIMPLECLI) || defined(OS_INCLUDE_COMMANDLINEINTERFACE))
 #define OS_INCLUDE_ISTREAM                              (1)
 #endif
 
-#if !defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF) && defined(OS_INCLUDE_SIMPLECLI)
+#if !defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF) && (defined(OS_INCLUDE_SIMPLECLI) || defined(OS_INCLUDE_COMMANDLINEINTERFACE))
 #define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          (1)
 #endif
 
@@ -246,6 +249,5 @@
 #define PSTR(_S_) ((const char*)_S_)
 #define putString_P putString
 #endif
-
 
 #endif /* OS_DEFINES_H_ */

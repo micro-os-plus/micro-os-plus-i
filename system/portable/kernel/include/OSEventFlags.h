@@ -10,7 +10,7 @@
 #include "portable/kernel/include/OS.h"
 
 #if defined(OS_INCLUDE_OSEVENTFLAGS_WORD)
-typedef unsigned short OSEventFlagsBits_t;
+typedef uint16_t OSEventFlagsBits_t;
 #else
 typedef unsigned char OSEventFlagsBits_t;
 #endif

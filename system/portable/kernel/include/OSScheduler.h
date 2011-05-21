@@ -11,7 +11,7 @@
 
 #include "portable/kernel/include/OSThread.h"
 
-typedef unsigned short schedTicks_t;
+typedef uint16_t schedTicks_t;
 
 class OSActiveThreads;
 

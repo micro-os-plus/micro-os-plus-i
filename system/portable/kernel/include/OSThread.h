@@ -27,17 +27,17 @@ public:
   static const OSThreadPriority_t DEFAULT_PRIORITY = (MAX_PRIORITY / 2 + 1);
 
   // Value for the minimal size for a thread.
-  static const unsigned short STACK_MINIMAL_SIZE = OS_CFGINT_STACK_MINIMAL_SIZE;
+  static const OSStackSize_t STACK_MINIMAL_SIZE = OS_CFGINT_STACK_MINIMAL_SIZE;
   // Pattern for initialising the stack.
   static const OSStack_t STACK_FILL_BYTE = 0x5A;
 
   // Constructor; run static threadMain (C++ style).
-  OSThread(const char* pName, const OSStack_t* pStack, unsigned short stackSize,
+  OSThread(const char* pName, const OSStack_t* pStack, OSStackSize_t stackSize,
       OSThreadPriority_t priority = OSThread::DEFAULT_PRIORITY);
 
   // Constructor; run given entryPoint function (C style).
   OSThread(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameters,
-      const OSStack_t* pStack, unsigned short stackSize,
+      const OSStack_t* pStack, OSStackSize_t stackSize,
       OSThreadPriority_t priority = OSThread::DEFAULT_PRIORITY);
 
   // Thread main() function.
@@ -65,7 +65,7 @@ public:
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   // Set the virtual watchdog expire interval (in seconds).
-  void virtualWatchdogSet(unsigned short seconds);
+  void virtualWatchdogSet(uint16_t seconds);
   // If the virtual watchdog interval expires, the MCU is reset using
   // the hardware module watchdog.
   void virtualWatchdogCheck(void);
@@ -88,7 +88,7 @@ public:
   getStack(void) const;
 
   // Return the stack size given at thread creation.
-  unsigned short
+  OSStackSize_t
   getStackSize(void) const; /* bytes */
 
 #if defined(OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER)
@@ -123,7 +123,7 @@ public:
   setEvent(OSEvent_t event);
 
   // Return the maximum usage of the stack, in bytes.
-  unsigned short
+  OSStackSize_t
   getStackUsed(void) const;
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
@@ -234,7 +234,7 @@ private:
   unsigned char* m_pStackBottom;
 
   // The size of the thread's stack, in bytes.
-  unsigned short m_stackSize;
+  OSStackSize_t m_stackSize;
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   // True if the thread can be put to sleep.
@@ -309,7 +309,7 @@ OSThread::getStack(void) const
   return m_pStack;
 }
 
-inline unsigned short
+inline OSStackSize_t
 OSThread::getStackSize(void) const
 {
   return m_stackSize;

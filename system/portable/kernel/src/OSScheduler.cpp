@@ -498,7 +498,7 @@ OSActiveThreads::insert(OSThread* pThread)
       return; // already in, we're done
     }
 
-  unsigned int prio;
+  uint_t prio;
   prio = pThread->m_staticPriority;
   for (i = 0; i < ms_count; ++i)
     {

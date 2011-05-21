@@ -12,7 +12,7 @@
 class CANPacket
 {
 public:
-  unsigned short id;
+  uint16_t id;
   unsigned char len;
   unsigned char data[8];
 

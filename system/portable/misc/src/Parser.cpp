@@ -327,7 +327,7 @@ Parser::parseFixedPrec(unsigned char* pStr, signed long* pLong,
       ++pStr;
     }
 
-  for (unsigned int i = 0; i < prec; ++i)
+  for (uint_t i = 0; i < prec; ++i)
     {
       l *= 10;
       c = *pStr;

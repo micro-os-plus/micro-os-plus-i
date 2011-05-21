@@ -14,7 +14,7 @@
 
 // C++ style constructor, run threadMain
 OSThread::OSThread(const char* pName, const OSStack_t* pStack,
-    unsigned short stackSize, OSThreadPriority_t priority)
+    OSStackSize_t stackSize, OSThreadPriority_t priority)
 {
   OSThread::init(pName, (OSThreadMainPtr_t) &OSThread::staticMain, this, pStack,
       stackSize, priority);
@@ -22,7 +22,7 @@ OSThread::OSThread(const char* pName, const OSStack_t* pStack,
 
 // C style constructor, run any function
 OSThread::OSThread(const char* pName, OSThreadMainPtr_t entryPoint,
-    void* pParameters, const OSStack_t* pStack, unsigned short stackSize,
+    void* pParameters, const OSStack_t* pStack, OSStackSize_t stackSize,
     OSThreadPriority_t priority)
 {
   OSThread::init(pName, entryPoint, pParameters, pStack, stackSize, priority);
@@ -31,7 +31,7 @@ OSThread::OSThread(const char* pName, OSThreadMainPtr_t entryPoint,
 // The stack size is in multiples of OSStack_t
 void
 OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameters,
-    const OSStack_t* pStack, unsigned short stackSize,
+    const OSStack_t* pStack, OSStackSize_t stackSize,
     OSThreadPriority_t priority)
 {
   // no stack, sorry...
@@ -170,11 +170,11 @@ OSThread::resume(void)
 
 #if defined(OS_INCLUDE_OSTHREAD_GETSTACKUSED)
 
-unsigned short
+OSStackSize_t
 OSThread::getStackUsed(void) const
 {
-  unsigned short i;
-  unsigned short r;
+  OSStackSize_t i;
+  OSStackSize_t r;
   unsigned char* pc;
 
   r = m_stackSize;
@@ -196,7 +196,7 @@ OSProgramPtr_t OSThread::getProgramCounter(void)
   {
     unsigned char*  p;
     p = (unsigned char*) getStack() + 34;
-    unsigned short w;
+    uint16_t w;
     w = (p[0] << 8) | p[1];
 
     return (OSProgramPtr_t) w;

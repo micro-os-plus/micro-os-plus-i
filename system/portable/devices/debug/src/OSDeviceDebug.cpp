@@ -64,7 +64,7 @@ OSDeviceDebug::commonPutByte(unsigned char c)
 }
 
 int
-OSDeviceDebug::commonPutBytes(const char* s, unsigned int n)
+OSDeviceDebug::commonPutBytes(const char* s, uint_t n)
 {
   if (!implDevicePresent())
     return -1;

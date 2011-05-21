@@ -22,9 +22,9 @@
 #endif
 
 inline int
-OSDeviceDebug::implPutBytes(const char* s, unsigned int n)
+OSDeviceDebug::implPutBytes(const char* s, uint_t n)
 {
-  unsigned int i;
+  uint_t i;
   for (i = 0; i < n; ++i)
     implPutByte(s[i]);
 

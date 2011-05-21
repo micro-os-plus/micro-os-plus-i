@@ -265,7 +265,7 @@ OS::earlyInit(void)
 #if defined(OS_INCLUDE_OS_BUSYWAITMILLIS)
 
 void
-OS::busyWaitMillis(unsigned int n)
+OS::busyWaitMillis(uint_t n)
 {
   for (; n--;)
     {
@@ -284,7 +284,7 @@ OS::busyWaitMillis(unsigned int n)
 #if defined(OS_INCLUDE_OS_BUSYWAITMICROS)
 
 void
-OS::busyWaitMicros(unsigned int n)
+OS::busyWaitMicros(uint_t n)
 {
   int i;
   // calibrate from OSC
@@ -304,7 +304,7 @@ OS::busyWaitMicros(unsigned int n)
 #warning "malloc() and free() are not thread safe!"
 
 void* operator
-new(unsigned int n)
+new(std::size_t n)
   {
     return malloc(n);
   }

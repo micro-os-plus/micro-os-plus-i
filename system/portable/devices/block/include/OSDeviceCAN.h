@@ -19,7 +19,7 @@ public:
   static const unsigned char MODE_STANDBY = 2;
   static const unsigned char MODE_LISTEN = 3;
 
-  OSDeviceCAN(CANPacket *pRxBuf, unsigned short rxBufSize,
+  OSDeviceCAN(CANPacket* pRxBuf, unsigned short rxBufSize,
       unsigned short rxHWM, unsigned short rxLWM, CANPacket *pTxBuf,
       unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM);
 

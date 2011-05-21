@@ -30,8 +30,8 @@ public:
 
 private:
   OSThread** m_pWaitingThreadsArray;
-  unsigned short m_waitingThreadsArraySize;
-  unsigned short m_waitingThreadsCount;
+  uint16_t m_waitingThreadsArraySize;
+  uint16_t m_waitingThreadsCount;
 };
 
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */

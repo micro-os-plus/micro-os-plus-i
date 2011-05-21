@@ -49,7 +49,7 @@ void TaskPitpalac::threadMain(void)
     // initialise led port as output
     ledInit();
 
-    unsigned int n;
+    uint_t n;
     for (n = 1; n * n < (m_rate / 4); ++n)
       ;
     --n; // compute n = sqrt(m_rate / 4);
@@ -57,7 +57,7 @@ void TaskPitpalac::threadMain(void)
     // thread endless loop
     for (;;)
       {
-        unsigned int i;
+        uint_t i;
 
         OSScheduler::timerSeconds.sleep(1);
 
