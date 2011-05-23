@@ -126,7 +126,7 @@ namespace avr32
         uint32_t isr;
       };
 
-      // A reference is not only convenient to se, but it is the only one
+      // A reference is not only convenient to use, but it is the only one
       // that guarantees not to change.
       ChannelRegisters& m_channelRegisters;
 
@@ -152,7 +152,7 @@ namespace avr32
       interruptServiceRoutine(void);
     };
 
-    // ----- PdcaReceive -----------------------------------------------------
+    // ----- PdcaReceive ------------------------------------------------------
 
     class PdcaReceive : public Pdca
     {
@@ -194,6 +194,7 @@ namespace avr32
       m_channelRegisters.mar = (uint32_t)address;
     }
 
+    // TODO: add the other
   }
 }
 
