@@ -11,7 +11,6 @@ namespace avr32
 {
   namespace uc3
   {
-
     class Spi
     {
     public:
@@ -23,7 +22,7 @@ namespace avr32
       Spi(ModuleId_t id);
 
     private:
-      void* m_peripheralAddress;
+      void* m_channelAddress;
     };
   }
 }

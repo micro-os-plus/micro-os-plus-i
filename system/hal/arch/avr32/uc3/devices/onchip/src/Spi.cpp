@@ -16,16 +16,15 @@ namespace avr32
 {
   namespace uc3
   {
-
     Spi::Spi(ModuleId_t id)
     {
       if (id == zero)
         {
-          m_peripheralAddress = (void*) 0xFFFF2400;
+          m_channelAddress = (void*) 0xFFFF2400;
         }
       else if (id == one)
         {
-          m_peripheralAddress = (void*) 0xFFFF2800;
+          m_channelAddress = (void*) 0xFFFF2800;
         }
     }
   }
