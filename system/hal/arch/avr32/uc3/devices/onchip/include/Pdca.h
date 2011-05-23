@@ -13,10 +13,15 @@ namespace avr32
 {
   namespace uc3
   {
+    // ----- Pdca base class --------------------------------------------------
+
     class Pdca
     {
     public:
-      typedef enum
+
+      // ----- Type definitions -----------------------------------------------
+
+      typedef enum ChannelId_e
       {
         // Define one of the eight channels
         zero = 0,
@@ -29,9 +34,18 @@ namespace avr32
         seven = 7
       } ChannelId_t;
 
-      typedef enum
+      typedef void* RegionAddress_t;
+      typedef uint16_t RegionSize_t;
+      typedef struct Region_s
       {
-        // Define the peripheral to do the actual transfer
+        // A memory region is defined by an address and a size
+        RegionAddress_t address;
+        RegionSize_t size;
+      } Region_t;
+
+      typedef enum PeripheralId_e
+      {
+        // Define the peripheral which will do the actual transfer
         // Should be limited to a byte, currently no more than 23
         adcRx = 0,
         sscRx = 1,
@@ -46,7 +60,7 @@ namespace avr32
         abdacTx = 23
       } PeripheralId_t;
 
-      typedef enum
+      typedef enum TransferSize_e
       {
         // Define the transfer size
         oneByte = 0,
@@ -54,63 +68,30 @@ namespace avr32
         fourBytes = 2
       } TransferSize_t;
 
-      typedef void* RegionAddress_t;
-      typedef uint16_t RegionSize_t;
-      typedef struct
-      {
-        // A memory region is defined by an address and a size
-        RegionAddress_t address;
-        RegionSize_t size;
-      } Region_t;
-
-      // Construct a specific Pdca driver
-      Pdca(ChannelId_t id);
-
-      void
-      setPeripheralId(PeripheralId_t id);
-      PeripheralId_t
-      getPeripheralId(void);
-
-      void
-      setRegionsArray(Region_t* pRegionsArray, uint_t regionsArraySize,
-          bool isCircular);
-
-      OSReturn_t
-      prepareTransfer(PeripheralId_t id);
-      void
-      startTransfer(void);
-
-      void
-      registerInterruptHandler(void* handler);
-
-    protected:
-      void
-      writeRegPeripheralSelect(PeripheralId_t id);
-      void
-      writeRegMode(TransferSize_t size);
-
-      void
-      writeRegMemoryAddress(RegionAddress_t address);
-      void
-      writeRegMemoryAddressReload(RegionAddress_t address);
-      void
-      writeRegTransferCount(RegionSize_t count);
-      void
-      writeRegTransferCountReload(RegionSize_t count);
-      void
-      writeRegControl(uint32_t mask);
-      uint32_t
-      readRegStatus(void);
-
-      // Not (yet) implemented:
-      //        Performance Monitor Registers
-      //        Version Register
-
-    private:
+      // ----- Channel Memory Mapped Registers --------------------------------
 
       class ChannelRegisters
       {
       public:
+        ChannelRegisters();
+        void
+        writeMemoryAddress(RegionAddress_t address);
+        void
+        writePeripheralSelect(PeripheralId_t id);
+        void
+        writeTransferCount(RegionSize_t count);
+        void
+        writeMemoryAddressReload(RegionAddress_t address);
+        void
+        writeTransferCountReload(RegionSize_t count);
+        void
+        writeControl(uint32_t mask);
+        void
+        writeMode(TransferSize_t size);
+        uint32_t
+        readStatus(void);
+
+      private:
         // TODO add volatile to fields that change by themselves
         uint32_t mar;
         uint32_t psr;
@@ -126,10 +107,39 @@ namespace avr32
         uint32_t isr;
       };
 
-      // A reference is not only convenient to use, but it is the only one
-      // that guarantees not to change.
-      ChannelRegisters& m_channelRegisters;
+    public:
+      // Constructor for the given channel
+      Pdca(ChannelId_t id);
 
+      void
+      setPeripheralId(PeripheralId_t id);
+      PeripheralId_t
+      getPeripheralId(void);
+
+      void
+      setRegionsArray(Region_t* pRegionsArray, uint_t regionsArraySize,
+          bool isCircular);
+
+      OSReturn_t
+      prepareTransfer(void);
+
+      void
+      startTransfer(void);
+
+      void
+      registerInterruptHandler(void* handler);
+
+      // Not (yet) implemented:
+      //        Performance Monitor Registers
+      //        Version Register
+
+    public:
+      // A reference (instead of a pointer) since it is not only more
+      // convenient to use, but it is the only one that guarantees
+      // not to change.
+      ChannelRegisters& registers;
+
+    private:
       PeripheralId_t m_peripheralId;
 
       Region_t* m_pRegionsArray;
@@ -183,18 +193,30 @@ namespace avr32
     }
 
     inline void
-    Pdca::writeRegPeripheralSelect(PeripheralId_t id)
+    Pdca::ChannelRegisters::writePeripheralSelect(PeripheralId_t id)
     {
-      m_channelRegisters.psr = id;
+      psr = id;
     }
 
     inline void
-    Pdca::writeRegMemoryAddress(RegionAddress_t address)
+    Pdca::ChannelRegisters::writeMemoryAddress(RegionAddress_t address)
     {
-      m_channelRegisters.mar = (uint32_t)address;
+      mar = (uint32_t) address;
     }
 
-    // TODO: add the other
+    inline void
+    Pdca::ChannelRegisters::writeTransferCount(RegionSize_t count)
+    {
+      tcr = (uint32_t) count;
+    }
+
+    inline uint32_t
+    Pdca::ChannelRegisters::readStatus(void)
+    {
+      return sr;
+    }
+
+  // TODO: add the other
   }
 }
 

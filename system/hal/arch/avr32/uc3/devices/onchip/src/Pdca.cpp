@@ -19,7 +19,7 @@ namespace avr32
     // ----- Pdca base --------------------------------------------------------
 
     Pdca::Pdca(ChannelId_t id) :
-          m_channelRegisters(
+          registers(
               *reinterpret_cast<ChannelRegisters*> (0xFFFF0000 + ((int) id)
                   * 0x040))
     {
@@ -28,8 +28,10 @@ namespace avr32
       // The trick here was to map the object reference over the actual
       // processor memory mapped register.
 
-      //OSDeviceDebug::putPtr(reinterpret_cast<void*> (&m_channelRegisters));
-      //OSDeviceDebug::putNewLine();
+#if true
+      OSDeviceDebug::putPtr(reinterpret_cast<void*> (&registers));
+      OSDeviceDebug::putNewLine();
+#endif
     }
 
     void
@@ -41,6 +43,34 @@ namespace avr32
       m_isCircular = isCircular;
     }
 
+    OSReturn_t
+    Pdca::prepareTransfer(void)
+    {
+#if true
+      // First set the associated peripheral
+      registers.writePeripheralSelect(m_peripheralId);
+
+      registers.writeMemoryAddress(m_pRegionsArray[0].address);
+      registers.writeTransferCount(m_pRegionsArray[0].size);
+#else
+      // test to check compiled code
+      // First set the associated peripheral
+      registers.writePeripheralSelect(spi1rx);
+
+      registers.writeMemoryAddress((void*)32);
+      registers.writeTransferCount(64);
+#endif
+      // TODO: add more code
+
+      return OSReturn::OS_OK;
+    }
+
+    void
+    Pdca::registerInterruptHandler(void* handler)
+    {
+      // TODO register the given interrupt in the m_peripheralId position
+    }
+
     // ----- PdcaTransmit -----------------------------------------------------
 
     PdcaTransmit::PdcaTransmit(ChannelId_t id) :
@@ -49,6 +79,8 @@ namespace avr32
       OSDeviceDebug::putConstructor("avr32::uc3::PdcaTransmit", this);
     }
 
+    // TODO: add the other functions
+
     // ----- PdcaReceive ------------------------------------------------------
 
     PdcaReceive::PdcaReceive(ChannelId_t id) :
@@ -56,6 +88,9 @@ namespace avr32
     {
       OSDeviceDebug::putConstructor("avr32::uc3::PdcaReceive", this);
     }
+
+    // TODO: add the other functions
+
   }
 }
 
