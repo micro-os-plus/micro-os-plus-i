@@ -1,0 +1,200 @@
+/*
+ *      Copyright (C) 2011 Liviu Ionescu.
+ *
+ *      This file is part of the uOS++ distribution.
+ */
+
+#ifndef AVR32_UC3_PDCA_H_
+#define AVR32_UC3_PDCA_H_
+
+#include "portable/kernel/include/OS.h"
+
+namespace avr32
+{
+  namespace uc3
+  {
+    class Pdca
+    {
+    public:
+      typedef enum
+      {
+        // Define one of the eight channels
+        zero = 0,
+        one,
+        two,
+        three,
+        four,
+        five,
+        six,
+        seven = 7
+      } ChannelId_t;
+
+      typedef enum
+      {
+        // Define the peripheral to do the actual transfer
+        // Should be limited to a byte, currently no more than 23
+        adcRx = 0,
+        sscRx = 1,
+        usart0rx = 2,
+        twim0rx = 6,
+        spi0rx = 10,
+        spi1rx = 11,
+        usart0tx = 13,
+        twim0tx = 17,
+        spi0tx = 21,
+        spi1tx = 22,
+        abdacTx = 23
+      } PeripheralId_t;
+
+      typedef enum
+      {
+        // Define the transfer size
+        oneByte = 0,
+        twoBytes = 1,
+        fourBytes = 2
+      } TransferSize_t;
+
+      typedef void* RegionAddress_t;
+      typedef uint16_t RegionSize_t;
+      typedef struct
+      {
+        // A memory region is defined by an address and a size
+        RegionAddress_t address;
+        RegionSize_t size;
+      } Region_t;
+
+      // Construct a specific Pdca driver
+      Pdca(ChannelId_t id);
+
+      void
+      setPeripheralId(PeripheralId_t id);
+      PeripheralId_t
+      getPeripheralId(void);
+
+      void
+      setRegionsArray(Region_t* pRegionsArray, uint_t regionsArraySize,
+          bool isCircular);
+
+      OSReturn_t
+      prepareTransfer(PeripheralId_t id);
+      void
+      startTransfer(void);
+
+      void
+      registerInterruptHandler(void* handler);
+
+    protected:
+      void
+      writeRegPeripheralSelect(PeripheralId_t id);
+      void
+      writeRegMode(TransferSize_t size);
+
+      void
+      writeRegMemoryAddress(RegionAddress_t address);
+      void
+      writeRegMemoryAddressReload(RegionAddress_t address);
+      void
+      writeRegTransferCount(RegionSize_t count);
+      void
+      writeRegTransferCountReload(RegionSize_t count);
+      void
+      writeRegControl(uint32_t mask);
+      uint32_t
+      readRegStatus(void);
+
+      // Not (yet) implemented:
+      //        Performance Monitor Registers
+      //        Version Register
+
+    private:
+
+      class ChannelRegisters
+      {
+      public:
+        // TODO add volatile to fields that change by themselves
+        uint32_t mar;
+        uint32_t psr;
+        uint32_t tcr;
+        uint32_t marr;
+        uint32_t tcrr;
+        uint32_t cr;
+        uint32_t mr;
+        uint32_t sr;
+        uint32_t ier;
+        uint32_t idr;
+        uint32_t imr;
+        uint32_t isr;
+      };
+
+      // A reference is not only convenient to se, but it is the only one
+      // that guarantees not to change.
+      ChannelRegisters& m_channelRegisters;
+
+      PeripheralId_t m_peripheralId;
+
+      Region_t* m_pRegionsArray;
+      uint_t m_regionsArraySize;
+      bool m_isCircular;
+    };
+
+    // ----- PdcaTransmit -----------------------------------------------------
+
+    class PdcaTransmit : public Pdca
+    {
+    public:
+      PdcaTransmit(ChannelId_t id);
+
+      OSReturn_t
+      waitWriteRegions(bool doNotBlock);
+      void
+      stopTransfer(void);
+      void
+      interruptServiceRoutine(void);
+    };
+
+    // ----- PdcaReceive -----------------------------------------------------
+
+    class PdcaReceive : public Pdca
+    {
+    public:
+      PdcaReceive(ChannelId_t id);
+
+      OSReturn_t
+      readRegion(RegionAddress_t& region, bool doNotBlock);
+      void
+      stopTransfer(void);
+
+      void
+      interruptServiceRoutine(void);
+    };
+
+    // ----- Pdca base inlines ------------------------------------------------
+
+    inline void
+    Pdca::setPeripheralId(PeripheralId_t id)
+    {
+      m_peripheralId = id;
+    }
+
+    inline Pdca::PeripheralId_t
+    Pdca::getPeripheralId(void)
+    {
+      return m_peripheralId;
+    }
+
+    inline void
+    Pdca::writeRegPeripheralSelect(PeripheralId_t id)
+    {
+      m_channelRegisters.psr = id;
+    }
+
+    inline void
+    Pdca::writeRegMemoryAddress(RegionAddress_t address)
+    {
+      m_channelRegisters.mar = (uint32_t)address;
+    }
+
+  }
+}
+
+#endif /* AVR32_UC3_PDCA_H_ */
