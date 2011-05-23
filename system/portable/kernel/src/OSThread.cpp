@@ -60,7 +60,7 @@ OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameter
       OSDeviceDebug::putHex(stackSize);
       OSDeviceDebug::putChar(',');
       OSDeviceDebug::putHex(priority);
-      OSDeviceDebug::putString_P(PSTR(")="));
+      OSDeviceDebug::putString_P(PSTR(") @"));
       OSDeviceDebug::putPtr(this);
       OSDeviceDebug::putNewLine();
     }
