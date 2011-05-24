@@ -9,6 +9,8 @@
 
 #include "portable/kernel/include/OS.h"
 
+#include "portable/misc/include/OSLogManager.h"
+
 // Generic logger facility.
 
 typedef int logLevel_t;
@@ -64,8 +66,20 @@ public:
   void
   setLevel(logLevel_t level);
 
+  logLevel_t
+  getDebugLevel(void) const;
+  void
+  setDebugLevel(logLevel_t level);
+
   static const char*
   convertLevelToString(logLevel_t level);
+  static int
+  convertStringToLevel(const char* level);
+
+  static OSLogger* getLogger(char *name);
+  static OSLogger* getLogger(int index);
+
+  static int getLoggersCount(void);
 
 private:
   void
@@ -74,10 +88,17 @@ private:
   virtual void
   implLog(logLevel_t level, logCode_t code, const char* msg);
 
+  static int registerLogger(OSLogger *log);
+
   // minimum log level for the line to be logged
   logLevel_t m_minLevel;
 
   const char* m_name;
+
+  static OSLogger* loggersArray[OS_CFGINT_OSLOGGER_ARRAY_SIZE];
+  static int loggersArrayCount;
+
+  OSLogManager *logManager;
 };
 
 inline const char*

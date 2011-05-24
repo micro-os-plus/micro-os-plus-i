@@ -250,4 +250,8 @@
 #define putString_P putString
 #endif
 
+// ----- LOG definitions ------------------------------------------------------
+
+#define OS_CFGINT_OSLOGGER_ARRAY_SIZE 16
+
 #endif /* OS_DEFINES_H_ */
