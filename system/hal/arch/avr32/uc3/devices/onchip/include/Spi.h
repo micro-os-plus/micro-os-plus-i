@@ -7,6 +7,8 @@
 #ifndef AVR32_UC3_SPI_H_
 #define AVR32_UC3_SPI_H_
 
+#include "portable/kernel/include/OS.h"
+
 namespace avr32
 {
   namespace uc3
