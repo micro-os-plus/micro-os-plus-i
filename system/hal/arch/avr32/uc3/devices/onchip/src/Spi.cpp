@@ -18,6 +18,7 @@ namespace avr32
   {
     Spi::Spi(ModuleId_t id)
     {
+      OSDeviceDebug::putConstructor("avr32::uc3::Spi", this);
       if (id == zero)
         {
           m_channelAddress = (void*) 0xFFFF2400;
