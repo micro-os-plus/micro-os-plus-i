@@ -22,6 +22,7 @@
 // This one are probably less standard, but quite useful
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
+typedef unsigned long ulong_t;
 
 #include <cstddef>
 // From now on, we can use:
