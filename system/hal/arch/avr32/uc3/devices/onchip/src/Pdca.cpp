@@ -66,7 +66,7 @@ namespace avr32
     }
 
     void
-    Pdca::registerInterruptHandler(void* handler)
+    Pdca::registerInterruptHandler(void* handler __attribute__((unused)))
     {
       // TODO register the given interrupt in the m_peripheralId position
     }
@@ -89,7 +89,7 @@ namespace avr32
       OSDeviceDebug::putConstructor("avr32::uc3::PdcaReceive", this);
     }
 
-    // TODO: add the other functions
+  // TODO: add the other functions
 
   }
 }
