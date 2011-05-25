@@ -39,6 +39,8 @@ public:
   static void
   putConstructor(const char* pc, const void* p);
   static void
+  putConstructorWithIndex(const char* pc, unsigned short i, const void* p);
+  static void
   putDestructor(const char* pc, const void* p);
 
 #if defined(OS_CONFIG_ARCH_AVR8)
@@ -47,6 +49,8 @@ public:
   static void putString_P(const char*  PROGMEM pc);
 
   static void putConstructor_P(const char* PROGMEM pc, const void* p);
+  static void
+  putConstructorWithIndex_P(const char* pc, unsigned short i, const void* p);
   static void putDestructor_P(const char* PROGMEM pc, const void* p);
 
 #endif
@@ -162,6 +166,11 @@ private:
     }
 
     inline void
+    OSDeviceDebug::putConstructorWithIndex(const char* pc __attribute__((unused)), unsigned short i __attribute__((unused)), const void* p __attribute__((unused)))
+    {
+    }
+
+    inline void
     OSDeviceDebug::putDestructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
     {
     }
@@ -188,6 +197,11 @@ putConstructor(const char* __attribute__((unused)) pc, const void* __attribute__
 {
 }
 
+inline void
+putConstructorWithIndex(const char* __attribute__((unused)) pc, unsigned short i __attribute__((unused)), const void* __attribute__((unused)) p)
+{
+}
+
 #if defined(OS_INCLUDE_SEPARATE_PROGMEM)
 
 inline void OSDeviceDebug::putString_P(const char* __attribute__((unused)) PROGMEM pc)
@@ -196,6 +210,11 @@ inline void OSDeviceDebug::putString_P(const char* __attribute__((unused)) PROGM
 
 inline void
 putConstructor_P(const char* __attribute__((unused)) PROGMEM pc, const void* __attribute__((unused)) p)
+{
+}
+
+inline void
+putConstructorWithIndex_P(const char* __attribute__((unused)) PROGMEM pc, unsigned short i __attribute__((unused)), const void* __attribute__((unused)) p)
 {
 }
 
