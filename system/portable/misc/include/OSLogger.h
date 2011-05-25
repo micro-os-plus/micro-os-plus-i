@@ -9,12 +9,12 @@
 
 #include "portable/kernel/include/OS.h"
 
-#include "portable/misc/include/OSLogManager.h"
-
 // Generic logger facility.
 
-typedef int logLevel_t;
+typedef uint8_t logLevel_t;
 typedef int logCode_t;
+
+// common log classes
 
 // Plenty of log levels to choose from
 class OSLogLevel
@@ -34,7 +34,6 @@ public:
 
   static const logLevel_t OS_ALL = 90;
 };
-
 class OSLogger
 {
 public:
@@ -98,7 +97,7 @@ private:
   static OSLogger* loggersArray[OS_CFGINT_OSLOGGER_ARRAY_SIZE];
   static int loggersArrayCount;
 
-  OSLogManager *logManager;
+//  OSLogManager *logManager;
 };
 
 inline const char*
