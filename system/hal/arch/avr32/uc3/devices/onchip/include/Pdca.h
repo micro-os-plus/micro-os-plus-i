@@ -88,6 +88,10 @@ namespace avr32
         writeControl(uint32_t mask);
         void
         writeMode(TransferSize_t size);
+        void
+        writeInterruptEnable(uint32_t mask);
+        void
+        writeInterruptDisable(uint32_t mask);
         uint32_t
         readStatus(void);
 
@@ -140,11 +144,19 @@ namespace avr32
       ChannelRegisters& registers;
 
     private:
+      int
+      getNextRegionIndex();
+
+      void
+      setupReloadMechanism();
+
       PeripheralId_t m_peripheralId;
 
       Region_t* m_pRegionsArray;
       uint_t m_regionsArraySize;
       bool m_isCircular;
+      uint_t currentRegionIndex;
+      int reloadedRegionIndex;
     };
 
     // ----- PdcaTransmit -----------------------------------------------------
@@ -210,10 +222,59 @@ namespace avr32
       tcr = (uint32_t) count;
     }
 
+    inline void
+    Pdca::ChannelRegisters::writeMemoryAddressReload(RegionAddress_t address)
+    {
+      marr = (uint32_t) address;
+    }
+
+    inline void
+    Pdca::ChannelRegisters::writeTransferCountReload(RegionSize_t count)
+    {
+      tcrr = (uint32_t) count;
+    }
+
+    // mask is logic OR between following possible flags:
+    //          AVR32_PDCA_IER_RCZ_MASK, for Reload Counter Zero
+    //          AVR32_PDCA_IER_TERR_MASK, for Transfer Error
+    //          AVR32_PDCA_IER_TRC_MASK, for Transfer Complete
+    inline void
+    Pdca::ChannelRegisters::writeInterruptEnable(uint32_t mask)
+    {
+      ier = mask;
+    }
+
+    // mask is logic OR between following possible flags:
+    //          AVR32_PDCA_IDR_RCZ_MASK, for Reload Counter Zero
+    //          AVR32_PDCA_IDR_TERR_MASK, for Transfer Error
+    //          AVR32_PDCA_IDR_TRC_MASK, for Transfer Complete
+    inline void
+    Pdca::ChannelRegisters::writeInterruptDisable(uint32_t mask)
+    {
+      idr = mask;
+    }
+
     inline uint32_t
     Pdca::ChannelRegisters::readStatus(void)
     {
       return sr;
+    }
+
+    // mask is logic OR between following possible flags:
+    //          AVR32_PDCA_CR_TEN_MASK, for enabling channel
+    //          AVR32_PDCA_CR_TDIS_MASK, for disabling channel
+    //          AVR32_PDCA_CR_ECLR_MASK, for clearing transfer error
+    inline void
+    Pdca::ChannelRegisters::writeControl(uint32_t mask)
+    {
+      // Writing a zero to any bit(flag) has no effect
+      cr = (uint32_t)mask;
+    }
+
+    inline void
+    Pdca::ChannelRegisters::writeMode(TransferSize_t size)
+    {
+      mr = (uint32_t)size;
     }
 
   // TODO: add the other
