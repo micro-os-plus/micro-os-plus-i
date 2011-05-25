@@ -16,10 +16,32 @@ namespace avr32
 {
   namespace uc3
   {
-    Gpio::Gpio()
+    Gpio::Gpio(gpio::PinNumber_t pin) :
+          portRegisters(
+              *reinterpret_cast<gpio::PortRegisters*> (gpio::PortRegisters::MEMORY_ADDRESS
+                  + ((pin / 32) * gpio::PortRegisters::MEMORY_OFFSET)))
+
     {
-      OSDeviceDebug::putConstructor("avr32::uc3::Gpio", this);
+      OSDeviceDebug::putConstructorWithIndex("avr32::uc3::Gpio", pin, this);
+
+      m_mask = pin % 32;
     }
+
+    void
+    Gpio::configPeripheralFunction(gpio::PeripheralFunction_t f)
+    {
+      if (f & 0x1)
+        portRegisters.pmr0s = m_mask;
+      else
+        portRegisters.pmr0c = m_mask;
+
+      if (f & 0x2)
+        portRegisters.pmr1s = m_mask;
+      else
+        portRegisters.pmr1c = m_mask;
+
+    }
+
   }
 }
 #endif /* defined(OS_INCLUDE_AVR32_UC3_GPIO) */
