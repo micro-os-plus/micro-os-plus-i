@@ -11,6 +11,7 @@
 #if defined(OS_INCLUDE_AVR32_UC3_PDCA)
 
 #include "hal/arch/avr32/uc3/devices/onchip/include/Pdca.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Intc.h"
 
 namespace avr32
 {
@@ -18,17 +19,19 @@ namespace avr32
   {
     // ----- Pdca base --------------------------------------------------------
 
-    Pdca::Pdca(ChannelId_t id) :
+    Pdca::Pdca(pdca::ChannelId_t id) :
           registers(
-              *reinterpret_cast<ChannelRegisters*> (0xFFFF0000 + ((int) id)
-                  * 0x040))
+              *reinterpret_cast<pdca::ChannelRegisters*> (pdca::ChannelRegisters::MEMORY_ADDRESS
+                  + ((int) id) * pdca::ChannelRegisters::MEMORY_OFFSET))
     {
-      OSDeviceDebug::putConstructor("avr32::uc3::Pdca", this);
+      OSDeviceDebug::putConstructorWithIndex("avr32::uc3::Pdca", id, this);
 
       // The trick here was to map the object reference over the actual
       // processor memory mapped register.
 
-#if true
+      m_channelId = id;
+
+#if false
       OSDeviceDebug::putPtr(reinterpret_cast<void*> (&registers));
       OSDeviceDebug::putNewLine();
 #endif
@@ -36,8 +39,8 @@ namespace avr32
     }
 
     void
-    Pdca::setRegionsArray(Region_t* pRegionsArray, uint_t regionsArraySize,
-        bool isCircular)
+    Pdca::setRegionsArray(pdca::Region_t* pRegionsArray,
+        uint_t regionsArraySize, bool isCircular)
     {
       m_pRegionsArray = pRegionsArray;
       m_regionsArraySize = regionsArraySize;
@@ -66,10 +69,10 @@ namespace avr32
       // set first region to be used in transfer
       registers.writeMemoryAddress(m_pRegionsArray[0].address);
       registers.writeTransferCount(m_pRegionsArray[0].size);
-      currentRegionIndex = 0;
+      m_currentRegionIndex = 0;
 
-      registers.writeInterruptEnable(AVR32_PDCA_IER_TRC_MASK |
-          AVR32_PDCA_IER_TERR_MASK);
+      registers.writeInterruptEnable(
+          AVR32_PDCA_IER_TRC_MASK | AVR32_PDCA_IER_TERR_MASK);
 
       setupReloadMechanism();
 
@@ -94,12 +97,12 @@ namespace avr32
       if (nextRegion < 0)
         {
           // no region to be set next
-          reloadedRegionIndex = -1;
+          m_reloadedRegionIndex = -1;
           return;
         }
       registers.writeMemoryAddressReload(m_pRegionsArray[nextRegion].address);
       registers.writeTransferCountReload(m_pRegionsArray[nextRegion].size);
-      reloadedRegionIndex = nextRegion;
+      m_reloadedRegionIndex = nextRegion;
       registers.writeInterruptEnable(AVR32_PDCA_IER_RCZ_MASK);
     }
 
@@ -112,16 +115,20 @@ namespace avr32
       if (m_isCircular)
         {
           // get consecutive index, modulo total regions number
-          nextRegionIndex = (currentRegionIndex + 1) % m_regionsArraySize;
+          nextRegionIndex = (m_currentRegionIndex + 1) % m_regionsArraySize;
         }
       else
         {
           // get consecutive index, if there are more regions available
-          if (m_regionsArraySize > currentRegionIndex )
-            nextRegionIndex = currentRegionIndex + 1;
+          if (m_regionsArraySize > m_currentRegionIndex)
+            {
+              nextRegionIndex = m_currentRegionIndex + 1;
+            }
           else
-            // no further regions available
-            nextRegionIndex = -1;
+            {
+              // no further regions available
+              nextRegionIndex = -1;
+            }
         }
       return nextRegionIndex;
     }
@@ -134,14 +141,18 @@ namespace avr32
     }
 
     void
-    Pdca::registerInterruptHandler(void* handler __attribute__((unused)))
+    Pdca::registerInterruptHandler(intc::InterruptHandler_t handler)
     {
-      // TODO register the given interrupt in the m_peripheralId position
+      avr32::uc3::Intc::registerInterruptHandler(
+          (intc::InterruptHandler_t) handler,
+          pdca::INTERRUPT_BASE + m_channelId,
+          avr32::uc3::intc::GroupPriorities::GROUP_03);
+
     }
 
     // ----- PdcaTransmit -----------------------------------------------------
 
-    PdcaTransmit::PdcaTransmit(ChannelId_t id) :
+    PdcaTransmit::PdcaTransmit(pdca::ChannelId_t id) :
       Pdca(id)
     {
       OSDeviceDebug::putConstructor("avr32::uc3::PdcaTransmit", this);
@@ -151,7 +162,7 @@ namespace avr32
 
     // ----- PdcaReceive ------------------------------------------------------
 
-    PdcaReceive::PdcaReceive(ChannelId_t id) :
+    PdcaReceive::PdcaReceive(pdca::ChannelId_t id) :
       Pdca(id)
     {
       OSDeviceDebug::putConstructor("avr32::uc3::PdcaReceive", this);
