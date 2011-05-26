@@ -4,8 +4,8 @@
  *      This file is part of the uOS++ distribution.
  */
 
-#ifndef LOGGER_H_
-#define LOGGER_H_
+#ifndef OSLOGGER_H_
+#define OSLOGGER_H_
 
 #include "portable/kernel/include/OS.h"
 
@@ -180,4 +180,4 @@ OSLogger::getDebugLevel(void) const
   return m_minDebugLevel;
 }
 
-#endif /* LOGGER_H_ */
+#endif /* OSLOGGER_H_ */
