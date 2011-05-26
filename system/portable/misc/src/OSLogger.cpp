@@ -90,37 +90,37 @@ OSLogger::convertLevelToString(logLevel_t level)
 logLevel_t
 OSLogger::convertStringToLevel(const char* level)
 {
-  if(level == NULL)
+  if (level == NULL)
     return -1;
 
-  if(!strcmp(level, "off"))
+  if (!strcmp(level, "off"))
     return OSLogLevel::OS_OFF;
 
-  if(!strcmp(level, "fatal"))
+  if (!strcmp(level, "fatal"))
     return OSLogLevel::OS_FATAL;
 
-  if(!strcmp(level, "error"))
+  if (!strcmp(level, "error"))
     return OSLogLevel::OS_ERROR;
 
-  if(!strcmp(level, "warning"))
+  if (!strcmp(level, "warning"))
     return OSLogLevel::OS_WARNING;
 
-  if(!strcmp(level, "info"))
+  if (!strcmp(level, "info"))
     return OSLogLevel::OS_INFO;
 
-  if(!strcmp(level, "config"))
+  if (!strcmp(level, "config"))
     return OSLogLevel::OS_CONFIG;
 
-  if(!strcmp(level, "debug"))
+  if (!strcmp(level, "debug"))
     return OSLogLevel::OS_DEBUG;
 
-  if(!strcmp(level, "trace"))
+  if (!strcmp(level, "trace"))
     return OSLogLevel::OS_TRACE;
 
-  if(!strcmp(level, "insane"))
+  if (!strcmp(level, "insane"))
     return OSLogLevel::OS_INSANE;
 
-  if(!strcmp(level, "all"))
+  if (!strcmp(level, "all"))
     return OSLogLevel::OS_ALL;
 
   return -1;
@@ -129,7 +129,7 @@ OSLogger::convertStringToLevel(const char* level)
 OSLogger*
 OSLogger::registerLogger(OSLogger *logger)
 {
-  if(ms_loggersArrayCount == OS_CFGINT_OSLOGGER_ARRAY_SIZE)
+  if (ms_loggersArrayCount == OS_CFGINT_OSLOGGER_ARRAY_SIZE)
     return NULL;
 
   ms_loggersArray[ms_loggersArrayCount] = logger;
@@ -150,11 +150,11 @@ OSLogger::getLogger(const char *name)
   int i;
   char *tempName;
 
-  for(i=0; i<ms_loggersArrayCount; i++)
+  for (i = 0; i < ms_loggersArrayCount; i++)
     {
-      tempName = (char*)ms_loggersArray[i]->m_name;
+      tempName = (char*) ms_loggersArray[i]->m_name;
 
-      if(!strcmp(tempName, name))
+      if (!strcmp(tempName, name))
         return ms_loggersArray[i];
     }
 
@@ -164,7 +164,7 @@ OSLogger::getLogger(const char *name)
 OSLogger*
 OSLogger::getLogger(int index)
 {
-  if(index >= ms_loggersArrayCount)
+  if (index >= ms_loggersArrayCount)
     return NULL;
 
   return ms_loggersArray[index];
@@ -173,9 +173,9 @@ OSLogger::getLogger(int index)
 void
 OSLogger::log(logLevel_t level, logCode_t code, const char* msg)
 {
+#if defined(DEBUG)
   if (level <= m_minDebugLevel)
     {
-#if defined(DEBUG)
       OSDeviceDebug::putString("DEBUG: log ");
       OSDeviceDebug::putString(convertLevelToString(level));
       OSDeviceDebug::putString(" ");
@@ -186,8 +186,9 @@ OSLogger::log(logLevel_t level, logCode_t code, const char* msg)
       OSDeviceDebug::putString(msg);
       OSDeviceDebug::putString("'");
       OSDeviceDebug::putNewLine();
-#endif /* defined(DEBUG) */
     }
+#endif /* defined(DEBUG) */
+
   if (level <= m_minLevel)
     {
       implLog(level, code, msg);
@@ -195,12 +196,10 @@ OSLogger::log(logLevel_t level, logCode_t code, const char* msg)
 }
 
 void
-OSLogger::implLog(logLevel_t level, logCode_t code, const char* msg)
+OSLogger::implLog(logLevel_t level __attribute__((unused)), logCode_t code __attribute__((unused)), const char* msg __attribute__((unused)))
 {
-  // make compiler happy
-  level = level;
-  code = code;
-  msg = msg;
+  ; // Nothing here, implement it in children classes
+
 }
 
 #endif /* defined(OS_INCLUDE_OSLOGGER) */
