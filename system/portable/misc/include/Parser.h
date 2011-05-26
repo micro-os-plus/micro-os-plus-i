@@ -31,6 +31,9 @@ public:
   unsigned char*
   getToken(void) const;
 
+  unsigned char*
+  getCurrentPosition(void) const;
+
   void
   setCurrent(unsigned short index);
 
@@ -109,6 +112,12 @@ inline unsigned char*
 Parser::getToken(void) const
 {
   return m_pToken;
+}
+
+inline unsigned char*
+Parser::getCurrentPosition(void) const
+{
+  return m_pCrt;
 }
 
 inline unsigned char
