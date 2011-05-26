@@ -58,6 +58,9 @@ public:
   void
   logInsane(logCode_t code, const char* msg);
 
+  void
+  log(logLevel_t level, logCode_t code, const char* msg);
+
   const char*
   getName(void) const;
 
@@ -84,9 +87,6 @@ public:
 protected:
   virtual void
   implLog(logLevel_t level, logCode_t code, const char* msg);
-
-  void
-  log(logLevel_t level, logCode_t code, const char* msg);
 
   static OSLogger* registerLogger(OSLogger *log);
 
