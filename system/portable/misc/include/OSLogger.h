@@ -34,6 +34,7 @@ public:
 
   static const logLevel_t OS_ALL = 90;
 };
+
 class OSLogger
 {
 public:
@@ -72,51 +73,34 @@ public:
 
   static const char*
   convertLevelToString(logLevel_t level);
-  static int
+  static logLevel_t
   convertStringToLevel(const char* level);
 
-  static OSLogger* getLogger(char *name);
+  static OSLogger* getLogger(const char *name);
   static OSLogger* getLogger(int index);
 
   static int getLoggersCount(void);
 
-private:
-  void
-  log(logLevel_t level, logCode_t code, const char* msg);
-
+protected:
   virtual void
   implLog(logLevel_t level, logCode_t code, const char* msg);
 
-  static int registerLogger(OSLogger *log);
+  void
+  log(logLevel_t level, logCode_t code, const char* msg);
+
+  static OSLogger* registerLogger(OSLogger *log);
 
   // minimum log level for the line to be logged
   logLevel_t m_minLevel;
 
+  // minimum debug log level for the line to be logged
+  logLevel_t m_minDebugLevel;
+
   const char* m_name;
 
-  static OSLogger* loggersArray[OS_CFGINT_OSLOGGER_ARRAY_SIZE];
-  static int loggersArrayCount;
-
-//  OSLogManager *logManager;
+  static OSLogger* ms_loggersArray[OS_CFGINT_OSLOGGER_ARRAY_SIZE];
+  static int ms_loggersArrayCount;
 };
-
-inline const char*
-OSLogger::getName(void) const
-{
-  return m_name;
-}
-
-inline logLevel_t
-OSLogger::getLevel(void) const
-{
-  return m_minLevel;
-}
-
-inline void
-OSLogger::setLevel(logLevel_t level)
-{
-  m_minLevel = level;
-}
 
 inline void
 OSLogger::logFatal(logCode_t code, const char* msg)
@@ -164,6 +148,36 @@ inline void
 OSLogger::logInsane(logCode_t code, const char* msg)
 {
   log(OSLogLevel::OS_INSANE, code, msg);
+}
+
+inline const char*
+OSLogger::getName(void) const
+{
+  return m_name;
+}
+
+inline void
+OSLogger::setLevel(logLevel_t level)
+{
+  m_minLevel = level;
+}
+
+inline logLevel_t
+OSLogger::getLevel(void) const
+{
+  return m_minLevel;
+}
+
+inline void
+OSLogger::setDebugLevel(logLevel_t level)
+{
+  m_minDebugLevel = level;
+}
+
+inline logLevel_t
+OSLogger::getDebugLevel(void) const
+{
+  return m_minDebugLevel;
 }
 
 #endif /* LOGGER_H_ */
