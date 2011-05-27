@@ -50,7 +50,7 @@
 
 // Mask to disable regular and real-time interrupts
 #if !defined(OS_CFGINT_OSCRITICALSECTION_MASKRT)
-#define OS_CFGINT_OSCRITICALSECTION_RTMASKRT            (0xE << (16+1))
+#define OS_CFGINT_OSCRITICALSECTION_MASKRT              (0xE << (16+1))
 #endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASKRT) */
 
 // Mask to disable regular interrupts, except real-time ones
