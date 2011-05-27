@@ -41,8 +41,27 @@ main(void) __attribute__((weak));
 
 #define OS_CFGLONG_CONSTANT_MARKER (0x12345678)
 #if defined(DEBUG)
-int g_constantMarker = OS_CFGLONG_CONSTANT_MARKER;
+uint_t g_constantMarker = OS_CFGLONG_CONSTANT_MARKER;
 #endif /* defined(DEBUG) */
+
+/* init value for the stack pointer. defined in linker script */
+extern unsigned long __stack_end;
+
+/* start address for the initialization values of the .data section.
+ defined in linker script */
+extern unsigned long __os_data_load_start;
+
+/* start address for the .data section. defined in linker script */
+extern unsigned long __os_data_start;
+
+/* end address for the .data section. defined in linker script */
+extern unsigned long __os_data_end;
+
+/* start address for the .bss section. defined in linker script */
+extern unsigned long __os_bss_start;
+
+/* end address for the .bss section. defined in linker script */
+extern unsigned long __os_bss_end;
 
 void
 OS::resetHandler(void)
@@ -70,16 +89,31 @@ OS::resetHandler(void)
   bssInit();
 
 #if defined(DEBUG)
-  if (g_constantMarker != OS_CFGLONG_CONSTANT_MARKER)
-    {
-      OSDeviceDebug::putString("dataInit() failed");
-      OSDeviceDebug::putNewLine();
-    }
+  // WARNING: No debug output before this point!
+  OSDeviceDebug::earlyInit();
 #endif /* defined(DEBUG) */
 
 #if defined(DEBUG)
-  // WARNING: No debug output before this point!
-  OSDeviceDebug::earlyInit();
+  if (g_constantMarker != OS_CFGLONG_CONSTANT_MARKER)
+    {
+      OSDeviceDebug::putString("dataInit() failed ");
+      OSDeviceDebug::putHex(g_constantMarker);
+      OSDeviceDebug::putNewLine();
+
+      OSDeviceDebug::putString("data ");
+      OSDeviceDebug::putPtr(&__os_data_load_start);
+      OSDeviceDebug::putString("->");
+      OSDeviceDebug::putPtr(&__os_data_start);
+      OSDeviceDebug::putString("-");
+      OSDeviceDebug::putPtr(&__os_data_end);
+      OSDeviceDebug::putNewLine();
+
+      OSDeviceDebug::putString("bss ");
+      OSDeviceDebug::putPtr(&__os_bss_start);
+      OSDeviceDebug::putString("-");
+      OSDeviceDebug::putPtr(&__os_bss_end);
+      OSDeviceDebug::putNewLine();
+    }
 #endif /* defined(DEBUG) */
 
   // will call OSScheduler::earlyInit() to init registered threads count
@@ -115,25 +149,6 @@ OS::resetHandler(void)
   for (;;)
     ;
 }
-
-/* init value for the stack pointer. defined in linker script */
-extern unsigned long __stack_end;
-
-/* start address for the initialization values of the .data section.
- defined in linker script */
-extern unsigned long __os_data_load_start;
-
-/* start address for the .data section. defined in linker script */
-extern unsigned long __os_data_start;
-
-/* end address for the .data section. defined in linker script */
-extern unsigned long __os_data_end;
-
-/* start address for the .bss section. defined in linker script */
-extern unsigned long __os_bss_start;
-
-/* end address for the .bss section. defined in linker script */
-extern unsigned long __os_bss_end;
 
 void
 OS::dataInit(void)
