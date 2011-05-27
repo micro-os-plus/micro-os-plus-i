@@ -40,12 +40,22 @@
 #endif
 #endif
 
+//#define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK          (1)
+//#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
+//#define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
+//#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
+
 // Mask to disable ALL interrupts, including real-time ones
 #define OS_CFGINT_OSCRITICALSECTION_MASKALL             (0xF << (16+1))
 
+// Mask to disable regular and real-time interrupts
+#if !defined(OS_CFGINT_OSCRITICALSECTION_MASKRT)
+#define OS_CFGINT_OSCRITICALSECTION_RTMASKRT            (0xE << (16+1))
+#endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASKRT) */
+
 // Mask to disable regular interrupts, except real-time ones
 #if !defined(OS_CFGINT_OSCRITICALSECTION_MASK)
-#define OS_CFGINT_OSCRITICALSECTION_MASK                (0xF << (16+1))
+#define OS_CFGINT_OSCRITICALSECTION_MASK                (0xC << (16+1))
 #endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASK) */
 
 

@@ -91,7 +91,7 @@ OSRealTimeCriticalSection::enter(void)
     register OSStack_t tmp;
 
     tmp = OSCPUImpl::getInterruptsMask();
-    tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKALL);
+    tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKRT);
     OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
     OSCPUImpl::interruptsDisable();
@@ -113,7 +113,7 @@ OSRealTimeCriticalSection::exit(void)
         register OSStack_t tmp;
 
         tmp = OSCPUImpl::getInterruptsMask();
-        tmp &= ~(OS_CFGINT_OSCRITICALSECTION_MASKALL);
+        tmp &= ~(OS_CFGINT_OSCRITICALSECTION_MASKRT);
         OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
         OSCPUImpl::interruptsEnable();

@@ -136,7 +136,7 @@ OSRealTimeCriticalSection::enter(void)
   OSCPUImpl::stackPush(tmp);
 
 #if defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS)
-  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKALL);
+  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKRT);
   OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
   OSCPUImpl::interruptsDisable();
