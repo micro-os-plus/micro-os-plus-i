@@ -139,8 +139,6 @@ SECTIONS
   . = ORIGIN(INTRAM);
   .dalign	: { . = ALIGN(8); PROVIDE(_data = .); } >INTRAM AT>INTRAM :INTRAM_ALIGN
 
-    PROVIDE (__data_start = .) ;
-
   /* Exception handling  */
   .eh_frame       : ONLY_IF_RW { KEEP (*(.eh_frame)) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   .gcc_except_table   : ONLY_IF_RW { KEEP (*(.gcc_except_table)) *(.gcc_except_table.*) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
@@ -193,6 +191,9 @@ SECTIONS
   .dynamic        : { *(.dynamic) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   .got            : { *(.got.plt) *(.got) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
   .ramtext        : { *(.ramtext .ramtext.*) } >INTRAM AT>FLASH :INTRAM_AT_FLASH
+  
+  PROVIDE (__data_start = .) ;
+  
   .data           :
   {
     *(.data .data.* .gnu.linkonce.d.*)
