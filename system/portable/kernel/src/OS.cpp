@@ -47,20 +47,17 @@ uint_t g_constantMarker = OS_CFGLONG_CONSTANT_MARKER;
 /* init value for the stack pointer. defined in linker script */
 extern unsigned long __stack_end;
 
-/* start address for the initialization values of the .data section.
+/* start/end addresses for the initialization values of the .data section.
  defined in linker script */
 extern unsigned long __os_data_load_start;
+extern unsigned long __os_data_load_end;
 
-/* start address for the .data section. defined in linker script */
+/* start/end address for the .data section. defined in linker script */
 extern unsigned long __os_data_start;
-
-/* end address for the .data section. defined in linker script */
 extern unsigned long __os_data_end;
 
-/* start address for the .bss section. defined in linker script */
+/* start/end address for the .bss section. defined in linker script */
 extern unsigned long __os_bss_start;
-
-/* end address for the .bss section. defined in linker script */
 extern unsigned long __os_bss_end;
 
 void
@@ -99,22 +96,28 @@ OS::resetHandler(void)
       OSDeviceDebug::putString("dataInit() failed ");
       OSDeviceDebug::putHex(g_constantMarker);
       OSDeviceDebug::putNewLine();
-
-      OSDeviceDebug::putString("data ");
-      OSDeviceDebug::putPtr(&__os_data_load_start);
-      OSDeviceDebug::putString("->");
-      OSDeviceDebug::putPtr(&__os_data_start);
-      OSDeviceDebug::putString("-");
-      OSDeviceDebug::putPtr(&__os_data_end);
-      OSDeviceDebug::putNewLine();
-
-      OSDeviceDebug::putString("bss ");
-      OSDeviceDebug::putPtr(&__os_bss_start);
-      OSDeviceDebug::putString("-");
-      OSDeviceDebug::putPtr(&__os_bss_end);
-      OSDeviceDebug::putNewLine();
     }
 #endif /* defined(DEBUG) */
+
+#if defined(DEBUG) && defined(OS_DEBUG_INIT_SECTIONS)
+
+  OSDeviceDebug::putString(".data ");
+  OSDeviceDebug::putPtr(&__os_data_load_start);
+  OSDeviceDebug::putString("-");
+  OSDeviceDebug::putPtr(&__os_data_load_end);
+  OSDeviceDebug::putString("->");
+  OSDeviceDebug::putPtr(&__os_data_start);
+  OSDeviceDebug::putString("-");
+  OSDeviceDebug::putPtr(&__os_data_end);
+  OSDeviceDebug::putNewLine();
+
+  OSDeviceDebug::putString(".bss ");
+  OSDeviceDebug::putPtr(&__os_bss_start);
+  OSDeviceDebug::putString("-");
+  OSDeviceDebug::putPtr(&__os_bss_end);
+  OSDeviceDebug::putNewLine();
+
+#endif
 
   // will call OSScheduler::earlyInit() to init registered threads count
   OS::earlyInit();
