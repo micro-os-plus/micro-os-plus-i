@@ -71,6 +71,8 @@ OSCriticalSection::exit(void)
 
 // ----------------------------------------------------------------------------
 
+#if defined(OS_INCLUDE_OSREALTIME)
+
 #if defined(DEBUG)
 OSRealTimeCriticalSection::OSRealTimeCriticalSection()
 {
@@ -122,6 +124,8 @@ OSRealTimeCriticalSection::exit(void)
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
+
+#endif /* defined(OS_INCLUDE_OSREALTIME) */
 
 #endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 

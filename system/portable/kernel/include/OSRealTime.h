@@ -9,6 +9,8 @@
 
 #include "portable/kernel/include/OS.h"
 
+#if defined(OS_INCLUDE_OSREALTIME)
+
 // ----------------------------------------------------------------------------
 
 class OSRealTime
@@ -42,5 +44,7 @@ private:
 };
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(OS_INCLUDE_OSREALTIME) */
 
 #endif /* OSREALTIME_H_ */

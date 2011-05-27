@@ -48,6 +48,8 @@ private:
 
 // ----------------------------------------------------------------------------
 
+#if defined(OS_INCLUDE_OSREALTIME)
+
 class OSRealTimeCriticalSection
 {
 public:
@@ -81,6 +83,8 @@ public:
 private:
   char m_dummy;
 };
+
+#endif /* defined(OS_INCLUDE_OSREALTIME) */
 
 // ============================================================================
 
@@ -123,6 +127,8 @@ OSCriticalSection::exit(void)
 
 // ----------------------------------------------------------------------------
 
+#if defined(OS_INCLUDE_OSREALTIME)
+
 // When we can use the stack, the enter()/exit() calls are inlined
 
 inline void
@@ -157,6 +163,8 @@ OSRealTimeCriticalSection::exit(void)
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 }
+
+#endif /* defined(OS_INCLUDE_OSREALTIME) */
 
 #endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 
