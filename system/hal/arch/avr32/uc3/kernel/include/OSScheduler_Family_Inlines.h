@@ -22,8 +22,8 @@
  * and only the resulting stack pointer (SP) is stored in the current thread area.
  *
  * To make things simpler and faster, the code uses the global variable
- * OSScheduler::ms_ppCurrentStack that points to the current OSThread::m_pStack, where
- * the pointer to the current stack frame is located. This variable is
+ * OSScheduler::ms_ppCurrentStack that points to the current OSThread::m_pStack,
+ * where the pointer to the current stack frame is located. This variable is
  * set during the context switch in OSScheduler::contextSwitch().
  *
  * - contextSave() : store the SP through the global pointer
@@ -109,7 +109,7 @@ inline unsigned int getSP(void)
         : [RET] "=r" (ret)
         :
         :
-  );
+    );
 
     return ret;
   }
@@ -140,7 +140,7 @@ OSSchedulerImpl::stackPointerSave(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         :
-  );
+    );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -159,7 +159,7 @@ inline void setSP(OSStack_t* p)
         :
         : [R] "r" (p)
         :
-  );
+    );
   }
 
 inline void
@@ -192,7 +192,7 @@ OSSchedulerImpl::stackPointerRestore(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pTCB] "i" (&OSScheduler::ms_ppCurrentStack)
         : "sp"
-  );
+    );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -221,7 +221,7 @@ OSSchedulerImpl::criticalSectionNestingSave(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
         :
-  );
+    );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -248,7 +248,7 @@ OSSchedulerImpl::criticalSectionNestingRestore(void)
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
         : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
         : "sp"
-  );
+    );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -267,7 +267,7 @@ OSSchedulerImpl::registersSave(void)
         :
         :
         : "sp"
-  );
+    );
   }
 
 /*
@@ -284,7 +284,7 @@ OSSchedulerImpl::registersRestore(void)
         :
         :
         : "sp" // r0-r7 were also changed
-  );
+    );
   }
 
 /*
@@ -316,7 +316,7 @@ inline unsigned int getSRfromStack(void)
         : [RET] "=r" (ret)
         :
         :
-  );
+    );
 
     return ret;
   }
@@ -377,7 +377,7 @@ OSSchedulerImpl::FirstThread_contextRestore(void)
       :
       : [SR] "i" (AVR32_SR)
       : "r0", "sp"
-);
+  );
 
 }
 
@@ -440,38 +440,32 @@ SCALL_contextSave(void)
       :
       :
       :
-);
+  );
 
+  // Save the OSCriticalSection::ms_nestingLevel
   OSSchedulerImpl::criticalSectionNestingSave();
 
-  // enter critical region here; interrupts will be re-enabled
-  // when the new context is executed
+  // FreeRTOS dixit:
+
+  // Disable all interrupts which may cause a context switch
+  // (i.e. cause a change of ms_ppCurrentStack)
+  // Basically, all accesses to ms_ppCurrentStack should be put in a
+  // critical section because it is a global structure.
+
+  // Interrupts will be re-enabled when the new context is restored
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK)
 
-#if false
-  register unsigned int tmp; // asm("r8");
-  asm volatile
-  (
-      " mfsr    %[R], %[SR] \n"
-      " orh     %[R], %[MASK] \n" // selectively disable interrupts in MASK
-      " mtsr    %[SR], %[R] \n"
-
-      : [R] "=r" (tmp)
-      // TODO: define a configuration macro for the MASK
-      : [MASK] "i" (0x0F << 1), [SR] "i" (AVR32_SR)
-      :
-);
-#else
   register OSStack_t tmp;
 
   tmp = OSCPUImpl::getInterruptsMask();
-  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
+  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKYIELD);
   OSCPUImpl::setInterruptsMask(tmp);
-#endif
 
 #else
+
   OSCPUImpl::interruptsDisable();
+
 #endif
 
   OSSchedulerImpl::stackPointerSave();
@@ -519,7 +513,7 @@ SCALL_contextRestore(void)
       :
       :
       :
-);
+  );
 }
 
 /*
@@ -535,7 +529,7 @@ OSSchedulerImpl::yield(void)
       :
       :
       :
-);
+  );
 }
 
 #endif /* HAL_FAMILY_OSSCHEDULER_INLINES_H_ */
