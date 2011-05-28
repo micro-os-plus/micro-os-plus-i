@@ -26,6 +26,8 @@ StacksReporter::StacksReporter(const char* pName, schedTicks_t rateSeconds,
   m_rateSeconds = rateSeconds;
   m_maxSeconds = maxSeconds;
   m_increaseRate = increaseRate;
+
+  m_uptimeSeconds = 0;
 }
 
 /*
@@ -81,22 +83,38 @@ StacksReporter::threadMain(void)
                 }
               if (i == 0)
                 {
+                  ulong_t val;
+
+                  val = m_uptimeSeconds;
+
+                  clog << std::endl << std::endl;
+                  clog << " Up time: ";
+                  if (val > 3600)
+                    {
+                      clog << (val / 3600) << "h ";
+                      val %= 3600;
+                    }
+                  if (m_uptimeSeconds > 60)
+                    {
+                      clog << (val / 60) << "m ";
+                    }
+                  clog << (val % 60) << "s";
+
                   int nThreads;
                   nThreads = os.sched.getThreadsCount();
                   for (int j = 0; j < nThreads; ++j)
                     {
                       OSThread* pt;
                       pt = os.sched.getThread(j);
-                      clog << std::endl;
-                      clog << ((pt == this) ? '*' : ' ');
-#if false
-                      clog << *pt; // print thread info
-#else
-                      clog << pt->getName() << ' ' << pt->getStackUsed() << '/'
-                          << pt->getStackSize();
-#endif
+                      if (pt != 0)
+                        {
+                          clog << std::endl;
+                          clog << ((pt == this) ? '*' : ' ');
+                          clog << pt->getName() << ' ' << pt->getStackUsed()
+                              << '/' << pt->getStackSize();
+                        }
                     }
-                  clog << std::endl;
+                  clog << std::endl << std::endl;
                 }
               ++i;
             }
@@ -108,6 +126,8 @@ StacksReporter::threadMain(void)
 #else
       os.sched.timerTicks.sleep(OS_CFGINT_TICK_RATE_HZ);
 #endif
+
+      ++m_uptimeSeconds;
     }
 }
 

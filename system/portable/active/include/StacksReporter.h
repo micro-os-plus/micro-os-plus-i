@@ -33,6 +33,8 @@ private:
   schedTicks_t m_rateSeconds;
   schedTicks_t m_maxSeconds;
   uint8_t m_increaseRate;
+
+  ulong_t m_uptimeSeconds;
 };
 
 #endif /* OS_ACTIVE_STACKS_REPORTER_H_ */
