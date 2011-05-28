@@ -136,6 +136,7 @@ SECTIONS
   .eh_frame       : ONLY_IF_RO { KEEP (*(.eh_frame)) } >FLASH AT>FLASH :FLASH
   .gcc_except_table   : ONLY_IF_RO { KEEP (*(.gcc_except_table)) *(.gcc_except_table.*) } >FLASH AT>FLASH :FLASH
   .lalign	: { . = ALIGN(8); PROVIDE(_data_lma = .); } >FLASH AT>FLASH :FLASH
+  
   . = ORIGIN(INTRAM);
   .dalign	: { . = ALIGN(8); PROVIDE(_data = .); } >INTRAM AT>INTRAM :INTRAM_ALIGN
 
@@ -274,6 +275,9 @@ SECTIONS
   } >INTRAM AT>INTRAM :INTRAM
   .userpage       : { *(.userpage .userpage.*) } >USERPAGE AT>USERPAGE :USERPAGE
   /DISCARD/ : { *(.note.GNU-stack) }
+ 
+   __os_text_start = __executable_start;
+   __os_text_end = __etext;
   
    __os_data_start = __data_start;
    __os_data_end = __data_end;
