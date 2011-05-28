@@ -327,7 +327,7 @@ OSScheduler::performContextSwitch()
   // If scheduler is not locked, perform the context switch
   if (!OSSchedulerLock::isSet())
     {
-      OSCriticalSection::enter();
+      //OSCriticalSection::enter();
         {
           OSThread* pThread;
           pThread = ms_pThreadRunning;
@@ -344,7 +344,7 @@ OSScheduler::performContextSwitch()
           // Prepare the global variable with the pointer to the m_pStack.
           ms_ppCurrentStack = (volatile OSStack_t**) &pThread->m_pStack;
         }
-      OSCriticalSection::exit();
+      //OSCriticalSection::exit();
     }
   else
     {
@@ -585,6 +585,7 @@ void
 OSActiveThreads::dump(void)
 {
   int i;
+  OSDeviceDebug::putNewLine();
   OSDeviceDebug::putString_P(PSTR("Threads: "));
   for (i = 0; i < ms_count; ++i)
     {
