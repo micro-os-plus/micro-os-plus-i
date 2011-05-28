@@ -16,8 +16,8 @@
 
 // Notice: do not use parenthesis! (the values will be stringified)
 #define OS_CFGINT_VERSION_MAJOR         4
-#define OS_CFGINT_VERSION_MINOR         1
-#define OS_CFGINT_VERSION_REVISION      1845
+#define OS_CFGINT_VERSION_MINOR         2
+#define OS_CFGINT_VERSION_REVISION      2228
 
 #define OS_CFGSTR_STRINGIFY(x)          OS_CFGSTR_SHARP(x)
 #define OS_CFGSTR_SHARP(x)              #x
