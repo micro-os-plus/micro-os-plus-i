@@ -45,18 +45,28 @@
 //#define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
 //#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
 
-// Mask to disable ALL interrupts, including real-time ones
+// Below are default masks used to disable/enable interrupts.
+// The order of bits is: 3210
+
+// Mask to disable ALL (0-3) interrupts, including real-time ones
 #define OS_CFGINT_OSCRITICALSECTION_MASKALL             (0xF << (16+1))
 
-// Mask to disable regular and real-time interrupts
+// Mask to disable regular (0,1) and real-time (2) interrupts
 #if !defined(OS_CFGINT_OSCRITICALSECTION_MASKRT)
-#define OS_CFGINT_OSCRITICALSECTION_MASKRT              (0xE << (16+1))
+#define OS_CFGINT_OSCRITICALSECTION_MASKRT              (0x7 << (16+1))
 #endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASKRT) */
 
-// Mask to disable regular interrupts, except real-time ones
+// Mask to disable regular (0, 1) interrupts, except real-time ones
 #if !defined(OS_CFGINT_OSCRITICALSECTION_MASK)
-#define OS_CFGINT_OSCRITICALSECTION_MASK                (0xC << (16+1))
+#define OS_CFGINT_OSCRITICALSECTION_MASK                (0x3 << (16+1))
 #endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASK) */
+
+// Mask to disable regular (0,1) and real-time (2) interrupts
+// Used in yield() context switch code
+#if !defined(OS_CFGINT_OSCRITICALSECTION_MASKYIELD)
+#define OS_CFGINT_OSCRITICALSECTION_MASKYIELD           (0x7 << (16+1))
+#endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASKYIELD) */
+
 
 
 /*
