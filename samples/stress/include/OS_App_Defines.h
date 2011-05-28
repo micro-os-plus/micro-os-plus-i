@@ -9,21 +9,13 @@
 
 // ----- Portable Definitions -------------------------------------------------
 
-// override the board definitions, if needed
-//#define OS_CFGLONG_OSCILLATOR_HZ                        (16000000UL)
-
 #define OS_CFGINT_TICK_RATE_HZ                          (1000)
-//#define OS_CFGINT_TIMER_PRESCALLER                      (4)
-//#define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
 
-#define OS_CFGINT_THREADS_TABLE_SIZE                      (13)
+#define OS_CFGINT_THREADS_TABLE_SIZE                    (13)
 
-#define OS_INCLUDE_TASKREPORTSTACKS                     (1)
+#define OS_INCLUDE_ACTIVE_STACKSREPORTER                (1)
 
 #define OS_INCLUDE_OSTIMERSECONDS                       (1)
-
-//#define OS_EXCLUDE_PREEMPTION                           (1)
-//#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 #define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
@@ -33,11 +25,11 @@
 
 #define OS_CFGINT_IDLE_TASK_STACK_SIZE                  (800)
 
-#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
+//#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 #define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
 //#define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
 #define OS_INCLUDE_CLOG                                 1
-#define OS_INCLUDE_OSTREAM                              1
+//#define OS_INCLUDE_OSTREAM                              1
 #define OS_INCLUDE_OSTREAM_OSTHREAD                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
 
@@ -47,8 +39,15 @@
 
 #if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
 
+//#define OS_EXCLUDE_PREEMPTION                           (1)
+//#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
 #define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK          (1)
 #define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
+#define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
+#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
+//#define OS_CFGINT_OSCRITICALSECTION_MASK                (0xF << (16+1))
+//#define OS_CFGINT_OSCRITICALSECTION_MASKYIELD           (0xF << (16+1))
+
 
 #define OS_INCLUDE_OSREALTIME                           (1)
 
@@ -76,6 +75,9 @@
 
 //#define OS_DEBUG_OSSCHEDULER_STACKINITIALIZE            (1)
 #define OS_DEBUG_CONSTRUCTORS                           (1)
+#define OS_DEBUG_INIT_SECTIONS                          (1)
+#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
+
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
 //#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
 //#define OS_DEBUG_OSSCHEDULER_THREADREGISTER               (1)
@@ -84,7 +86,6 @@
 //#define OS_DEBUG_OSREADYLIST_INSERT                     (1)
 //#define OS_DEBUG_OSREADYLIST_REMOVE                     (1)
 //#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
-//#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
 
 #endif /* defined(DEBUG) */
 
