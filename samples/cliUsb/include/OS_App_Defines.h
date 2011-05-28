@@ -34,14 +34,11 @@
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE           1
 
 #if true
-#define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF          1
-#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 #define OS_INCLUDE_CLOG                                 1
-#define OS_INCLUDE_OSTREAM                              1
-#define OS_INCLUDE_ISTREAM                              1
 #define OS_INCLUDE_OSTREAM_OSTHREAD                       1
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
 #endif
+
 
 #define OS_INCLUDE_TASKBLINK                            1
 
@@ -55,7 +52,22 @@
 //#define OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_TXBUF_SIZE (32)
 //#define OS_CFGINT_DEVICECHARACTERBUFFEREDUSART1_RXBUF_SIZE (32)
 
-// ----------------------------------------------------------------------------
+// ----- Board Definitions ----------------------------------------------------
+
+#if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+
+#define OS_EXCLUDE_PREEMPTION                           (1)
+#define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK          (1)
+#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
+#define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
+#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
+//#define OS_CFGINT_OSCRITICALSECTION_MASK                (0xF << (16+1))
+
+#elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
+
+#endif /* OS_CONFIG_BOARD_* */
+
+// ----- Debug Definitions ----------------------------------------------------
 
 #if defined(DEBUG)
 
@@ -65,6 +77,8 @@
 
 #define OS_DEBUG_CONSTRUCTORS                           1
 #define OS_DEBUG_INITS                                  1
+
+#define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS       (1)
 
 //#define OS_DEBUG_OSDEVICECHARACTER_OPEN                 1
 //#define OS_DEBUG_OSDEVICECHARACTER_READBYTE             1
