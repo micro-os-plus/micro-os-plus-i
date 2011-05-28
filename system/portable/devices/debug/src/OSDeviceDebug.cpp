@@ -44,7 +44,7 @@ OSDeviceDebug::earlyInit(void)
   commonPutBytes(greeting, strlen(greeting));
   commonPutBytes("\r\n", 2);
   commonPutBytes(OS_CFGSTR_GREETING, sizeof(OS_CFGSTR_GREETING));
-  commonPutBytes("\r\n\r\n", 4);
+  commonPutBytes("\r\n", 4);
 }
 
 // ----------------------------------------------------------------------------

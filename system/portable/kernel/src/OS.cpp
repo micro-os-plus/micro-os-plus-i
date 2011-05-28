@@ -101,6 +101,7 @@ OS::resetHandler(void)
 
 #if defined(DEBUG) && defined(OS_DEBUG_INIT_SECTIONS)
 
+  OSDeviceDebug::putNewLine();
   OSDeviceDebug::putString_P(PSTR(".text "));
   OSDeviceDebug::putPtr(&__os_text_begin);
   OSDeviceDebug::putChar('-');
