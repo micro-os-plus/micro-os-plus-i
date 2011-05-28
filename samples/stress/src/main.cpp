@@ -7,7 +7,9 @@
 #include "portable/kernel/include/uOS.h"
 
 #include "TaskBlink.h"
-#include "portable/tasks/include/TaskReportStacks.h"
+
+#include "portable/active/include/StacksReporter.h"
+
 #include "TaskStress.h"
 
 #if defined(APP_INCLUDE_TASKBLINKREALTIME)
@@ -62,7 +64,7 @@ bool g_flagNotify;
 #endif
 
 
-TaskReportStacks taskR("R", APP_CFGINT_DUMP_INTERVAL_SECONDS,
+StacksReporter taskR("R", APP_CFGINT_DUMP_INTERVAL_SECONDS,
     APP_CFGINT_DUMP_MAX_INTERVAL_SECONDS,
     APP_CFGINT_DUMP_INCREASE_RATE_PROCENTS);
 
