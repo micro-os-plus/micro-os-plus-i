@@ -7,6 +7,8 @@
 #ifndef HAL_FAMILY_OS_INLINES_H_
 #define HAL_FAMILY_OS_INLINES_H_
 
+// Included at the end of OS.h, after OS_Architecture.h
+
 #include "hal/arch/avr32/uc3/devices/onchip/include/Common.h"
 
 #if OS_CFGINT_PBA_PRESCALLER_SEL == 0
