@@ -276,18 +276,18 @@ SECTIONS
   .userpage       : { *(.userpage .userpage.*) } >USERPAGE AT>USERPAGE :USERPAGE
   /DISCARD/ : { *(.note.GNU-stack) }
  
-   __os_text_start = __executable_start;
+   __os_text_begin = __executable_start;
    __os_text_end = __etext;
   
-   __os_data_start = __data_start;
+   __os_data_begin = __data_start;
    __os_data_end = __data_end;
-   __os_data_load_start = LOADADDR(.data);
-   __os_data_load_end = __os_data_load_start + SIZEOF(.data);
+   __os_data_load_begin = LOADADDR(.data);
+   __os_data_load_end = __os_data_load_begin + SIZEOF(.data);
 
-   __os_bss_start = __bss_start;
+   __os_bss_begin = __bss_start;
    __os_bss_end = __bss_end;
 
-   __os_ctors_array_start = LOADADDR (.ctors);
-   __os_ctors_array_end = (__os_ctors_array_start + SIZEOF (.ctors));
+   __os_ctors_array_begin = LOADADDR (.ctors);
+   __os_ctors_array_end = (__os_ctors_array_begin + SIZEOF (.ctors));
     
 }

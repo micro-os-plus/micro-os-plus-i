@@ -44,21 +44,30 @@ main(void) __attribute__((weak));
 uint_t g_constantMarker = OS_CFGLONG_CONSTANT_MARKER;
 #endif /* defined(DEBUG) */
 
-/* init value for the stack pointer. defined in linker script */
+// init value for the stack pointer. defined in linker script
 extern unsigned long __stack_end;
 
-/* start/end addresses for the initialization values of the .data section.
- defined in linker script */
-extern unsigned long __os_data_load_start;
+// start/end addresses for the .text section.
+// defined in linker script
+extern unsigned long __os_text_begin;
+extern unsigned long __os_text_end;
+
+// start/end addresses for the initialization values of the .data section.
+// defined in linker script
+extern unsigned long __os_data_load_begin;
 extern unsigned long __os_data_load_end;
 
-/* start/end address for the .data section. defined in linker script */
-extern unsigned long __os_data_start;
+// start/end address for the .data section. defined in linker script
+extern unsigned long __os_data_begin;
 extern unsigned long __os_data_end;
 
-/* start/end address for the .bss section. defined in linker script */
-extern unsigned long __os_bss_start;
+// start/end address for the .bss section. defined in linker script
+extern unsigned long __os_bss_begin;
 extern unsigned long __os_bss_end;
+
+// start/end address for the constructors section. defined in linker script
+extern unsigned long __os_ctors_array_begin;
+extern unsigned long __os_ctors_array_end;
 
 void
 OS::resetHandler(void)
@@ -90,34 +99,41 @@ OS::resetHandler(void)
   OSDeviceDebug::earlyInit();
 #endif /* defined(DEBUG) */
 
-#if defined(DEBUG)
-  if (g_constantMarker != OS_CFGLONG_CONSTANT_MARKER)
-    {
-      OSDeviceDebug::putString("dataInit() failed ");
-      OSDeviceDebug::putHex(g_constantMarker);
-      OSDeviceDebug::putNewLine();
-    }
-#endif /* defined(DEBUG) */
-
 #if defined(DEBUG) && defined(OS_DEBUG_INIT_SECTIONS)
 
-  OSDeviceDebug::putString(".data ");
-  OSDeviceDebug::putPtr(&__os_data_load_start);
-  OSDeviceDebug::putString("-");
-  OSDeviceDebug::putPtr(&__os_data_load_end);
-  OSDeviceDebug::putString("->");
-  OSDeviceDebug::putPtr(&__os_data_start);
-  OSDeviceDebug::putString("-");
-  OSDeviceDebug::putPtr(&__os_data_end);
+  OSDeviceDebug::putString_P(PSTR(".text "));
+  OSDeviceDebug::putPtr(&__os_text_begin);
+  OSDeviceDebug::putChar('-');
+  OSDeviceDebug::putPtr(&__os_text_end);
   OSDeviceDebug::putNewLine();
 
-  OSDeviceDebug::putString(".bss ");
-  OSDeviceDebug::putPtr(&__os_bss_start);
-  OSDeviceDebug::putString("-");
+  OSDeviceDebug::putString_P(PSTR(".data "));
+  OSDeviceDebug::putPtr(&__os_data_begin);
+  OSDeviceDebug::putChar('-');
+  OSDeviceDebug::putPtr(&__os_data_end);
+  OSDeviceDebug::putString_P(PSTR(" ("));
+  OSDeviceDebug::putPtr(&__os_data_load_begin);
+  OSDeviceDebug::putChar('-');
+  OSDeviceDebug::putPtr(&__os_data_load_end);
+  OSDeviceDebug::putString_P(PSTR(")"));
+  OSDeviceDebug::putNewLine();
+
+  OSDeviceDebug::putString_P(PSTR(".bss "));
+  OSDeviceDebug::putPtr(&__os_bss_begin);
+  OSDeviceDebug::putChar('-');
   OSDeviceDebug::putPtr(&__os_bss_end);
   OSDeviceDebug::putNewLine();
 
 #endif
+
+#if defined(DEBUG)
+  if (g_constantMarker != OS_CFGLONG_CONSTANT_MARKER)
+    {
+      OSDeviceDebug::putString_P(PSTR("dataInit() failed "));
+      OSDeviceDebug::putHex(g_constantMarker);
+      OSDeviceDebug::putNewLine();
+    }
+#endif /* defined(DEBUG) */
 
   // will call OSScheduler::earlyInit() to init registered threads count
   OS::earlyInit();
@@ -160,8 +176,8 @@ OS::dataInit(void)
   unsigned long* pDest;
 
   /* Copy the data segment initialisers from flash to SRAM */
-  pSrc = &__os_data_load_start;
-  pDest = &__os_data_start;
+  pSrc = &__os_data_load_begin;
+  pDest = &__os_data_begin;
   for (; pDest < &__os_data_end;)
     {
       *(pDest++) = *(pSrc++);
@@ -174,38 +190,37 @@ OS::bssInit(void)
   unsigned long* pDest;
 
   /* Zero fill the bss segment. */
-  for (pDest = &__os_bss_start; pDest < &__os_bss_end;)
+  for (pDest = &__os_bss_begin; pDest < &__os_bss_end;)
     {
       *(pDest++) = 0;
     }
 }
 
-/* start address for the constructors section. defined in linker script */
-extern unsigned long __os_ctors_array_start;
-
-/* end address for the constructors section. defined in linker script */
-extern unsigned long __os_ctors_array_end;
-
-typedef void
-(*pFunc_t)(void);
-
 void
 OS::staticConstructorsInit(void)
 {
-  unsigned long* p;
-  void
-  (*pFunc)(void);
+  typedef void
+  (*pFunc_t)(void);
 
-  p = &__os_ctors_array_start;
-  for (; p < &__os_ctors_array_end; p++)
+  pFunc_t* p;
+
+#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
+  OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("Constructors:"));
+  OSDeviceDebug::putNewLine();
+#endif
+
+  p = (pFunc_t*) &__os_ctors_array_begin;
+  for (; p < (pFunc_t*) &__os_ctors_array_end; ++p)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS) && defined(OS_DEBUG_CONSTRUCTORS_INIT)
-      OSDeviceDebug::putString(".ctor=");
-      OSDeviceDebug::putHex(*p);
+      OSDeviceDebug::putString_P(PSTR(".ctor "));
+      OSDeviceDebug::putPtr((void*)*p);
+      OSDeviceDebug::putString_P(PSTR(" @"));
+      OSDeviceDebug::putPtr(p);
       OSDeviceDebug::putNewLine();
 #endif
-      pFunc = (pFunc_t) (*p);
-      (*pFunc)();
+      (**p)();
     }
 }
 
@@ -226,6 +241,7 @@ void
 OS::earlyInit(void)
 {
 #if defined(DEBUG)
+  OSDeviceDebug::putNewLine();
   OSDeviceDebug::putString_P(PSTR("OS::earlyInit()"));
   OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
