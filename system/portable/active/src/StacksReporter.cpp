@@ -6,22 +6,22 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_TASKREPORTSTACKS)
+#if defined(OS_INCLUDE_ACTIVE_STACKSREPORTER)
 
 #include "portable/kernel/include/OS.h"
 
-#include "portable/tasks/include/TaskReportStacks.h"
+#include "portable/active/include/StacksReporter.h"
 
 /*
  * Thread constructor.
  * Initialise system thread object and store parameters in private members.
  */
 
-TaskReportStacks::TaskReportStacks(const char* pName, schedTicks_t rateSeconds,
-    schedTicks_t maxSeconds, unsigned char increaseRate) :
-  OSThread(pName, m_stack, sizeof(m_stack))
+StacksReporter::StacksReporter(const char* pName, schedTicks_t rateSeconds,
+    schedTicks_t maxSeconds, uint8_t increaseRate, OSThreadPriority_t priority) :
+  OSThread(pName, m_stack, sizeof(m_stack), priority)
 {
-  debug.putConstructor_P(PSTR("TaskReportStacks"), this);
+  debug.putConstructor_P(PSTR("StacksReporter"), this);
 
   m_rateSeconds = rateSeconds;
   m_maxSeconds = maxSeconds;
@@ -35,7 +35,7 @@ TaskReportStacks::TaskReportStacks(const char* pName, schedTicks_t rateSeconds,
  */
 
 void
-TaskReportStacks::threadMain(void)
+StacksReporter::threadMain(void)
 {
   if (os.isDebug())
     {
@@ -111,4 +111,4 @@ TaskReportStacks::threadMain(void)
     }
 }
 
-#endif /* defined(OS_INCLUDE_TASKREPORTSTACKS) */
+#endif /* defined(OS_INCLUDE_ACTIVE_STACKSREPORTER) */
