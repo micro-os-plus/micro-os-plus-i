@@ -14,7 +14,7 @@
 
 GpsCoordinate::GpsCoordinate()
 {
-  debug.putConstructor("GpsCoordinate", this);
+  debug.putConstructor_P(PSTR("GpsCoordinate"), this);
 
   m_degrees = 0;
   m_minutesInteger = 0;
@@ -23,7 +23,7 @@ GpsCoordinate::GpsCoordinate()
 
 GpsCoordinate::~GpsCoordinate()
 {
-  debug.putDestructor("GpsCoordinate", this);
+  debug.putDestructor_P(PSTR("GpsCoordinate"), this);
 }
 
 #if defined(OS_INCLUDE_OSTREAM_GPSPOSITION)
