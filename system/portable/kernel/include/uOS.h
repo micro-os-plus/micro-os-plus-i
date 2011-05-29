@@ -89,6 +89,26 @@
 #include "portable/devices/misc/include/DeviceSPIMaster.h"
 #endif
 
+// -----
+
+#if defined(OS_INCLUDE_OSDEVICEADDRESSABLE)
+#include "portable/devices/block/include/OSDeviceAddressable.h"
+#endif
+
+#if defined(OS_INCLUDE_OSDEVICEADDRESSABLESYNCHRONISED)
+#include "portable/devices/block/include/OSDeviceAddressableSynchronised.h"
+#endif
+
+#if defined(OS_INCLUDE_OSDEVICEADDRESSABLEPARTITION)
+#include "portable/devices/block/include/OSDeviceAddressablePartition.h"
+#endif
+
+#if defined(OS_INCLUDE_LARGECIRCULARSTORAGE)
+#include "portable/misc/include/LargeCircularStorage.h"
+#endif
+
+// -----
+
 #if defined(OS_INCLUDE_DEVICECHIPSELECT)
 #include "portable/devices/misc/include/DeviceChipSelect.h"
 #endif
