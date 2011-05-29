@@ -185,6 +185,20 @@
 #define OS_INCLUDE_CIRCULARBYTEBUFFER                   (1)
 #endif
 
+// ----- OSDeviceAddressable dependencies -------------------------------------
+
+#if !defined(OS_INCLUDE_OSDEVICEADDRESSABLESYNCHRONISED) && defined(OS_INCLUDE_OSDEVICEADDRESSABLEPARTITION)
+#define OS_INCLUDE_OSDEVICEADDRESSABLESYNCHRONISED      (1)
+#endif
+
+#if !defined(OS_INCLUDE_OSDEVICEADDRESSABLE) && defined(OS_INCLUDE_OSDEVICEADDRESSABLESYNCHRONISED)
+#define OS_INCLUDE_OSDEVICEADDRESSABLE                  (1)
+#endif
+
+#if !defined(OS_INCLUDE_OSDEVICEADDRESSABLE) && defined(OS_INCLUDE_LARGECIRCULARSTORAGE)
+#define OS_INCLUDE_OSDEVICEADDRESSABLE                  (1)
+#endif
+
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_OSUSBDEVICE) && defined(OS_INCLUDE_DEVICECHARACTERUSB)
