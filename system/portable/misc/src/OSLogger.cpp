@@ -22,7 +22,7 @@ OSLogger::OSLogger(const char* name)
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
   OSDeviceDebug::putString_P(PSTR("OSLogger('"));
   OSDeviceDebug::putString(name);
-  OSDeviceDebug::putString_P(PSTR("')="));
+  OSDeviceDebug::putString_P(PSTR("') @"));
   OSDeviceDebug::putPtr(this);
   OSDeviceDebug::putNewLine();
 #endif
