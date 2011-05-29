@@ -33,7 +33,7 @@ unsigned char OSScheduler::ms_notifyIndex;
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
 
 // The +1 is here to reserve space for the idle thread.
-OSThread* OSScheduler::ms_threads[OS_CFGINT_THREADS_TABLE_SIZE + 1];
+OSThread* OSScheduler::ms_threads[OS_CFGINT_THREADS_ARRAY_SIZE + 1];
 
 OSSchedulerLock OSScheduler::lock;
 OSCriticalSection OSScheduler::critical;
@@ -53,7 +53,7 @@ bool OSScheduler::ms_allowDeepSleep;
 // ----- OSActiveThreads static variables ---------------------------------------
 
 unsigned char OSActiveThreads::ms_count;
-OSThread* OSActiveThreads::ms_array[OS_CFGINT_THREADS_TABLE_SIZE + 1];
+OSThread* OSActiveThreads::ms_array[OS_CFGINT_THREADS_ARRAY_SIZE + 1];
 
 // ============================================================================
 
@@ -477,7 +477,7 @@ OSActiveThreads::OSActiveThreads()
   OSDeviceDebug::putConstructor_P(PSTR("OSActiveThreads"), this);
 
   int i;
-  for (i = 0; i < OS_CFGINT_THREADS_TABLE_SIZE + 1; ++i)
+  for (i = 0; i < OS_CFGINT_THREADS_ARRAY_SIZE + 1; ++i)
     {
       ms_array[i] = 0;
     }

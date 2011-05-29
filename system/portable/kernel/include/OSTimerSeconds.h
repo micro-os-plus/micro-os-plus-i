@@ -14,7 +14,7 @@
 #include "portable/kernel/include/OS.h"
 
 #if !defined(OS_CFGINT_OSTIMERSECONDS_SIZE)
-#define OS_CFGINT_OSTIMERSECONDS_SIZE 	(OS_CFGINT_THREADS_TABLE_SIZE)
+#define OS_CFGINT_OSTIMERSECONDS_SIZE 	(OS_CFGINT_THREADS_ARRAY_SIZE)
 #endif
 
 // the second system timer functionality, intended to measure longer intervals

@@ -196,7 +196,7 @@
 #endif
 
 #if defined(OS_EXCLUDE_MULTITASKING)
-#undef OS_CFGINT_THREADS_TABLE_SIZE
+#undef OS_CFGINT_THREADS_ARRAY_SIZE
 #define OS_EXCLUDE_OSTIMER                              (1)
 #endif /* defined(OS_EXCLUDE_MULTITASKING) */
 
