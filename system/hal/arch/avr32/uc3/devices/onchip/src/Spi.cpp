@@ -16,17 +16,40 @@ namespace avr32
 {
   namespace uc3
   {
-    Spi::Spi(ModuleId_t id)
+    Spim::Spim(spi::ModuleId_t module) :
+          registers(
+              *reinterpret_cast<spi::Registers*> (spi::Registers::MEMORY_ADDRESS
+                  + ((module % 2) * spi::Registers::MEMORY_OFFSET)))
     {
-      OSDeviceDebug::putConstructor("avr32::uc3::Spi", this);
-      if (id == zero)
-        {
-          m_channelAddress = (void*) 0xFFFF2400;
-        }
-      else if (id == one)
-        {
-          m_channelAddress = (void*) 0xFFFF2800;
-        }
+      OSDeviceDebug::putConstructor("avr32::uc3::Spim", this);
+    }
+
+    void
+    Spim::init(void)
+    {
+      // TODO: implement it
+    }
+
+    // Busy wait version of a full Spi byte access
+    uint8_t
+    Spim::writeWaitReadByte(uint8_t value)
+    {
+      transmitByte(value);
+      while (!isTransmitDataRegisterEmpty())
+        // TODO: check logic
+        ;
+      return receiveByte();
+    }
+
+    // Busy wait version of a full Spi word access
+    uint16_t
+    Spim::writeWaitReadWord(uint16_t value)
+    {
+      transmitWord(value);
+      while (!isTransmitDataRegisterEmpty())
+        // TODO: check logic
+        ;
+      return receiveWord();
     }
   }
 }
