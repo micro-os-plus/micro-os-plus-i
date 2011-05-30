@@ -184,7 +184,8 @@ namespace avr32
       ChannelRegisters::writeInterruptDisable(uint32_t mask)
       {
         this->idr = mask;
-        AVR32_PDCA_IDR_TRC_MASK
+        // AVR32_PDCA_IDR_TRC_MASK 
+        // TODO: clean this up
       }
 
       inline uint32_t

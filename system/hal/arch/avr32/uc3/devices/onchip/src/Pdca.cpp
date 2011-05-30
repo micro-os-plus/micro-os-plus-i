@@ -171,7 +171,7 @@ namespace avr32
     OSReturn_t
     PdcaReceive::readRegion(pdca::RegionAddress_t& region, bool doNotBlock)
     {
-
+      // TODO: implement it
       return 1;
     }
 
