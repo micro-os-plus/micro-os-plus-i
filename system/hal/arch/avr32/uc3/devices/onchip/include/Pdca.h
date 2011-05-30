@@ -34,11 +34,21 @@ namespace avr32
 
       typedef void* RegionAddress_t;
       typedef uint16_t RegionSize_t;
+      typedef enum RegionStatus_e
+      {
+        // Define masks for each region
+        IS_EMPTY_MASK = 1, // not used
+        IS_PREPARED_MASK = 2, // region is loaded into PDCA's registers
+        IS_TRANFERRED_MASK = 4, // region is transferred
+        IS_SIGNALLED_MASK = 8 // region is signalled to the upper layer
+      }RegionStatus_t;
+
       typedef struct Region_s
       {
         // A memory region is defined by an address and a size
         RegionAddress_t address;
         RegionSize_t size;
+        RegionStatus_t status;
       } Region_t;
 
       typedef enum PeripheralId_e
@@ -114,7 +124,10 @@ namespace avr32
         writeInterruptDisable(uint32_t mask);
         uint32_t
         readStatus(void);
-
+        uint32_t
+        readInterruptMask(void);
+        uint32_t
+        readInterruptStatus(void);
       };
 
       // Not (yet) implemented:
@@ -169,12 +182,33 @@ namespace avr32
       ChannelRegisters::writeInterruptDisable(uint32_t mask)
       {
         this->idr = mask;
+        AVR32_PDCA_IDR_TRC_MASK
       }
 
       inline uint32_t
       ChannelRegisters::readStatus(void)
       {
         return this->sr;
+      }
+
+      // return value is logic OR between following possible flags:
+      //          AVR32_PDCA_IMR_RCZ_MASK means TCRR holds a non-zero value
+      //          AVR32_PDCA_IMR_TERR_MASK means errors have occurred
+      //          AVR32_PDCA_IMR_TRC_MASK means both TCR and TCRR are zero
+      inline uint32_t
+      ChannelRegisters::readInterruptMask(void)
+      {
+        return this->imr;
+      }
+
+      // mask is logic OR between following possible flags:
+      //          AVR32_PDCA_ISR_RCZ_MASK means TCRR holds a non-zero value
+      //          AVR32_PDCA_ISR_TERR_MASK means errors have occurred
+      //          AVR32_PDCA_ISR_TRC_MASK means both TCR and TCRR are zero
+      inline uint32_t
+      ChannelRegisters::readInterruptStatus(void)
+      {
+        return this->isr;
       }
 
       // mask is logic OR between following possible flags:
@@ -273,6 +307,9 @@ namespace avr32
 
       void
       interruptServiceRoutine(void);
+
+    private:
+      uint32_t m_lastReadRegion;
     };
 
     // ----- Pdca base inlines ------------------------------------------------

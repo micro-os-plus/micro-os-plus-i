@@ -168,6 +168,55 @@ namespace avr32
       OSDeviceDebug::putConstructor("avr32::uc3::PdcaReceive", this);
     }
 
+    OSReturn_t
+    PdcaReceive::readRegion(pdca::RegionAddress_t& region, bool doNotBlock)
+    {
+
+      return 1;
+    }
+
+    void
+    PdcaReceive::stopTransfer(void)
+    {
+      // disable all interrupt sources
+      // disable PDMA channel
+      // update remaining numbers of words
+      // reset counters
+      // reset reload counters
+      // clear error
+    }
+
+    void
+    PdcaReceive::interruptServiceRoutine(void)
+    {
+      uint32_t interruptFlag;
+
+      // find the interrupt source
+      interruptFlag = registers.readInterruptMask() &
+          registers.readInterruptStatus();
+
+      if (interruptFlag & AVR32_PDCA_IER_TERR_MASK) // transfer error
+        {
+          // disable all interrupt sources
+          // TODO: log registers MAR, TCR, MARR and TCRR
+          //update remaining numbers of words
+          // disable PDMA channel
+          // reset counters
+          // reset reload counters
+          // clear error
+        }
+      if (interruptFlag & AVR32_PDCA_IER_RCZ_MASK) // reload counter zero
+        {
+          // if last transfer
+            // disable RCZ interrupt
+          // load next transfer
+        }
+      if (interruptFlag & AVR32_PDCA_IER_TRC_MASK) // transfer complete
+      {
+          // disable PDMA channel
+          // disable all interrupt sources
+      }
+    }
   // TODO: add the other functions
 
   }
