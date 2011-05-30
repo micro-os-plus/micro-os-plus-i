@@ -102,6 +102,8 @@ namespace avr32
         regReadOnly_t imr;
         regReadOnly_t isr;
 
+        // ----- Methods ------------------------------------------------------
+
       public:
         ChannelRegisters();
         void
