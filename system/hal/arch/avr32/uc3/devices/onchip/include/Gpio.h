@@ -15,6 +15,16 @@ namespace avr32
   {
     namespace gpio
     {
+      // ----- Type definitions -----------------------------------------------
+
+      typedef uint_t PinNumber_t;
+      typedef enum PeripheralFunction_e
+      {
+        FUNCTION_A = 0, FUNCTION_B = 1, FUNCTION_C = 2, FUNCTION_D = 3
+      } PeripheralFunction_t;
+
+      // ----- Port memory mapped registers -----------------------------------
+
       class PortRegisters
       {
       public:
@@ -23,7 +33,7 @@ namespace avr32
         const static uint32_t MEMORY_ADDRESS = 0xFFFF1000;
         const static uint32_t MEMORY_OFFSET = 0x100;
 
-        // ----- Memory Map ---------------------------------------------------
+        // ----- Memory map ---------------------------------------------------
 
         regReadWrite_t gper; //0x0000
         regWriteOnly_t gpers; //0x0004
@@ -96,13 +106,10 @@ namespace avr32
         regNotAllocated_t dummyDC;//0x00dc
 
         // ----- Methods ------------------------------------------------------
+
+        // TODO: add methods, if needed
       };
 
-      typedef uint_t PinNumber_t;
-      typedef enum PeripheralFunction_e
-      {
-        FUNCTION_A = 0, FUNCTION_B = 1, FUNCTION_C = 2, FUNCTION_D = 3
-      } PeripheralFunction_t;
     }
     class Gpio
     {
