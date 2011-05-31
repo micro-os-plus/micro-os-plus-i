@@ -46,7 +46,7 @@ USB_contextHandler(void) __attribute__((interrupt));
 void
 USB_contextHandler(void)
 {
-  OSScheduler::ledActiveOn();
+  OSScheduler::ISR_ledActiveOn();
 
   OSUsbLed::toggle();
 
@@ -74,7 +74,7 @@ OSUsbDeviceImpl::interruptComServiceRoutine(void)
       if (OSUsbDeviceImpl::isInterruptReceiveSetup()
           && OSUsbDeviceImpl::isInterruptReceiveSetupEnabled())
         {
-          OSDeviceDebug::putString("Vs ");
+          //OSDeviceDebug::putString("Vs ");
           //OSDeviceDebug::putNewLine();
           //usb_process_request();
           OSUsbDeviceImpl::standardProcessRequest();
@@ -111,9 +111,6 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
   if (OSUsbDeviceImpl::Is_usb_vbus_transition()
       && OSUsbDeviceImpl::Is_usb_vbus_interrupt_enabled())
     {
-      OSDeviceDebug::putString("uv");
-      OSDeviceDebug::putNewLine();
-
       OSUsbDeviceImpl::Usb_ack_vbus_transition();
       if (OSUsbDeviceImpl::Is_usb_vbus_high())
         {
@@ -135,55 +132,54 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
           Usb_freeze_clock();
           (void) Is_usb_clock_frozen();
         }
+      OSDeviceDebug::putString("uv");
+      OSDeviceDebug::putNewLine();
     }
   // - Device Suspend event(no more USB activity detected)
   if (OSUsbDeviceImpl::Is_usb_suspend()
       && OSUsbDeviceImpl::Is_suspend_interrupt_enabled())
     {
-      OSDeviceDebug::putString("us");
-      OSDeviceDebug::putNewLine();
-
       OSUsbDeviceImpl::Usb_ack_suspend();
       OSUsbDeviceImpl::Usb_enable_wake_up_interrupt();
       (void) OSUsbDeviceImpl::Is_swake_up_interrupt_enabled();
       OSUsbDeviceImpl::Usb_freeze_clock();
       OSUsbDeviceImpl::Usb_send_event(EVT_USB_SUSPEND);
       OSUsbDeviceImpl::Usb_suspend_action();
+
+      OSDeviceDebug::putString("us");
+      OSDeviceDebug::putNewLine();
     }
   // - Wake up event(USB activity detected): Used to resume
   if (OSUsbDeviceImpl::Is_usb_wake_up()
       && OSUsbDeviceImpl::Is_swake_up_interrupt_enabled())
     {
-      OSDeviceDebug::putString("uw");
-      OSDeviceDebug::putNewLine();
-
       OSUsbDeviceImpl::Usb_unfreeze_clock();
       (void) Is_usb_clock_frozen();
       OSUsbDeviceImpl::Usb_ack_wake_up();
       OSUsbDeviceImpl::Usb_disable_wake_up_interrupt();
       OSUsbDeviceImpl::Usb_wake_up_action();
       OSUsbDeviceImpl::Usb_send_event(EVT_USB_WAKE_UP);
+
+      OSDeviceDebug::putString("uw");
+      OSDeviceDebug::putNewLine();
     }
   // - Resume state bus detection
   if (OSUsbDeviceImpl::Is_usb_resume()
       && OSUsbDeviceImpl::Is_resume_interrupt_enabled())
     {
-      OSDeviceDebug::putString("ue");
-      OSDeviceDebug::putNewLine();
-
       OSUsbDeviceImpl::Usb_disable_wake_up_interrupt();
       OSUsbDeviceImpl::Usb_ack_resume();
       OSUsbDeviceImpl::Usb_disable_resume_interrupt();
       OSUsbDeviceImpl::Usb_resume_action();
       OSUsbDeviceImpl::Usb_send_event(EVT_USB_RESUME);
+
+      OSDeviceDebug::putString("ue");
+      OSDeviceDebug::putNewLine();
     }
   // - USB bus reset detection
   if (OSUsbDeviceImpl::Is_usb_reset()
       && OSUsbDeviceImpl::Is_reset_interrupt_enabled())
     {
-      OSDeviceDebug::putString("ur");
-      OSDeviceDebug::putNewLine();
-
       OSUsbDeviceImpl::Usb_ack_reset();
       usb_init_device();
 
@@ -197,13 +193,15 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
 
       OSUsbDeviceImpl::Usb_reset_action();
       OSUsbDeviceImpl::Usb_send_event(EVT_USB_RESET);
+
+      OSDeviceDebug::putString("ur");
+      OSDeviceDebug::putNewLine();
     }
   // - Device start of frame received
   if (OSUsbDeviceImpl::Is_usb_sof()
       && OSUsbDeviceImpl::Is_sof_interrupt_enabled())
     {
       OSUsbDeviceImpl::Usb_ack_sof();
-      //debug_put_string("uf\n");
       OSUsbDeviceImpl::Usb_sof_action();
     }
 
@@ -765,7 +763,7 @@ OSUsbDeviceImpl::standardProcessRequest(void)
   bmRequestType = readByte();
   bmRequest = readByte();
 
-#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
+#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST) && 0
   OSDeviceDebug::putString("type/req=");
   OSDeviceDebug::putHex(bmRequestType);
   OSDeviceDebug::putString("/");
@@ -1261,15 +1259,16 @@ OSUsbDeviceImpl::usb_set_address(void)
 {
   unsigned char addr;
   addr = readByte();
-#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
-  OSDeviceDebug::putString("SET_ADDRESS ");
-  OSDeviceDebug::putHex(addr);
-  OSDeviceDebug::putNewLine();
-#endif
 
   Usb_configure_address(addr);
 
   Usb_ack_receive_setup();
+
+#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST) && 0
+  OSDeviceDebug::putString("SET_ADDRESS ");
+  OSDeviceDebug::putHex(addr);
+  OSDeviceDebug::putNewLine();
+#endif
 
   Usb_send_control_in(); //!< send a ZLP for STATUS phase
   while (!OSUsbDeviceImpl::Is_usb_in_ready())
@@ -1292,7 +1291,8 @@ OSUsbDeviceImpl::usb_set_configuration(void)
   unsigned char configuration_number, u8_i;
 
   configuration_number = OSUsbDeviceImpl::readByte();
-#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
+
+#if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST) && 0
   OSDeviceDebug::putString("SET_CONFIGURATION ");
   OSDeviceDebug::putHex(configuration_number);
   OSDeviceDebug::putNewLine();
