@@ -28,44 +28,47 @@ OSCriticalSection::OSCriticalSection()
 // the usual routines to enter()/exit() critical sections.
 void
 OSCriticalSection::enter(void)
-  {
+{
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
 #if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
-    register OSStack_t tmp;
+  register OSStack_t tmp;
 
-    tmp = OSCPUImpl::getInterruptsMask();
-    tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
-    OSCPUImpl::setInterruptsMask(tmp);
+  tmp = OSCPUImpl::getInterruptsMask();
+  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
+  OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-    OSCPUImpl::interruptsDisable();
+  OSCPUImpl::interruptsDisable();
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
 
-    ++ms_nestingLevel;
+  ++ms_nestingLevel;
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
-  }
+}
 
 void
 OSCriticalSection::exit(void)
-  {
+{
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-    if ((ms_nestingLevel > 0) && (--ms_nestingLevel == 0))
-      {
+  if ((ms_nestingLevel > 0) && (--ms_nestingLevel == 0))
+    {
 #if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
-        register OSStack_t tmp;
+      register OSStack_t tmp;
 
-        tmp = OSCPUImpl::getInterruptsMask();
-        tmp &= ~(OS_CFGINT_OSCRITICALSECTION_MASK);
-        OSCPUImpl::setInterruptsMask(tmp);
+      tmp = OSCPUImpl::getInterruptsMask();
+      // When executed on an interrupt context, be sure we do not unmask
+      // the current level. For this we need to exclude one bit from the
+      // given mask
+      tmp &= ~(OSCRITICALSECTION_FAMILY_MASK(OS_CFGINT_OSCRITICALSECTION_MASK));
+      OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-        OSCPUImpl::interruptsEnable();
+      OSCPUImpl::interruptsEnable();
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-      }
+    }
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
-  }
+}
 
 #endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
 
@@ -75,9 +78,9 @@ OSCriticalSection::exit(void)
 
 #if defined(DEBUG)
 OSRealTimeCriticalSection::OSRealTimeCriticalSection()
-{
-  OSDeviceDebug::putConstructor_P(PSTR("OSRealTimeCriticalSection"), this);
-}
+  {
+    OSDeviceDebug::putConstructor_P(PSTR("OSRealTimeCriticalSection"), this);
+  }
 #endif
 
 #if defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
@@ -115,7 +118,7 @@ OSRealTimeCriticalSection::exit(void)
         register OSStack_t tmp;
 
         tmp = OSCPUImpl::getInterruptsMask();
-        tmp &= ~(OS_CFGINT_OSCRITICALSECTION_MASKRT);
+        tmp &= ~(OSCRITICALSECTION_FAMILY_MASK(OS_CFGINT_OSCRITICALSECTION_MASKRT));
         OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
         OSCPUImpl::interruptsEnable();
