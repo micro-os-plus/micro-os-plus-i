@@ -127,11 +127,11 @@ OSDeviceDebug::putDestructor(const char* pc, const void* p)
 void
 OSDeviceDebug::putChar(unsigned char c)
 {
-  OSCriticalSection::enter();
+//  OSCriticalSection::enter();
     {
       commonPutByte(c);
     }
-  OSCriticalSection::exit();
+//  OSCriticalSection::exit();
 }
 
 void
@@ -170,11 +170,11 @@ OSDeviceDebug::putHex(unsigned char b)
   c = (b & 0x0F);
   buff[1] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSCriticalSection::enter();
+//  OSCriticalSection::enter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSCriticalSection::exit();
+//  OSCriticalSection::exit();
 }
 
 void
@@ -198,11 +198,11 @@ OSDeviceDebug::putHex(unsigned short w)
   c = (b & 0x0F);
   buff[3] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSCriticalSection::enter();
+//  OSCriticalSection::enter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSCriticalSection::exit();
+//  OSCriticalSection::exit();
 }
 
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG)
