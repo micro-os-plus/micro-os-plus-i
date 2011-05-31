@@ -12,13 +12,13 @@
 // Application versioning and greeting definitions
 // More definitions will be computed in uOS.h
 
-#define APP_CFGSTR_APPLICATION_NAME                     "storageTransfer"
+#define APP_CFGSTR_APPLICATION_NAME                     "avr32drivers"
 #define APP_CFGSTR_APPLICATION_MANUFACTURER             "AVI"
 
 // Notice: do not use parenthesis! (the values will be stringified)
 #define APP_CFGINT_VERSION_MAJOR                        1
 #define APP_CFGINT_VERSION_MINOR                        1
-#define APP_CFGINT_VERSION_REVISION                     1630
+#define APP_CFGINT_VERSION_REVISION                     2272
 
 // ----------------------------------------------------------------------------
 
