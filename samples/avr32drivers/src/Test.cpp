@@ -56,17 +56,18 @@ Test::testSpi(void)
   debug.putNewLine();
 
   spi0m.init();
+  //spi0m.enableLocalLoopback();
 
   // Max speed, no delays, 8 bits/transfer
-  spi0m.configChipSelect(1, 0, 0);
+  //spi0m.configChipSelect(16, 0, 0);
   // Enable loopback
-  spi0m.registers.writeMode(spi0m.registers.readMode() | (1 << 7));
+  //spi0m.registers.writeMode(spi0m.registers.readMode() | AVR32_SPI_MR_LLB_MASK);
 
   spi0m.enable();
 
   bool failed;
   failed = false;
-  for (uint_t i = 0; i < 256; ++i)
+  for (uint8_t i = 1; i < 10; ++i)
     {
       uint8_t r;
       r = spi0m.writeWaitReadByte(i);
@@ -84,9 +85,15 @@ Test::testSpi(void)
 
   if (!failed)
     {
-      debug.putString("Spi test... pased.");
+      debug.putString("Spi test... passed.");
+      debug.putNewLine();
+    }
+  else
+    {
+      debug.putString("Spi test... failed.");
       debug.putNewLine();
     }
   spi0m.disable();
+  spi0m.disableLocalLoopback();
 }
 
