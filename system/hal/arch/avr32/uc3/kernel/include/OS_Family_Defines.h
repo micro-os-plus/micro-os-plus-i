@@ -67,7 +67,8 @@
 #define OS_CFGINT_OSCRITICALSECTION_MASKYIELD           (0x7 << (16+1))
 #endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASKYIELD) */
 
-
+// Hack to adjust the mask when executed in an interrupt context
+#define OSCRITICALSECTION_FAMILY_MASK(_MASK_)           (_MASK_ & ~(1 << (((((OSCPUImpl::getInterruptsMask() >> 22) & 0x7) - 2) & 3)+(16+1))))
 
 /*
  * Usage:
