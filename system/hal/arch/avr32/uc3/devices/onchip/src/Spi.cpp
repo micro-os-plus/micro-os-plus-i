@@ -32,8 +32,26 @@ namespace avr32
     void
     Spim::init(void)
     {
-      // TODO: implement it
-      registers.writeMode(1); // Master
+      // software reset SPI module
+      registers.writeControl(AVR32_SPI_CR_SWRST_MASK);
+      // Set master mode and enable RX FIFO
+      //AVR32_SPI_MR_RXFIFOEN_MASK
+      registers.writeMode(AVR32_SPI_MSTR_MASK |
+          AVR32_SPI_MR_MODFDIS_MASK | AVR32_SPI_MR_LLB_MASK);
+      // initialize CSR0
+      registers.writeChipSelect0(0);
+      // set fixed peripheral mode for CS0
+      // set PCS field from MR to 1110 value
+      uint32_t chipSelectValue = 0;
+      registers.writeMode(registers.readMode() |
+          //((~(1 << (chipSelectValue + AVR32_SPI_MR_PCS_OFFSET));
+          ( (uint32_t)0b1110 << AVR32_SPI_MR_PCS_OFFSET));
+
+      // 1Mbps, 0, delay, 1 byte word size, CASST, ...
+      registers.writeChipSelect0((uint32_t)8<<8 | (uint32_t)0x0A);
+                //((1 << chipSelectValue) << AVR32_SPI_MR_PCS_OFFSET));
+      // clear RDR
+      receiveByte();
     }
 
     // Busy wait version of a full Spi byte access
@@ -42,7 +60,12 @@ namespace avr32
     {
       transmitByte(value);
 #if true
-      while (!isReceiveDataRegisterFull())
+      //while (!isReceiveDataRegisterFull())
+      // wait for sending
+      while (registers.readStatus() & AVR32_SPI_SR_TXEMPTY_MASK == 0)
+        ;
+      // wait for receiving
+      while (registers.readStatus() & AVR32_SPI_SR_RDRF_MASK == 0)
 #else
       while (!isTransmitDataRegisterEmpty())
 #endif

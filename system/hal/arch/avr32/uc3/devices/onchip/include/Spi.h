@@ -241,6 +241,10 @@ namespace avr32
       writeWaitReadByte(uint8_t value);
       uint16_t
       writeWaitReadWord(uint16_t value);
+      void
+      enableLocalLoopback();
+      void
+      disableLocalLoopback();
 
     public:
       spi::Registers& registers;
@@ -252,19 +256,19 @@ namespace avr32
     {
       registers.writeChipSelect0(
           ((uint32_t) delayBCT << 24) | ((uint32_t) baudRateFactor < 8)
-              | (bitsPerTransfer << 4));
+              | (bitsPerTransfer << 4) | (uint32_t)0x0A);
     }
 
     inline void
     Spim::enable(void)
     {
-      registers.writeControl(1); // TODO: use definition
+      registers.writeControl(AVR32_SPI_CR_SPIEN_MASK);
     }
 
     inline void
     Spim::disable(void)
     {
-      registers.writeControl(2); // TODO: use definition
+      registers.writeControl(AVR32_SPI_CR_SPIDIS_MASK);
     }
 
     inline void
@@ -282,13 +286,13 @@ namespace avr32
     inline bool
     Spim::isTransmitDataRegisterEmpty(void)
     {
-      return (registers.readStatus() & 0x2) != 0; // TODO: use definition and check
+      return (registers.readStatus() & AVR32_SPI_SR_TDRE_MASK) != 0;
     }
 
     inline bool
     Spim::isReceiveDataRegisterFull(void)
     {
-      return (registers.readStatus() & 0x1) != 0; // TODO: use definition and check
+      return (registers.readStatus() & AVR32_SPI_SR_RDRF_MASK) != AVR32_SPI_SR_RDRF_MASK;
     }
 
     inline uint8_t
@@ -303,6 +307,17 @@ namespace avr32
       return registers.readReceiveData();
     }
 
+    inline void
+    Spim::enableLocalLoopback()
+    {
+      registers.writeMode(registers.readMode() | AVR32_SPI_MR_LLB_MASK);
+    }
+
+    inline void
+    Spim::disableLocalLoopback()
+    {
+      registers.writeMode(registers.readMode() & (~AVR32_SPI_MR_LLB_MASK));
+    }
   }
 }
 
