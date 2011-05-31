@@ -24,10 +24,16 @@ namespace avr32
       OSDeviceDebug::putConstructor("avr32::uc3::Spim", this);
     }
 
+    Spim::~Spim()
+    {
+      OSDeviceDebug::putDestructor("avr32::uc3::Spim", this);
+    }
+
     void
     Spim::init(void)
     {
       // TODO: implement it
+      registers.writeMode(1); // Master
     }
 
     // Busy wait version of a full Spi byte access
@@ -35,7 +41,11 @@ namespace avr32
     Spim::writeWaitReadByte(uint8_t value)
     {
       transmitByte(value);
+#if true
+      while (!isReceiveDataRegisterFull())
+#else
       while (!isTransmitDataRegisterEmpty())
+#endif
         // TODO: check logic
         ;
       return receiveByte();

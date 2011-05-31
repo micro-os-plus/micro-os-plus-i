@@ -208,6 +208,7 @@ namespace avr32
     {
     public:
       Spim(spi::ModuleId_t module);
+      ~Spim();
 
       // Init Spi in master mode
       void
@@ -229,6 +230,8 @@ namespace avr32
       transmitWord(uint16_t value);
       bool
       isTransmitDataRegisterEmpty(void);
+      bool
+      isReceiveDataRegisterFull(void);
       uint8_t
       receiveByte(void);
       uint16_t
@@ -280,6 +283,12 @@ namespace avr32
     Spim::isTransmitDataRegisterEmpty(void)
     {
       return (registers.readStatus() & 0x2) != 0; // TODO: use definition and check
+    }
+
+    inline bool
+    Spim::isReceiveDataRegisterFull(void)
+    {
+      return (registers.readStatus() & 0x1) != 0; // TODO: use definition and check
     }
 
     inline uint8_t
