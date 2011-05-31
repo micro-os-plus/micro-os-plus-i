@@ -137,12 +137,12 @@ OSDeviceDebug::putChar(unsigned char c)
 void
 OSDeviceDebug::putNewLine(void)
 {
-  OSCriticalSection::enter();
+//  OSCriticalSection::enter();
     {
       commonPutByte('\r');
       commonPutByte('\n');
     }
-  OSCriticalSection::exit();
+//  OSCriticalSection::exit();
 }
 
 void
@@ -151,11 +151,11 @@ OSDeviceDebug::putString(const char* pc)
   if (pc == 0)
     return;
 
-  OSCriticalSection::enter();
+//  OSCriticalSection::enter();
     {
       commonPutBytes(pc, strlen(pc));
     }
-  OSCriticalSection::exit();
+//  OSCriticalSection::exit();
 }
 
 void
