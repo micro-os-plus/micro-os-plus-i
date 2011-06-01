@@ -8,6 +8,7 @@
 #define TEST_H_
 
 #include "portable/kernel/include/uOS.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Spi.h"
 
 class Test : public OSThread
 {
@@ -19,7 +20,9 @@ public:
   virtual void
   threadMain(void);
 
-  void testSpi(void);
+  void
+  testSpi(avr32::uc3::spi::ModuleId_t moduleId,
+      avr32::uc3::spi::BitsPerTransfer_t bitsPerTransfer);
 
 private:
   // members

@@ -38,8 +38,10 @@ Test::threadMain(void)
       os.sched.lock.exit();
     }
 
-  testSpi();
-
+  testSpi(avr32::uc3::spi::MODULE_0, avr32::uc3::spi::BITS_8);
+  testSpi(avr32::uc3::spi::MODULE_0, avr32::uc3::spi::BITS_16);
+  testSpi(avr32::uc3::spi::MODULE_1, avr32::uc3::spi::BITS_8);
+  testSpi(avr32::uc3::spi::MODULE_1, avr32::uc3::spi::BITS_16);
   // Thread endless loop
   for (;;)
     {
@@ -48,35 +50,54 @@ Test::threadMain(void)
 }
 
 void
-Test::testSpi(void)
+Test::testSpi(avr32::uc3::spi::ModuleId_t moduleId,
+    avr32::uc3::spi::BitsPerTransfer_t bitsPerTransfer)
 {
-  avr32::uc3::Spim spi0m(avr32::uc3::spi::MODULE_0);
+  //avr32::uc3::Spim spi0m(avr32::uc3::spi::MODULE_1);
+  avr32::uc3::Spim spi0m(moduleId);
 
-  debug.putString("Spi test...");
+  debug.putString("Spi test start");
+  debug.putNewLine();
+  debug.putString("Module ");
+  debug.putHex((uint8_t)moduleId);
+  debug.putNewLine();
+
+  if (bitsPerTransfer == avr32::uc3::spi::BITS_8)
+    debug.putString("Bits per transfer 8");
+  else
+    debug.putString("Bits per transfer 16");
   debug.putNewLine();
 
   spi0m.init();
-  //spi0m.enableLocalLoopback();
+  spi0m.enableLocalLoopback();
 
-  // Max speed, no delays, 8 bits/transfer
-  //spi0m.configChipSelect(16, 0, 0);
-  // Enable loopback
-  //spi0m.registers.writeMode(spi0m.registers.readMode() | AVR32_SPI_MR_LLB_MASK);
+  // 1Mbps speed, no delays, 8 bits/transfer
+  spi0m.configChipSelect(16, 0, bitsPerTransfer);
 
   spi0m.enable();
 
   bool failed;
   failed = false;
-  for (uint8_t i = 1; i < 10; ++i)
+  for (uint32_t i = 0; i < 100; ++i)
     {
-      uint8_t r;
-      r = spi0m.writeWaitReadByte(i);
-      if (r != i)
+      uint32_t valueReceived, valueSent;
+
+      if (bitsPerTransfer == avr32::uc3::spi::BITS_8)
         {
-          debug.putString("byte ");
-          debug.putHex(i);
+          valueSent = i & 0xFF;
+          valueReceived = spi0m.writeWaitReadByte(valueSent);
+        }
+      else
+        {
+          valueSent = i;
+          valueReceived = spi0m.writeWaitReadWord(valueSent);
+        }
+      if (valueReceived != valueSent)
+        {
+          debug.putString("word ");
+          debug.putHex(valueSent);
           debug.putString(" received as ");
-          debug.putHex(r);
+          debug.putHex(valueReceived);
           debug.putNewLine();
 
           failed = true;
@@ -93,7 +114,7 @@ Test::testSpi(void)
       debug.putString("Spi test... failed.");
       debug.putNewLine();
     }
-  spi0m.disable();
   spi0m.disableLocalLoopback();
+  spi0m.disable();
 }
 
