@@ -9,6 +9,8 @@
 
 #include "portable/kernel/include/OS.h"
 
+#include "hal/arch/avr32/uc3/devices/onchip/include/Intc.h"
+
 namespace avr32
 {
   namespace uc3
@@ -23,6 +25,13 @@ namespace avr32
         FUNCTION_A = 0, FUNCTION_B = 1, FUNCTION_C = 2, FUNCTION_D = 3
       } PeripheralFunction_t;
 
+      typedef enum InterruptMode_e
+      {
+        PIN_CHANGE = 0, RISING_EDGE, FAILING_EDGE = 2
+      } InterruptMode_t;
+
+      const static uint_t INTERRUPT_BASE = 64; // TODO: check it
+
       // ----- Port memory mapped registers -----------------------------------
 
       class PortRegisters
@@ -30,7 +39,8 @@ namespace avr32
       public:
         // --------------------------------------------------------------------
 
-        const static uint32_t MEMORY_ADDRESS = 0xFFFF1000;
+        const static uint32_t MEMORY_ADDRESS =
+            avr32::uc3::PeripheralAddressMap::GPIO;
         const static uint32_t MEMORY_OFFSET = 0x100;
 
         // ----- Memory map ---------------------------------------------------
@@ -118,9 +128,13 @@ namespace avr32
       Gpio(gpio::PinNumber_t pin);
 
       void
-      configModeGpio(void);
+      setModeGpio(void);
       void
-      configModePeripheral(void);
+      setModePeripheral(void);
+      void
+      toggleMode(void);
+      bool
+      isModeGpio(void);
 
       void
       configPeripheralFunction(gpio::PeripheralFunction_t f);
@@ -135,28 +149,81 @@ namespace avr32
       bool
       isPinHigh(void);
 
+      void
+      setDirectionOutput(void);
+      void
+      setDirectionInput(void);
+      void
+      toggleDirection(void);
+      bool
+      isDirectionOutputEnabled(void);
+
+      void
+      enablePullup(void);
+      void
+      disablePullup(void);
+      void
+      togglePullup(void);
+      bool
+      isPullupEnabled(void);
+
+      void
+      enableInterrupt(void);
+      void
+      disableInterrupt(void);
+      void
+      toggleInterrupt(void);
+      bool
+      isInterruptEnabled(void);
+
+      void
+      enableGlitchFilter(void);
+      void
+      disableGlitchFilter(void);
+      void
+      toggleGlitchFilter(void);
+      bool
+      isGlitchFilterEnabled(void);
+
+      bool
+      isInterruptRequested(void);
+      void
+      clearInterruptRequested(void);
+
+      void
+      configInterruptMode(gpio::InterruptMode_t mode);
+
+      void
+      registerInterruptHandler(avr32::uc3::intc::InterruptHandler_t handler);
+
+      // Static method to be used at system init to enable local bus
+      // (mandatory, otherwise all local bus peripheral calls will fail).
+      static void
+      configLocalBus(void);
+
       // Static methods to be used without a dedicated object,
       // for example when setting pins for another terminal
 
       static void
       configPeripheralModeAndFunction(gpio::PinNumber_t pin,
-          gpio::PeripheralFunction_t f);
+          gpio::PeripheralFunction_t func);
 
     public:
       gpio::PortRegisters& portRegisters;
 
     private:
       uint32_t m_mask;
+      uint16_t m_pin;
     };
 
     inline void
-    Gpio::configModeGpio(void)
+    Gpio::setModeGpio(void)
     {
       portRegisters.gpers = m_mask;
     }
 
     inline void
-    Gpio::configModePeripheral(void)
+    Gpio::setModePeripheral(void)
     {
       portRegisters.gperc = m_mask;
     }

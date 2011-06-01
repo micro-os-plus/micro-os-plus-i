@@ -25,32 +25,51 @@ namespace avr32
       OSDeviceDebug::putConstructorWithIndex("avr32::uc3::Gpio", pin, this);
 
       m_mask = pin % 32;
+      m_pin = pin;
     }
 
     void
-    Gpio::configPeripheralFunction(gpio::PeripheralFunction_t f)
+    Gpio::configPeripheralFunction(gpio::PeripheralFunction_t func)
     {
-      if (f & 0x1)
+      if (func & 0x1)
         portRegisters.pmr0s = m_mask;
       else
         portRegisters.pmr0c = m_mask;
 
-      if (f & 0x2)
+      if (func & 0x2)
         portRegisters.pmr1s = m_mask;
       else
         portRegisters.pmr1c = m_mask;
     }
 
     void
+    Gpio::configInterruptMode(gpio::InterruptMode_t mode)
+    {
+      // TODO: implement as above
+    }
+
+    // Warning: it is not possible to set handlers of each individual interrupt,
+    // but only for groups of 8 (there are 14 groups (0-13) of 8 interrupts)
+    void
+    Gpio::registerInterruptHandler(avr32::uc3::intc::InterruptHandler_t handler)
+    {
+      avr32::uc3::Intc::registerInterruptHandler(
+          (intc::InterruptHandler_t) handler,
+          gpio::INTERRUPT_BASE + (m_pin / 8),
+          avr32::uc3::intc::GroupPriorities::GROUP_02);
+    }
+
+    // Static method
+    void
     Gpio::configPeripheralModeAndFunction(gpio::PinNumber_t pin,
-        gpio::PeripheralFunction_t f)
+        gpio::PeripheralFunction_t func)
     {
       // Construct a local object here and use it
       // It will be deleted when exiting this function
       Gpio gpio(pin);
 
-      gpio.configModePeripheral();
-      gpio.configPeripheralFunction(f);
+      gpio.setModePeripheral();
+      gpio.configPeripheralFunction(func);
     }
 
   }
