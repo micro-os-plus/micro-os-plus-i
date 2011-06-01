@@ -289,7 +289,7 @@ OSUsbDeviceImpl::usbDriverInit(void)
   }
   OSCriticalSection::exit();
 
-  return 0;
+  return TRUE;
 }
 
 bool
