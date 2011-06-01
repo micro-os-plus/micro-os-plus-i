@@ -22,6 +22,10 @@ namespace avr32
         MODULE_0 = 0, MODULE_1 = 1
       } ModuleId_t;
 
+      typedef enum BitsPerTransfer_e
+      {
+        BITS_8 = 0, BITS_16 = 8
+      } BitsPerTransfer_t;
       // ----- Module memory mapped registers ---------------------------------
 
       class Registers
@@ -217,7 +221,7 @@ namespace avr32
       // configure baud rate and other communication parameters
       void
       configChipSelect(uint_t baudRateFactor, uint_t delayBCT,
-          uint_t bitsPerTransfer);
+          spi::BitsPerTransfer_t bitsPerTransfer);
 
       void
       enable(void);
@@ -232,6 +236,8 @@ namespace avr32
       isTransmitDataRegisterEmpty(void);
       bool
       isReceiveDataRegisterFull(void);
+      bool
+      isTransmittedAndReceived(void);
       uint8_t
       receiveByte(void);
       uint16_t
@@ -252,11 +258,12 @@ namespace avr32
 
     inline void
     Spim::configChipSelect(uint_t baudRateFactor, uint_t delayBCT,
-        uint_t bitsPerTransfer)
+        spi::BitsPerTransfer_t bitsPerTransfer)
     {
       registers.writeChipSelect0(
-          ((uint32_t) delayBCT << 24) | ((uint32_t) baudRateFactor < 8)
-              | (bitsPerTransfer << 4) | (uint32_t)0x0A);
+          ((uint32_t) delayBCT << AVR32_SPI_CSR0_DLYBCT_OFFSET) |
+          ((uint32_t) baudRateFactor << AVR32_SPI_CSR0_SCBR_OFFSET) |
+          ((uint32_t)bitsPerTransfer << AVR32_SPI_CSR0_BITS_OFFSET));
     }
 
     inline void
@@ -292,7 +299,14 @@ namespace avr32
     inline bool
     Spim::isReceiveDataRegisterFull(void)
     {
-      return (registers.readStatus() & AVR32_SPI_SR_RDRF_MASK) != AVR32_SPI_SR_RDRF_MASK;
+      return (registers.readStatus() & AVR32_SPI_SR_RDRF_MASK) != 0;
+    }
+
+    inline bool
+    Spim::isTransmittedAndReceived(void)
+    {
+      return (registers.readStatus() &
+          (AVR32_SPI_SR_TXEMPTY_MASK | AVR32_SPI_SR_RDRF_MASK)) != 0;
     }
 
     inline uint8_t
