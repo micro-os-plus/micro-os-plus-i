@@ -39,7 +39,18 @@ namespace avr32
         portRegisters.pmr1s = m_mask;
       else
         portRegisters.pmr1c = m_mask;
+    }
 
+    void
+    Gpio::configPeripheralFunction(gpio::PinNumber_t pin,
+        gpio::PeripheralFunction_t f)
+    {
+      // Construct a local object here and use it
+      // It will be deleted when exiting this function
+      Gpio gpio(pin);
+
+      gpio.configModePeripheral();
+      gpio.configPeripheralFunction(f);
     }
 
   }
