@@ -30,7 +30,8 @@ DeviceCharacterUsb::implOpen()
   if (!flagShouldNotInit)
     {
       // TODO: check if is ok to put it here!
-      OSUsbDevice::usbDriverInit();
+      OSDeviceDebug::putString("OSUsbDevice::usbDriverInit()");
+      flagShouldNotInit = OSUsbDevice::usbDriverInit();
     }
 
   OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
