@@ -24,6 +24,9 @@ public:
   testSpi(avr32::uc3::spi::ModuleId_t moduleId,
       avr32::uc3::spi::BitsPerTransfer_t bitsPerTransfer);
 
+  int
+  testAlloca(int x);
+
 private:
   // members
   OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];

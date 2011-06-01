@@ -38,6 +38,10 @@ Test::threadMain(void)
       os.sched.lock.exit();
     }
 
+#if true
+  testAlloca(77);
+#endif
+
   testSpi(avr32::uc3::spi::MODULE_0, avr32::uc3::spi::BITS_8);
   testSpi(avr32::uc3::spi::MODULE_0, avr32::uc3::spi::BITS_16);
   testSpi(avr32::uc3::spi::MODULE_1, avr32::uc3::spi::BITS_8);
@@ -59,7 +63,7 @@ Test::testSpi(avr32::uc3::spi::ModuleId_t moduleId,
   debug.putString("Spi test start");
   debug.putNewLine();
   debug.putString("Module ");
-  debug.putHex((uint8_t)moduleId);
+  debug.putHex((uint8_t) moduleId);
   debug.putNewLine();
 
   if (bitsPerTransfer == avr32::uc3::spi::BITS_8)
@@ -118,3 +122,38 @@ Test::testSpi(avr32::uc3::spi::ModuleId_t moduleId,
   spi0m.disable();
 }
 
+int
+Test::testAlloca(int x)
+{
+  register OSStack_t tmp1;
+
+  tmp1 = OSCPUImpl::getInterruptsMask();
+  *((OSStack_t*) __builtin_alloca(1)) = tmp1;
+  tmp1 |= (OS_CFGINT_OSCRITICALSECTION_MASK);
+  OSCPUImpl::setInterruptsMask(tmp1);
+
+  debug.putString("alloca 1 ");
+  debug.putNewLine();
+
+  register OSStack_t tmp2;
+
+  tmp2 = OSCPUImpl::stackPop();
+  OSCPUImpl::setInterruptsMask(tmp2);
+
+  register OSStack_t tmp3;
+
+  tmp3 = OSCPUImpl::getInterruptsMask();
+  *((OSStack_t*) __builtin_alloca(1)) = tmp3;
+  tmp3 |= (OS_CFGINT_OSCRITICALSECTION_MASK);
+  OSCPUImpl::setInterruptsMask(tmp3);
+
+  debug.putString("alloca 2 ");
+  debug.putNewLine();
+
+  register OSStack_t tmp4;
+
+  tmp4 = OSCPUImpl::stackPop();
+  OSCPUImpl::setInterruptsMask(tmp4);
+
+  return x + 123;
+}
