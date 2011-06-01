@@ -139,7 +139,7 @@ namespace avr32
       // for example when setting pins for another terminal
 
       static void
-      configPeripheralFunction(gpio::PinNumber_t pin,
+      configPeripheralModeAndFunction(gpio::PinNumber_t pin,
           gpio::PeripheralFunction_t f);
 
     public:

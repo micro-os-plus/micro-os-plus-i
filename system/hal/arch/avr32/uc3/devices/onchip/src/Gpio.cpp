@@ -42,7 +42,7 @@ namespace avr32
     }
 
     void
-    Gpio::configPeripheralFunction(gpio::PinNumber_t pin,
+    Gpio::configPeripheralModeAndFunction(gpio::PinNumber_t pin,
         gpio::PeripheralFunction_t f)
     {
       // Construct a local object here and use it
