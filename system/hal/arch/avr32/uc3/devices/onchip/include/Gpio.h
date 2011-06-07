@@ -10,6 +10,9 @@
 #include "portable/kernel/include/OS.h"
 
 #include "hal/arch/avr32/uc3/devices/onchip/include/Intc.h"
+#include "hal/arch/avr32/lib/include/compiler.h"
+
+#define AVR32_UC3_GPIO_PIN_INTERRUPT 0
 
 namespace avr32
 {
@@ -27,10 +30,10 @@ namespace avr32
 
       typedef enum InterruptMode_e
       {
-        PIN_CHANGE = 0, RISING_EDGE, FAILING_EDGE = 2
+        PIN_CHANGE = 0, RISING_EDGE = 1, FAILING_EDGE = 2
       } InterruptMode_t;
 
-      const static uint_t INTERRUPT_BASE = 64; // TODO: check it
+      const static uint_t INTERRUPT_BASE = 64;
 
       // ----- Port memory mapped registers -----------------------------------
 
@@ -127,6 +130,9 @@ namespace avr32
     public:
       Gpio(gpio::PinNumber_t pin);
 
+      static void
+      init(void);
+
       void
       setModeGpio(void);
       void
@@ -209,11 +215,38 @@ namespace avr32
           gpio::PeripheralFunction_t func);
 
     public:
-      gpio::PortRegisters& portRegisters;
+      volatile gpio::PortRegisters& portRegisters;
 
     private:
+
+#if AVR32_UC3_GPIO_PIN_INTERRUPT
+      static volatile gpio::PortRegisters* portRegistersArray[4];
+
+      // private methods
+      static void lineHandler(uint8_t line);
+      static __attribute__((__interrupt__)) void lineHandler0(void);
+      static __attribute__((__interrupt__)) void lineHandler1(void);
+      static __attribute__((__interrupt__)) void lineHandler2(void);
+      static __attribute__((__interrupt__)) void lineHandler3(void);
+      static __attribute__((__interrupt__)) void lineHandler4(void);
+      static __attribute__((__interrupt__)) void lineHandler5(void);
+      static __attribute__((__interrupt__)) void lineHandler6(void);
+      static __attribute__((__interrupt__)) void lineHandler7(void);
+      static __attribute__((__interrupt__)) void lineHandler8(void);
+      static __attribute__((__interrupt__)) void lineHandler9(void);
+      static __attribute__((__interrupt__)) void lineHandler10(void);
+      static __attribute__((__interrupt__)) void lineHandler11(void);
+      static __attribute__((__interrupt__)) void lineHandler12(void);
+      static __attribute__((__interrupt__)) void lineHandler13(void);
+#endif // AVR32_UC3_GPIO_PIN_INTERRUPT
+
+      // private data
       uint32_t m_mask;
       uint16_t m_pin;
+
+#if AVR32_UC3_GPIO_PIN_INTERRUPT
+      static avr32::uc3::intc::InterruptHandler_t registeredCallbacks[];
+#endif // AVR32_UC3_GPIO_PIN_INTERRUPT
     };
 
     inline void
@@ -226,6 +259,18 @@ namespace avr32
     Gpio::setModePeripheral(void)
     {
       portRegisters.gperc = m_mask;
+    }
+
+    inline void
+    Gpio::toggleMode(void)
+    {
+      portRegisters.gpert = m_mask;
+    }
+
+    inline bool
+    Gpio::isModeGpio(void)
+    {
+      return (bool)(portRegisters.gper & m_mask);
     }
 
     inline void
@@ -249,7 +294,115 @@ namespace avr32
     inline bool
     Gpio::isPinHigh(void)
     {
-      return (portRegisters.pvr & m_mask) != 0;
+      return (bool)(portRegisters.pvr & m_mask) != 0;
+    }
+
+    inline void
+    Gpio::setDirectionOutput(void)
+    {
+      portRegisters.oders = m_mask;
+    }
+
+    inline void
+    Gpio::setDirectionInput(void)
+    {
+      portRegisters.oderc = m_mask;
+    }
+
+    inline void
+    Gpio::toggleDirection(void)
+    {
+      portRegisters.odert = m_mask;
+    }
+
+    inline bool
+    Gpio::isDirectionOutputEnabled(void)
+    {
+      return (bool)(portRegisters.oder & m_mask);
+    }
+
+    inline void
+    Gpio::enablePullup(void)
+    {
+      portRegisters.puers = m_mask;
+    }
+
+    inline void
+    Gpio::disablePullup(void)
+    {
+      portRegisters.puerc = m_mask;
+    }
+
+    inline void
+    Gpio::togglePullup(void)
+    {
+      portRegisters.puert = m_mask;
+    }
+
+    inline bool
+    Gpio::isPullupEnabled(void)
+    {
+      return (bool)(portRegisters.puer & m_mask);
+    }
+
+    inline void
+    Gpio::enableInterrupt(void)
+    {
+      portRegisters.iers = m_mask;
+    }
+    inline void
+    Gpio::disableInterrupt(void)
+    {
+      portRegisters.ierc = m_mask;
+    }
+    inline void
+    Gpio::toggleInterrupt(void)
+    {
+      portRegisters.iert = m_mask;
+    }
+    inline bool
+    Gpio::isInterruptEnabled(void)
+    {
+      return (bool)(portRegisters.ier & m_mask);
+    }
+
+    inline bool
+    Gpio::isInterruptRequested(void)
+    {
+      return (bool)(portRegisters.ifr & m_mask);
+    }
+    inline void
+    Gpio::clearInterruptRequested(void)
+    {
+      portRegisters.ifrc = m_mask;
+    }
+
+    inline void
+    Gpio::enableGlitchFilter(void)
+    {
+      portRegisters.gfers = m_mask;
+    }
+    inline void
+    Gpio::disableGlitchFilter(void)
+    {
+      portRegisters.gferc = m_mask;
+    }
+    inline void
+    Gpio::toggleGlitchFilter(void)
+    {
+      portRegisters.gfert = m_mask;
+    }
+    inline bool
+    Gpio::isGlitchFilterEnabled(void)
+    {
+      return (bool)(portRegisters.gfer & m_mask);
+    }
+
+    inline void
+    configLocalBus(void)
+    {
+      Set_system_register(AVR32_CPUCR,
+          Get_system_register(AVR32_CPUCR) | AVR32_CPUCR_LOCEN_MASK);
     }
   }
 }
