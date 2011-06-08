@@ -36480,7 +36480,7 @@
 							<builder buildPath="${workspace_loc:/sample-mutex/Debug-Atmel-EVK1104}" id="de.innot.avreclipse.target.builder.winavr.base.160113108" keepEnvironmentInBuildfile="false" name="AVR GNU Make Builder" superClass="de.innot.avreclipse.target.builder.winavr.base"/>
 							<tool id="avr32.managedbuild.tool.gnu.archiver.exe.debug.778585860" name="32-bit AVR/GNU Archiver" superClass="avr32.managedbuild.tool.gnu.archiver.exe.debug"/>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.1539239020" name="32-bit AVR/GNU C++ Compiler" superClass="avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug">
-								<option id="gnu.cpp.compiler.option.optimization.level.274411552" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.optimization.level.274411552" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.optimize" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.87851297" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="avr32.cpp.compiler.option.mcu.1726823071" name="Microcontroller Unit" superClass="avr32.cpp.compiler.option.mcu" value="-mpart=uc3a3256" valueType="string"/>
 								<option id="avr32.cpp.compiler.option.flashvault.913458895" name="Enable FlashVault support" superClass="avr32.cpp.compiler.option.flashvault" value="false" valueType="boolean"/>
