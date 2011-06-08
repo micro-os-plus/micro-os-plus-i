@@ -11,7 +11,7 @@
 
 #define OS_CFGINT_TICK_RATE_HZ                          (1000)
 
-#define OS_CFGINT_THREADS_TABLE_SIZE                    (13)
+#define OS_CFGINT_THREADS_ARRAY_SIZE                    (13)
 
 #define OS_INCLUDE_ACTIVE_STACKSREPORTER                (1)
 
