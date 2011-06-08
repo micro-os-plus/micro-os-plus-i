@@ -36,6 +36,8 @@ namespace avr32
       OSDeviceDebug::putNewLine();
 #endif
       m_regionsArraySize = 0;
+      m_event = (OSEvent_t) this;
+      m_eventRet = OSEventWaitReturn::OS_NONE;
     }
 
     void
@@ -89,7 +91,7 @@ namespace avr32
       return OSReturn::OS_OK;
     }
 
-    void
+    OSReturn_t
     Pdca::setupReloadMechanism()
     {
       int nextRegion;
@@ -98,12 +100,13 @@ namespace avr32
         {
           // no region to be set next
           m_reloadedRegionIndex = -1;
-          return;
+          return OSReturn::OS_ITEM_NOT_FOUND;
         }
       registers.writeMemoryAddressReload(m_pRegionsArray[nextRegion].address);
       registers.writeTransferCountReload(m_pRegionsArray[nextRegion].size);
       m_reloadedRegionIndex = nextRegion;
       registers.writeInterruptEnable(AVR32_PDCA_IER_RCZ_MASK);
+      return OSReturn::OS_OK;
     }
 
     // returns the index of the next region which must be used
@@ -136,8 +139,33 @@ namespace avr32
     void
     Pdca::startTransfer(void)
     {
+      m_status = avr32::uc3::pdca::STATUS_BUSY;
       // enable channel and transfer
       registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+    }
+
+    void
+    Pdca::abortTransfer(void)
+    {
+      // disable all interrupt sources
+      registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
+          AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
+
+      // disable PDMA channel
+      registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+
+      // update remaining numbers of words
+      m_wordsRemaining = registers.readTransferCounter() +
+          registers.readTransferCounterReload();
+
+      // reset counters
+      registers.writeTransferCount(0);
+
+      // reset reload counters
+      registers.writeTransferCountReload(0);
+
+      // clear error
+      registers.writeControl(AVR32_PDCA_CR_ECLR_MASK);
     }
 
     void
@@ -171,19 +199,46 @@ namespace avr32
     OSReturn_t
     PdcaReceive::readRegion(pdca::RegionAddress_t& region, bool doNotBlock)
     {
-      // TODO: implement it
-      return 1;
+      int nextRegion;
+
+      // check if the candidate to the notify is ready
+      if (m_pRegionsArray[m_candidateNotif].status ==
+          avr32::uc3::pdca::IS_TRANFERRED_MASK)
+        {
+          region = &(m_pRegionsArray[m_candidateNotif]);
+          m_pRegionsArray[m_candidateNotif].status =
+                    avr32::uc3::pdca::IS_SIGNALLED_MASK;
+          nextRegion = getNextRegionIndex();
+          if (nextRegion != -1)
+            m_candidateNotif = nextRegion;
+          return OSReturn::OS_OK;
+        }
+
+      // the candidate is not ready to be notified
+      if (doNotBlock == true)
+        return OSReturn::OS_WOULD_BLOCK;
+
+      // now wait for the candidate to be ready
+      //OSEventWaitReturn_t ret = OSScheduler::eventWait(m_event);
+      OSScheduler::eventWait(m_event);
+
+      region = &(m_pRegionsArray[m_candidateNotif]);
+      m_pRegionsArray[m_candidateNotif].status =
+                avr32::uc3::pdca::IS_SIGNALLED_MASK;
+      nextRegion = getNextRegionIndex();
+      if (nextRegion != -1)
+        m_candidateNotif = nextRegion;
+      return OSReturn::OS_OK;
+
     }
 
     void
     PdcaReceive::stopTransfer(void)
     {
-      // disable all interrupt sources
-      // disable PDMA channel
-      // update remaining numbers of words
-      // reset counters
-      // reset reload counters
-      // clear error
+      abortTransfer();
+      m_status = avr32::uc3::pdca::STATUS_STOPPED;
+      // notify
+      OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
     }
 
     void
@@ -197,26 +252,125 @@ namespace avr32
 
       if (interruptFlag & AVR32_PDCA_IER_TERR_MASK) // transfer error
         {
-          // disable all interrupt sources
+
           // TODO: log registers MAR, TCR, MARR and TCRR
-          //update remaining numbers of words
-          // disable PDMA channel
-          // reset counters
-          // reset reload counters
-          // clear error
+          // the only source of error is an invalid address in MAR or MARR
+
+          abortTransfer();
+          m_status = avr32::uc3::pdca::STATUS_ERROR;
+          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }
       if (interruptFlag & AVR32_PDCA_IER_RCZ_MASK) // reload counter zero
         {
-          // if last transfer
-            // disable RCZ interrupt
-          // load next transfer
+          m_currentRegionIndex = m_reloadedRegionIndex;
+
+          OSReturn_t ret = setupReloadMechanism();
+          if (ret != OSReturn::OS_OK)
+            {
+              // means no next region so this is last transfer
+              // disable RCZ interrupt
+              registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK);
+            }
+
+          // set status to finished
+          m_pRegionsArray[m_candidateNotif].status =
+                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
+
+          // notify
+          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }
       if (interruptFlag & AVR32_PDCA_IER_TRC_MASK) // transfer complete
       {
-          // disable PDMA channel
           // disable all interrupt sources
+          registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
+              AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
+
+          // disable PDMA channel
+          registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+          m_status = avr32::uc3::pdca::STATUS_OK;
+          // notify
+          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
       }
     }
+
+    OSReturn_t
+    PdcaTransmit::waitWriteRegions(bool doNotBlock)
+    {
+      // if status is not busy return immediately
+      if (m_status != avr32::uc3::pdca::STATUS_BUSY)
+        {
+          return OSReturn::OS_OK;
+        }
+
+      // status busy and doNotBlock return WOULD_BLOCK
+      if (doNotBlock == true)
+        return OSReturn::OS_WOULD_BLOCK;
+
+      // wait
+      OSScheduler::eventWait(m_event);
+      return OSReturn::OS_OK;
+    }
+
+    void
+    PdcaTransmit::stopTransfer(void)
+    {
+      abortTransfer();
+      m_status = avr32::uc3::pdca::STATUS_STOPPED;
+      // notify
+      OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
+    }
+
+    void
+    PdcaTransmit::interruptServiceRoutine(void)
+    {
+      uint32_t interruptFlag;
+
+      // find the interrupt source
+      interruptFlag = registers.readInterruptMask() &
+          registers.readInterruptStatus();
+
+      if (interruptFlag & AVR32_PDCA_IER_TERR_MASK) // transfer error
+        {
+
+          // TODO: log registers MAR, TCR, MARR and TCRR
+          // the only source of error is an invalid address in MAR or MARR
+
+          abortTransfer();
+          m_status = avr32::uc3::pdca::STATUS_ERROR;
+        }
+      if (interruptFlag & AVR32_PDCA_IER_RCZ_MASK) // reload counter zero
+        {
+          m_currentRegionIndex = m_reloadedRegionIndex;
+
+          OSReturn_t ret = setupReloadMechanism();
+          if (ret != OSReturn::OS_OK)
+            {
+              // means no next region so this is last transfer
+              // disable RCZ interrupt
+              registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK);
+            }
+
+          // set status to finished
+          m_pRegionsArray[m_candidateNotif].status =
+                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
+
+          // notify
+          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
+        }
+      if (interruptFlag & AVR32_PDCA_IER_TRC_MASK) // transfer complete
+      {
+          // disable all interrupt sources
+          registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
+              AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
+
+          // disable PDMA channel
+          registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+          m_status = avr32::uc3::pdca::STATUS_OK;
+          // notify
+          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
+      }
+    }
+
   // TODO: add the other functions
 
   }

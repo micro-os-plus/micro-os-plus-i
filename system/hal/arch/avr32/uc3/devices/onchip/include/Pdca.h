@@ -76,6 +76,15 @@ namespace avr32
         SIZE_4_BYTES = 2
       } TransferSize_t;
 
+      typedef enum Status_e
+      {
+        // Define the state of the PDMA channel
+        STATUS_OK = 0,
+        STATUS_BUSY = -1,
+        STATUS_STOPPED = -2,
+        STATUS_ERROR = -3
+      } Status_t;
+
       const static uint_t INTERRUPT_BASE = 96;
 
       // ----- Channel Memory Mapped Registers --------------------------------
@@ -130,6 +139,10 @@ namespace avr32
         readInterruptMask(void);
         uint32_t
         readInterruptStatus(void);
+        uint32_t
+        readTransferCounter(void);
+        uint32_t
+        readTransferCounterReload(void);
       };
 
       // Not (yet) implemented:
@@ -231,6 +244,17 @@ namespace avr32
         this->mr = (uint32_t) size;
       }
 
+      inline uint32_t
+      ChannelRegisters::readTransferCounter(void)
+      {
+        return this->tcr;
+      }
+
+      inline uint32_t
+      ChannelRegisters::readTransferCounterReload(void)
+      {
+        return this->tcrr;
+      }
     }
     // ----- Pdca base class --------------------------------------------------
 
@@ -264,21 +288,43 @@ namespace avr32
       // not to change.
       pdca::ChannelRegisters& registers;
 
-    private:
+    protected:
       int
       getNextRegionIndex(void);
 
-      void
+      OSReturn_t
       setupReloadMechanism(void);
+
+      void
+      abortTransfer(void);
+
+      pdca::Region_t* m_pRegionsArray;
+      uint_t m_currentRegionIndex;
+      int m_reloadedRegionIndex;
+
+      // the index of the region which is most likely to have to be notified
+      // as finished
+      int m_candidateNotif;
+
+      // no of words remaining if the transfer was stopped
+      int m_wordsRemaining;
+
+      // the event used for notifying
+      OSEvent_t m_event;
+
+      // the event return value of the event used for notification
+      OSEventWaitReturn_t m_eventRet;
+
+      // the status of this PDCA channel
+      pdca::Status_t m_status;
+
+    private:
 
       pdca::ChannelId_t m_channelId;
       pdca::PeripheralId_t m_peripheralId;
 
-      pdca::Region_t* m_pRegionsArray;
       uint_t m_regionsArraySize;
       bool m_isCircular;
-      uint_t m_currentRegionIndex;
-      int m_reloadedRegionIndex;
     };
 
     // ----- PdcaTransmit -----------------------------------------------------
@@ -294,6 +340,8 @@ namespace avr32
       stopTransfer(void);
       void
       interruptServiceRoutine(void);
+
+
     };
 
     // ----- PdcaReceive ------------------------------------------------------
