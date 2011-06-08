@@ -56,7 +56,7 @@ extern void delayWithYield(schedTicks_t n);
 
 #define APP_CONFIG_LED_ISACTIVE_LOW     (1)
 
-//#define APP_INCLUDE_TASKBLINKREALTIME   (1)
+#define APP_INCLUDE_TASKBLINKREALTIME   (1)
 
 #define APP_CFGVAR_TASKBLINKREALTIME_TIMER              (AVR32_TC1)
 #define APP_CFGINT_TASKBLINKREALTIME_TIMERCHANNEL       (0)
