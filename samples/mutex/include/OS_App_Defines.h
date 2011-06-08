@@ -30,15 +30,39 @@
 
 // used for activating the mutex mechanism
 #define OS_INCLUDE_OSMUTEX                              (1)
+
+// ----- Test phase -----------------------------------------------------------
+#define TEST_PHASE 3
+
+#if TEST_PHASE == 1
+
+// Phase 1
+// Default configuration. The first threads are favourised.
+
+#elif TEST_PHASE == 2
+
+// Phase 2
+// Use mutex local round robin configuration.
+// It should give quite good spread.
+
 #define OS_INCLUDE_OSMUTEX_WAITING_THREADS              (1)
-//#define OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY       (1)
+
+#elif TEST_PHASE == 3
+
+// Phase 3
+// Use global scheduler round robin.
+// It should give almost perfect good spread.
+
+#define OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY       (1)
+
+#endif
 
 // ----- Board Definitions ----------------------------------------------------
 
 #if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
-#define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK          (1)
+//#define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK          (1)
 #define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
 #define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
 #define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
