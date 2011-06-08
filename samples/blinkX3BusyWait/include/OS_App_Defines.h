@@ -9,14 +9,7 @@
 
 // ----- Portable Definitions -------------------------------------------------
 
-// Override the board definitions, if needed
-//#define OS_CFGLONG_OSCILLATOR_HZ                        (16000000UL)
-
-//#define OS_CFGINT_TICK_RATE_HZ                          (1000)
-//#define OS_CFGINT_TIMER_PRESCALLER                      (4)
-//#define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
-
-#define OS_CFGINT_THREADS_TABLE_SIZE                      (3)
+#define OS_CFGINT_THREADS_ARRAY_SIZE                      (3)
 
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 
@@ -30,6 +23,10 @@
 // ----- Board Definitions ----------------------------------------------------
 
 #if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+
+#define OS_EXCLUDE_OSCRITICALSECTION_USE_STACK          (1)
+#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
+//#define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
 
 #elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
 

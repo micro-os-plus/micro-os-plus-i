@@ -11,7 +11,7 @@
 
 // you may override the board definitions, if needed
 
-#define OS_CFGINT_THREADS_TABLE_SIZE                      (4)
+#define OS_CFGINT_THREADS_ARRAY_SIZE                      (4)
 
 #define OS_INCLUDE_OSTIMERSECONDS                       1
 
