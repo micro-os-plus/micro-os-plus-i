@@ -187,7 +187,7 @@ OSCPUImpl::stackPush(OSStack_t reg)
   register OSStack_t tmp; // asm("r8");
 
   tmp = reg;
-
+#if false
   asm volatile
   (
       " st.w    --sp, %[R] \n" // push value onto stack
@@ -196,6 +196,9 @@ OSCPUImpl::stackPush(OSStack_t reg)
       : [R] "r" (tmp)
       : "sp"
 );
+#else
+  *((OSStack_t*) __builtin_alloca(1)) = tmp;
+#endif
 }
 
 inline OSStack_t
