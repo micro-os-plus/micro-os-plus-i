@@ -66,7 +66,7 @@
 #define APP_CFGINT_TASKREPORT_SECONDS           (4)
 #define APP_CFGINT_TASKBLINK_LEDBIT             APP_CONFIG_LED1
 
-#define APP_INCLUDE_OSMUTEX_WAITING_TASKS (1)
+#define APP_INCLUDE_OSMUTEX_WAITING_THREADS     (1)
 
 // The maximum number of mutex stress threads
 #define APP_CONFIG_RESOURCES_ARRAY_SIZE         (10)
