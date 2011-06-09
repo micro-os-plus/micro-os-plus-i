@@ -432,11 +432,11 @@ OSSchedulerLock::enter(void)
 inline void
 OSSchedulerLock::exit(void)
 {
-#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) && false
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) && false
   ms_isLocked = OSCPUImpl::stackPop();
-#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
   --ms_nestingLevel;
-#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 }
 
 // ============================================================================

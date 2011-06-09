@@ -18,7 +18,7 @@ public:
 
   // Pair of functions to enable disable interrupts
 
-#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK)
 
   // Inlines using the stack to save/restore the interrupt status.
 
@@ -28,7 +28,7 @@ public:
   static void
   exit(void) __attribute__((always_inline));
 
-#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 
   // Regular functions, using a nesting counter.
 
@@ -38,7 +38,7 @@ public:
   static void
   exit(void);
 
-#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 
   static OSStack_t volatile ms_nestingLevel;
 
@@ -58,7 +58,7 @@ public:
 #endif
   // Pair of functions to enable disable interrupts
 
-#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK)
 
   // Inlines using the stack to save/restore the interrupt status.
 
@@ -68,7 +68,7 @@ public:
   static void
   exit(void) __attribute__((always_inline));
 
-#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 
   // Regular functions, using a nesting counter.
 
@@ -78,7 +78,7 @@ public:
   static void
   exit(void);
 
-#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 
 private:
   char m_dummy;
@@ -88,7 +88,7 @@ private:
 
 // ============================================================================
 
-#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK)
 
 // When we can use the stack, the enter()/exit() calls are inlined
 
@@ -166,7 +166,7 @@ OSRealTimeCriticalSection::exit(void)
 
 #endif /* defined(OS_INCLUDE_OSREALTIME) */
 
-#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 
 // ----------------------------------------------------------------------------
 

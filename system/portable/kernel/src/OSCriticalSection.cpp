@@ -22,7 +22,7 @@ OSCriticalSection::OSCriticalSection()
 }
 #endif
 
-#if defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+#if defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK)
 
 // When we cannot use the stack, we no longer need to inline, so here are
 // the usual routines to enter()/exit() critical sections.
@@ -70,7 +70,7 @@ OSCriticalSection::exit(void)
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 }
 
-#endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 
 // ----------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ OSRealTimeCriticalSection::OSRealTimeCriticalSection()
   }
 #endif
 
-#if defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK)
+#if defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK)
 
 // When we cannot use the stack, we no longer need to inline, so here are
 // the usual routines to enter()/exit() critical sections.
@@ -130,6 +130,6 @@ OSRealTimeCriticalSection::exit(void)
 
 #endif /* defined(OS_INCLUDE_OSREALTIME) */
 
-#endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_STACK) */
+#endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 
 // ----------------------------------------------------------------------------
