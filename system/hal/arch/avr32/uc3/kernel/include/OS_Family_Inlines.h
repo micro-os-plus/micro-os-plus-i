@@ -206,6 +206,7 @@ OSCPUImpl::stackPop(void)
 {
   register OSStack_t tmp; // asm("r8");
 
+#if false
   asm volatile
   (
       " ld.w    %[R], sp++ \n" // pop value from stack
@@ -214,6 +215,16 @@ OSCPUImpl::stackPop(void)
       :
       : "sp"
 );
+#else
+  asm volatile
+  (
+      " ld.w    %[R], sp[0] \n" // pop value from stack
+
+      : [R] "=r" (tmp)
+      :
+      : "sp"
+);
+#endif
   return tmp;
 }
 
