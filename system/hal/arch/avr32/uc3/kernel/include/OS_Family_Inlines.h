@@ -187,7 +187,7 @@ OSCPUImpl::stackPush(OSStack_t reg)
   register OSStack_t tmp; // asm("r8");
 
   tmp = reg;
-#if false
+#if true
   asm volatile
   (
       " st.w    --sp, %[R] \n" // push value onto stack
@@ -206,7 +206,7 @@ OSCPUImpl::stackPop(void)
 {
   register OSStack_t tmp; // asm("r8");
 
-#if false
+#if true
   asm volatile
   (
       " ld.w    %[R], sp++ \n" // pop value from stack
