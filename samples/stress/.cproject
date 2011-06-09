@@ -10404,12 +10404,12 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.34302672" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections -finline-small-functions -Wa,-adhlns=&quot;$@.lst&quot; " valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.34302672" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-exceptions -fno-rtti -Wextra -Wabi -std=gnu++98 -fdata-sections -finline-small-functions " valueType="string"/>
 								<option id="avr32.cpp.compiler.option.gc-sections.981238236" name="Prepare functions for garbage collection" superClass="avr32.cpp.compiler.option.gc-sections" value="true" valueType="boolean"/>
 								<inputType id="avr32.managedbuild.tool.gnu.cpp.compiler.input.846157428" superClass="avr32.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="avr32-gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="avr32.managedbuild.tool.gnu.c.compiler.exe.debug.610979193" name="32-bit AVR/GNU C Compiler" superClass="avr32.managedbuild.tool.gnu.c.compiler.exe.debug">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.574194820" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.574194820" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" value="gnu.c.optimization.level.optimize" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1061703751" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="avr32.c.compiler.option.mcu.1331027407" name="Microcontroller Unit" superClass="avr32.c.compiler.option.mcu" value="-mpart=uc3a3256" valueType="string"/>
 								<option id="avr32.c.compiler.option.flashvault.2082588226" name="Enable FlashVault support" superClass="avr32.c.compiler.option.flashvault" value="false" valueType="boolean"/>
