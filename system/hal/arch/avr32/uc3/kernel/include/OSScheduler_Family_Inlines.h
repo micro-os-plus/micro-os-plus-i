@@ -475,6 +475,8 @@ inline void
 SCALL_contextRestore(void)
 {
   OSSchedulerImpl::stackPointerRestore();
+
+  // Restore ms_nestingLevel using the value pushed onto the stack
   OSSchedulerImpl::criticalSectionNestingRestore();
 
   asm volatile
