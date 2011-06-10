@@ -14,7 +14,7 @@
 
 OSStack_t*
 OSSchedulerImpl::stackInitialise(OSStack_t* pStack, void
-(*pCode)(void*), void* pParams, unsigned char id)
+(*pCode)(void*), void* pParams, unsigned char id, void* pNesting)
 {
   // The value on the right is the offset from the thread stack pointer
 
@@ -51,7 +51,7 @@ OSSchedulerImpl::stackInitialise(OSStack_t* pStack, void
   *pStack-- = 0x06; /* R6          +2*4=4 */
   *pStack-- = 0x07; /* R7          +1*4=0 */
 
-  *pStack-- = 0x0; /* criticalSectionNesting +0*4=0 */
+  *pStack-- = (OSStack_t) pNesting; /* criticalSectionNesting +0*4=0 */
 
   ++pStack;
 
@@ -118,7 +118,7 @@ OSSchedulerImpl::dumpContextInfo(OSThread* pThread)
 
   const char* sRegNames[] =
     { "N", "R7", "R6", "R5", "R4", "R3", "R2", "R1", "R0", "SR", "PC", "LR",
-        "R12", "R11", "R10", "R9", "R8", "X" };
+      "R12", "R11", "R10", "R9", "R8", "X"};
 
   uint16_t i;
   for (i = 0; i < STACK_WORD_COUNT; ++i, ++pStack)
