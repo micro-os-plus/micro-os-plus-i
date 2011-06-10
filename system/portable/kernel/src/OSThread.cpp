@@ -98,10 +98,13 @@ OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameter
   // Fill the stack with constant pattern (0x5A)
   memset((void*) pStack, STACK_FILL_BYTE, stackSize);
 
+  void* pNesting;
+  pNesting = 0;
+
   // Initialise the stack so that a context restore will be performed
   m_pStack = OSSchedulerImpl::stackInitialise(
       (OSStack_t*) (&pStack[stackSize / sizeof(OSStack_t) - 1]), entryPoint,
-      pParameters, m_id);
+      pParameters, m_id, pNesting);
 
   // pStack points to the first register on arm and
   // to the byte before the first register on AVR8

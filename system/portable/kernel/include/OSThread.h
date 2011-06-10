@@ -178,6 +178,8 @@ public:
 private:
   friend class OSScheduler; // TODO: explain why they are here
   friend class OSActiveThreads;
+  friend class OSCriticalSection;
+  friend class OSRealTimeCriticalSection;
 
   // Initialise thread's environment.
   void
@@ -233,8 +235,15 @@ private:
   // The bottom of the thread's stack (lowest address).
   unsigned char* m_pStackBottom;
 
+public:
   // The size of the thread's stack, in bytes.
   OSStackSize_t m_stackSize;
+
+  uint_t m_dummy;
+
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+  OSStack_t m_criticalSectionNestingStack[OS_CFGINT_OSTHREAD_CRITICALSECTIONNESTINGSTACK_ARRAY_SIZE];
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   // True if the thread can be put to sleep.
