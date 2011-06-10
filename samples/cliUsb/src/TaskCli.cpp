@@ -6,6 +6,8 @@
 
 #include "TaskCli.h"
 
+#if defined OS_INCLUDE_SIMPLECLI
+
 #include "portable/kernel/include/ostream_OSThread.h"
 
 /*
@@ -404,4 +406,7 @@ TaskCli::lineProcess()
   cout << std::endl << str_help;
 }
 #endif
+
+#endif // OS_INCLUDE_SIMPLECLI
+
 

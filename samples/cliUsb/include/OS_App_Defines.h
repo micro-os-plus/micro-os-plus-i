@@ -27,7 +27,7 @@
 #define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
 //#define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
 
-#define OS_INCLUDE_SIMPLECLI                            1
+//#define OS_INCLUDE_SIMPLECLI                            1
 
 #define OS_INCLUDE_SIMPLECLI_PARSER                     1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG             1

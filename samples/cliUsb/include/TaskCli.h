@@ -9,6 +9,8 @@
 
 #include "portable/kernel/include/uOS.h"
 
+#if defined OS_INCLUDE_SIMPLECLI
+
 #include "portable/devices/character/include/OSDeviceCharacter.h"
 #include "portable/misc/include/SimpleCli.h"
 
@@ -36,5 +38,7 @@ private:
   SimpleCli m_cli;
   unsigned char m_line[ 80 ];
   };
+
+#endif // OS_INCLUDE_SIMPLECLI
 
 #endif /* TASKCLI_H_ */
