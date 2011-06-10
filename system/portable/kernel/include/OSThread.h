@@ -239,8 +239,6 @@ public:
   // The size of the thread's stack, in bytes.
   OSStackSize_t m_stackSize;
 
-  uint_t m_dummy;
-
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
   OSStack_t m_criticalSectionNestingStack[OS_CFGINT_OSTHREAD_CRITICALSECTIONNESTINGSTACK_ARRAY_SIZE];
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
