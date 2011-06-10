@@ -69,6 +69,9 @@ extern unsigned long __os_bss_end;
 extern unsigned long __os_ctors_array_begin;
 extern unsigned long __os_ctors_array_end;
 
+class OSThreadIdle;
+extern OSThreadIdle idleThread;
+
 void
 OS::resetHandler(void)
 {
@@ -82,6 +85,7 @@ OS::resetHandler(void)
   OSCPU::interruptsDisable();
 
   // earlyInit() should also init GPIO, so that leds will be available
+  // WARNING: NO DEBUG YET!
   OSCPU::earlyInit();
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
@@ -93,6 +97,10 @@ OS::resetHandler(void)
 
   dataInit();
   bssInit();
+
+  // WARNING: NO CRITICAL SECTIONS BEFORE THIS POINT!
+  OSCriticalSection::ms_nestingLevel = 0;
+  OSScheduler::ms_pThreadRunning = (OSThread*)&idleThread;
 
 #if defined(DEBUG)
   // WARNING: No debug output before this point!
