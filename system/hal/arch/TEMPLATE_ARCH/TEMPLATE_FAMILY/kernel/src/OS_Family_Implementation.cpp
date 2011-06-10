@@ -11,6 +11,7 @@
 void
 OSCPUImpl::earlyInit(void)
 {
+  // Be sure not to use debug here
   ;
 }
 
