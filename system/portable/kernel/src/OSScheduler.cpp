@@ -12,7 +12,7 @@
 
 // ----- OSSchedulerLock static variables -------------------------------------
 
-unsigned char volatile OSSchedulerLock::ms_nestingLevel;
+uint8_t volatile OSSchedulerLock::ms_nestingLevel;
 
 // ----- OSScheduler static variables -----------------------------------------
 
@@ -86,8 +86,6 @@ OSScheduler::earlyInit(void)
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   ms_allowDeepSleep = true;
 #endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
-
-  OSCriticalSection::ms_nestingLevel = 0;
 
   // pIdleThread = 0;      // will be set by IdleThread constructor
   // do not reset if not run before any constructor (<=.init6)
@@ -365,13 +363,13 @@ OSScheduler::performContextSwitch()
 
 // Get the address of the thread registered under 'id' in threads array,
 // or NULL if 'id' is too high.
-OSThread* 
+OSThread*
 OSScheduler::getThread(int id)
 {
   if (id < ms_threadsCount)
     return ms_threads[id];
   else
-    return (OSThread* )0;
+    return (OSThread*) 0;
 }
 
 // Internal methods
