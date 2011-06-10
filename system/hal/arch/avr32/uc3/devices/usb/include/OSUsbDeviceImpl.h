@@ -56,10 +56,10 @@ public:
   writeLong(unsigned long l);
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
-  static int
-  readBuffer(void* buf, int count);
-  static int
-  writeBuffer(void* buf, int count);
+  static uint32_t
+  usbReadEpRxPacket(uint8_t ep, void* rxbuf, uint32_t data_length, void** prxbuf);
+  static uint32_t
+  usbWriteEpTxPacket(uint8_t ep, const void* txbuf, uint32_t data_length, const void** ptxbuf);
   static void
   Usb_reset_endpoint_fifo_access(unsigned char ep);
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */

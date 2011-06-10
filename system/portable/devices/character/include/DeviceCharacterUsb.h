@@ -1,7 +1,7 @@
 /*
- *	Copyright (C) 2007-2011 Liviu Ionescu.
+ *      Copyright (C) 2007-2011 Liviu Ionescu.
  *
- *	This file is part of the uOS++ distribution.
+ *      This file is part of the uOS++ distribution.
  */
 
 #ifndef DEVICECHARACTERUSB_H_
@@ -56,6 +56,10 @@ private:
   implGetReadEvent(void);
   virtual int
   implReadByte(void);
+  virtual int
+  implReadBytes(unsigned char* pBuf, int size);
+  virtual int
+  implWriteBytes(const unsigned char* pBuf, int size);
 
   friend class OSUsbDevice;
   friend class OSUsbDeviceImpl;

@@ -105,12 +105,14 @@ void
 OSUsbDeviceImpl::interruptGenServiceRoutine(void)
 {
   //OSUsbLed::toggle();
-
   // ---------- DEVICE events management -----------------------------------
   //- VBUS state detection
   if (OSUsbDeviceImpl::Is_usb_vbus_transition()
       && OSUsbDeviceImpl::Is_usb_vbus_interrupt_enabled())
     {
+      OSDeviceDebug::putString("uv");
+      OSDeviceDebug::putNewLine();
+
       OSUsbDeviceImpl::Usb_ack_vbus_transition();
       if (OSUsbDeviceImpl::Is_usb_vbus_high())
         {
@@ -132,54 +134,55 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
           Usb_freeze_clock();
           (void) Is_usb_clock_frozen();
         }
-      OSDeviceDebug::putString("uv");
-      OSDeviceDebug::putNewLine();
     }
   // - Device Suspend event(no more USB activity detected)
   if (OSUsbDeviceImpl::Is_usb_suspend()
       && OSUsbDeviceImpl::Is_suspend_interrupt_enabled())
     {
+      OSDeviceDebug::putString("us");
+      OSDeviceDebug::putNewLine();
+
       OSUsbDeviceImpl::Usb_ack_suspend();
       OSUsbDeviceImpl::Usb_enable_wake_up_interrupt();
       (void) OSUsbDeviceImpl::Is_swake_up_interrupt_enabled();
       OSUsbDeviceImpl::Usb_freeze_clock();
       OSUsbDeviceImpl::Usb_send_event(EVT_USB_SUSPEND);
       OSUsbDeviceImpl::Usb_suspend_action();
-
-      OSDeviceDebug::putString("us");
-      OSDeviceDebug::putNewLine();
     }
   // - Wake up event(USB activity detected): Used to resume
   if (OSUsbDeviceImpl::Is_usb_wake_up()
       && OSUsbDeviceImpl::Is_swake_up_interrupt_enabled())
     {
+      OSDeviceDebug::putString("uw");
+      OSDeviceDebug::putNewLine();
+
       OSUsbDeviceImpl::Usb_unfreeze_clock();
       (void) Is_usb_clock_frozen();
       OSUsbDeviceImpl::Usb_ack_wake_up();
       OSUsbDeviceImpl::Usb_disable_wake_up_interrupt();
       OSUsbDeviceImpl::Usb_wake_up_action();
       OSUsbDeviceImpl::Usb_send_event(EVT_USB_WAKE_UP);
-
-      OSDeviceDebug::putString("uw");
-      OSDeviceDebug::putNewLine();
     }
   // - Resume state bus detection
   if (OSUsbDeviceImpl::Is_usb_resume()
       && OSUsbDeviceImpl::Is_resume_interrupt_enabled())
     {
+      OSDeviceDebug::putString("ue");
+      OSDeviceDebug::putNewLine();
+
       OSUsbDeviceImpl::Usb_disable_wake_up_interrupt();
       OSUsbDeviceImpl::Usb_ack_resume();
       OSUsbDeviceImpl::Usb_disable_resume_interrupt();
       OSUsbDeviceImpl::Usb_resume_action();
       OSUsbDeviceImpl::Usb_send_event(EVT_USB_RESUME);
-
-      OSDeviceDebug::putString("ue");
-      OSDeviceDebug::putNewLine();
     }
   // - USB bus reset detection
   if (OSUsbDeviceImpl::Is_usb_reset()
       && OSUsbDeviceImpl::Is_reset_interrupt_enabled())
     {
+      OSDeviceDebug::putString("ur");
+      OSDeviceDebug::putNewLine();
+
       OSUsbDeviceImpl::Usb_ack_reset();
       usb_init_device();
 
@@ -193,9 +196,6 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
 
       OSUsbDeviceImpl::Usb_reset_action();
       OSUsbDeviceImpl::Usb_send_event(EVT_USB_RESET);
-
-      OSDeviceDebug::putString("ur");
-      OSDeviceDebug::putNewLine();
     }
   // - Device start of frame received
   if (OSUsbDeviceImpl::Is_usb_sof()
@@ -204,7 +204,6 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
       OSUsbDeviceImpl::Usb_ack_sof();
       OSUsbDeviceImpl::Usb_sof_action();
     }
-
   //OSUsbLed::toggle();
 }
 
@@ -437,6 +436,7 @@ OSUsbDeviceImpl::writeBuffer(void* pBuf, int bufMaxSize)
 
     return min;
   }
+#endif
 
 //! usb_read_ep_rxpacket
 //!
@@ -458,7 +458,8 @@ OSUsbDeviceImpl::writeBuffer(void* pBuf, int bufMaxSize)
 //!
 //! @warning Do not mix calls to this function with calls to indexed macros.
 //!
-U32 usb_read_ep_rxpacket(U8 ep, void* rxbuf, U32 data_length, void** prxbuf)
+uint32_t
+OSUsbDeviceImpl::usbReadEpRxPacket(uint8_t ep, void* rxbuf, uint32_t data_length, void** prxbuf)
   {
     // Use aggregated pointers to have several alignments available for a same address
     UnionCVPtr ep_fifo;
@@ -575,7 +576,8 @@ U32 usb_read_ep_rxpacket(U8 ep, void* rxbuf, U32 data_length, void** prxbuf)
 //!
 //! @warning Do not mix calls to this function with calls to indexed macros.
 //!
-U32 usb_write_ep_txpacket(U8 ep, const void* txbuf, U32 data_length, const void** ptxbuf)
+uint32_t
+OSUsbDeviceImpl::usbWriteEpTxPacket(uint8_t ep, const void* txbuf, uint32_t data_length, const void** ptxbuf)
   {
     // Use aggregated pointers to have several alignments available for a same address
     UnionVPtr ep_fifo;
@@ -672,7 +674,7 @@ U32 usb_write_ep_txpacket(U8 ep, const void* txbuf, U32 data_length, const void*
     if (ptxbuf) *ptxbuf = txbuf_cur.u8ptr;
     return data_length - (txbuf_cur.u8ptr - (U8 *)txbuf);
   }
-#endif
+
 
 // ----------------------------------------------------------------------------
 

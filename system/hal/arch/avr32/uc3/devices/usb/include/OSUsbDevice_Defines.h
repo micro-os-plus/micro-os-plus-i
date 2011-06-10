@@ -29,14 +29,14 @@
 #define DIRECTION_IN             1
 //typedef enum ep_dir {DIRECTION_OUT, DIRECTION_IN} e_ep_dir;
 
-#define SIZE_8                   0
-#define SIZE_16                  1
-#define SIZE_32                  2
-#define SIZE_64                  3
-#define SIZE_128                 4
-#define SIZE_256                 5
-#define SIZE_512                 6
-#define SIZE_1024                7
+#define SIZE_8                   8
+#define SIZE_16                  16
+#define SIZE_32                  32
+#define SIZE_64                  64
+#define SIZE_128                 128
+#define SIZE_256                 256
+#define SIZE_512                 512
+#define SIZE_1024                1024
 //typedef enum ep_size {SIZE_8,   SIZE_16,  SIZE_32,  SIZE_64,
 //                      SIZE_128, SIZE_256, SIZE_512, SIZE_1024} e_ep_size;
 
