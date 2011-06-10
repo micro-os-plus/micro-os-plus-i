@@ -42,6 +42,10 @@ public:
 
   static OSStack_t volatile ms_nestingLevel;
 
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+  static OSStack_t* volatile ms_nestingStackPointer;
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
+
 private:
   char m_dummy;
 };
@@ -94,36 +98,36 @@ private:
 
 inline void
 OSCriticalSection::enter(void)
-{
+  {
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-  register OSStack_t tmp;
+    register OSStack_t tmp;
 
-  tmp = OSCPUImpl::getInterruptsMask();
-  OSCPUImpl::stackPush(tmp);
+    tmp = OSCPUImpl::getInterruptsMask();
+    OSCPUImpl::stackPush(tmp);
 
 #if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
-  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
-  OSCPUImpl::setInterruptsMask(tmp);
+    tmp |= (OS_CFGINT_OSCRITICALSECTION_MASK);
+    OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
-  OSCPUImpl::interruptsDisable();
+    OSCPUImpl::interruptsDisable();
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
-}
+  }
 
 inline void
 OSCriticalSection::exit(void)
-{
+  {
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-  register OSStack_t tmp;
+    register OSStack_t tmp;
 
-  tmp = OSCPUImpl::stackPop();
-  OSCPUImpl::setInterruptsMask(tmp);
+    tmp = OSCPUImpl::stackPop();
+    OSCPUImpl::setInterruptsMask(tmp);
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
-}
+  }
 
 // ----------------------------------------------------------------------------
 
@@ -133,36 +137,36 @@ OSCriticalSection::exit(void)
 
 inline void
 OSRealTimeCriticalSection::enter(void)
-{
+  {
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-  register OSStack_t tmp;
+    register OSStack_t tmp;
 
-  tmp = OSCPUImpl::getInterruptsMask();
-  OSCPUImpl::stackPush(tmp);
+    tmp = OSCPUImpl::getInterruptsMask();
+    OSCPUImpl::stackPush(tmp);
 
 #if defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS)
-  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKRT);
-  OSCPUImpl::setInterruptsMask(tmp);
+    tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKRT);
+    OSCPUImpl::setInterruptsMask(tmp);
 #else /* !defined(OS_INCLUDE_OSSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
-  OSCPUImpl::interruptsDisable();
+    OSCPUImpl::interruptsDisable();
 #endif /* defined(OS_INCLUDE_OSSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
-}
+  }
 
 inline void
 OSRealTimeCriticalSection::exit(void)
-{
+  {
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-  register OSStack_t tmp;
+    register OSStack_t tmp;
 
-  tmp = OSCPUImpl::stackPop();
-  OSCPUImpl::setInterruptsMask(tmp);
+    tmp = OSCPUImpl::stackPop();
+    OSCPUImpl::setInterruptsMask(tmp);
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
-}
+  }
 
 #endif /* defined(OS_INCLUDE_OSREALTIME) */
 
