@@ -288,7 +288,7 @@ public:
   // initialise the stack for a thread
   static OSStack_t*
   stackInitialise(OSStack_t* pStackTop, void
-  (*entryPoint)(void*), void* pParams, unsigned char id);
+  (*entryPoint)(void*), void* pParams, unsigned char id, void* pNesting);
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSWITCHREQUEST)
   static void
