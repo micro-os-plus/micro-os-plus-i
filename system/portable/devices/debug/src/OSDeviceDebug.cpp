@@ -50,7 +50,7 @@ OSDeviceDebug::earlyInit(void)
 // ----------------------------------------------------------------------------
 
 int
-OSDeviceDebug::commonPutByte(unsigned char c)
+OSDeviceDebug::commonPutByte(uchar_t c)
 {
   if (!implDevicePresent())
     return -1;
@@ -81,21 +81,26 @@ OSDeviceDebug::commonPutBytes(const char* s, uint_t n)
 void
 OSDeviceDebug::putConstructor(const char* pc, const void* p)
 {
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       putString(pc);
       putString("() @");
       putPtr(p);
       putNewLine();
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 // display constructor name and object address
 void
-OSDeviceDebug::putConstructorWithIndex(const char* pc, unsigned short i,const void* p)
+OSDeviceDebug::putConstructorWithIndex(const char* pc, uint16_t i,
+    const void* p)
 {
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       putString(pc);
       putChar('(');
@@ -104,14 +109,16 @@ OSDeviceDebug::putConstructorWithIndex(const char* pc, unsigned short i,const vo
       putPtr(p);
       putNewLine();
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 // display destructor name and object address
 void
 OSDeviceDebug::putDestructor(const char* pc, const void* p)
 {
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       putChar('~');
       putString(pc);
@@ -119,30 +126,34 @@ OSDeviceDebug::putDestructor(const char* pc, const void* p)
       putPtr(p);
       putNewLine();
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 #endif /* defined(OS_DEBUG_CONSTRUCTORS) */
 
 void
-OSDeviceDebug::putChar(unsigned char c)
+OSDeviceDebug::putChar(uchar_t c)
 {
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       commonPutByte(c);
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 void
 OSDeviceDebug::putNewLine(void)
 {
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       commonPutByte('\r');
       commonPutByte('\n');
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 void
@@ -151,15 +162,17 @@ OSDeviceDebug::putString(const char* pc)
   if (pc == 0)
     return;
 
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       commonPutBytes(pc, strlen(pc));
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 void
-OSDeviceDebug::putHex(unsigned char b)
+OSDeviceDebug::putHex(uint8_t b)
 {
   unsigned char c;
   unsigned char buff[2];
@@ -170,15 +183,17 @@ OSDeviceDebug::putHex(unsigned char b)
   c = (b & 0x0F);
   buff[1] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 void
-OSDeviceDebug::putHex(unsigned short w)
+OSDeviceDebug::putHex(uint16_t w)
 {
   unsigned char c;
   unsigned char b;
@@ -198,16 +213,18 @@ OSDeviceDebug::putHex(unsigned short w)
   c = (b & 0x0F);
   buff[3] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG)
 void
-OSDeviceDebug::putHex(unsigned long l)
+OSDeviceDebug::putHex(uint32_t l)
 {
   unsigned char c;
   unsigned char b;
@@ -241,19 +258,23 @@ OSDeviceDebug::putHex(unsigned long l)
   c = (b & 0x0F);
   buff[7] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 #endif
 
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT)
 
+// TODO: maybe differentiate between 2 and 4 bytes int
+
 void
-OSDeviceDebug::putHex(unsigned int l)
+OSDeviceDebug::putHex(uint_t l)
 {
   unsigned char c;
   unsigned char b;
@@ -287,17 +308,19 @@ OSDeviceDebug::putHex(unsigned int l)
   c = (b & 0x0F);
   buff[7] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 #endif
 
 void
-OSDeviceDebug::putPC(const char*  PROGMEM pc)
+OSDeviceDebug::putPC(const char* PROGMEM pc)
 {
   unsigned char c;
   unsigned char b;
@@ -348,11 +371,13 @@ OSDeviceDebug::putPC(const char*  PROGMEM pc)
   c = (b & 0x0F);
   buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 void
@@ -403,15 +428,17 @@ OSDeviceDebug::putPtr(const void* p)
   c = (b & 0x0F);
   buff[i++] = c < 10 ? c + '0' : c + 'A' - 10;
 
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       commonPutBytes((const char*) buff, sizeof(buff));
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 }
 
 void
-OSDeviceDebug::putDec(unsigned short w, unsigned short n)
+OSDeviceDebug::putDec(uint16_t w, uint16_t n)
 {
   int i;
   unsigned char buff[5];
@@ -432,18 +459,20 @@ OSDeviceDebug::putDec(unsigned short w, unsigned short n)
     }
   if (i < (int) sizeof(buff))
     {
-      OSCriticalSection::enter();
+      register OSStack_t mask;
+
+      mask = criticalEnter();
         {
           commonPutBytes((const char*) &buff[i], (int) sizeof(buff) - i);
         }
-      OSCriticalSection::exit();
+      criticalExit(mask);
     }
 }
 
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
 
 void
-OSDeviceDebug::putDec(unsigned long w, unsigned short n)
+OSDeviceDebug::putDec(uint32_t w, uint16_t n)
 {
   int i;
   unsigned char buff[10];
@@ -464,11 +493,13 @@ OSDeviceDebug::putDec(unsigned long w, unsigned short n)
     }
   if (i < (int) sizeof(buff))
     {
-      OSCriticalSection::enter();
+      register OSStack_t mask;
+
+      mask = criticalEnter();
         {
           commonPutBytes((const char*) &buff[i], (int) sizeof(buff) - i);
         }
-      OSCriticalSection::exit();
+      criticalExit(mask);
     }
 }
 #endif /* OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG */
@@ -477,7 +508,9 @@ void
 OSDeviceDebug::__assert(const char* func, const char* file, int lineno,
     const char* sexp)
 {
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       putString_P(PSTR("assertion '"));
       putString(sexp);
@@ -502,11 +535,13 @@ int
 OSDeviceDebug::overflow(int c)
 {
   int r;
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       r = commonPutByte(c);
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 
   return r;
 }
@@ -517,11 +552,13 @@ OSDeviceDebug::xsputn(const char* s, std::streamsize n)
 #if defined(DEBUG)
 
   int r;
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = criticalEnter();
     {
       r = commonPutBytes(s, n);
     }
-  OSCriticalSection::exit();
+  criticalExit(mask);
 
   return r;
 #else
