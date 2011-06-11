@@ -99,8 +99,14 @@ OS::resetHandler(void)
   bssInit();
 
   // WARNING: NO CRITICAL SECTIONS BEFORE THIS POINT!
+  OSScheduler::ms_pThreadRunning = (OSThread*) &idleThread;
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+  OSCriticalSection::ms_nestingStackPointer
+      = OSScheduler::ms_pThreadRunning->getCriticalSectionNestingStack();
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
   OSCriticalSection::ms_nestingLevel = 0;
-  OSScheduler::ms_pThreadRunning = (OSThread*)&idleThread;
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) */
 
 #if defined(DEBUG)
   // WARNING: No debug output before this point!
@@ -224,7 +230,7 @@ OS::staticConstructorsInit(void)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS) && defined(OS_DEBUG_CONSTRUCTORS_INIT)
       OSDeviceDebug::putString_P(PSTR(".ctor "));
-      OSDeviceDebug::putPtr((void*)*p);
+      OSDeviceDebug::putPtr((void*) *p);
       OSDeviceDebug::putString_P(PSTR(" @"));
       OSDeviceDebug::putPtr(p);
       OSDeviceDebug::putNewLine();
