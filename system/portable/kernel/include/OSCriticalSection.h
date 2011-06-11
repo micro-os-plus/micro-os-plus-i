@@ -40,10 +40,21 @@ public:
 
 #endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
+
   static OSStack_t volatile ms_nestingLevel;
 
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) */
+
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+
   static OSStack_t* volatile ms_nestingStackPointer;
+
+  static void
+  pushInterruptMask(OSStack_t mask);
+  static OSStack_t
+  popInterruptMask(void);
+
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
 private:
@@ -171,6 +182,22 @@ OSRealTimeCriticalSection::exit(void)
 #endif /* defined(OS_INCLUDE_OSREALTIME) */
 
 #endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
+
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+
+inline void
+OSCriticalSection::pushInterruptMask(OSStack_t mask)
+{
+  *ms_nestingStackPointer++ = mask;
+}
+
+inline OSStack_t
+OSCriticalSection::popInterruptMask(void)
+{
+  return *--ms_nestingStackPointer;
+}
+
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
 // ----------------------------------------------------------------------------
 

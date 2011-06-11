@@ -10,8 +10,10 @@
 
 // ----- OSCriticalSection static variables -----------------------------------
 
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
 // Used in contextSave/Restore.
 OSStack_t volatile OSCriticalSection::ms_nestingLevel;
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) */
 
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
 OSStack_t* volatile OSCriticalSection::ms_nestingStackPointer;
@@ -47,6 +49,12 @@ OSCriticalSection::enter(void)
   OSCPUImpl::interruptsDisable();
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
 
+#if true
+  // Push actual interrupt mask onto the thread stack.
+  // The stack pointer is set at stackInitialise() and
+  // updated at context switch time.
+  pushInterruptMask(tmp);
+#else
   OSThread* pCurrentThread;
   pCurrentThread = OSScheduler::getThreadCurrent();
 
@@ -77,6 +85,7 @@ OSCriticalSection::enter(void)
   pStack = &(pCurrentThread->m_criticalSectionNestingStack[0]);
   pStack[ms_nestingLevel] = tmp;
   ++ms_nestingLevel;
+#endif
 
 #elif defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
 
@@ -97,6 +106,14 @@ OSCriticalSection::exit(void)
 
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
 
+  register OSStack_t tmp;
+
+#if true
+
+  // Pop interrupt mask from the thread stack
+  tmp = popInterruptMask();
+
+#else
   OSThread* pCurrentThread;
   pCurrentThread = OSScheduler::getThreadCurrent();
 
@@ -110,7 +127,6 @@ OSCriticalSection::exit(void)
     }
 #endif /* defined(DEBUG) */
 
-  register OSStack_t tmp;
 
   // Pop current interrupt mask from the thread stack
   tmp = pCurrentThread->m_criticalSectionNestingStack[--ms_nestingLevel];
@@ -124,6 +140,7 @@ OSCriticalSection::exit(void)
   OSDeviceDebug::putDec(ms_nestingLevel);
   OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSCRITICALSECTION) */
+#endif
 
   OSCPUImpl::setInterruptsMask(tmp);
 
@@ -170,15 +187,18 @@ OSRealTimeCriticalSection::enter(void)
   tmp = OSCPUImpl::getInterruptsMask();
 
 #if defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS)
-  tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKRT);
-  OSCPUImpl::setInterruptsMask(tmp);
+  OSCPUImpl::setInterruptsMask(tmp | (OS_CFGINT_OSCRITICALSECTION_MASKRT));
 #else /* !defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
   OSCPUImpl::interruptsDisable();
 #endif /* defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
 
+#if true
+  OSCriticalSection::pushInterruptMask(tmp);
+#else
   // Push current interrupt mask onto the thread stack
   OSScheduler::getThreadCurrent()->m_criticalSectionNestingStack[OSCriticalSection::ms_nestingLevel++]
       = tmp;
+#endif
 
 #elif defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
 
@@ -199,10 +219,14 @@ OSRealTimeCriticalSection::exit(void)
 
   register OSStack_t tmp;
 
+#if true
+  tmp = OSCriticalSection::popInterruptMask();
+#else
   // Pop current interrupt mask from the thread stack
   tmp
       = OSScheduler::getThreadCurrent()->m_criticalSectionNestingStack[--OSCriticalSection::ms_nestingLevel];
   OSCPUImpl::setInterruptsMask(tmp);
+#endif
 
 #elif defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
 
