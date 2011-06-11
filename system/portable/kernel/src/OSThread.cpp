@@ -16,8 +16,8 @@
 OSThread::OSThread(const char* pName, const OSStack_t* pStack,
     OSStackSize_t stackSize, OSThreadPriority_t priority)
 {
-  OSThread::init(pName, (OSThreadMainPtr_t) &OSThread::staticMain, this, pStack,
-      stackSize, priority);
+  OSThread::init(pName, (OSThreadMainPtr_t) &OSThread::staticMain, this,
+      pStack, stackSize, priority);
 }
 
 // C style constructor, run any function
@@ -30,8 +30,8 @@ OSThread::OSThread(const char* pName, OSThreadMainPtr_t entryPoint,
 
 // The stack size is in multiples of OSStack_t
 void
-OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameters,
-    const OSStack_t* pStack, OSStackSize_t stackSize,
+OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint,
+    void* pParameters, const OSStack_t* pStack, OSStackSize_t stackSize,
     OSThreadPriority_t priority)
 {
   // no stack, sorry...
@@ -101,7 +101,21 @@ OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameter
   void* pNesting;
   pNesting = 0;
 
-  // Initialise the stack so that a context restore will be performed
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+
+  pNesting = getCriticalSectionNestingStack();
+
+  // initialise the local critical section nesting stack
+  memset(
+      (void*) pNesting,
+      STACK_FILL_BYTE,
+      OS_CFGINT_OSTHREAD_CRITICALSECTIONNESTINGSTACK_ARRAY_SIZE
+          * sizeof(OSStack_t));
+
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
+
+  // Initialise the stack to mimic a context save, so that a context
+  // restore will be possible; that's how we enter threads for the first time
   m_pStack = OSSchedulerImpl::stackInitialise(
       (OSStack_t*) (&pStack[stackSize / sizeof(OSStack_t) - 1]), entryPoint,
       pParameters, m_id, pNesting);
@@ -197,7 +211,7 @@ OSThread::getStackUsed(void) const
 
 OSProgramPtr_t OSThread::getProgramCounter(void)
   {
-    unsigned char*  p;
+    unsigned char* p;
     p = (unsigned char*) getStack() + 34;
     uint16_t w;
     w = (p[0] << 8) | p[1];

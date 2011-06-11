@@ -175,6 +175,11 @@ public:
   void
   setEventWaitReturn(OSEventWaitReturn_t ret);
 
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+  OSStack_t*
+  getCriticalSectionNestingStack(void);
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
+
 private:
   friend class OSScheduler; // TODO: explain why they are here
   friend class OSActiveThreads;
@@ -235,11 +240,12 @@ private:
   // The bottom of the thread's stack (lowest address).
   unsigned char* m_pStackBottom;
 
-public:
+//public:
   // The size of the thread's stack, in bytes.
   OSStackSize_t m_stackSize;
 
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+  // This local stack grows to higher addresses
   OSStack_t m_criticalSectionNestingStack[OS_CFGINT_OSTHREAD_CRITICALSECTIONNESTINGSTACK_ARRAY_SIZE];
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
@@ -321,6 +327,14 @@ OSThread::getStackSize(void) const
 {
   return m_stackSize;
 }
+
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+  inline OSStack_t*
+  OSThread::getCriticalSectionNestingStack(void)
+  {
+    return &m_criticalSectionNestingStack[0];
+  }
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
 // since all registers are saved on the thread stack,
 // the 'context' in simply a pointer to the stack (the address below
