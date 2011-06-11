@@ -22,18 +22,22 @@
 // This class is used for displaying the trace messages.
 // The actual device output is passed to an implementation helper.
 
-class OSDeviceDebug :
+class OSDeviceDebug
+
+#if defined(DEBUG)
+:
 
 #if defined(OS_CONFIG_DEBUG_DEVICE_I2C)
-    public DeviceDebugI2cImpl
+public DeviceDebugI2cImpl
 #elif defined(OS_CONFIG_DEBUG_DEVICE_USART)
-  public OSDeviceDebugUsartImpl
+public OSDeviceDebugUsartImpl
 #else
 #error "Missing OS_CONFIG_DEBUG_DEVICE_* definition"
 #endif
 
-#if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
-    , public std::streambuf
+#if defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
+, public std::streambuf
+#endif
 #endif
 
 {
@@ -159,20 +163,20 @@ private:
 
 inline OSStack_t
 OSDeviceDebug::criticalEnter(void)
-{
-  register OSStack_t tmp;
+  {
+    register OSStack_t tmp;
 
-  tmp = OSCPUImpl::getInterruptsMask();
-  OSCPUImpl::interruptsDisable();
+    tmp = OSCPUImpl::getInterruptsMask();
+    OSCPUImpl::interruptsDisable();
 
-  return tmp;
-}
+    return tmp;
+  }
 
 inline void
 OSDeviceDebug::criticalExit(OSStack_t mask)
-{
-  OSCPUImpl::setInterruptsMask(mask);
-}
+  {
+    OSCPUImpl::setInterruptsMask(mask);
+  }
 
 #if !defined(OS_DEBUG_CONSTRUCTORS)
 
@@ -198,34 +202,34 @@ OSDeviceDebug::putDestructor(const char* pc __attribute__((unused)), const void*
 // define empty functions for Release
 inline void
 OSDeviceDebug::putChar(unsigned char __attribute__((unused)) c)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putNewLine(void)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putString(const char __attribute__((unused)) * pc)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putConstructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putConstructorWithIndex(const char* pc __attribute__((unused)), uint16_t i __attribute__((unused)),
     const void* p __attribute__((unused)))
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putDestructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
-  {
-  }
+{
+}
 
 #if defined(OS_INCLUDE_SEPARATE_PROGMEM)
 
@@ -252,19 +256,19 @@ OSDeviceDebug::putDestructor_P(const char* __attribute__((unused)) PROGMEM pc, c
 
 inline void
 OSDeviceDebug::putHex(unsigned char __attribute__((unused)) c)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putHex(unsigned short __attribute__((unused)) w)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putDec(unsigned short __attribute__((unused)) w,
     unsigned short __attribute__((unused)) n)
-  {
-  }
+{
+}
 
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
 inline void OSDeviceDebug::putDec(unsigned long __attribute__((unused)) l, unsigned short
@@ -275,17 +279,17 @@ inline void OSDeviceDebug::putDec(unsigned long __attribute__((unused)) l, unsig
 
 inline void
 OSDeviceDebug::putPC(const char* PROGMEM __attribute__((unused)) pc)
-  {
-    pc = pc;
-  }
+{
+  pc = pc;
+}
 
 inline void
 OSDeviceDebug::__assert(const char __attribute__((unused)) *func,
     const char __attribute__((unused)) *xfile,
     int __attribute__((unused)) lineno,
     const char __attribute__((unused)) *sexp)
-  {
-  }
+{
+}
 
 #endif
 
