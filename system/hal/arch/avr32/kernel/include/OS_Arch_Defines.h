@@ -35,6 +35,10 @@ typedef unsigned long OSInterruptsMask_t;
 //#define OS_INCLUDE_OSSCHEDULER_INTERRUPTENTER_EXIT      (1)
 #define OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING   (1)
 
+// AVR32 compiler messes SP and R7 when optimisation level is not -O0
+// so it is not possible to use the system stack
+#define OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK   (1)
+
 #if !defined(OS_CFGINT_STACK_MINIMAL_SIZE)
 #define OS_CFGINT_STACK_MINIMAL_SIZE                    (400)
 #endif
