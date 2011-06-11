@@ -219,8 +219,13 @@ OSSchedulerImpl::criticalSectionNestingSave(void)
         " st.w    --sp, %[RB] \n " // push Nesting onto stack
 
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
-        : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
-        :
+        : [pCSN] "i"
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+        (&OSCriticalSection::ms_nestingStackPointer)
+#else
+        (&OSCriticalSection::ms_nestingLevel)
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
+        : "sp"
     );
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
@@ -246,7 +251,12 @@ OSSchedulerImpl::criticalSectionNestingRestore(void)
         " st.w    %[RB][0], %[RA] \n"
 
         : [RA] "=r" (tmp1), [RB] "=r" (tmp2)
-        : [pCSN] "i" (&OSCriticalSection::ms_nestingLevel)
+        : [pCSN] "i"
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+        (&OSCriticalSection::ms_nestingStackPointer)
+#else
+        (&OSCriticalSection::ms_nestingLevel)
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
         : "sp"
     );
 
@@ -456,12 +466,27 @@ SCALL_contextSave(void)
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK)
 
+#if false
   register OSStack_t tmp;
-
   tmp = OSCPUImpl::getInterruptsMask();
   tmp |= (OS_CFGINT_OSCRITICALSECTION_MASKYIELD);
   OSCPUImpl::setInterruptsMask(tmp);
+#else
+  // The assembly version was required in order to make it compile with -O0
+  register uint_t tmp;
+  asm volatile
+  (
+      " mfsr    %[R], %[SR] \n"
+      " orh     %[R], %[M] \n"
+      " mtsr    %[SR], %[R] \n"
 
+      : [R] "=r" (tmp)
+      : [SR] "i" (AVR32_SR),
+        [M] "i" ((OS_CFGINT_OSCRITICALSECTION_MASKYIELD) >> 16)
+      :
+  );
+
+#endif
 #else
 
   OSCPUImpl::interruptsDisable();
