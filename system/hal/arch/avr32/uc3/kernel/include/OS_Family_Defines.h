@@ -40,11 +40,6 @@
 #endif
 #endif
 
-//#define OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK          (1)
-//#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
-//#define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
-//#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
-
 // Below are default masks used to disable/enable interrupts.
 // The order of bits is: 3210
 
