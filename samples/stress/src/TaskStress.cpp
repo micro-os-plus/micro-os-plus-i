@@ -65,13 +65,23 @@ TaskStress::threadMain(void)
       os.busyWaitMicros(nBusy);
       os.sched.timerTicks.sleep(nSleep);
 
-      nCnt += nSleep;
-      if (nCnt >= 1000)
+      // The critical sections are not needed, but are here just to test
+      // if embedded critical sections work properly.
+      os.sched.critical.enter();
         {
-          nCnt -= 1000;
-          debug.putString(getName());
-        }
+          nCnt += nSleep;
+          if (nCnt >= 1000)
+            {
+              os.sched.critical.enter();
+                {
+                  nCnt -= 1000;
+                }
+              os.sched.critical.exit();
 
+              debug.putString(getName());
+            }
+        }
+      os.sched.critical.exit();
     }
 }
 
