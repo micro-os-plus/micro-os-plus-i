@@ -70,6 +70,30 @@ OSImpl::familyEarlyInit(void)
 #if defined(DEBUG)
 
   //OSDeviceDebug::putNewLine();
+
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
+  OSDeviceDebug::putString("Disable All Interrupts=true");
+  OSDeviceDebug::putNewLine();
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) */
+
+#if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
+  OSDeviceDebug::putString("Mask=");
+  OSDeviceDebug::putHex((uint16_t)((OS_CFGINT_OSCRITICALSECTION_MASK) >> 16));
+  OSDeviceDebug::putNewLine();
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
+
+#if defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS)
+  OSDeviceDebug::putString("RT Mask=");
+  OSDeviceDebug::putHex((uint16_t)((OS_CFGINT_OSCRITICALSECTION_MASKRT) >> 16));
+  OSDeviceDebug::putNewLine();
+#endif /* defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
+
+#if defined(OS_INCLUDE_OSSCHEDULER_YIELD_MASK_INTERRUPTS)
+  OSDeviceDebug::putString("YIELD Mask=");
+  OSDeviceDebug::putHex((uint16_t)((OS_CFGINT_OSCRITICALSECTION_MASKYIELD) >> 16));
+  OSDeviceDebug::putNewLine();
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_YIELD_MASK_INTERRUPTS) */
+
   OSDeviceDebug::putString("DID=");
   OSDeviceDebug::putHex((unsigned long) __builtin_mfdr(0));
   OSDeviceDebug::putNewLine();
