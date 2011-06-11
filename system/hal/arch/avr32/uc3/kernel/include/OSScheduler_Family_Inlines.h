@@ -464,7 +464,7 @@ SCALL_contextSave(void)
 
   // Interrupts will be re-enabled when the new context is restored
 
-#if defined(OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK)
+#if defined(OS_INCLUDE_OSSCHEDULER_YIELD_MASK_INTERRUPTS)
 
 #if false
   register OSStack_t tmp;
