@@ -148,10 +148,15 @@
 #if !defined(OS_INCLUDE_OSEVENTFLAGS) && defined(OS_INCLUDE_SDI12SENSOR)
 #define OS_INCLUDE_OSEVENTFLAGS                         (1)
 #endif
-//
+
+// ----- Critical sections interdependencies ----------------------------------
 
 #if !defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) && (defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) || defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS))
 #define OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK   (1)
+#endif
+
+#if !defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) && defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) && !defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+#define OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL  (1)
 #endif
 
 // ----- OSDeviceCharacter dependencies ---------------------------------------
