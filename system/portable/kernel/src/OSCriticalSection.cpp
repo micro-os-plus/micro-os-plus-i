@@ -26,7 +26,7 @@ OSCriticalSection::OSCriticalSection()
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSCriticalSection"), this);
 }
-#endif
+#endif /* defined(DEBUG) */
 
 #if defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK)
 
