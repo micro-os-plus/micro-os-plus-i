@@ -208,6 +208,8 @@ OSSchedulerImpl::criticalSectionNestingSave(void)
   {
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) || defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
+
     register unsigned int tmp1;
     register unsigned int tmp2;
 
@@ -222,11 +224,24 @@ OSSchedulerImpl::criticalSectionNestingSave(void)
         : [pCSN] "i"
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
         (&OSCriticalSection::ms_nestingStackPointer)
-#else
+#elif defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
         (&OSCriticalSection::ms_nestingLevel)
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
         : "sp"
     );
+
+#else
+
+    asm volatile
+    (
+        " sub    sp, 4 \n " // simulate push Nesting onto stack
+
+        :
+        :
+        : "sp"
+    );
+
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) || defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
@@ -239,6 +254,8 @@ inline void
 OSSchedulerImpl::criticalSectionNestingRestore(void)
   {
 #if !defined(OS_EXCLUDE_MULTITASKING)
+
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) || defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
 
     register unsigned int tmp1;
     register unsigned int tmp2;
@@ -254,11 +271,24 @@ OSSchedulerImpl::criticalSectionNestingRestore(void)
         : [pCSN] "i"
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
         (&OSCriticalSection::ms_nestingStackPointer)
-#else
+#elif defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
         (&OSCriticalSection::ms_nestingLevel)
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
         : "sp"
     );
+
+#else
+
+    asm volatile
+    (
+        " sub    sp, -4 \n " // simulate pop Nesting from stack
+
+        :
+        :
+        : "sp"
+    );
+
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) || defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
