@@ -23,12 +23,12 @@ namespace avr32
       {
         // Define one of the eight channels
         CHANNEL_0 = 0,
-        CHANNEL_1,
-        CHANNEL_2,
-        CHANNEL_3,
-        CHANNEL_4,
-        CHANNEL_5,
-        CHANNEL_6,
+        CHANNEL_1 = 1,
+        CHANNEL_2 = 2,
+        CHANNEL_3 = 3,
+        CHANNEL_4 = 4,
+        CHANNEL_5 = 5,
+        CHANNEL_6 = 6,
         CHANNEL_7 = 7
       } ChannelId_t;
 
@@ -282,6 +282,9 @@ namespace avr32
       void
       registerInterruptHandler(avr32::uc3::intc::InterruptHandler_t handler);
 
+      pdca::Status_t
+      getStatus();
+
     public:
       // A reference (instead of a pointer) since it is not only more
       // convenient to use, but it is the only one that guarantees
@@ -316,7 +319,7 @@ namespace avr32
       OSEventWaitReturn_t m_eventRet;
 
       // the status of this PDCA channel
-      pdca::Status_t m_status;
+      volatile pdca::Status_t m_status;
 
     private:
 
@@ -377,6 +380,11 @@ namespace avr32
       return m_peripheralId;
     }
 
+    inline pdca::Status_t
+    Pdca::getStatus(void)
+    {
+      return m_status;
+    }
   // TODO: add the other
   }
 }

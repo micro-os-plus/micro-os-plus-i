@@ -55,26 +55,35 @@ namespace avr32
 #if true
       // make sure no transfer is ongoing
       registers.writeControl(AVR32_PDCA_CR_TDIS_MASK); // disable channel
-      registers.writeControl(AVR32_PDCA_CR_ECLR_MASK); // clear errors
       // set zero count for the current transfer
       registers.writeTransferCount(0);
       // set zero count for the next transfer
       registers.writeTransferCountReload(0);
 
+      registers.writeControl(AVR32_PDCA_CR_ECLR_MASK); // clear errors
+
       // set the associated peripheral
       registers.writePeripheralSelect(m_peripheralId);
 
       if (m_regionsArraySize == 0)
-        // no regions configured, so nothing to be done
-        return -1;
-
+        {
+          // no regions configured, so nothing to be done
+          #if OS_DEBUG_PDCA
+                OSDeviceDebug::putString("Pdca::prepareTransfer no region");
+                OSDeviceDebug::putNewLine();
+          #endif
+          return OSReturn::OS_BAD_COMMAND;
+        }
       // set first region to be used in transfer
       registers.writeMemoryAddress(m_pRegionsArray[0].address);
       registers.writeTransferCount(m_pRegionsArray[0].size);
+      //while (registers.readStatus())
       m_currentRegionIndex = 0;
+      m_candidateNotif = 0;
 
       registers.writeInterruptEnable(
           AVR32_PDCA_IER_TRC_MASK | AVR32_PDCA_IER_TERR_MASK);
+      // enable channel and transfer
 
       setupReloadMechanism();
 
@@ -100,6 +109,10 @@ namespace avr32
         {
           // no region to be set next
           m_reloadedRegionIndex = -1;
+#if OS_DEBUG_PDCA
+            OSDeviceDebug::putString("Pdca::setupReloadMechanism no next region");
+            OSDeviceDebug::putNewLine();
+#endif
           return OSReturn::OS_ITEM_NOT_FOUND;
         }
       registers.writeMemoryAddressReload(m_pRegionsArray[nextRegion].address);
@@ -123,7 +136,7 @@ namespace avr32
       else
         {
           // get consecutive index, if there are more regions available
-          if (m_regionsArraySize > m_currentRegionIndex)
+          if (m_regionsArraySize > m_currentRegionIndex + 1)
             {
               nextRegionIndex = m_currentRegionIndex + 1;
             }
@@ -141,7 +154,7 @@ namespace avr32
     {
       m_status = avr32::uc3::pdca::STATUS_BUSY;
       // enable channel and transfer
-      registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+      registers.writeControl(AVR32_PDCA_CR_TEN_MASK);
     }
 
     void
@@ -169,13 +182,12 @@ namespace avr32
     }
 
     void
-    Pdca::registerInterruptHandler(intc::InterruptHandler_t handler)
+    Pdca::registerInterruptHandler(avr32::uc3::intc::InterruptHandler_t handler)
     {
       avr32::uc3::Intc::registerInterruptHandler(
           (intc::InterruptHandler_t) handler,
           pdca::INTERRUPT_BASE + m_channelId,
           avr32::uc3::intc::GroupPriorities::GROUP_03);
-
     }
 
     // ----- PdcaTransmit -----------------------------------------------------
@@ -250,20 +262,22 @@ namespace avr32
       interruptFlag = registers.readInterruptMask() &
           registers.readInterruptStatus();
 
-      if (interruptFlag & AVR32_PDCA_IER_TERR_MASK) // transfer error
+      if ((interruptFlag & AVR32_PDCA_IER_TERR_MASK) != 0) // transfer error
         {
 
           // TODO: log registers MAR, TCR, MARR and TCRR
           // the only source of error is an invalid address in MAR or MARR
 
           abortTransfer();
+          // set status to finished
+          m_pRegionsArray[m_candidateNotif].status =
+                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
           m_status = avr32::uc3::pdca::STATUS_ERROR;
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }
-      if (interruptFlag & AVR32_PDCA_IER_RCZ_MASK) // reload counter zero
+      if ((interruptFlag & AVR32_PDCA_IER_RCZ_MASK) != 0) // reload counter zero
         {
           m_currentRegionIndex = m_reloadedRegionIndex;
-
           OSReturn_t ret = setupReloadMechanism();
           if (ret != OSReturn::OS_OK)
             {
@@ -279,14 +293,19 @@ namespace avr32
           // notify
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }
-      if (interruptFlag & AVR32_PDCA_IER_TRC_MASK) // transfer complete
+      if ((interruptFlag & AVR32_PDCA_IER_TRC_MASK) != 0) // transfer complete
       {
+          // disable PDMA channel
+          registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+
           // disable all interrupt sources
           registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
               AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
 
-          // disable PDMA channel
-          registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+          // set status to finished
+          m_pRegionsArray[m_candidateNotif].status =
+                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
+
           m_status = avr32::uc3::pdca::STATUS_OK;
           // notify
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
@@ -329,7 +348,7 @@ namespace avr32
       interruptFlag = registers.readInterruptMask() &
           registers.readInterruptStatus();
 
-      if (interruptFlag & AVR32_PDCA_IER_TERR_MASK) // transfer error
+      if ((interruptFlag & AVR32_PDCA_IER_TERR_MASK) != 0) // transfer error
         {
 
           // TODO: log registers MAR, TCR, MARR and TCRR
@@ -338,7 +357,7 @@ namespace avr32
           abortTransfer();
           m_status = avr32::uc3::pdca::STATUS_ERROR;
         }
-      if (interruptFlag & AVR32_PDCA_IER_RCZ_MASK) // reload counter zero
+      if ((interruptFlag & AVR32_PDCA_IER_RCZ_MASK) != 0) // reload counter zero
         {
           m_currentRegionIndex = m_reloadedRegionIndex;
 
@@ -357,14 +376,15 @@ namespace avr32
           // notify
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }
-      if (interruptFlag & AVR32_PDCA_IER_TRC_MASK) // transfer complete
+      if ((interruptFlag & AVR32_PDCA_IER_TRC_MASK) != 0) // transfer complete
       {
+          // disable PDMA channel
+          registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+
           // disable all interrupt sources
           registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
               AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
 
-          // disable PDMA channel
-          registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
           m_status = avr32::uc3::pdca::STATUS_OK;
           // notify
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
