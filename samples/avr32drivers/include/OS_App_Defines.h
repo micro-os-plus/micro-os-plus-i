@@ -25,6 +25,7 @@
 #define OS_INCLUDE_AVR32_UC3_GPIO                       (1)
 #define OS_INCLUDE_AVR32_UC3_ADC                        (1)
 #define OS_INCLUDE_AVR32_UC3_RTC                        (1)
+#define OS_INCLUDE_AVR32_UC3_INTC                       (1)
 
 // ----------------------------------------------------------------------------
 
@@ -40,7 +41,7 @@
 //#define OS_DEBUG_OSREADYLIST_INSERT                     (1)
 //#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
 //#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
-
+#define OS_DEBUG_PDCA                                 (1)
 #endif /* DEBUG */
 
 // ----------------------------------------------------------------------------

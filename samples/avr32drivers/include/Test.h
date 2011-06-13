@@ -9,6 +9,7 @@
 
 #include "portable/kernel/include/uOS.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Spi.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Pdca.h"
 
 class Test : public OSThread
 {
@@ -27,9 +28,20 @@ public:
   int
   testAlloca(int x);
 
+  // test for a single buffer transfer on SPI using PDCA
+  int
+  testPdcaSpiSingleTransfer(void);
+
+  static __attribute__((__interrupt__)) void testPdcaSpiSingleTransferRxHandler( void);
+  static __attribute__((__interrupt__)) void testPdcaSpiSingleTransferTxHandler( void);
+
 private:
   // members
   OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
+
+  // members for Pdca Test
+  static avr32::uc3::PdcaReceive m_pdcaReceive;
+  static avr32::uc3::PdcaTransmit m_pdcaTransmit;
 
 };
 
