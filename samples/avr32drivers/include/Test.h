@@ -11,6 +11,9 @@
 #include "hal/arch/avr32/uc3/devices/onchip/include/Spi.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Pdca.h"
 
+class Test;
+extern Test test;
+
 class Test : public OSThread
 {
 public:
@@ -25,9 +28,6 @@ public:
   testSpi(avr32::uc3::spi::ModuleId_t moduleId,
       avr32::uc3::spi::BitsPerTransfer_t bitsPerTransfer);
 
-  int
-  testAlloca(int x);
-
   // test for a single buffer transfer on SPI using PDCA
   int
   testPdcaSpiSingleTransfer(void);
@@ -36,23 +36,30 @@ public:
   int
   testPdcaSpiMultipleTransfer(void);
 
-  static __attribute__((__interrupt__)) void testPdcaSpiSingleTransferRxHandler( void);
-  static __attribute__((__interrupt__)) void testPdcaSpiSingleTransferTxHandler( void);
+  static void __attribute__((__interrupt__))
+  testPdcaSpiSingleTransferRxHandler(void);
+  static void __attribute__((__interrupt__))
+  testPdcaSpiSingleTransferTxHandler(void);
 
 private:
   // members
-  OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
+  OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 800) / sizeof(OSStack_t)];
 
   // members for Pdca Test
-  static avr32::uc3::PdcaReceive m_pdcaReceive;
-  static avr32::uc3::PdcaTransmit m_pdcaTransmit;
-
+  avr32::uc3::PdcaReceive m_pdcaReceive;
+  avr32::uc3::PdcaTransmit m_pdcaTransmit;
 
   // PDCA-SPI Transfer test
-  uint8_t *m_singleTransfBufRx;
-  uint8_t *m_singleTransfBufTx;
-  uint8_t **m_multTransfBufRx;
-  uint8_t **m_multTransfBufTx;
+  // PDCA-SPI Single Transfer test globals
+#define TEST_PDCA_SPI_BUFF_SIZE         10
+  uint8_t m_singleTransfBufRx[TEST_PDCA_SPI_BUFF_SIZE];
+  uint8_t m_singleTransfBufTx[TEST_PDCA_SPI_BUFF_SIZE];
+
+  // PDCA-SPI Multiple Transfer test globals
+#define TEST_PDCA_SPI_BUFF_NUM         3
+#define TEST_PDCA_SPI_BUFF_SIZE2         10
+  uint8_t m_multTransfBufRx[TEST_PDCA_SPI_BUFF_NUM][TEST_PDCA_SPI_BUFF_SIZE2];
+  uint8_t m_multTransfBufTx[TEST_PDCA_SPI_BUFF_NUM][TEST_PDCA_SPI_BUFF_SIZE2];
 
 };
 
