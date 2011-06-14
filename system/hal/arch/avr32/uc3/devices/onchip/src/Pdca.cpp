@@ -38,6 +38,7 @@ namespace avr32
       m_regionsArraySize = 0;
       m_event = (OSEvent_t) this;
       m_eventRet = OSEventWaitReturn::OS_NONE;
+      m_candidateNotif = -1; // no candidate to be notified, yet
     }
 
     void
@@ -100,11 +101,12 @@ namespace avr32
       return OSReturn::OS_OK;
     }
 
+    // configures the reload mechanism with the next region
     OSReturn_t
     Pdca::setupReloadMechanism()
     {
       int nextRegion;
-      nextRegion = getNextRegionIndex();
+      nextRegion = getNextRegionIndex(m_currentRegionIndex);
       if (nextRegion < 0)
         {
           // no region to be set next
@@ -124,21 +126,21 @@ namespace avr32
 
     // returns the index of the next region which must be used
     int
-    Pdca::getNextRegionIndex()
+    Pdca::getNextRegionIndex(int actualRegion)//implicit should be m_currentRegionIndex
     {
       int nextRegionIndex = 0;
 
       if (m_isCircular)
         {
           // get consecutive index, modulo total regions number
-          nextRegionIndex = (m_currentRegionIndex + 1) % m_regionsArraySize;
+          nextRegionIndex = (actualRegion + 1) % m_regionsArraySize;
         }
       else
         {
           // get consecutive index, if there are more regions available
-          if (m_regionsArraySize > m_currentRegionIndex + 1)
+          if (m_regionsArraySize > (uint_t)(actualRegion + 1))
             {
-              nextRegionIndex = m_currentRegionIndex + 1;
+              nextRegionIndex = actualRegion + 1;
             }
           else
             {
@@ -198,120 +200,6 @@ namespace avr32
       OSDeviceDebug::putConstructor("avr32::uc3::PdcaTransmit", this);
     }
 
-    // TODO: add the other functions
-
-    // ----- PdcaReceive ------------------------------------------------------
-
-    PdcaReceive::PdcaReceive(pdca::ChannelId_t id) :
-      Pdca(id)
-    {
-      OSDeviceDebug::putConstructor("avr32::uc3::PdcaReceive", this);
-    }
-
-    OSReturn_t
-    PdcaReceive::readRegion(pdca::RegionAddress_t& region, bool doNotBlock)
-    {
-      int nextRegion;
-
-      // check if the candidate to the notify is ready
-      if (m_pRegionsArray[m_candidateNotif].status ==
-          avr32::uc3::pdca::IS_TRANFERRED_MASK)
-        {
-          region = &(m_pRegionsArray[m_candidateNotif]);
-          m_pRegionsArray[m_candidateNotif].status =
-                    avr32::uc3::pdca::IS_SIGNALLED_MASK;
-          nextRegion = getNextRegionIndex();
-          if (nextRegion != -1)
-            m_candidateNotif = nextRegion;
-          return OSReturn::OS_OK;
-        }
-
-      // the candidate is not ready to be notified
-      if (doNotBlock == true)
-        return OSReturn::OS_WOULD_BLOCK;
-
-      // now wait for the candidate to be ready
-      //OSEventWaitReturn_t ret = OSScheduler::eventWait(m_event);
-      OSScheduler::eventWait(m_event);
-
-      region = &(m_pRegionsArray[m_candidateNotif]);
-      m_pRegionsArray[m_candidateNotif].status =
-                avr32::uc3::pdca::IS_SIGNALLED_MASK;
-      nextRegion = getNextRegionIndex();
-      if (nextRegion != -1)
-        m_candidateNotif = nextRegion;
-      return OSReturn::OS_OK;
-
-    }
-
-    void
-    PdcaReceive::stopTransfer(void)
-    {
-      abortTransfer();
-      m_status = avr32::uc3::pdca::STATUS_STOPPED;
-      // notify
-      OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
-    }
-
-    void
-    PdcaReceive::interruptServiceRoutine(void)
-    {
-      uint32_t interruptFlag;
-
-      // find the interrupt source
-      interruptFlag = registers.readInterruptMask() &
-          registers.readInterruptStatus();
-
-      if ((interruptFlag & AVR32_PDCA_IER_TERR_MASK) != 0) // transfer error
-        {
-
-          // TODO: log registers MAR, TCR, MARR and TCRR
-          // the only source of error is an invalid address in MAR or MARR
-
-          abortTransfer();
-          // set status to finished
-          m_pRegionsArray[m_candidateNotif].status =
-                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
-          m_status = avr32::uc3::pdca::STATUS_ERROR;
-          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
-        }
-      if ((interruptFlag & AVR32_PDCA_IER_RCZ_MASK) != 0) // reload counter zero
-        {
-          m_currentRegionIndex = m_reloadedRegionIndex;
-          OSReturn_t ret = setupReloadMechanism();
-          if (ret != OSReturn::OS_OK)
-            {
-              // means no next region so this is last transfer
-              // disable RCZ interrupt
-              registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK);
-            }
-
-          // set status to finished
-          m_pRegionsArray[m_candidateNotif].status =
-                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
-
-          // notify
-          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
-        }
-      if ((interruptFlag & AVR32_PDCA_IER_TRC_MASK) != 0) // transfer complete
-      {
-          // disable PDMA channel
-          registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
-
-          // disable all interrupt sources
-          registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
-              AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
-
-          // set status to finished
-          m_pRegionsArray[m_candidateNotif].status =
-                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
-
-          m_status = avr32::uc3::pdca::STATUS_OK;
-          // notify
-          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
-      }
-    }
-
     OSReturn_t
     PdcaTransmit::waitWriteRegions(bool doNotBlock)
     {
@@ -368,13 +256,6 @@ namespace avr32
               // disable RCZ interrupt
               registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK);
             }
-
-          // set status to finished
-          m_pRegionsArray[m_candidateNotif].status =
-                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
-
-          // notify
-          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }
       if ((interruptFlag & AVR32_PDCA_IER_TRC_MASK) != 0) // transfer complete
       {
@@ -391,7 +272,148 @@ namespace avr32
       }
     }
 
-  // TODO: add the other functions
+    // ----- PdcaReceive ------------------------------------------------------
+
+    PdcaReceive::PdcaReceive(pdca::ChannelId_t id) :
+      Pdca(id)
+    {
+      OSDeviceDebug::putConstructor("avr32::uc3::PdcaReceive", this);
+    }
+
+    OSReturn_t
+    PdcaReceive::readRegion(pdca::RegionAddress_t& region, bool doNotBlock)
+    {
+      int nextRegion;
+
+      // if nothing to be notified
+      if (m_candidateNotif < 0)
+        {
+#if OS_DEBUG_PDCA
+          OSDeviceDebug::putString("PdcaReceive::readRegion no candid. region");
+          OSDeviceDebug::putNewLine();
+#endif
+          return OSReturn::OS_ITEM_NOT_FOUND;
+        }
+
+      // check if the candidate(to be notified) is already transfered
+      if (m_pRegionsArray[m_candidateNotif].status ==
+          avr32::uc3::pdca::IS_TRANFERRED_MASK)
+        {
+          region = &(m_pRegionsArray[m_candidateNotif]);
+          m_pRegionsArray[m_candidateNotif].status =
+                    avr32::uc3::pdca::IS_SIGNALLED_MASK;
+          nextRegion = getNextRegionIndex(m_candidateNotif);
+          if (nextRegion != -1)
+            m_candidateNotif = nextRegion;
+          else // no next region
+            m_candidateNotif = -1;
+          return OSReturn::OS_OK;
+        }
+
+      // the candidate is not ready to be notified
+      if (doNotBlock == true)
+        return OSReturn::OS_WOULD_BLOCK;
+
+      // now wait for the candidate to be ready
+      //OSEventWaitReturn_t ret = OSScheduler::eventWait(m_event);
+      OSScheduler::eventWait(m_event);
+
+      // should check if m_candidateNotif is transferred
+      if (m_pRegionsArray[m_candidateNotif].status !=
+                avr32::uc3::pdca::IS_TRANFERRED_MASK)
+        {
+#if OS_DEBUG_PDCA
+          OSDeviceDebug::putString("PdcaReceive::readRegion candid. reg NOT transf.");
+          OSDeviceDebug::putNewLine();
+#endif
+          return OSReturn::OS_ITEM_NOT_FOUND;
+        }
+
+      region = &(m_pRegionsArray[m_candidateNotif]);
+      m_pRegionsArray[m_candidateNotif].status =
+                avr32::uc3::pdca::IS_SIGNALLED_MASK;
+
+      // set next candidate to be notified
+      nextRegion = getNextRegionIndex(m_candidateNotif);
+      if (nextRegion != -1)
+        m_candidateNotif = nextRegion;
+      else // no next region
+        m_candidateNotif = -1;
+      return OSReturn::OS_OK;
+
+    }
+
+    void
+    PdcaReceive::stopTransfer(void)
+    {
+      abortTransfer();
+      m_status = avr32::uc3::pdca::STATUS_STOPPED;
+      m_pRegionsArray[m_candidateNotif].status =
+                      avr32::uc3::pdca::IS_TRANFERRED_MASK;
+      // notify
+      OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
+    }
+
+    void
+    PdcaReceive::interruptServiceRoutine(void)
+    {
+      uint32_t interruptFlag;
+
+      // find the interrupt source
+      interruptFlag = registers.readInterruptMask() &
+          registers.readInterruptStatus();
+
+      if ((interruptFlag & AVR32_PDCA_IER_TERR_MASK) != 0) // transfer error
+        {
+
+          // TODO: log registers MAR, TCR, MARR and TCRR
+          // the only source of error is an invalid address in MAR or MARR
+
+          abortTransfer();
+          // set status to finished
+          m_pRegionsArray[m_candidateNotif].status =
+                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
+          m_status = avr32::uc3::pdca::STATUS_ERROR;
+          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
+        }
+      if ((interruptFlag & AVR32_PDCA_IER_RCZ_MASK) != 0) // reload counter zero
+        {
+          // set status to finished
+          m_pRegionsArray[m_currentRegionIndex].status =
+                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
+          // notify
+          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
+
+          m_currentRegionIndex = m_reloadedRegionIndex;
+          OSReturn_t ret = setupReloadMechanism();
+          if (ret != OSReturn::OS_OK)
+            {
+              // means no next region so this is last transfer
+              // disable RCZ interrupt
+              registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK);
+            }
+        }
+      if ((interruptFlag & AVR32_PDCA_IER_TRC_MASK) != 0) // transfer complete
+      {
+          // disable PDMA channel
+          registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+
+          // disable all interrupt sources
+          registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
+              AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
+
+          // set status to finished
+          m_pRegionsArray[m_currentRegionIndex].status =
+                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
+
+          m_status = avr32::uc3::pdca::STATUS_OK;
+          // notify
+          OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
+      }
+    }
+
+
+
 
   }
 }

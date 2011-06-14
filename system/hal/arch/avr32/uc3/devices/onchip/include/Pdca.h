@@ -293,7 +293,7 @@ namespace avr32
 
     protected:
       int
-      getNextRegionIndex(void);
+      getNextRegionIndex(int actualRegion);
 
       OSReturn_t
       setupReloadMechanism(void);
