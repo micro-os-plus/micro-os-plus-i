@@ -32,6 +32,10 @@ public:
   int
   testPdcaSpiSingleTransfer(void);
 
+  // test for multiple buffer transfer on SPI using PDCA
+  int
+  testPdcaSpiMultipleTransfer(void);
+
   static __attribute__((__interrupt__)) void testPdcaSpiSingleTransferRxHandler( void);
   static __attribute__((__interrupt__)) void testPdcaSpiSingleTransferTxHandler( void);
 
@@ -42,6 +46,13 @@ private:
   // members for Pdca Test
   static avr32::uc3::PdcaReceive m_pdcaReceive;
   static avr32::uc3::PdcaTransmit m_pdcaTransmit;
+
+
+  // PDCA-SPI Transfer test
+  uint8_t *m_singleTransfBufRx;
+  uint8_t *m_singleTransfBufTx;
+  uint8_t **m_multTransfBufRx;
+  uint8_t **m_multTransfBufTx;
 
 };
 
