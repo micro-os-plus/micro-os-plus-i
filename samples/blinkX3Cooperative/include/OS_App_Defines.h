@@ -9,22 +9,35 @@
 
 // ----- Portable Definitions -------------------------------------------------
 
-#define OS_CFGINT_THREADS_ARRAY_SIZE                      (3)
+#define OS_CFGINT_THREADS_ARRAY_SIZE                    (3)
 
 // Mandatory here, since we test the cooperative multitasking
 #define OS_EXCLUDE_PREEMPTION                           (1)
 
+#define OS_TEST_PHASE 2
+
+#if OS_TEST_PHASE == 1
+
 // First time we test with standard timer interrupts, to avoid
 // context save/restore.
-// After this works properly, proceed with naked interrupts.
-//#define OS_EXCLUDE_OSTIMERTICKS_NAKED_ISR               (1)
+#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
+
+#elif OS_TEST_PHASE == 2
+
+// After the above works properly, proceed with naked interrupts.
+
+#endif
+
 
 // ----- Board Definitions ----------------------------------------------------
 
 #if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
 
-#define OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK          (1)
+#define OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK   (1)
+#define OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK   (1)
 #define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
+//#define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
+#define OS_INCLUDE_OSSCHEDULER_YIELD_MASK_INTERRUPTS  (1)
 
 #elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
 
@@ -36,16 +49,19 @@
 
 #define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS          (1)
 
-//#define OS_DEBUG_OSSCHEDULER_STACKINITIALIZE            (1)
+#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
 #define OS_DEBUG_CONSTRUCTORS                           (1)
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
-//#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
-//#define OS_DEBUG_OSSCHEDULER_THREADREGISTER               (1)
-//#define OS_DEBUG_OSREADYLIST_INSERT                     (1)
-//#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
-//#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
 
-#endif /* DEBUG */
+#if false
+#define OS_DEBUG_OSSCHEDULER_STACKINITIALIZE            (1)
+#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
+#define OS_DEBUG_OSSCHEDULER_THREADREGISTER             (1)
+#define OS_DEBUG_OSREADYLIST_INSERT                     (1)
+#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
+#endif
+
+#endif /* defined(DEBUG) */
 
 // ----------------------------------------------------------------------------
 
