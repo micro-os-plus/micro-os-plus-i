@@ -13,17 +13,18 @@
 #include "portable/stdlib/include/streambuf"
 #endif
 
-#if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TYPE)
 // info to identify device type
-typedef enum
-  { OS_DEVICECHARACTER_USART, OS_DEVICECHARACTER_USB_CDC}
-deviceCharacterType_t;
+typedef enum DeviceCharacterType_e
+{
+  OS_DEVICECHARACTER_USART, OS_DEVICECHARACTER_USB_CDC, OS_DEVICECHARACTER_NET
+} DeviceCharacterType_t;
 #endif
 
 // TODO: methods for buffered read/write operations must be added.
 class OSDeviceCharacter
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
-: public std::streambuf
+    : public std::streambuf
 #endif
 
 {
@@ -88,9 +89,10 @@ public:
   OSReturn_t
   flush(void);
 
-#if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TYPE)
   // get device type
-  deviceCharacterType_t getDeviceType(void);
+  DeviceCharacterType_t
+  getDeviceType(void) const;
 #endif
 
   // set/get the thread event to be used by read
@@ -169,9 +171,9 @@ public:
 #endif
 
 protected:
-#if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TYPE)
   // info to identify device class
-  deviceCharacterType_t m_type;
+  DeviceCharacterType_t m_type;
 #endif
 
   bool m_isOpened;
@@ -381,12 +383,12 @@ OSDeviceCharacter::getWriteTimer(void) const
 
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
-#if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
-inline deviceCharacterType_t
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TYPE)
+inline DeviceCharacterType_t
 OSDeviceCharacter::getDeviceType(void) const
-  {
-    return m_type;
-  }
+{
+  return m_type;
+}
 #endif
 
 #endif /* OSDEVICECHARACTER_H_ */

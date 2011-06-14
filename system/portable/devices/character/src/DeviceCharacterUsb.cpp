@@ -42,10 +42,10 @@ DeviceCharacterUsb::DeviceCharacterUsb(int device)
 #endif /* defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE) */
     }
 
-#if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TYPE)
 
   m_type = OS_DEVICECHARACTER_USB_CDC;
-#endif /* defined(OS_INCLUDE_DEVICECHARACTER_TYPE) */
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_TYPE) */
 }
 
 DeviceCharacterUsb::~DeviceCharacterUsb()

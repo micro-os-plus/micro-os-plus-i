@@ -42,7 +42,7 @@ OSDeviceCharacterBuffered::init(unsigned char* pTxBuf,
     unsigned char* pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
     unsigned short rxLWM)
 {
-#if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_TYPE)
   m_type = OS_DEVICECHARACTER_USART;
 #endif
 
