@@ -278,6 +278,12 @@
 #define AVR32_is_usb_endpoint_stall_requested(ep)       (Tst_bits(AVR32_USBB_ueconx(ep), AVR32_USBB_UECONX_STALLRQ_MASK))
 //! enables the selected endpoint interrupt
 #define AVR32_usb_enable_endpoint_interrupt(ep)         (AVR32_USBB_udinteset = AVR32_USBB_UDINTESET_EP0INTES_MASK << (ep))
+  //! Test if controller is in full speed mode
+#define AVR32_is_usb_full_speed_mode()        (Rd_bitfield(AVR32_USBB_usbsta, AVR32_USBB_USBSTA_SPEED_MASK) == AVR32_USBB_USBSTA_SPEED_FULL)
+  //! disables the selected endpoint
+#define AVR32_usb_disable_endpoint(ep)                  (Clr_bits(AVR32_USBB_uerst, AVR32_USBB_UERST_EPEN0_MASK << (ep)))
+  //! un-allocates the configuration x in DPRAM memory
+#define AVR32_usb_unallocate_memory(ep)                 (Clr_bits(AVR32_USBB_uecfgx(ep), AVR32_USBB_UECFGX_ALLOC_MASK))
 
 //! configures selected endpoint in one step
 #define AVR32_usb_configure_endpoint(ep, type, dir, size, bank) \

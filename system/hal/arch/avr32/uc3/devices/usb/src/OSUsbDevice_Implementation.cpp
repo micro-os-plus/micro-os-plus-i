@@ -371,7 +371,7 @@ OSUsbDeviceImpl::usb_start_device(void)
   // enable suspend state interrupt
   Usb_enable_suspend_interrupt();
 
-#ifndef HIGH_SPEED_CAPABLE
+#ifndef USB_HIGH_SPEED_SUPPORT
   AVR32_usb_force_full_speed_mode(); // if we want to use full-speed
 #else
   //dual mode needed because the peripheral starts in full-speed mode and performs a
@@ -1101,34 +1101,34 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
 
 #else
     case CONFIGURATION_DESCRIPTOR:
-    if(Is_usb_full_speed_mode())
+    if(AVR32_is_usb_full_speed_mode())
       {
         data_to_transfer = Usb_get_conf_desc_fs_length(); //!< sizeof(usb_conf_desc_fs);
-        pbuffer = Usb_get_conf_desc_fs_pointer();
+        pbuffer = (void*)Usb_get_conf_desc_fs_pointer();
       }
     else
       {
         data_to_transfer = Usb_get_conf_desc_hs_length(); //!< sizeof(usb_conf_desc_hs);
-        pbuffer = Usb_get_conf_desc_hs_pointer();
+        pbuffer = (void*)Usb_get_conf_desc_hs_pointer();
       }
     break;
 
     case OTHER_SPEED_CONFIGURATION_DESCRIPTOR:
-    if(!Is_usb_full_speed_mode())
+    if(!AVR32_is_usb_full_speed_mode())
       {
         data_to_transfer = Usb_get_conf_desc_fs_length(); //!< sizeof(usb_conf_desc_fs);
-        pbuffer = Usb_get_conf_desc_fs_pointer();
+        pbuffer = (void*)Usb_get_conf_desc_fs_pointer();
       }
     else
       {
         data_to_transfer = Usb_get_conf_desc_hs_length(); //!< sizeof(usb_conf_desc_hs);
-        pbuffer = Usb_get_conf_desc_hs_pointer();
+        pbuffer = (void*)Usb_get_conf_desc_hs_pointer();
       }
     break;
 
     case DEVICE_QUALIFIER_DESCRIPTOR:
     data_to_transfer = Usb_get_qualifier_desc_length(); //!< sizeof(usb_qualifier_desc);
-    pbuffer = Usb_get_qualifier_desc_pointer();
+    pbuffer = (void*)Usb_get_qualifier_desc_pointer();
     break;
 
 #endif
@@ -1177,21 +1177,22 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
           b_first_data = FALSE;
           if(0!= data_to_transfer)
             {
-              usb_write_ep_txpacket(EP_CONTROL, pbuffer, 1, &pbuffer);
+              usbWriteEpTxPacket(EP_CONTROL, pbuffer, 1, (const void**)&pbuffer);
               data_to_transfer--;
             }
           if(0!= data_to_transfer)
             {
-              usb_write_ep_txpacket(EP_CONTROL, &descriptor_type, 1, NULL);
-              pbuffer = ((const U8*)pbuffer)+1;
+              usbWriteEpTxPacket(EP_CONTROL, &descriptor_type, 1, NULL);
+              pbuffer = (void*)(((const U8*)pbuffer)+1);
               data_to_transfer--;
             }
         }
 #endif
       if (0 != data_to_transfer)
         {
-          //         data_to_transfer = usb_write_ep_txpacket(EP_CONTROL, pbuffer,
-          //                                                  data_to_transfer, &pbuffer);
+                   data_to_transfer = usbWriteEpTxPacket(EP_CONTROL, pbuffer,
+                                                            data_to_transfer, (const void**)&pbuffer);
+#if 0
           //TODO: replace this with the code above.
           while (!OSUsbDeviceImpl::Is_usb_tx_ready())
             ; // Wait Endpoint ready...
@@ -1204,6 +1205,7 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
               if (data_to_transfer == 0)
                 break;
             }
+#endif
           Usb_send_control_in();
           if (data_to_transfer == 0 && counter
               == UsbGetEndpointSize(EP_CONTROL))// ZLP
@@ -1212,6 +1214,7 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
                 ; // Wait Endpoint ready...
               OSUsbDeviceImpl::Usb_send_in(); // ...and Send ZLP
             }
+
         }
       if (Is_usb_nak_out())
         break;
@@ -1485,25 +1488,25 @@ OSUsbDeviceImpl::usb_set_feature(void)
     switch (wIndex >> 8)
       {
         case TEST_J:
-        Usb_ack_setup_received_free();
-        Usb_ack_control_in_ready_send();
-        while (!Is_usb_control_in_ready());
+        AVR32_usb_ack_setup_received_free();
+        AVR32_usb_ack_control_in_ready_send();
+        while (!AVR32_is_usb_control_in_ready()) ;
         Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 2);
         Set_bits(AVR32_USBB_udcon, AVR32_USBB_UDCON_TSTJ_MASK);
         break;
 
         case TEST_K:
-        Usb_ack_setup_received_free();
-        Usb_ack_control_in_ready_send();
-        while (!Is_usb_control_in_ready());
+        AVR32_usb_ack_setup_received_free();
+        AVR32_usb_ack_control_in_ready_send();
+        while (!AVR32_is_usb_control_in_ready()) ;
         Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 2);
         Set_bits(AVR32_USBB_udcon, AVR32_USBB_UDCON_TSTK_MASK);
         break;
 
         case TEST_SE0_NAK:
-        Usb_ack_setup_received_free();
-        Usb_ack_control_in_ready_send();
-        while (!Is_usb_control_in_ready());
+        AVR32_usb_ack_setup_received_free();
+        AVR32_usb_ack_control_in_ready_send();
+        while (!AVR32_is_usb_control_in_ready()) ;
         Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 2);
         break;
 
@@ -1525,21 +1528,21 @@ OSUsbDeviceImpl::usb_set_feature(void)
                 0xFC, 0x7E, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0x7E
               };
 
-            Usb_ack_setup_received_free();
-            Usb_ack_control_in_ready_send();
-            while (!Is_usb_control_in_ready());
+            AVR32_usb_ack_setup_received_free();
+            AVR32_usb_ack_control_in_ready_send();
+            while (!AVR32_is_usb_control_in_ready()) ;
             Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 2);
-            Usb_disable_endpoint(EP_CONTROL);
-            Usb_unallocate_memory(EP_CONTROL);
-            (void)Usb_configure_endpoint(EP_CONTROL,
+            AVR32_usb_disable_endpoint(EP_CONTROL);
+            AVR32_usb_unallocate_memory(EP_CONTROL);
+            (void)AVR32_usb_configure_endpoint(EP_CONTROL,
                 TYPE_BULK,
                 DIRECTION_IN,
                 64,
                 SINGLE_BANK);
-            Usb_reset_endpoint(EP_CONTROL);
+            AVR32_usb_reset_endpoint(EP_CONTROL);
             Set_bits(AVR32_USBB_udcon, AVR32_USBB_UDCON_TSTPCKT_MASK);
-            usb_write_ep_txpacket(EP_CONTROL, &test_packet, sizeof(test_packet), NULL);
-            Usb_send_in(EP_CONTROL);
+            usbWriteEpTxPacket(EP_CONTROL, &test_packet, sizeof(test_packet), NULL);
+            AVR32_usb_send_in(EP_CONTROL);
           }
         break;
 
@@ -1679,15 +1682,15 @@ OSUsbDeviceImpl::usb_set_interface(void)
 
   // Get descriptor
 #if (USB_HIGH_SPEED_SUPPORT==ENABLED)
-  if(Is_usb_full_speed_mode())
+  if(AVR32_is_usb_full_speed_mode())
     {
       data_to_transfer = Usb_get_conf_desc_fs_length(); //!< sizeof(usb_conf_desc_fs);
-      pbuffer = Usb_get_conf_desc_fs_pointer();
+      pbuffer = (void*)Usb_get_conf_desc_fs_pointer();
     }
   else
     {
       data_to_transfer = Usb_get_conf_desc_hs_length(); //!< sizeof(usb_conf_desc_hs);
-      pbuffer = Usb_get_conf_desc_hs_pointer();
+      pbuffer = (void*)Usb_get_conf_desc_hs_pointer();
     }
 #else
   data_to_transfer = Usb_get_conf_desc_length(); //!< sizeof(usb_conf_desc);
