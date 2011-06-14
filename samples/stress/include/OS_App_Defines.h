@@ -20,18 +20,18 @@
 #define OS_INCLUDE_OS_BUSYWAITMILLIS                    (1)
 #define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
 
-//#define OS_INCLUDE_OSTHREAD_SCHEDULERTICK                 (1)
+//#define OS_INCLUDE_OSTHREAD_SCHEDULERTICK               (1)
 #define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
 
 #define OS_CFGINT_IDLE_TASK_STACK_SIZE                  (800)
 
-//#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
-#define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
-//#define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
-#define OS_INCLUDE_CLOG                                 1
-//#define OS_INCLUDE_OSTREAM                              1
-#define OS_INCLUDE_OSTREAM_OSTHREAD                       1
-#define OS_INCLUDE_OSTREAM_PROGRAMPTR                   1
+//#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              (1)
+#define OS_INCLUDE_OSTHREAD_GETSTACKUSED                (1)
+//#define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER           (1)
+#define OS_INCLUDE_CLOG                                 (1)
+//#define OS_INCLUDE_OSTREAM                              (1)
+#define OS_INCLUDE_OSTREAM_OSTHREAD                     (1)
+#define OS_INCLUDE_OSTREAM_PROGRAMPTR                   (1)
 
 // ----- Board Definitions ----------------------------------------------------
 
@@ -41,14 +41,10 @@
 
 //#define OS_EXCLUDE_PREEMPTION                           (1)
 //#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
-#define OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK   (1)
-#define OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK   (1)
-#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
-//#define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
-#define OS_INCLUDE_OSSCHEDULER_CRITICALENTER_WITH_MASK  (1)
-//#define OS_CFGINT_OSCRITICALSECTION_MASK                (0xF << (16+1))
-//#define OS_CFGINT_OSCRITICALSECTION_MASKYIELD           (0xF << (16+1))
 
+#define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
+#define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
+#define OS_INCLUDE_OSSCHEDULER_YIELD_MASK_INTERRUPTS    (1)
 
 #define OS_INCLUDE_OSREALTIME                           (1)
 
