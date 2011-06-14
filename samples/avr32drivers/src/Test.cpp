@@ -14,22 +14,10 @@
  * Initialise parent system thread and store parameters in private members.
  */
 
-avr32::uc3::PdcaReceive Test::m_pdcaReceive(avr32::uc3::pdca::CHANNEL_0);
-avr32::uc3::PdcaTransmit Test::m_pdcaTransmit(avr32::uc3::pdca::CHANNEL_1);
-
-// PDCA-SPI Single Transfer test globals
-#define TEST_PDCA_SPI_BUFF_SIZE         10
-uint8_t m_singleTransfBufRx[TEST_PDCA_SPI_BUFF_SIZE];
-uint8_t m_singleTransfBufTx[TEST_PDCA_SPI_BUFF_SIZE];
-
-// PDCA-SPI Multiple Transfer test globals
-#define TEST_PDCA_SPI_BUFF_NUM         3
-#define TEST_PDCA_SPI_BUFF_SIZE2         10
-uint8_t m_multTransfBufRx[TEST_PDCA_SPI_BUFF_NUM][TEST_PDCA_SPI_BUFF_SIZE2];
-uint8_t m_multTransfBufTx[TEST_PDCA_SPI_BUFF_NUM][TEST_PDCA_SPI_BUFF_SIZE2];
-
 Test::Test(void) :
-  OSThread("Test", m_stack, sizeof(m_stack))
+  OSThread("Test", m_stack, sizeof(m_stack)),
+      m_pdcaReceive(avr32::uc3::pdca::CHANNEL_0),
+      m_pdcaTransmit(avr32::uc3::pdca::CHANNEL_1)
 {
   debug.putConstructor_P(PSTR("Test"), this);
 }
@@ -53,10 +41,6 @@ Test::threadMain(void)
       os.sched.lock.exit();
     }
 
-#if false
-  testAlloca(77);
-#endif
-
 #if true
   testSpi(avr32::uc3::spi::MODULE_0, avr32::uc3::spi::BITS_8);
   testSpi(avr32::uc3::spi::MODULE_0, avr32::uc3::spi::BITS_16);
@@ -64,7 +48,7 @@ Test::threadMain(void)
   testSpi(avr32::uc3::spi::MODULE_1, avr32::uc3::spi::BITS_16);
 #endif
 
-#if false
+#if true
   testPdcaSpiSingleTransfer();
 #endif
 
@@ -86,6 +70,7 @@ Test::testSpi(avr32::uc3::spi::ModuleId_t moduleId,
   //avr32::uc3::Spim spi0m(avr32::uc3::spi::MODULE_1);
   avr32::uc3::Spim spi0m(moduleId);
 
+  debug.putNewLine();
   debug.putString("Spi test start");
   debug.putNewLine();
   debug.putString("Module ");
@@ -148,42 +133,6 @@ Test::testSpi(avr32::uc3::spi::ModuleId_t moduleId,
   spi0m.disable();
 }
 
-int
-Test::testAlloca(int x)
-{
-  register OSStack_t tmp1;
-
-  tmp1 = OSCPUImpl::getInterruptsMask();
-  *((OSStack_t*) __builtin_alloca(1)) = tmp1;
-  tmp1 |= (OS_CFGINT_OSCRITICALSECTION_MASK);
-  OSCPUImpl::setInterruptsMask(tmp1);
-
-  debug.putString("alloca 1 ");
-  debug.putNewLine();
-
-  register OSStack_t tmp2;
-
-  tmp2 = OSCPUImpl::stackPop();
-  OSCPUImpl::setInterruptsMask(tmp2);
-
-  register OSStack_t tmp3;
-
-  tmp3 = OSCPUImpl::getInterruptsMask();
-  *((OSStack_t*) __builtin_alloca(1)) = tmp3;
-  tmp3 |= (OS_CFGINT_OSCRITICALSECTION_MASK);
-  OSCPUImpl::setInterruptsMask(tmp3);
-
-  debug.putString("alloca 2 ");
-  debug.putNewLine();
-
-  register OSStack_t tmp4;
-
-  tmp4 = OSCPUImpl::stackPop();
-  OSCPUImpl::setInterruptsMask(tmp4);
-
-  return x + 123;
-}
-
 // test for a single buffer transfer on SPI using PDCA
 int
 Test::testPdcaSpiSingleTransfer(void)
@@ -195,6 +144,7 @@ Test::testPdcaSpiSingleTransfer(void)
   avr32::uc3::pdca::Region_t rxRegion[1];
   avr32::uc3::pdca::Region_t txRegion[1];
 
+  debug.putNewLine();
   debug.putString("Pdca-Spi Single Transfer Test start");
   debug.putNewLine();
 
@@ -209,10 +159,10 @@ Test::testPdcaSpiSingleTransfer(void)
   m_pdcaTransmit.setPeripheralId(avr32::uc3::pdca::SPI0_TX);
 
   // create buffers
-  for (int i = 0 ; i < TEST_PDCA_SPI_BUFF_SIZE; i++)
+  for (int i = 0; i < TEST_PDCA_SPI_BUFF_SIZE; i++)
     {
       m_singleTransfBufRx[i] = 0;
-      m_singleTransfBufTx[i] = (uint8_t)i;
+      m_singleTransfBufTx[i] = (uint8_t) i;
     }
   rxRegion[0].address = m_singleTransfBufRx;
   rxRegion[0].size = TEST_PDCA_SPI_BUFF_SIZE;
@@ -236,20 +186,20 @@ Test::testPdcaSpiSingleTransfer(void)
   m_pdcaTransmit.startTransfer();
 
   // busy wait - low level version
-//  while ((m_pdcaReceive.registers.readTransferCounter() !=0 ) ||
-//        (m_pdcaTransmit.registers.readTransferCounter() !=0 ))
-//    ;
+  //  while ((m_pdcaReceive.registers.readTransferCounter() !=0 ) ||
+  //        (m_pdcaTransmit.registers.readTransferCounter() !=0 ))
+  //    ;
 
   // busy wait - high level version
-//  avr32::uc3::pdca::Status_t txStatus, rxStatus;
-//  do
-//    {
-//      txStatus = m_pdcaTransmit.getStatus();
-//      rxStatus = m_pdcaReceive.getStatus();
-//    }while (txStatus == avr32::uc3::pdca::STATUS_BUSY ||
-//        rxStatus == avr32::uc3::pdca::STATUS_BUSY);
-//  debug.putString("status not busy");
-//  debug.putNewLine();
+  //  avr32::uc3::pdca::Status_t txStatus, rxStatus;
+  //  do
+  //    {
+  //      txStatus = m_pdcaTransmit.getStatus();
+  //      rxStatus = m_pdcaReceive.getStatus();
+  //    }while (txStatus == avr32::uc3::pdca::STATUS_BUSY ||
+  //        rxStatus == avr32::uc3::pdca::STATUS_BUSY);
+  //  debug.putString("status not busy");
+  //  debug.putNewLine();
 
   // block until transfer is over
   avr32::uc3::pdca::RegionAddress_t regionAddress;
@@ -260,8 +210,8 @@ Test::testPdcaSpiSingleTransfer(void)
   bool failed = false;
 
   // check the pdca(transfer) status
-  if ((m_pdcaTransmit.getStatus() != avr32::uc3::pdca::STATUS_OK) ||
-      (m_pdcaReceive.getStatus() != avr32::uc3::pdca::STATUS_OK))
+  if ((m_pdcaTransmit.getStatus() != avr32::uc3::pdca::STATUS_OK)
+      || (m_pdcaReceive.getStatus() != avr32::uc3::pdca::STATUS_OK))
     {
       debug.putString("wrong status");
       failed = true;
@@ -269,18 +219,18 @@ Test::testPdcaSpiSingleTransfer(void)
   // check the transferred data
 
 
-  for (int i = 0 ; i < TEST_PDCA_SPI_BUFF_SIZE; i++)
+  for (int i = 0; i < TEST_PDCA_SPI_BUFF_SIZE; i++)
     {
       if (m_singleTransfBufRx[i] != m_singleTransfBufTx[i])
-      {
-        debug.putString("sent: ");
-        debug.putHex(m_singleTransfBufTx[i]);
-        debug.putString(" received as ");
-        debug.putHex(m_singleTransfBufRx[i]);
-        debug.putNewLine();
+        {
+          debug.putString("sent: ");
+          debug.putHex(m_singleTransfBufTx[i]);
+          debug.putString(" received as ");
+          debug.putHex(m_singleTransfBufRx[i]);
+          debug.putNewLine();
 
-        failed = true;
-      }
+          failed = true;
+        }
     }
 
   if (!failed)
@@ -310,6 +260,7 @@ Test::testPdcaSpiMultipleTransfer(void)
   avr32::uc3::pdca::Region_t rxRegion[TEST_PDCA_SPI_BUFF_NUM];
   avr32::uc3::pdca::Region_t txRegion[TEST_PDCA_SPI_BUFF_NUM];
 
+  debug.putNewLine();
   debug.putString("Pdca-Spi Multiple Transfer Test start");
   debug.putNewLine();
 
@@ -324,12 +275,13 @@ Test::testPdcaSpiMultipleTransfer(void)
   m_pdcaTransmit.setPeripheralId(avr32::uc3::pdca::SPI0_TX);
 
   // create buffers
-  for (int regIdx = 0 ; regIdx < TEST_PDCA_SPI_BUFF_NUM; regIdx++)
+  for (uint16_t regIdx = 0; regIdx < TEST_PDCA_SPI_BUFF_NUM; regIdx++)
     {
-      for (int i = 0 ; i < TEST_PDCA_SPI_BUFF_SIZE2; i++)
+      for (uint16_t i = 0; i < TEST_PDCA_SPI_BUFF_SIZE2; i++)
         {
           m_multTransfBufRx[regIdx][i] = 0;
-          m_multTransfBufTx[regIdx][i] = (uint8_t)(regIdx*TEST_PDCA_SPI_BUFF_SIZE2 + i);
+          m_multTransfBufTx[regIdx][i] = (uint8_t) (regIdx
+              * TEST_PDCA_SPI_BUFF_SIZE2 + i);
         }
       rxRegion[regIdx].address = m_multTransfBufRx[regIdx];
       rxRegion[regIdx].size = TEST_PDCA_SPI_BUFF_SIZE2;
@@ -355,29 +307,26 @@ Test::testPdcaSpiMultipleTransfer(void)
   m_pdcaTransmit.startTransfer();
 
   // busy wait - low level version
-//  while ((m_pdcaReceive.registers.readTransferCounter() !=0 ) ||
-//        (m_pdcaTransmit.registers.readTransferCounter() !=0 ))
-//    ;
+  //  while ((m_pdcaReceive.registers.readTransferCounter() !=0 ) ||
+  //        (m_pdcaTransmit.registers.readTransferCounter() !=0 ))
+  //    ;
 
   // busy wait - high level version
-//  avr32::uc3::pdca::Status_t txStatus, rxStatus;
-//  do
-//    {
-//      txStatus = m_pdcaTransmit.getStatus();
-//      rxStatus = m_pdcaReceive.getStatus();
-//    }while (txStatus == avr32::uc3::pdca::STATUS_BUSY ||
-//        rxStatus == avr32::uc3::pdca::STATUS_BUSY);
-//  debug.putString("status not busy");
-//  debug.putNewLine();
+  //  avr32::uc3::pdca::Status_t txStatus, rxStatus;
+  //  do
+  //    {
+  //      txStatus = m_pdcaTransmit.getStatus();
+  //      rxStatus = m_pdcaReceive.getStatus();
+  //    }while (txStatus == avr32::uc3::pdca::STATUS_BUSY ||
+  //        rxStatus == avr32::uc3::pdca::STATUS_BUSY);
+  //  debug.putString("status not busy");
+  //  debug.putNewLine();
 
   bool failed = false;
 
-
   avr32::uc3::pdca::RegionAddress_t regionAddress;
 
-  for (uint16_t transferNum = 0;
-      transferNum < 2*TEST_PDCA_SPI_BUFF_NUM ;
-      transferNum ++)
+  for (uint16_t transferNum = 0; transferNum < 2 * TEST_PDCA_SPI_BUFF_NUM; transferNum++)
     {
       debug.putString("Transfer ");
       debug.putDec(transferNum);
@@ -389,8 +338,8 @@ Test::testPdcaSpiMultipleTransfer(void)
       debug.putNewLine();
 
       // check the pdca(transfer) status
-      if ((m_pdcaTransmit.getStatus() != avr32::uc3::pdca::STATUS_OK) ||
-          (m_pdcaReceive.getStatus() != avr32::uc3::pdca::STATUS_OK))
+      if ((m_pdcaTransmit.getStatus() != avr32::uc3::pdca::STATUS_OK)
+          || (m_pdcaReceive.getStatus() != avr32::uc3::pdca::STATUS_OK))
         {
           debug.putString("wrong status");
           failed = true;
@@ -398,18 +347,18 @@ Test::testPdcaSpiMultipleTransfer(void)
       // check the transferred data
       int bufIdx = transferNum % TEST_PDCA_SPI_BUFF_NUM;
 
-      for (int i = 0 ; i < TEST_PDCA_SPI_BUFF_SIZE; i++)
+      for (int i = 0; i < TEST_PDCA_SPI_BUFF_SIZE; i++)
         {
           if (m_multTransfBufRx[bufIdx][i] != m_multTransfBufTx[bufIdx][i])
-          {
-            debug.putString("sent: ");
-            debug.putHex(m_multTransfBufTx[bufIdx][i]);
-            debug.putString(" received as ");
-            debug.putHex(m_multTransfBufRx[bufIdx][i]);
-            debug.putNewLine();
+            {
+              debug.putString("sent: ");
+              debug.putHex(m_multTransfBufTx[bufIdx][i]);
+              debug.putString(" received as ");
+              debug.putHex(m_multTransfBufRx[bufIdx][i]);
+              debug.putNewLine();
 
-            failed = true;
-          }
+              failed = true;
+            }
         }
     }
   if (!failed)
@@ -431,16 +380,20 @@ Test::testPdcaSpiMultipleTransfer(void)
   return 1;
 }
 
-__attribute__((__interrupt__)) void
-Test::testPdcaSpiSingleTransferRxHandler( void)
+void
+Test::testPdcaSpiSingleTransferRxHandler(void)
 {
+  OSScheduler::ISR_ledActiveOn();
+
   debug.putString("+");
-  m_pdcaReceive.interruptServiceRoutine();
+  test.m_pdcaReceive.interruptServiceRoutine();
 }
 
-__attribute__((__interrupt__)) void
-Test::testPdcaSpiSingleTransferTxHandler( void)
+void
+Test::testPdcaSpiSingleTransferTxHandler(void)
 {
+  OSScheduler::ISR_ledActiveOn();
+
   debug.putString("-");
-  m_pdcaTransmit.interruptServiceRoutine();
+  test.m_pdcaTransmit.interruptServiceRoutine();
 }
