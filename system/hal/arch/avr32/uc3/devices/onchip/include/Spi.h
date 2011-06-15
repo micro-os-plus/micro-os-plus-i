@@ -261,9 +261,9 @@ namespace avr32
         spi::BitsPerTransfer_t bitsPerTransfer)
     {
       registers.writeChipSelect0(
-          ((uint32_t) delayBCT << AVR32_SPI_CSR0_DLYBCT_OFFSET) |
-          ((uint32_t) baudRateFactor << AVR32_SPI_CSR0_SCBR_OFFSET) |
-          ((uint32_t)bitsPerTransfer << AVR32_SPI_CSR0_BITS_OFFSET));
+          ((uint32_t) (delayBCT << AVR32_SPI_CSR0_DLYBCT_OFFSET) & AVR32_SPI_CSR0_DLYBCT_MASK) |
+          ((uint32_t) (baudRateFactor << AVR32_SPI_CSR0_SCBR_OFFSET) & AVR32_SPI_CSR0_SCBR_MASK) |
+          ((uint32_t) (bitsPerTransfer << AVR32_SPI_CSR0_BITS_OFFSET) & AVR32_SPI_CSR0_BITS_MASK));
     }
 
     inline void

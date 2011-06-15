@@ -35,6 +35,9 @@ namespace avr32
       // software reset SPI module
       registers.writeControl(AVR32_SPI_CR_SWRST_MASK);
 
+      // disable all interrupts
+      registers.writeInterruptsDisable(0xFFFFFFFF);
+
       // Set master mode, enable RX FIFO and Disable Mode Fault
       registers.writeMode(AVR32_SPI_MSTR_MASK | AVR32_SPI_MR_MODFDIS_MASK |
           AVR32_SPI_MR_RXFIFOEN_MASK);
