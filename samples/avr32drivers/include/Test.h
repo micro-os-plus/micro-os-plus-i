@@ -56,10 +56,10 @@ private:
   uint8_t m_singleTransfBufTx[TEST_PDCA_SPI_BUFF_SIZE];
 
   // PDCA-SPI Multiple Transfer test globals
-#define TEST_PDCA_SPI_BUFF_NUM         3
-#define TEST_PDCA_SPI_BUFF_SIZE2         10
-  uint8_t m_multTransfBufRx[TEST_PDCA_SPI_BUFF_NUM][TEST_PDCA_SPI_BUFF_SIZE2];
-  uint8_t m_multTransfBufTx[TEST_PDCA_SPI_BUFF_NUM][TEST_PDCA_SPI_BUFF_SIZE2];
+#define TEST_PDCA_SPI_BUFF_NUM         10
+#define TEST_PDCA_SPI_BUFF_SIZE2       128
+  volatile uint8_t m_multTransfBufRx[TEST_PDCA_SPI_BUFF_NUM][TEST_PDCA_SPI_BUFF_SIZE2];
+  volatile uint8_t m_multTransfBufTx[TEST_PDCA_SPI_BUFF_NUM][TEST_PDCA_SPI_BUFF_SIZE2];
 
 };
 

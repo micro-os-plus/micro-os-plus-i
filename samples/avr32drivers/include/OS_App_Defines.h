@@ -40,7 +40,7 @@
 //#define OS_DEBUG_OSREADYLIST_INSERT                     (1)
 //#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
 //#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
-#define OS_DEBUG_PDCA                                 (1)
+//#define OS_DEBUG_PDCA                                 (1)
 #endif /* DEBUG */
 
 // ----------------------------------------------------------------------------

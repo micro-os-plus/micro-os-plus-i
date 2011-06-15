@@ -41,14 +41,14 @@ Test::threadMain(void)
       os.sched.lock.exit();
     }
 
-#if true
+#if false
   testSpi(avr32::uc3::spi::MODULE_0, avr32::uc3::spi::BITS_8);
   testSpi(avr32::uc3::spi::MODULE_0, avr32::uc3::spi::BITS_16);
   testSpi(avr32::uc3::spi::MODULE_1, avr32::uc3::spi::BITS_8);
   testSpi(avr32::uc3::spi::MODULE_1, avr32::uc3::spi::BITS_16);
 #endif
 
-#if true
+#if false
   testPdcaSpiSingleTransfer();
 #endif
 
@@ -203,7 +203,8 @@ Test::testPdcaSpiSingleTransfer(void)
 
   // block until transfer is over
   avr32::uc3::pdca::RegionAddress_t regionAddress;
-  m_pdcaReceive.readRegion(regionAddress, false);
+  int regionIdx;
+  m_pdcaReceive.readRegion(regionAddress, regionIdx, false);
   debug.putString("Transfer finished");
   debug.putNewLine();
 
@@ -267,8 +268,8 @@ Test::testPdcaSpiMultipleTransfer(void)
   spi0m.init();
   spi0m.enableLocalLoopback();
 
-  // 1Mbps speed, no delays, 8 bits/transfer
-  spi0m.configChipSelect(255, 0, avr32::uc3::spi::BITS_8);
+  // minimum speed, max delay between words, 8 bits/transfer
+  spi0m.configChipSelect(16, 246, avr32::uc3::spi::BITS_8);
 
   // set SPI0 RX and TX pdma channels
   m_pdcaReceive.setPeripheralId(avr32::uc3::pdca::SPI0_RX);
@@ -283,9 +284,9 @@ Test::testPdcaSpiMultipleTransfer(void)
           m_multTransfBufTx[regIdx][i] = (uint8_t) (regIdx
               * TEST_PDCA_SPI_BUFF_SIZE2 + i);
         }
-      rxRegion[regIdx].address = m_multTransfBufRx[regIdx];
+      rxRegion[regIdx].address = (void*)m_multTransfBufRx[regIdx];
       rxRegion[regIdx].size = TEST_PDCA_SPI_BUFF_SIZE2;
-      txRegion[regIdx].address = m_multTransfBufTx[regIdx];
+      txRegion[regIdx].address = (void*)m_multTransfBufTx[regIdx];
       txRegion[regIdx].size = TEST_PDCA_SPI_BUFF_SIZE2;
     }
 
@@ -306,61 +307,64 @@ Test::testPdcaSpiMultipleTransfer(void)
   m_pdcaReceive.startTransfer();
   m_pdcaTransmit.startTransfer();
 
-  // busy wait - low level version
-  //  while ((m_pdcaReceive.registers.readTransferCounter() !=0 ) ||
-  //        (m_pdcaTransmit.registers.readTransferCounter() !=0 ))
-  //    ;
-
-  // busy wait - high level version
-  //  avr32::uc3::pdca::Status_t txStatus, rxStatus;
-  //  do
-  //    {
-  //      txStatus = m_pdcaTransmit.getStatus();
-  //      rxStatus = m_pdcaReceive.getStatus();
-  //    }while (txStatus == avr32::uc3::pdca::STATUS_BUSY ||
-  //        rxStatus == avr32::uc3::pdca::STATUS_BUSY);
-  //  debug.putString("status not busy");
-  //  debug.putNewLine();
-
   bool failed = false;
 
   avr32::uc3::pdca::RegionAddress_t regionAddress;
-
-  for (uint16_t transferNum = 0; transferNum < 2 * TEST_PDCA_SPI_BUFF_NUM; transferNum++)
+  int regionIdx;
+  int circularRepetitionsNum = 10;
+  for (uint16_t transferNum = 0;
+      transferNum < circularRepetitionsNum * TEST_PDCA_SPI_BUFF_NUM;
+      transferNum++)
     {
       debug.putString("Transfer ");
       debug.putDec(transferNum);
 
       // block until transfer is over
-      m_pdcaReceive.readRegion(regionAddress, false);
-
-      debug.putString(" finished");
-      debug.putNewLine();
-
-      // check the pdca(transfer) status
-      if ((m_pdcaTransmit.getStatus() != avr32::uc3::pdca::STATUS_OK)
-          || (m_pdcaReceive.getStatus() != avr32::uc3::pdca::STATUS_OK))
+      OSReturn_t ret = m_pdcaReceive.readRegion(regionAddress, regionIdx, false);
+      if (ret != OSReturn::OS_OK)
         {
-          debug.putString("wrong status");
-          failed = true;
+          debug.putString(" error");
+          debug.putNewLine();
         }
+      else
+        {
+          debug.putString(" finished");
+          debug.putNewLine();
+        }
+
       // check the transferred data
       int bufIdx = transferNum % TEST_PDCA_SPI_BUFF_NUM;
-
-      for (int i = 0; i < TEST_PDCA_SPI_BUFF_SIZE; i++)
+      if (bufIdx != regionIdx)
         {
-          if (m_multTransfBufRx[bufIdx][i] != m_multTransfBufTx[bufIdx][i])
+          debug.putString("received ");
+          debug.putDec((uint16_t)regionIdx);
+          debug.putString("expected ");
+          debug.putDec((uint16_t)bufIdx);
+          debug.putNewLine();
+        }
+
+      for (int i = 0; i < TEST_PDCA_SPI_BUFF_SIZE2; i++)
+        {
+          if (m_multTransfBufTx[bufIdx][i] != m_multTransfBufRx[bufIdx][i])
             {
-              debug.putString("sent: ");
-              debug.putHex(m_multTransfBufTx[bufIdx][i]);
-              debug.putString(" received as ");
-              debug.putHex(m_multTransfBufRx[bufIdx][i]);
+              //debug.putHex(m_multTransfBufRx[bufIdx][i]);
+              debug.putDec((uint16_t)m_multTransfBufRx[bufIdx][i]);
+              debug.putString(" <- ");
+              //debug.putHex(m_multTransfBufTx[bufIdx][i]);
+              debug.putDec((uint16_t)m_multTransfBufTx[bufIdx][i]);
               debug.putNewLine();
 
               failed = true;
             }
+          // re-init buffers
+          m_multTransfBufRx[bufIdx][i] = 0;
         }
     }
+
+  // as transfers are circulars, they must be explicitly stopped
+  m_pdcaTransmit.stopTransfer();
+  m_pdcaReceive.stopTransfer();
+
   if (!failed)
     {
       debug.putString("Pdca-Spi Single Transfer Test... passed.");
@@ -375,8 +379,7 @@ Test::testPdcaSpiMultipleTransfer(void)
   // make sure everything is disabled and stopped
   spi0m.disableLocalLoopback();
   spi0m.disable();
-  m_pdcaTransmit.stopTransfer();
-  m_pdcaReceive.stopTransfer();
+
   return 1;
 }
 
