@@ -37,10 +37,10 @@ namespace avr32
       typedef enum RegionStatus_e
       {
         // Define masks for each region
-        IS_EMPTY_MASK = 1, // not used
-        IS_PREPARED_MASK = 2, // region is loaded into PDCA's registers
-        IS_TRANFERRED_MASK = 4, // region is transferred
-        IS_SIGNALLED_MASK = 8 // region is signalled to the upper layer
+        IS_EMPTY_MASK = 0, // not used
+        IS_PREPARED_MASK = 1, // region is loaded into PDCA's registers
+        IS_TRANFERRED_MASK = 2, // region is transferred
+        IS_SIGNALLED_MASK = 3 // region is signalled to the upper layer
       }RegionStatus_t;
 
       typedef struct Region_s
@@ -320,10 +320,10 @@ namespace avr32
 
       // the status of this PDCA channel
       volatile pdca::Status_t m_status;
+      pdca::ChannelId_t m_channelId;
 
     private:
 
-      pdca::ChannelId_t m_channelId;
       pdca::PeripheralId_t m_peripheralId;
 
       uint_t m_regionsArraySize;
@@ -355,7 +355,7 @@ namespace avr32
       PdcaReceive(pdca::ChannelId_t id);
 
       OSReturn_t
-      readRegion(pdca::RegionAddress_t& region, bool doNotBlock);
+      readRegion(pdca::RegionAddress_t& region, int &regionIdx, bool doNotBlock);
       void
       stopTransfer(void);
 

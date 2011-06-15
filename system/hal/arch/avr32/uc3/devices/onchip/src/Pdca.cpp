@@ -48,6 +48,10 @@ namespace avr32
       m_pRegionsArray = pRegionsArray;
       m_regionsArraySize = regionsArraySize;
       m_isCircular = isCircular;
+
+      // init status of each region
+      for (uint_t i = 0 ; i < regionsArraySize ;i++)
+        pRegionsArray[i].status = avr32::uc3::pdca::IS_EMPTY_MASK;
     }
 
     OSReturn_t
@@ -69,10 +73,11 @@ namespace avr32
       if (m_regionsArraySize == 0)
         {
           // no regions configured, so nothing to be done
-          #if OS_DEBUG_PDCA
-                OSDeviceDebug::putString("Pdca::prepareTransfer no region");
-                OSDeviceDebug::putNewLine();
-          #endif
+#if OS_DEBUG_PDCA
+          OSDeviceDebug::putDec((uint16_t)m_channelId);
+          OSDeviceDebug::putString(" prepareTransfer no region");
+          OSDeviceDebug::putNewLine();
+#endif
           return OSReturn::OS_BAD_COMMAND;
         }
       // set first region to be used in transfer
@@ -112,7 +117,8 @@ namespace avr32
           // no region to be set next
           m_reloadedRegionIndex = -1;
 #if OS_DEBUG_PDCA
-            OSDeviceDebug::putString("Pdca::setupReloadMechanism no next region");
+            OSDeviceDebug::putDec((uint16_t)m_channelId);
+            OSDeviceDebug::putString(" setupReloadMechanism no next region");
             OSDeviceDebug::putNewLine();
 #endif
           return OSReturn::OS_ITEM_NOT_FOUND;
@@ -120,7 +126,14 @@ namespace avr32
       registers.writeMemoryAddressReload(m_pRegionsArray[nextRegion].address);
       registers.writeTransferCountReload(m_pRegionsArray[nextRegion].size);
       m_reloadedRegionIndex = nextRegion;
+      registers.writeInterruptDisable(AVR32_PDCA_IDR_TRC_MASK);
       registers.writeInterruptEnable(AVR32_PDCA_IER_RCZ_MASK);
+#if OS_DEBUG_PDCA
+      OSDeviceDebug::putDec((uint16_t)m_channelId);
+      OSDeviceDebug::putString(" reloaded ");
+      OSDeviceDebug::putDec((uint16_t) m_reloadedRegionIndex);
+      OSDeviceDebug::putNewLine();
+#endif
       return OSReturn::OS_OK;
     }
 
@@ -253,6 +266,7 @@ namespace avr32
           if (ret != OSReturn::OS_OK)
             {
               // means no next region so this is last transfer
+              registers.writeInterruptEnable(AVR32_PDCA_IER_TRC_MASK);
               // disable RCZ interrupt
               registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK);
             }
@@ -281,7 +295,7 @@ namespace avr32
     }
 
     OSReturn_t
-    PdcaReceive::readRegion(pdca::RegionAddress_t& region, bool doNotBlock)
+    PdcaReceive::readRegion(pdca::RegionAddress_t& region, int &regionIdx, bool doNotBlock)
     {
       int nextRegion;
 
@@ -289,7 +303,8 @@ namespace avr32
       if (m_candidateNotif < 0)
         {
 #if OS_DEBUG_PDCA
-          OSDeviceDebug::putString("PdcaReceive::readRegion no candid. region");
+          OSDeviceDebug::putDec((uint16_t)m_channelId);
+          OSDeviceDebug::putString(" PdcaReceive::readRegion no candid. region");
           OSDeviceDebug::putNewLine();
 #endif
           return OSReturn::OS_ITEM_NOT_FOUND;
@@ -300,8 +315,11 @@ namespace avr32
           avr32::uc3::pdca::IS_TRANFERRED_MASK)
         {
           region = &(m_pRegionsArray[m_candidateNotif]);
-          m_pRegionsArray[m_candidateNotif].status =
-                    avr32::uc3::pdca::IS_SIGNALLED_MASK;
+          regionIdx = m_candidateNotif;
+
+          // reset flag as it was signalled
+          m_pRegionsArray[m_candidateNotif].status = avr32::uc3::pdca::IS_EMPTY_MASK;
+                    //avr32::uc3::pdca::IS_SIGNALLED_MASK;
           nextRegion = getNextRegionIndex(m_candidateNotif);
           if (nextRegion != -1)
             m_candidateNotif = nextRegion;
@@ -323,15 +341,26 @@ namespace avr32
                 avr32::uc3::pdca::IS_TRANFERRED_MASK)
         {
 #if OS_DEBUG_PDCA
-          OSDeviceDebug::putString("PdcaReceive::readRegion candid. reg NOT transf.");
+          OSDeviceDebug::putDec((uint16_t)m_channelId);
+          OSDeviceDebug::putString(" readRegion NOT transf.");
           OSDeviceDebug::putNewLine();
 #endif
           return OSReturn::OS_ITEM_NOT_FOUND;
         }
 
+#if OS_DEBUG_PDCA
+      OSDeviceDebug::putDec((uint16_t)m_channelId);
+      OSDeviceDebug::putString(" readRegion notif ");
+      OSDeviceDebug::putDec((uint16_t)m_candidateNotif);
+      OSDeviceDebug::putNewLine();
+#endif
+
       region = &(m_pRegionsArray[m_candidateNotif]);
-      m_pRegionsArray[m_candidateNotif].status =
-                avr32::uc3::pdca::IS_SIGNALLED_MASK;
+      regionIdx = m_candidateNotif;
+
+      // reset flag as it was signalled
+      m_pRegionsArray[m_candidateNotif].status = avr32::uc3::pdca::IS_EMPTY_MASK;
+      //          avr32::uc3::pdca::IS_SIGNALLED_MASK;
 
       // set next candidate to be notified
       nextRegion = getNextRegionIndex(m_candidateNotif);
@@ -340,7 +369,6 @@ namespace avr32
       else // no next region
         m_candidateNotif = -1;
       return OSReturn::OS_OK;
-
     }
 
     void
@@ -389,6 +417,7 @@ namespace avr32
           if (ret != OSReturn::OS_OK)
             {
               // means no next region so this is last transfer
+              registers.writeInterruptEnable(AVR32_PDCA_IER_TRC_MASK);
               // disable RCZ interrupt
               registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK);
             }
