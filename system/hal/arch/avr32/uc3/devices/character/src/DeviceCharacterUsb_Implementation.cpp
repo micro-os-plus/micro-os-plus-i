@@ -528,6 +528,9 @@ DeviceCharacterUsb::cdcSetLineCoding(void)
   while (!OSUsbDevice::Is_usb_tx_ready())
     ;
 
+  OSDeviceDebug::putDec(m_lineCoding.baudRate);
+  OSDeviceDebug::putChar(' ');
+
   m_baudRate = m_lineCoding.baudRate;
 }
 
