@@ -179,7 +179,7 @@ protected:
   bool m_isOpened;
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
-  unsigned long m_baudRate;
+  unsigned long volatile m_baudRate;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
