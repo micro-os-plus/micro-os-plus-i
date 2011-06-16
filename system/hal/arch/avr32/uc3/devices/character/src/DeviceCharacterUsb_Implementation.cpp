@@ -35,7 +35,9 @@ DeviceCharacterUsb::implOpen()
       flagShouldNotInit = OSUsbDevice::usbDriverInit();
     }
 
+  AVR32_usb_free_out(m_rx_ep);
   OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
+  OSUsbDevice::Usb_reset_endpoint_fifo_access(m_rx_ep);
 
   m_txCounter = 0;
   m_rxCounter = 0;
