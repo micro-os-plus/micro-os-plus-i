@@ -178,9 +178,7 @@ protected:
 
   bool m_isOpened;
 
-#if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
   unsigned long volatile m_baudRate;
-#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE) */
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
   unsigned char* m_pReadMatchArray;
@@ -188,7 +186,7 @@ protected:
 
   int m_countToRead;
 
-private:
+protected:
 
   // Implementation for different methods.
 
@@ -223,6 +221,7 @@ private:
   implWriteByte(unsigned char b) = 0;
   virtual int
   implWriteBytes(const unsigned char* buf, int len);
+
   virtual bool
   implIsSending(void);
 
