@@ -92,6 +92,10 @@
 #define OS_CONFIG_DEBUG_LED2_BIT			PORTD6
 #endif
 
+#if defined(DEBUG) && !defined(OS_CONFIG_DEBUG_DEVICE_I2C)
+#define OS_CONFIG_DEBUG_DEVICE_I2C                      (1)
+#endif
+
 // ----------------------------------------------------------------------------
 
 #endif /* HAL_BOARD_OS_DEFINES_H_ */
