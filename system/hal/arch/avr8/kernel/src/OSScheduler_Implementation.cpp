@@ -10,7 +10,7 @@
 
 OSStack_t* 
 OSSchedulerImpl::stackInitialise(OSStack_t* pStackTop, void
-(*pCode)(void*), void* pParams, unsigned char id)
+(*pCode)(void*), void* pParams, unsigned char id, void* pNesting)
 {
   /* The value on the right is the offset from the thread stack pointer */
 
