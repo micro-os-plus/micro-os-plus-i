@@ -10,7 +10,7 @@
 
 #include "hal/arch/avr8/kernel/include/ostream_ProgramPtr.h"
 
-ostream& operator <<(ostream& out, OSProgramPtr_t pc)
+std::ostream& operator <<(std::ostream& out, OSProgramPtr_t pc)
   {
     unsigned short w;
     w = (unsigned short) pc;
@@ -19,10 +19,10 @@ ostream& operator <<(ostream& out, OSProgramPtr_t pc)
     unsigned char upp;
     upp = 0;
 
-    if (out.flags() & ios_base::showbase)
+    if (out.flags() & std::ios_base::showbase)
       {
         out.put('0');
-        if ((out.flags() & ios_base::uppercase))
+        if ((out.flags() & std::ios_base::uppercase))
           out.put('X');
         else
           out.put('x');
@@ -30,9 +30,9 @@ ostream& operator <<(ostream& out, OSProgramPtr_t pc)
 
     c = ((w >> 15) & 0x01);
     out.put(c + '0');
-    ios_base::fmtflags f = out.flags();
-    out.unsetf(ios_base::showbase);
-    out << hex << (unsigned short) (w << 1);
+    std::ios_base::fmtflags f = out.flags();
+    out.unsetf(std::ios_base::showbase);
+    out << std::hex << (unsigned short) (w << 1);
     out.flags(f);
 
     return out;
