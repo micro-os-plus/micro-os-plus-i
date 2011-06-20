@@ -56,10 +56,13 @@ private:
   implGetReadEvent(void);
   virtual int
   implReadByte(void);
+
+#if defined(OS_INCLUDE_DEVICECHARACTERUSB_MULTIBYTE)
   virtual int
   implReadBytes(unsigned char* pBuf, int size);
   virtual int
   implWriteBytes(const unsigned char* pBuf, int size);
+#endif /* defined(OS_INCLUDE_DEVICECHARACTERUSB_MULTIBYTE) */
 
   friend class OSUsbDevice;
   friend class OSUsbDeviceImpl;
