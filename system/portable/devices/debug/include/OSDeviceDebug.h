@@ -65,13 +65,14 @@ public:
   putDestructor(const char* pc, const void* p);
 
 #if defined(OS_CONFIG_ARCH_AVR8)
+
   // Output, on debug interface, the bytes at pc address,
   // until the first zero byte.
   static void putString_P(const char* PROGMEM pc);
 
   static void putConstructor_P(const char* PROGMEM pc, const void* p);
   static void
-  putConstructorWithIndex_P(const char* pc, unsigned short i, const void* p);
+  putConstructorWithIndex_P(const char* pc, uint16_t i, const void* p);
   static void putDestructor_P(const char* PROGMEM pc, const void* p);
 
 #endif
