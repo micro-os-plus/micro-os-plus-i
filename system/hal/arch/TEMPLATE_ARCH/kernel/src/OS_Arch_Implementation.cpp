@@ -10,11 +10,14 @@
 
 // placeholder for common architecture files
 
+#if false
 int
 main(void)
 {
   return 0;
 }
+#endif
+
 #if false
 extern "C" void
 __dso_handle(void);
