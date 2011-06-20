@@ -44,7 +44,7 @@ namespace device
         return status;
       }
 
-      uint8_t
+      Status_t
       Registers::readWord(RegisterId_t reg, uint16_t* pValue)
       {
         Status_t status;
