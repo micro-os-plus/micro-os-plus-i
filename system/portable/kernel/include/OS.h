@@ -24,7 +24,14 @@ typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
 typedef unsigned long ulong_t;
 
+#if defined(OS_INCLUDE_CSTDDEF)
 #include <cstddef>
+#else
+namespace std
+{
+  typedef unsigned int size_t;
+}
+#endif
 // From now on, we can use:
 //      std::size_t
 
@@ -94,7 +101,7 @@ public:
   inline static void
   stackInit(void) __attribute__((always_inline));
   // Some CPU initialisations.
-   static void
+  static void
   earlyInit(void);
   // Put MCU to the idle sleep mode.
   inline static void
@@ -134,9 +141,11 @@ public:
   interruptsDisable(void) __attribute__((always_inline));
 #else
   // Enable interrupts (global interrupt mask bit - GM from SR).
-  inline static void interruptsEnable(void);
+  inline static void
+  interruptsEnable(void);
   // Disable all interrupts (global interrupt mask bit - GM from SR).
-  inline static void interruptsDisable(void);
+  inline static void
+  interruptsDisable(void);
 #endif
 
 #if false
@@ -185,13 +194,11 @@ public:
 
 };
 
-
 // ----------------------------------------------------------------------------
 
 #include "portable/devices/debug/include/OSDeviceDebug.h"
 
 #include "portable/kernel/include/OSCriticalSection.h"
-
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
@@ -267,7 +274,6 @@ public:
 #endif /* defined(OS_INCLUDE_OSREALTIME) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
-
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 #if defined(DEBUG)
@@ -365,7 +371,6 @@ private:
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif
-
 
 // ----------------------------------------------------------------------------
 
