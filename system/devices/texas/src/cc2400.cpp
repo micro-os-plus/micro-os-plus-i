@@ -167,6 +167,70 @@ namespace device
       OSDeviceDebug::putConstructor("device::texas::Cc2400", this);
     }
 
+    // Set the packet which is going to be used in
+    // the following transmission test
+    void
+    Cc2400::rpcSetRadioPacketTx(uint16_t packetSize, uint16_t *packet)
+    {
+      // record packet and packetSize
+    }
+
+    // Start transmission of the packet,
+    // already recorded using rpcSetRadioPacketTx.
+    void
+    Cc2400::rpcRadioStartTx(uint16_t frecv, cc2400::TxPowerLevel_t txPowerLevel)
+    {
+      // IOCFG = 0xF960, configure GIO6 pin with LOCK_STATUS function, and GIO1 with CRC_OK function
+
+      // Set frequency by sending on SPI register FSDIV with frequency value
+
+      // Set output power level by sending on SPI register FREND with txPowerLevel value
+
+      // Clear FIFO by reading 32 bytes at max value
+
+      // Set FIFO_THRESHOLD by sending on SPI register INT with the value of 16
+
+      // Start calibration and PLL lock by setting both micro-controller pins connected to RX and TX Modem pins
+
+      // Wait until GIO6 is set (max 100usec)
+      // if GIO6 not set log "Calibration Failed"; exit
+
+      // Set Power Amplifier in TX mode, by setting PAEN=1 and EN=0
+      // Send on SPI (as a single word) the address of FIFO register (1byte) and leave CS asserted
+      // Prepare PDCA transfer
+      // Set Transmission mode, by resetting RX pin
+      // wait 200usec (time preamble to be sent 32bytes x 8 usec=256usec and
+        // sync word 4bytes x 8usec = 32usec
+      // start PDCA transfer
+
+      // TODO: finish design and implementation
+    }
+
+    // Start transmission of the packet,
+    // already recorded using rpcSetRadioPacketTx.
+    void
+    Cc2400::rpcRadioStartRx(uint16_t frecv, bool isLnaOn, uint16_t packetSize)
+    {
+      // TODO: finish design and implementation
+    }
+
+    // Requests the packet received in the last reception phase
+    void
+    Cc2400::rpcGetRadioPacketRx()
+    {
+      // TODO: finish design and implementation
+    }
+
+    // TODO: this is TCC Output Call
+    // Send the packet requested by rpcGetRadioPacketRx.
+    void
+    Cc2400::rpcGetRadioPacketRx(uint16_t &packetSize, uint8_t *packet,
+        int16_t &rssiValue, bool &isCrcOk)
+    {
+      // TODO: finish design and implementation
+    }
+
+    // TODO: add other functions
   }
 }
 

@@ -35,6 +35,18 @@ namespace device
 
       typedef uint8_t Status_t;
 
+      typedef enum TxPowerLevel_e
+      {
+        OUTPUT_POWER_25_DBM = 0,        // -25 dBm
+        OUTPUT_POWER_15_DBM = 1,        // -15 dBm
+        OUTPUT_POWER_10_DBM = 2,        // -10 dBm
+        OUTPUT_POWER_7_DBM = 3,         // -7 dBm
+        OUTPUT_POWER_4_6_DBM = 4,       // -4.6 dBm
+        OUTPUT_POWER_2_8_DBM = 5,       // -2.8 dBm
+        OUTPUT_POWER_1_3_DBM = 6,       // -1.3 dBm
+        OUTPUT_POWER_0_DBM = 7          // 0 dBm
+      }TxPowerLevel_t;
+
       class OPERATION
       {
       public:
@@ -104,6 +116,31 @@ namespace device
     {
     public:
       Cc2400(cc2400::spim_t& spi);
+
+      // Set the packet which is going to be used in
+      // the following transmission test
+      void
+      rpcSetRadioPacketTx(uint16_t packetSize, uint16_t *packet);
+
+      // Start transmission of the packet,
+      // already recorded using rpcSetRadioPacketTx.
+      void
+      rpcRadioStartTx(uint16_t frecv, cc2400::TxPowerLevel_t txPowerLevel);
+
+      // Start transmission of the packet,
+      // already recorded using rpcSetRadioPacketTx.
+      void
+      rpcRadioStartRx(uint16_t frecv, bool isLnaOn, uint16_t packetSize);
+
+      // Requests the packet received in the last reception phase
+      void
+      rpcGetRadioPacketRx();
+
+      // TODO: this is TCC Output Call
+      // Send the packet requested by rpcGetRadioPacketRx.
+      void
+      rpcGetRadioPacketRx(uint16_t &packetSize, uint8_t *packet,
+          int16_t &rssiValue, bool &isCrcOk);
 
     private:
       cc2400::Registers registers;
