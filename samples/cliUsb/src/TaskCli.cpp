@@ -6,8 +6,6 @@
 
 #include "TaskCli.h"
 
-#if defined OS_INCLUDE_SIMPLECLI
-
 #include "portable/kernel/include/ostream_OSThread.h"
 
 /*
@@ -20,9 +18,9 @@
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev),
 #if true
-  m_cin(&m_dev), m_cout(&m_dev),
+      m_cin(&m_dev), m_cout(&m_dev),
 #endif
-  m_cli(m_line, sizeof(m_line))
+      m_cli(m_line, sizeof(m_line))
 {
   debug.putConstructor_P(PSTR("TaskCli"), this);
 }
@@ -45,25 +43,18 @@ TaskCli::threadMain(void)
     {
       os.sched.lock.enter();
         {
-#if false
-          clog << "TaskCli::threadMain(" << showbase << hex << this <<
-              ") SP="<< hex
-              << ( unsigned short ) SP <<
-              endl;
-#else
           debug.putString("TaskCli::threadMain()");
           debug.putNewLine();
-#endif
         }
       os.sched.lock.exit();
     }
 
   OSDeviceCharacter& dev = m_dev;
 
-#if true
   std::istream& cin = m_cin;
   std::ostream& cout = m_cout;
 
+#if OS_TEST_PHASE == 9
   SimpleCli & cli = m_cli;
 #endif
 
@@ -71,13 +62,17 @@ TaskCli::threadMain(void)
   for (;;)
     {
       dev.open(); // wait for dtr
+
+      debug.putString("opened");
+      debug.putNewLine();
+
 #if true
       cout << std::endl << std::endl << greeting << std::endl;
 #else
       dev.writeByte('\n');
       dev.writeByte('\r');
       for (const char* p = greeting; *p; ++p)
-        dev.writeByte(*p);
+      dev.writeByte(*p);
 
       dev.writeByte('\n');
       dev.writeByte('\r');
@@ -86,7 +81,28 @@ TaskCli::threadMain(void)
 #endif
       for (; dev.isConnected();)
         {
-#if true
+
+#if OS_TEST_PHASE == 1
+
+          int c;
+          c = dev.readByte();
+          dev.writeByte(c);
+          dev.flush();
+          if (c == 0x03)
+          break; //CtrlC should quit
+
+#elif OS_TEST_PHASE == 2
+
+          dev.readBytes(m_loopBuff, 512, &m_countTest);
+
+          if(m_countTest != 0)
+            {
+              dev.writeBytes(m_loopBuff, m_countTest);
+              dev.flush();
+            }
+
+#elif OS_TEST_PHASE == 9
+
           cout << std::endl << prompt;
           int c;
 
@@ -113,41 +129,22 @@ TaskCli::threadMain(void)
               break;
             }
           lineProcess();
-#else
-          int c;
-          c = dev.readByte();
-          dev.writeByte(c);
-          dev.flush();
-          if (c == 0x03)
-            break; //CtrlC should quit
-#endif
+
+#endif /* OS_TEST_PHASE */
+
         }
+      debug.putString("not connected");
+      debug.putNewLine();
       dev.close();
+      debug.putString("closed");
+      debug.putNewLine();
+
     }
 }
 
-#if true
-static const char str_checksum[] = "Checksum?";
+#if OS_TEST_PHASE == 9
 
-/*
- * For cases when commands are sent by a device it is preferable to use
- * a method to validate the correctness of the command.
- * 
- * For this we addopted the following syntax:
- * 
- * 	$abcde*XX 
- * 
- * where XX is the hex value of the xor-ed 'abcde' string, starting with 00
- * 
- * To help human operators compute the checksum of some commands we also 
- * accept the form:
- * 
- * 	$abcde
- * 
- * situation when the command is not executed but only the checksum is 
- * computed and displayed.
- *
- */
+static const char str_checksum[] = "Checksum?";
 
 int
 TaskCli::xorCheck(unsigned char *pc)
@@ -405,8 +402,6 @@ TaskCli::lineProcess()
   err: cout << std::endl << str_unknown;
   cout << std::endl << str_help;
 }
+
 #endif
-
-#endif // OS_INCLUDE_SIMPLECLI
-
 

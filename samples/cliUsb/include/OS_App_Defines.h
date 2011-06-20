@@ -27,7 +27,7 @@
 #define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
 //#define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
 
-//#define OS_INCLUDE_SIMPLECLI                            1
+#define OS_INCLUDE_SIMPLECLI                            1
 
 #define OS_INCLUDE_SIMPLECLI_PARSER                     1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG             1
@@ -41,6 +41,10 @@
 
 
 #define OS_INCLUDE_TASKBLINK                            1
+
+//#define OS_TEST_PHASE 1
+//#define OS_TEST_PHASE 2
+#define OS_TEST_PHASE 9
 
 //#define OS_INCLUDE_USB_CDC_DUAL_INTERFACE               1
 //#define OS_INCLUDE_USB_CDC_DUAL_CONFIGURATION           1
@@ -65,7 +69,6 @@
 //#define OS_CFGINT_CPU_STATUS_REGISTER_MODE              ((OSCPUImpl::getInterruptsMask() >> 22) & 0x7)
 //#define OS_CFGINT_CPU_STATUS_REGISTER_INTERRUPT_MASK    (1 << ((OS_CFGINT_CPU_STATUS_REGISTER_MODE - 2) & 3))
 //#define OS_CFGINT_OSCRITICALSECTION_MASK                ((0xF & ~OS_CFGINT_CPU_STATUS_REGISTER_INTERRUPT_MASK) << (16+1))
-
 
 #elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
 
