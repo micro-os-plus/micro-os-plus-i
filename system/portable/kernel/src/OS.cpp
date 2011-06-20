@@ -155,33 +155,12 @@ OS::resetHandler(void)
 
   OS::staticConstructorsInit();
 
-#if !defined(OS_EXCLUDE_MULTITASKING)
-
-  // Threads were created and registered by class constructors
-  // We're ready to rock...
-  OSScheduler::start();
-
-#else /* defined(OS_EXCLUDE_MULTITASKING)*/
-
-#if defined(DEBUG)
-  OSDeviceDebug::putNewLine();
-  OSDeviceDebug::putString_P(PSTR("OS::main()"));
-  OSDeviceDebug::putNewLine();
-#endif /* defined(DEBUG) */
-
-  OS::main();
-
-  // Should never get here.
-#if defined(DEBUG)
-  OSDeviceDebug::putString_P(PSTR("OS::main() failed, loop"));
-  OSDeviceDebug::putNewLine();
-#endif /* defined(DEBUG) */
-
-#endif /* OS_EXCLUDE_MULTITASKING */
+  main();
 
   // noreturn
   for (;;)
     ;
+
 }
 
 void
@@ -239,7 +218,37 @@ OS::staticConstructorsInit(void)
     }
 }
 
-#endif /* OS_EXCLUDE_RESET_HANDLER */
+#endif /* defined(OS_EXCLUDE_RESET_HANDLER) */
+
+int
+main(void)
+{
+
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
+  // Threads were created and registered by class constructors
+  // We're ready to rock...
+  OSScheduler::start();
+
+#else /* defined(OS_EXCLUDE_MULTITASKING)*/
+
+#if defined(DEBUG)
+  OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString_P(PSTR("OS::main()"));
+  OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
+
+  OS::main();
+
+  // Should never get here.
+#if defined(DEBUG)
+  OSDeviceDebug::putString_P(PSTR("OS::main() failed, loop"));
+  OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+
+}
 
 #if defined(OS_INCLUDE_NAKED_INIT)
 
