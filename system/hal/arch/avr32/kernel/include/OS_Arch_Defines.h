@@ -18,6 +18,7 @@ typedef unsigned long OSInterruptsMask_t;
 
 #endif
 
+#define OS_INCLUDE_CSTDDEF                              (1)
 
 #define PROGMEM
 #define PSTR(_S_) ((const char*)_S_)
