@@ -488,7 +488,7 @@ DeviceCharacterUsb::cdcGetLineCoding(void)
   OSUsbDevice::Usb_ack_receive_setup();
 
   OSUsbDevice::Usb_reset_endpoint_fifo_access(EP_CONTROL);
-  OSUsbDevice::writeLong(LSB0(m_lineCoding.baudRate));
+  OSUsbDevice::writeLong(m_lineCoding.baudRate);
   OSUsbDevice::writeByte(m_lineCoding.charFormat);
   OSUsbDevice::writeByte(m_lineCoding.parityType);
   OSUsbDevice::writeByte(m_lineCoding.dataBits);
