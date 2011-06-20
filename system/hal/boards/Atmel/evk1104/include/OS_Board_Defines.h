@@ -161,4 +161,8 @@
 #define OS_CONFIG_DEBUG_LED2_BIT                                OS_CFGPIN_BOARD_LED2_PIN
 #endif
 
+#if defined(DEBUG) && !defined(OS_CONFIG_DEBUG_DEVICE_I2C)
+#define OS_CONFIG_DEBUG_DEVICE_I2C                      (1)
+#endif
+
 #endif /* HAL_OS_BOARD_DEFINES_H_ */
