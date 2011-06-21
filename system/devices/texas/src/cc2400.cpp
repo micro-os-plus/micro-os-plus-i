@@ -167,6 +167,51 @@ namespace device
       OSDeviceDebug::putConstructor("device::texas::Cc2400", this);
     }
 
+    void
+    Cc2400::PowerOn(void)
+    {
+//      Turn on power supplies, by setting MDM_PWR_EN_IO, MDM_PWR_EN_CORE and PA_PWR_EN
+
+//      Wait 150usec (while stabilising power supplies)
+
+//      Send MAIN register, having set the flags: RESET and XOSC16M_BYPASS set (value 0x8003)
+
+//      Set the following configuration register:
+//      FSCTRL = 0x0010, default value
+//      FSDIV = 2401, set on first channel 2401Mhz
+//      MDMCTRL = 0x0040, frequency deviation of 250kHz
+//      AGCCTRL unchanged
+//      FREND = 0x0008, minimum output power: -25dBm
+//      RSSI = 0x00F3, set to maximum (8) the number of samples that are used to calculate the average signal amplitude; on
+//      FREQEST read only
+//      IOCFG = 0xF960, configure GIO6 pin with LOCK_STATUS function, and GIO1 with CRC_OK function
+//      FSMTC unchanged
+//      MANAND = 0xFFFF
+//      FSMSTATE unchanged
+//      ADCTST read only
+//      RXBPFTST unchanged
+//      PAMTST = 0x0803, as in TI's example
+//      LMTST = 0x2B22, default value, also as in TI's example
+//      MANOR unchanged
+//      MDMTST0 =0x134B, as in TI's example
+//      MDMTST1 = 0x004B, as in TI's example
+//      DACTST = 0, default value as in TI's example
+//      AGCTST0 unchanged
+//      AGCTST1 unchanged
+//      AGCTST2 unchanged
+//      FSTST0 = 0xA210, as in TI's example, default value is 0xA200
+//      FSTST1 = 0x1002, default value as in TI's example
+//      FSTST2 = 0x0600, default value
+//      FSTST3 = 0x02CC, default value
+//      MANFIDL unchanged
+//      MANFIDH unchanged
+//      GRMDM = 0x0F71, set buffered mode, 32 preamble bytes, 4 SYNC bytes, CRC generation and checking ok, NRZ line-coding format, GFSK modulation
+//      GRDEC unchanged
+//      PKTSTATUS read only
+//      INT = 30, default value
+//      SYNCL unchanged
+//      SYNCH unchanged
+    }
     // Set the packet which is going to be used in
     // the following transmission test
     void
@@ -186,24 +231,29 @@ namespace device
 
       // Set output power level by sending on SPI register FREND with txPowerLevel value
 
-      // Clear FIFO by reading 32 bytes at max value
+      // clearFifo();
 
       // Set FIFO_THRESHOLD by sending on SPI register INT with the value of 16
 
-      // Start calibration and PLL lock by setting both micro-controller pins connected to RX and TX Modem pins
-
-      // Wait until GIO6 is set (max 100usec)
-      // if GIO6 not set log "Calibration Failed"; exit
+      // returnVal = calibrate();
+      // if returnVal < 0 log "Calibration Failed"; exit
 
       // Set Power Amplifier in TX mode, by setting PAEN=1 and EN=0
       // Send on SPI (as a single word) the address of FIFO register (1byte) and leave CS asserted
       // Prepare PDCA transfer
-      // Set Transmission mode, by resetting RX pin
-      // wait 200usec (time preamble to be sent 32bytes x 8 usec=256usec and
-        // sync word 4bytes x 8usec = 32usec
+      // Set Transmission mode, by resetting RX pin (leave TX pin set)
+      // wait 200usec (time for preamble to be sent 32bytes x 8 usec=256usec and
+        // sync word 4bytes x 8usec = 32usec)
       // start PDCA transfer
+      // when PDCA transmission channel interrupt is raised,
+      // means there are still some bytes(aprox 11 bytes = (256 + 32 - 200)/8) to be sent out on radio
 
-      // TODO: finish design and implementation
+      // Note: If we want to put inside the packet the timestamp of sending, then
+      // the FIFO signal will fall after preamble was sent
+      // so timestamp of sending the 16th byte(when FIFO signal in reception will fall)
+      // can be computed and added
+      //
+      // TODO: do implementation
     }
 
     // Start transmission of the packet,
@@ -211,7 +261,59 @@ namespace device
     void
     Cc2400::rpcRadioStartRx(uint16_t frecv, bool isLnaOn, uint16_t packetSize)
     {
-      // TODO: finish design and implementation
+      // IOCFG = 0xF960, configure GIO6 pin with LOCK_STATUS function, and GIO1 with CRC_OK function
+
+      // Set frequency by sending on SPI register FSDIV with frequency-1 value
+      // Clear FIFO by reading 32 bytes (in FIFO buffer could be unread bytes)
+
+      // clearFifo();
+
+      // Set FIFO_THRESHOLD by sending on SPI register INT with the value of 16
+
+      // returnVal = calibrate();
+      // if returnVal < 0 log "Calibration Failed"; exit
+
+      // Prepare PDCA transfer for (packetSize-30) bytes
+
+      // Set Power Amplifier in RX mode, by setting pins PAEN = 0, EN = 1 and HGM = isLnaOn
+
+      // Set Reception mode, by resetting TX pin (leave RX pin set)
+
+      // (in about 415usec) wait for FIFO pin to go low (meaning modem received 16 data bytes)
+      //        this moment "must" be compared against the timestamp from the packet
+
+      // read RSSI value, by reading register RSSI
+
+      // Send on SPI (as a single word) the address of FIFO register (1byte) and leave CS asserted
+      // Start PDCA transfer (so PDCA transfer started when (about) 20bytes are already received in FIFO buffer)
+
+      // if PDCA interrupt is raised (means there are still (32-20) data bytes to be received on radio
+
+      // (turn off SPI's chip select signal)
+      // read RSSI value, by reading register RSSI
+
+      // read the last 32 bytes of data (including the last 2 CRC bytes)
+      // check if CRC_OK signal(GIO1pin) is set
+
+      // TODO: do implementation
+    }
+
+    void
+    Cc2400::clearFifoBuffer()
+    {
+      // Clear FIFO by reading 32 bytes (in FIFO buffer could be unread bytes)
+      //        this could take at 16Mhz, 0.5usec/byte -> 16 usec
+
+    }
+
+    uint8_t
+    Cc2400::calibrate(void)
+    {
+      // Start calibration and PLL lock by setting both micro-controller pins connected to RX and TX Modem pins
+
+      // Wait until GIO6 is set (max 100usec)
+      // if GIO6 not set return -1;//error
+      return 0;
     }
 
     // Requests the packet received in the last reception phase

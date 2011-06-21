@@ -117,6 +117,18 @@ namespace device
     public:
       Cc2400(cc2400::spim_t& spi);
 
+      // power ON and initialise all the configuration registers
+      void
+      PowerOn(void)
+
+      // do the calibration, and return its status
+      uint8_t
+      calibrate(void);
+
+      // clear FIFO buffer
+      void
+      clearFifoBuffer();
+
       // Set the packet which is going to be used in
       // the following transmission test
       void
