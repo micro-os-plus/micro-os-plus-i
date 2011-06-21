@@ -238,21 +238,25 @@ namespace device
       // returnVal = calibrate();
       // if returnVal < 0 log "Calibration Failed"; exit
 
-      // Set Power Amplifier in TX mode, by setting PAEN=1 and EN=0
       // Send on SPI (as a single word) the address of FIFO register (1byte) and leave CS asserted
-      // Prepare PDCA transfer
-      // Set Transmission mode, by resetting RX pin (leave TX pin set)
-      // wait 200usec (time for preamble to be sent 32bytes x 8 usec=256usec and
-        // sync word 4bytes x 8usec = 32usec)
-      // start PDCA transfer
-      // when PDCA transmission channel interrupt is raised,
-      // means there are still some bytes(aprox 11 bytes = (256 + 32 - 200)/8) to be sent out on radio
+      // Send the first 32 data bytes, by writing to FIFO buffer; still leave Chip Select asserted
 
-      // Note: If we want to put inside the packet the timestamp of sending, then
-      // the FIFO signal will fall after preamble was sent
-      // so timestamp of sending the 16th byte(when FIFO signal in reception will fall)
-      // can be computed and added
-      //
+      // Set Power Amplifier in TX mode, by setting PAEN=1 and EN=0
+
+      // Prepare PDCA transfer, of the last (packetSize-32) data bytes
+      // Set Transmission mode, by resetting RX pin (leave TX pin set)
+
+      // wait for FIFO interrupt (on falling edge) to be raised
+      //(in about 416usec = (32+4+16)bytes * 8usec/byte)
+      //        capture the timestamp of the FIFO, and put it in the packet at offset 32
+
+      // start PDCA transfer of the last (packetSize-32) data bytes
+
+      // the last code section should not exceed 128usedc (FIFO capture, timestamp computation, packet filling)
+
+      // when PDCA transmission channel interrupt is raised,
+      // means there are still some bytes(less than 16) to be sent out on radio
+
       // TODO: do implementation
     }
 
