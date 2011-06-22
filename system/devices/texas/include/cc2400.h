@@ -137,43 +137,6 @@ namespace device
     public:
       Cc2400(cc2400::spim_t& spi);
 
-      // power ON and initialise all the configuration registers
-      void
-      PowerOn(void);
-
-      // do the calibration, and return its status
-      uint8_t
-      calibrate(void);
-
-      // clear FIFO buffer
-      void
-      clearFifoBuffer();
-
-      // Set the packet which is going to be used in
-      // the following transmission test
-      void
-      rpcSetRadioPacketTx(uint16_t packetSize, uint16_t *packet);
-
-      // Start transmission of the packet,
-      // already recorded using rpcSetRadioPacketTx.
-      void
-      rpcRadioStartTx(uint16_t frecv, cc2400::TxPowerLevel_t txPowerLevel);
-
-      // Start transmission of the packet,
-      // already recorded using rpcSetRadioPacketTx.
-      void
-      rpcRadioStartRx(uint16_t frecv, bool isLnaOn, uint16_t packetSize);
-
-      // Requests the packet received in the last reception phase
-      void
-      rpcGetRadioPacketRx();
-
-      // TODO: this is TCC Output Call
-      // Send the packet requested by rpcGetRadioPacketRx.
-      void
-      rpcGetRadioPacketRx(uint16_t &packetSize, uint8_t *packet,
-          int16_t &rssiValue, bool &isCrcOk);
-
     private:
       cc2400::Registers registers;
     };
