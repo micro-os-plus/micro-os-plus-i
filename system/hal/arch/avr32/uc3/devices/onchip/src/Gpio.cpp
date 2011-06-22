@@ -29,12 +29,6 @@ namespace avr32
     }
 
     void
-    Gpio::init(void)
-    {
-      ;
-    }
-
-    void
     Gpio::configPeripheralFunction(gpio::PeripheralFunction_t func)
     {
       if (func & 0x1)
