@@ -27,7 +27,7 @@ namespace device
       {
         Status_t status;
 
-        status = m_spi.writeWaitReadByte(reg | OPERATION::WRITE);
+        status = m_spi.writeWaitReadByte(reg | Operation::WRITE);
 
         return status;
       }
@@ -37,7 +37,7 @@ namespace device
       {
         Status_t status;
 
-        status = m_spi.writeWaitReadByte(reg | OPERATION::WRITE);
+        status = m_spi.writeWaitReadByte(reg | Operation::WRITE);
         m_spi.writeWaitReadByte(value >> 8);
         m_spi.writeWaitReadByte(value & 0xFF);
 
@@ -50,7 +50,7 @@ namespace device
         Status_t status;
         uint16_t value;
 
-        status = m_spi.writeWaitReadByte(reg | OPERATION::READ);
+        status = m_spi.writeWaitReadByte(reg | Operation::READ);
 
         value = (m_spi.writeWaitReadByte(0xFF) << 8);
         value |= m_spi.writeWaitReadByte(0xFF);
@@ -67,7 +67,7 @@ namespace device
         Status_t status;
         uint8_t value;
 
-        status = m_spi.writeWaitReadByte(reg | OPERATION::READ);
+        status = m_spi.writeWaitReadByte(reg | Operation::READ);
 
         value = m_spi.writeWaitReadByte(0xFF);
 
@@ -82,7 +82,7 @@ namespace device
       {
         Status_t status;
 
-        status = m_spi.writeWaitReadByte(reg | OPERATION::WRITE);
+        status = m_spi.writeWaitReadByte(reg | Operation::WRITE);
         m_spi.writeWaitReadByte(value);
 
         return status;
@@ -93,7 +93,7 @@ namespace device
       {
         Status_t status;
 
-        status = m_spi.writeWaitReadByte(reg | OPERATION::READ);
+        status = m_spi.writeWaitReadByte(reg | Operation::READ);
 
         return status;
       }
@@ -103,7 +103,7 @@ namespace device
       {
         Status_t status;
 
-        status = m_spi.writeWaitReadByte(reg | OPERATION::WRITE);
+        status = m_spi.writeWaitReadByte(reg | Operation::WRITE);
 
         return status;
       }
@@ -131,7 +131,7 @@ namespace device
       {
         Status_t status;
 
-        status = m_spi.writeWaitReadByte(REGISTER::FIFOREG | OPERATION::READ);
+        status = m_spi.writeWaitReadByte(Register::FIFOREG | Operation::READ);
 
         return status;
       }
@@ -141,7 +141,7 @@ namespace device
       {
         Status_t status;
 
-        status = m_spi.writeWaitReadByte(REGISTER::FIFOREG | OPERATION::WRITE);
+        status = m_spi.writeWaitReadByte(Register::FIFOREG | Operation::WRITE);
 
         return status;
       }
