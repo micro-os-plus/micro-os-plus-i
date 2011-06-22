@@ -118,7 +118,7 @@ public:
   // line number and expression string.
   // It is used to in case of a failed assertion.
   static void
-  __assert(const char* func, const char* file, int lineno, const char* sexp);
+  assert(const char* func, const char* file, int lineno, const char* sexp);
 
   // Initialise debug interface and print greeting and build strings.
   static void

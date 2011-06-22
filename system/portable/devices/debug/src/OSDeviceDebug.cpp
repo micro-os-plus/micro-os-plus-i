@@ -505,7 +505,7 @@ OSDeviceDebug::putDec(uint32_t w, uint16_t n)
 #endif /* OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG */
 
 void
-OSDeviceDebug::__assert(const char* func, const char* file, int lineno,
+OSDeviceDebug::assert(const char* func, const char* file, int lineno,
     const char* sexp)
 {
   register OSStack_t mask;
