@@ -117,7 +117,7 @@
 #  error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#if !defined(assert)
+#if false && !defined(assert)
 #  if !defined(DEBUG)
 #    define assert(e)   ((void)0)
 #  else /* DEBUG */
