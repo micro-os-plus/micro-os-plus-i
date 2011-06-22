@@ -34,27 +34,47 @@ namespace device
       typedef uint8_t RegisterOperation_t;
 
       typedef uint8_t Status_t;
+      typedef uint8_t TxPowerLevel_t;
 
-      typedef enum TxPowerLevel_e
+      class TxPowerLevel
       {
-        OUTPUT_POWER_25_DBM = 0,        // -25 dBm
-        OUTPUT_POWER_15_DBM = 1,        // -15 dBm
-        OUTPUT_POWER_10_DBM = 2,        // -10 dBm
-        OUTPUT_POWER_7_DBM = 3,         // -7 dBm
-        OUTPUT_POWER_4_6_DBM = 4,       // -4.6 dBm
-        OUTPUT_POWER_2_8_DBM = 5,       // -2.8 dBm
-        OUTPUT_POWER_1_3_DBM = 6,       // -1.3 dBm
-        OUTPUT_POWER_0_DBM = 7          // 0 dBm
-      }TxPowerLevel_t;
+      public:
+        static const TxPowerLevel_t DBM_25 = 0; // -25 dBm
+        static const TxPowerLevel_t DBM_15 = 1; // -15 dBm
+        static const TxPowerLevel_t DBM_10 = 2; // -10 dBm
+        static const TxPowerLevel_t DBM_7 = 3; // -7 dBm
+        static const TxPowerLevel_t DBM_4_6 = 4; // -4.6 dBm
+        static const TxPowerLevel_t DBM_2_8 = 5; // -2.8 dBm
+        static const TxPowerLevel_t DBM_1_3 = 6; // -1.3 dBm
+        static const TxPowerLevel_t DBM_0 = 7; // 0 dBm
 
-      class OPERATION
+      };
+      class Status
+      {
+      public:
+        static const Status_t XOSC16M_STABLE = 0x40; // Oscillator running
+        static const Status_t SYNC_RECEIVED = 0x20; // RX sync word received
+        static const Status_t CRC_OK = 0x08; // Next 2 FIFO bytes make CRC OK
+        static const Status_t FS_LOCK = 0x04; // Freq. Synthesiser is in lock
+
+        static bool
+        isOscStable(Status_t status);
+        static bool
+        isSyncReceived(Status_t status);
+        static bool
+        isCrcOk(Status_t status);
+        static bool
+        isFsLock(Status_t status);
+      };
+
+      class Operation
       {
       public:
         static const RegisterOperation_t WRITE = 0x00;
         static const RegisterOperation_t READ = 0x80;
       };
 
-      class REGISTER
+      class Register
       {
       public:
         static const RegisterId_t MAIN = 0x01; // Read/Write
@@ -119,7 +139,7 @@ namespace device
 
       // power ON and initialise all the configuration registers
       void
-      PowerOn(void)
+      PowerOn(void);
 
       // do the calibration, and return its status
       uint8_t
@@ -158,6 +178,35 @@ namespace device
       cc2400::Registers registers;
     };
 
+    // ===== Inline methods ===================================================
+
+    namespace cc2400
+    {
+      inline bool
+      Status::isOscStable(Status_t status)
+      {
+        return (status & XOSC16M_STABLE) != 0;
+      }
+
+      inline bool
+      Status::isSyncReceived(Status_t status)
+      {
+        return (status & SYNC_RECEIVED) != 0;
+      }
+
+      inline bool
+      Status::isCrcOk(Status_t status)
+      {
+        return (status & CRC_OK) != 0;
+      }
+
+      inline bool
+      Status::isFsLock(Status_t status)
+      {
+        return (status & FS_LOCK) != 0;
+      }
+
+    }
   }
 }
 #endif /* DEVICE_TEXAS_CC2400_H_ */
