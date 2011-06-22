@@ -17,6 +17,8 @@
 #include "portable/devices/debug/include/DeviceDebugI2cImpl.h"
 #endif /* defined(OS_CONFIG_DEBUG_DEVICE_I2C) */
 
+#undef assert
+
 // ============================================================================
 
 // This class is used for displaying the trace messages.
