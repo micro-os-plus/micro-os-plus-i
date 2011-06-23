@@ -20,14 +20,14 @@ namespace util
 
     Crc16x1021::Crc16x1021()
     {
-      OSDeviceDebug::putConstructor_P(PSTR("Crc16x1021"), this);
+      OSDeviceDebug::putConstructor_P(PSTR("util::crc::Crc16x1021"), this);
     }
 
     // ----- Destructor -------------------------------------------------------
 
     Crc16x1021::~Crc16x1021()
     {
-      OSDeviceDebug::putDestructor_P(PSTR("Crc16x1021"), this);
+      OSDeviceDebug::putDestructor_P(PSTR("util::crc::Crc16x1021"), this);
     }
 
     // ----- Static methods ---------------------------------------------------
