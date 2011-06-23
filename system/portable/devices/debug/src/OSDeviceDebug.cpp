@@ -75,65 +75,61 @@ OSDeviceDebug::commonPutBytes(const char* s, uint_t n)
   return implPutBytes(s, n);
 }
 
+#if defined(OS_DEBUG_CONSTRUCTORS)
 
 // display constructor name and object address
 void
 OSDeviceDebug::putConstructor(const char* pc, const void* p)
-{
-#if defined(OS_DEBUG_CONSTRUCTORS)
-  register OSStack_t mask;
+  {
+    register OSStack_t mask;
 
-  mask = criticalEnter();
-    {
-      putString(pc);
-      putString("() @");
-      putPtr(p);
-      putNewLine();
-    }
-  criticalExit(mask);
-#endif /* defined(OS_DEBUG_CONSTRUCTORS) */
-}
+    mask = criticalEnter();
+      {
+        putString(pc);
+        putString("() @");
+        putPtr(p);
+        putNewLine();
+      }
+    criticalExit(mask);
+  }
 
 // display constructor name and object address
 void
 OSDeviceDebug::putConstructorWithIndex(const char* pc, uint16_t i,
     const void* p)
-{
-#if defined(OS_DEBUG_CONSTRUCTORS)
-  register OSStack_t mask;
+  {
+    register OSStack_t mask;
 
-  mask = criticalEnter();
-    {
-      putString(pc);
-      putChar('(');
-      putDec(i);
-      putString(") @");
-      putPtr(p);
-      putNewLine();
-    }
-  criticalExit(mask);
-#endif /* defined(OS_DEBUG_CONSTRUCTORS) */
-}
+    mask = criticalEnter();
+      {
+        putString(pc);
+        putChar('(');
+        putDec(i);
+        putString(") @");
+        putPtr(p);
+        putNewLine();
+      }
+    criticalExit(mask);
+  }
 
 // display destructor name and object address
 void
 OSDeviceDebug::putDestructor(const char* pc, const void* p)
-{
-#if defined(OS_DEBUG_CONSTRUCTORS)
-  register OSStack_t mask;
+  {
+    register OSStack_t mask;
 
-  mask = criticalEnter();
-    {
-      putChar('~');
-      putString(pc);
-      putString("() @");
-      putPtr(p);
-      putNewLine();
-    }
-  criticalExit(mask);
+    mask = criticalEnter();
+      {
+        putChar('~');
+        putString(pc);
+        putString("() @");
+        putPtr(p);
+        putNewLine();
+      }
+    criticalExit(mask);
+  }
+
 #endif /* defined(OS_DEBUG_CONSTRUCTORS) */
-}
-
 
 void
 OSDeviceDebug::putChar(uchar_t c)
