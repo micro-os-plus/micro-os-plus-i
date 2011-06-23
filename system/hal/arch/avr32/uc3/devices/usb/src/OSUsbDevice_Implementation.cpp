@@ -219,73 +219,73 @@ bool
 OSUsbDeviceImpl::usbDriverInit(void)
 {
   OSCriticalSection::enter();
-  {
+    {
 
-  ////////////////////
-  // Start USB clock.
-  ////////////////////
+      ////////////////////
+      // Start USB clock.
+      ////////////////////
 
-  // Use 16MHz from OSC0 and generate 96 MHz
-  pm_pll_setup(&AVR32_PM, 0, // pll.
-      2, // mul.
-      0, // div.
-      0, // osc.
-      16); // lockcount.
+      // Use 16MHz from OSC0 and generate 96 MHz
+      pm_pll_setup(&AVR32_PM, 0, // pll.
+          2, // mul.
+          0, // div.
+          0, // osc.
+          16); // lockcount.
 
-  pm_pll_set_option(&AVR32_PM, 0, // pll.
-      1, // pll_freq: choose the range 80-180MHz.
-      0, // pll_div2.
-      0); // pll_wbwdisable.
+      pm_pll_set_option(&AVR32_PM, 0, // pll.
+          1, // pll_freq: choose the range 80-180MHz.
+          0, // pll_div2.
+          0); // pll_wbwdisable.
 
-  // start PLL1 and wait forl lock
-  pm_pll_enable(&AVR32_PM, 0);
+      // start PLL1 and wait forl lock
+      pm_pll_enable(&AVR32_PM, 0);
 
-  // Wait for PLL1 locked.
-  pm_wait_for_pll0_locked(&AVR32_PM);
+      // Wait for PLL1 locked.
+      pm_wait_for_pll0_locked(&AVR32_PM);
 
-  //setup the USB generic clock
-  pm_gc_setup(&AVR32_PM, AVR32_PM_GCLK_USBB, // gc
-      1, // osc_or_pll: use Osc (if 0) or PLL (if 1)
-      0, // pll_osc: select Osc0/PLL0 or Osc1/PLL1
-      1, // diven
-      3); // div
-  // Enable USB GCLK.
-  pm_gc_enable(&AVR32_PM, AVR32_PM_GCLK_USBB);
+      //setup the USB generic clock
+      pm_gc_setup(&AVR32_PM, AVR32_PM_GCLK_USBB, // gc
+          1, // osc_or_pll: use Osc (if 0) or PLL (if 1)
+          0, // pll_osc: select Osc0/PLL0 or Osc1/PLL1
+          1, // diven
+          3); // div
+      // Enable USB GCLK.
+      pm_gc_enable(&AVR32_PM, AVR32_PM_GCLK_USBB);
 
-  ////////////////////
-  // configure USB module.
-  ////////////////////
+      ////////////////////
+      // configure USB module.
+      ////////////////////
 
-  // register interrupt
-  INTC_register_interrupt(USB_contextHandler, AVR32_USBB_IRQ,
-      OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY);
+      // register interrupt
+      INTC_register_interrupt(USB_contextHandler, AVR32_USBB_IRQ,
+          OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY);
 
-  // force USB module into device mode
-  OSUsbDeviceImpl::Usb_force_device_mode();
+      // force USB module into device mode
+      OSUsbDeviceImpl::Usb_force_device_mode();
 
-  /////////////////////
-  // initializes the USB device controller.
-  ////////////////////
-  usb_connected = FALSE;
-  usb_configuration_nb = 0;
+      /////////////////////
+      // initializes the USB device controller.
+      ////////////////////
+      usb_connected = FALSE;
+      usb_configuration_nb = 0;
 
-  OSUsbDeviceImpl::Usb_disable();
-  (void) OSUsbDeviceImpl::isUsbEnabled();
-  OSUsbDeviceImpl::disableOtgPad();
-  OSUsbDeviceImpl::enableOtgPad();
-  OSUsbDeviceImpl::Usb_enable();
-  OSUsbDeviceImpl::Usb_unfreeze_clock();
-  (void) Is_usb_clock_frozen();
+      OSUsbDeviceImpl::Usb_disable();
+      (void) OSUsbDeviceImpl::isUsbEnabled();
+      OSUsbDeviceImpl::disableOtgPad();
+      OSUsbDeviceImpl::enableOtgPad();
+      OSUsbDeviceImpl::Usb_enable();
+      OSUsbDeviceImpl::Usb_unfreeze_clock();
+      (void) Is_usb_clock_frozen();
 
-  OSUsbDeviceImpl::Usb_enable_vbus_interrupt();
+      OSUsbDeviceImpl::Usb_enable_vbus_interrupt();
 
-  OSUsbDeviceImpl::Usb_ack_suspend(); // A suspend condition may be detected right after enabling the USB macro
-  (void) OSUsbDeviceImpl::Is_usb_suspend();
+      OSUsbDeviceImpl::Usb_ack_suspend(); // A suspend condition may be detected right after enabling the USB macro
+      (void) OSUsbDeviceImpl::Is_usb_suspend();
 
-  // freeze clocks in order to save power
-  OSUsbDeviceImpl::Usb_freeze_clock();
-  //(void)Is_usb_clock_frozen();
-  }
+      // freeze clocks in order to save power
+      OSUsbDeviceImpl::Usb_freeze_clock();
+      //(void)Is_usb_clock_frozen();
+    }
   OSCriticalSection::exit();
 
   return TRUE;
@@ -459,102 +459,107 @@ OSUsbDeviceImpl::writeBuffer(void* pBuf, int bufMaxSize)
 //! @warning Do not mix calls to this function with calls to indexed macros.
 //!
 uint32_t
-OSUsbDeviceImpl::usbReadEpRxPacket(uint8_t ep, void* rxbuf, uint32_t data_length, void** prxbuf)
-  {
-    // Use aggregated pointers to have several alignments available for a same address
-    UnionCVPtr ep_fifo;
-    UnionPtr rxbuf_cur;
+OSUsbDeviceImpl::usbReadEpRxPacket(uint8_t ep, void* rxbuf,
+    uint32_t data_length, void** prxbuf)
+{
+  // Use aggregated pointers to have several alignments available for a same address
+  UnionCVPtr ep_fifo;
+  UnionPtr rxbuf_cur;
 #if (!defined __OPTIMIZE_SIZE__) || !__OPTIMIZE_SIZE__  // Auto-generated when GCC's -Os command option is used
-    StructCPtr rxbuf_end;
+  StructCPtr rxbuf_end;
 #else
-    StructCPtr rxbuf_end;
+  StructCPtr rxbuf_end;
 #endif  // !__OPTIMIZE_SIZE__
-    // Initialize pointers for copy loops and limit the number of bytes to copy
-    ep_fifo.u8ptr = OSUsbDeviceImpl::pep_fifo[ep].u8ptr;
-    rxbuf_cur.u8ptr = (U8*)rxbuf;
-    rxbuf_end.u8ptr = rxbuf_cur.u8ptr + min(data_length, (AVR32_usb_byte_count(ep)));
+  // Initialize pointers for copy loops and limit the number of bytes to copy
+  ep_fifo.u8ptr = OSUsbDeviceImpl::pep_fifo[ep].u8ptr;
+  rxbuf_cur.u8ptr = (U8*) rxbuf;
+  rxbuf_end.u8ptr = rxbuf_cur.u8ptr
+      + min(data_length, (AVR32_usb_byte_count(ep)));
 #if (!defined __OPTIMIZE_SIZE__) || !__OPTIMIZE_SIZE__  // Auto-generated when GCC's -Os command option is used
-    rxbuf_end.u16ptr = (U16 *)Align_down((U32)rxbuf_end.u8ptr, sizeof(U16));
-    rxbuf_end.u32ptr = (U32 *)Align_down((U32)rxbuf_end.u16ptr, sizeof(U32));
-    rxbuf_end.u64ptr = (U64 *)Align_down((U32)rxbuf_end.u32ptr, sizeof(U64));
+  rxbuf_end.u16ptr = (U16 *) Align_down((U32)rxbuf_end.u8ptr, sizeof(U16));
+  rxbuf_end.u32ptr = (U32 *) Align_down((U32)rxbuf_end.u16ptr, sizeof(U32));
+  rxbuf_end.u64ptr = (U64 *) Align_down((U32)rxbuf_end.u32ptr, sizeof(U64));
 
-    // If all addresses are aligned the same way with respect to 16-bit boundaries
-    if (Get_align((U32)rxbuf_cur.u8ptr, sizeof(U16)) == Get_align((U32)ep_fifo.u8ptr, sizeof(U16)))
-      {
-        // If pointer to reception buffer is not 16-bit aligned
-        if (!Test_align((U32)rxbuf_cur.u8ptr, sizeof(U16)))
-          {
-            // Copy 8-bit data to reach 16-bit alignment
-            if (rxbuf_cur.u8ptr < rxbuf_end.u8ptr)
-              {
-                // 8-bit accesses to FIFO data registers do require pointer post-increment
-                *rxbuf_cur.u8ptr++ = *ep_fifo.u8ptr++;
-              }
-          }
+  // If all addresses are aligned the same way with respect to 16-bit boundaries
+  if (Get_align((U32)rxbuf_cur.u8ptr, sizeof(U16))
+      == Get_align((U32)ep_fifo.u8ptr, sizeof(U16)))
+    {
+      // If pointer to reception buffer is not 16-bit aligned
+      if (!Test_align((U32)rxbuf_cur.u8ptr, sizeof(U16)))
+        {
+          // Copy 8-bit data to reach 16-bit alignment
+          if (rxbuf_cur.u8ptr < rxbuf_end.u8ptr)
+            {
+              // 8-bit accesses to FIFO data registers do require pointer post-increment
+              *rxbuf_cur.u8ptr++ = *ep_fifo.u8ptr++;
+            }
+        }
 
-        // If all addresses are aligned the same way with respect to 32-bit boundaries
-        if (Get_align((U32)rxbuf_cur.u16ptr, sizeof(U32)) == Get_align((U32)ep_fifo.u16ptr, sizeof(U32)))
-          {
-            // If pointer to reception buffer is not 32-bit aligned
-            if (!Test_align((U32)rxbuf_cur.u16ptr, sizeof(U32)))
-              {
-                // Copy 16-bit data to reach 32-bit alignment
-                if (rxbuf_cur.u16ptr < rxbuf_end.u16ptr)
-                  {
-                    // 16-bit accesses to FIFO data registers do require pointer post-increment
-                    *rxbuf_cur.u16ptr++ = *ep_fifo.u16ptr++;
-                  }
-              }
+      // If all addresses are aligned the same way with respect to 32-bit boundaries
+      if (Get_align((U32)rxbuf_cur.u16ptr, sizeof(U32))
+          == Get_align((U32)ep_fifo.u16ptr, sizeof(U32)))
+        {
+          // If pointer to reception buffer is not 32-bit aligned
+          if (!Test_align((U32)rxbuf_cur.u16ptr, sizeof(U32)))
+            {
+              // Copy 16-bit data to reach 32-bit alignment
+              if (rxbuf_cur.u16ptr < rxbuf_end.u16ptr)
+                {
+                  // 16-bit accesses to FIFO data registers do require pointer post-increment
+                  *rxbuf_cur.u16ptr++ = *ep_fifo.u16ptr++;
+                }
+            }
 
-            // If pointer to reception buffer is not 64-bit aligned
-            if (!Test_align((U32)rxbuf_cur.u32ptr, sizeof(U64)))
-              {
-                // Copy 32-bit data to reach 64-bit alignment
-                if (rxbuf_cur.u32ptr < rxbuf_end.u32ptr)
-                  {
-                    // 32-bit accesses to FIFO data registers do not require pointer post-increment
-                    *rxbuf_cur.u32ptr++ = *ep_fifo.u32ptr;
-                  }
-              }
+          // If pointer to reception buffer is not 64-bit aligned
+          if (!Test_align((U32)rxbuf_cur.u32ptr, sizeof(U64)))
+            {
+              // Copy 32-bit data to reach 64-bit alignment
+              if (rxbuf_cur.u32ptr < rxbuf_end.u32ptr)
+                {
+                  // 32-bit accesses to FIFO data registers do not require pointer post-increment
+                  *rxbuf_cur.u32ptr++ = *ep_fifo.u32ptr;
+                }
+            }
 
-            // Copy 64-bit-aligned data
-            while (rxbuf_cur.u64ptr < rxbuf_end.u64ptr)
-              {
-                // 64-bit accesses to FIFO data registers do not require pointer post-increment
-                *rxbuf_cur.u64ptr++ = *ep_fifo.u64ptr;
-              }
+          // Copy 64-bit-aligned data
+          while (rxbuf_cur.u64ptr < rxbuf_end.u64ptr)
+            {
+              // 64-bit accesses to FIFO data registers do not require pointer post-increment
+              *rxbuf_cur.u64ptr++ = *ep_fifo.u64ptr;
+            }
 
-            // Copy 32-bit-aligned data
-            if (rxbuf_cur.u32ptr < rxbuf_end.u32ptr)
-              {
-                // 32-bit accesses to FIFO data registers do not require pointer post-increment
-                *rxbuf_cur.u32ptr++ = *ep_fifo.u32ptr;
-              }
-          }
+          // Copy 32-bit-aligned data
+          if (rxbuf_cur.u32ptr < rxbuf_end.u32ptr)
+            {
+              // 32-bit accesses to FIFO data registers do not require pointer post-increment
+              *rxbuf_cur.u32ptr++ = *ep_fifo.u32ptr;
+            }
+        }
 
-        // Copy remaining 16-bit data if some
-        while (rxbuf_cur.u16ptr < rxbuf_end.u16ptr)
-          {
-            // 16-bit accesses to FIFO data registers do require pointer post-increment
-            *rxbuf_cur.u16ptr++ = *ep_fifo.u16ptr++;
-          }
-      }
+      // Copy remaining 16-bit data if some
+      while (rxbuf_cur.u16ptr < rxbuf_end.u16ptr)
+        {
+          // 16-bit accesses to FIFO data registers do require pointer post-increment
+          *rxbuf_cur.u16ptr++ = *ep_fifo.u16ptr++;
+        }
+    }
 
 #endif  // !__OPTIMIZE_SIZE__
-    // Copy remaining 8-bit data if some
-    while (rxbuf_cur.u8ptr < rxbuf_end.u8ptr)
-      {
-        // 8-bit accesses to FIFO data registers do require pointer post-increment
-        *rxbuf_cur.u8ptr++ = *ep_fifo.u8ptr++;
-      }
+  // Copy remaining 8-bit data if some
+  while (rxbuf_cur.u8ptr < rxbuf_end.u8ptr)
+    {
+      // 8-bit accesses to FIFO data registers do require pointer post-increment
+      *rxbuf_cur.u8ptr++ = *ep_fifo.u8ptr++;
+    }
 
-    // Save current position in FIFO data register
-    OSUsbDeviceImpl::pep_fifo[ep].u8ptr = (volatile U8 *)ep_fifo.u8ptr;
+  // Save current position in FIFO data register
+  OSUsbDeviceImpl::pep_fifo[ep].u8ptr = (volatile U8 *) ep_fifo.u8ptr;
 
-    // Return the updated buffer address and the number of non-copied bytes
-    if (prxbuf) *prxbuf = rxbuf_cur.u8ptr;
-    return data_length - (rxbuf_cur.u8ptr - (U8 *)rxbuf);
-  }
+  // Return the updated buffer address and the number of non-copied bytes
+  if (prxbuf)
+    *prxbuf = rxbuf_cur.u8ptr;
+  return data_length - (rxbuf_cur.u8ptr - (U8 *) rxbuf);
+}
 
 //! usb_write_ep_txpacket
 //!
@@ -577,104 +582,108 @@ OSUsbDeviceImpl::usbReadEpRxPacket(uint8_t ep, void* rxbuf, uint32_t data_length
 //! @warning Do not mix calls to this function with calls to indexed macros.
 //!
 uint32_t
-OSUsbDeviceImpl::usbWriteEpTxPacket(uint8_t ep, const void* txbuf, uint32_t data_length, const void** ptxbuf)
-  {
-    // Use aggregated pointers to have several alignments available for a same address
-    UnionVPtr ep_fifo;
-    UnionCPtr txbuf_cur;
+OSUsbDeviceImpl::usbWriteEpTxPacket(uint8_t ep, const void* txbuf,
+    uint32_t data_length, const void** ptxbuf)
+{
+  // Use aggregated pointers to have several alignments available for a same address
+  UnionVPtr ep_fifo;
+  UnionCPtr txbuf_cur;
 #if (!defined __OPTIMIZE_SIZE__) || !__OPTIMIZE_SIZE__  // Auto-generated when GCC's -Os command option is used
-    StructCPtr txbuf_end;
+  StructCPtr txbuf_end;
 #else
-    UnionCPtr txbuf_end;
+  UnionCPtr txbuf_end;
 #endif  // !__OPTIMIZE_SIZE__
-    // Initialize pointers for copy loops and limit the number of bytes to copy
-    ep_fifo.u8ptr = OSUsbDeviceImpl::pep_fifo[ep].u8ptr;
-    txbuf_cur.u8ptr = (const U8*)txbuf;
-    txbuf_end.u8ptr = txbuf_cur.u8ptr +
-    min(data_length, AVR32_usb_get_endpoint_size(ep) - AVR32_usb_byte_count(ep));
+  // Initialize pointers for copy loops and limit the number of bytes to copy
+  ep_fifo.u8ptr = OSUsbDeviceImpl::pep_fifo[ep].u8ptr;
+  txbuf_cur.u8ptr = (const U8*) txbuf;
+  txbuf_end.u8ptr
+      = txbuf_cur.u8ptr
+          + min(data_length, AVR32_usb_get_endpoint_size(ep) - AVR32_usb_byte_count(ep));
 #if (!defined __OPTIMIZE_SIZE__) || !__OPTIMIZE_SIZE__  // Auto-generated when GCC's -Os command option is used
-    txbuf_end.u16ptr = (U16 *)Align_down((U32)txbuf_end.u8ptr, sizeof(U16));
-    txbuf_end.u32ptr = (U32 *)Align_down((U32)txbuf_end.u16ptr, sizeof(U32));
-    txbuf_end.u64ptr = (U64 *)Align_down((U32)txbuf_end.u32ptr, sizeof(U64));
+  txbuf_end.u16ptr = (U16 *) Align_down((U32)txbuf_end.u8ptr, sizeof(U16));
+  txbuf_end.u32ptr = (U32 *) Align_down((U32)txbuf_end.u16ptr, sizeof(U32));
+  txbuf_end.u64ptr = (U64 *) Align_down((U32)txbuf_end.u32ptr, sizeof(U64));
 
-    // If all addresses are aligned the same way with respect to 16-bit boundaries
-    if (Get_align((U32)txbuf_cur.u8ptr, sizeof(U16)) == Get_align((U32)ep_fifo.u8ptr, sizeof(U16)))
-      {
-        // If pointer to transmission buffer is not 16-bit aligned
-        if (!Test_align((U32)txbuf_cur.u8ptr, sizeof(U16)))
-          {
-            // Copy 8-bit data to reach 16-bit alignment
-            if (txbuf_cur.u8ptr < txbuf_end.u8ptr)
-              {
-                // 8-bit accesses to FIFO data registers do require pointer post-increment
-                *ep_fifo.u8ptr++ = *txbuf_cur.u8ptr++;
-              }
-          }
+  // If all addresses are aligned the same way with respect to 16-bit boundaries
+  if (Get_align((U32)txbuf_cur.u8ptr, sizeof(U16))
+      == Get_align((U32)ep_fifo.u8ptr, sizeof(U16)))
+    {
+      // If pointer to transmission buffer is not 16-bit aligned
+      if (!Test_align((U32)txbuf_cur.u8ptr, sizeof(U16)))
+        {
+          // Copy 8-bit data to reach 16-bit alignment
+          if (txbuf_cur.u8ptr < txbuf_end.u8ptr)
+            {
+              // 8-bit accesses to FIFO data registers do require pointer post-increment
+              *ep_fifo.u8ptr++ = *txbuf_cur.u8ptr++;
+            }
+        }
 
-        // If all addresses are aligned the same way with respect to 32-bit boundaries
-        if (Get_align((U32)txbuf_cur.u16ptr, sizeof(U32)) == Get_align((U32)ep_fifo.u16ptr, sizeof(U32)))
-          {
-            // If pointer to transmission buffer is not 32-bit aligned
-            if (!Test_align((U32)txbuf_cur.u16ptr, sizeof(U32)))
-              {
-                // Copy 16-bit data to reach 32-bit alignment
-                if (txbuf_cur.u16ptr < txbuf_end.u16ptr)
-                  {
-                    // 16-bit accesses to FIFO data registers do require pointer post-increment
-                    *ep_fifo.u16ptr++ = *txbuf_cur.u16ptr++;
-                  }
-              }
+      // If all addresses are aligned the same way with respect to 32-bit boundaries
+      if (Get_align((U32)txbuf_cur.u16ptr, sizeof(U32))
+          == Get_align((U32)ep_fifo.u16ptr, sizeof(U32)))
+        {
+          // If pointer to transmission buffer is not 32-bit aligned
+          if (!Test_align((U32)txbuf_cur.u16ptr, sizeof(U32)))
+            {
+              // Copy 16-bit data to reach 32-bit alignment
+              if (txbuf_cur.u16ptr < txbuf_end.u16ptr)
+                {
+                  // 16-bit accesses to FIFO data registers do require pointer post-increment
+                  *ep_fifo.u16ptr++ = *txbuf_cur.u16ptr++;
+                }
+            }
 
-            // If pointer to transmission buffer is not 64-bit aligned
-            if (!Test_align((U32)txbuf_cur.u32ptr, sizeof(U64)))
-              {
-                // Copy 32-bit data to reach 64-bit alignment
-                if (txbuf_cur.u32ptr < txbuf_end.u32ptr)
-                  {
-                    // 32-bit accesses to FIFO data registers do not require pointer post-increment
-                    *ep_fifo.u32ptr = *txbuf_cur.u32ptr++;
-                  }
-              }
+          // If pointer to transmission buffer is not 64-bit aligned
+          if (!Test_align((U32)txbuf_cur.u32ptr, sizeof(U64)))
+            {
+              // Copy 32-bit data to reach 64-bit alignment
+              if (txbuf_cur.u32ptr < txbuf_end.u32ptr)
+                {
+                  // 32-bit accesses to FIFO data registers do not require pointer post-increment
+                  *ep_fifo.u32ptr = *txbuf_cur.u32ptr++;
+                }
+            }
 
-            // Copy 64-bit-aligned data
-            while (txbuf_cur.u64ptr < txbuf_end.u64ptr)
-              {
-                // 64-bit accesses to FIFO data registers do not require pointer post-increment
-                *ep_fifo.u64ptr = *txbuf_cur.u64ptr++;
-              }
+          // Copy 64-bit-aligned data
+          while (txbuf_cur.u64ptr < txbuf_end.u64ptr)
+            {
+              // 64-bit accesses to FIFO data registers do not require pointer post-increment
+              *ep_fifo.u64ptr = *txbuf_cur.u64ptr++;
+            }
 
-            // Copy 32-bit-aligned data
-            if (txbuf_cur.u32ptr < txbuf_end.u32ptr)
-              {
-                // 32-bit accesses to FIFO data registers do not require pointer post-increment
-                *ep_fifo.u32ptr = *txbuf_cur.u32ptr++;
-              }
-          }
+          // Copy 32-bit-aligned data
+          if (txbuf_cur.u32ptr < txbuf_end.u32ptr)
+            {
+              // 32-bit accesses to FIFO data registers do not require pointer post-increment
+              *ep_fifo.u32ptr = *txbuf_cur.u32ptr++;
+            }
+        }
 
-        // Copy remaining 16-bit data if some
-        while (txbuf_cur.u16ptr < txbuf_end.u16ptr)
-          {
-            // 16-bit accesses to FIFO data registers do require pointer post-increment
-            *ep_fifo.u16ptr++ = *txbuf_cur.u16ptr++;
-          }
-      }
+      // Copy remaining 16-bit data if some
+      while (txbuf_cur.u16ptr < txbuf_end.u16ptr)
+        {
+          // 16-bit accesses to FIFO data registers do require pointer post-increment
+          *ep_fifo.u16ptr++ = *txbuf_cur.u16ptr++;
+        }
+    }
 
 #endif  // !__OPTIMIZE_SIZE__
-    // Copy remaining 8-bit data if some
-    while (txbuf_cur.u8ptr < txbuf_end.u8ptr)
-      {
-        // 8-bit accesses to FIFO data registers do require pointer post-increment
-        *ep_fifo.u8ptr++ = *txbuf_cur.u8ptr++;
-      }
+  // Copy remaining 8-bit data if some
+  while (txbuf_cur.u8ptr < txbuf_end.u8ptr)
+    {
+      // 8-bit accesses to FIFO data registers do require pointer post-increment
+      *ep_fifo.u8ptr++ = *txbuf_cur.u8ptr++;
+    }
 
-    // Save current position in FIFO data register
-    OSUsbDeviceImpl::pep_fifo[ep].u8ptr = ep_fifo.u8ptr;
+  // Save current position in FIFO data register
+  OSUsbDeviceImpl::pep_fifo[ep].u8ptr = ep_fifo.u8ptr;
 
-    // Return the updated buffer address and the number of non-copied bytes
-    if (ptxbuf) *ptxbuf = txbuf_cur.u8ptr;
-    return data_length - (txbuf_cur.u8ptr - (U8 *)txbuf);
-  }
-
+  // Return the updated buffer address and the number of non-copied bytes
+  if (ptxbuf)
+    *ptxbuf = txbuf_cur.u8ptr;
+  return data_length - (txbuf_cur.u8ptr - (U8 *) txbuf);
+}
 
 // ----------------------------------------------------------------------------
 
@@ -1071,7 +1080,7 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
   OSUsbDeviceImpl::Usb_ack_receive_out();
 #else
   Bool zlp;
-  U16 wLength, counter;
+  U16 wLength;
   U8 descriptor_type;
   U8 string_type;
   unsigned short dummy16;
@@ -1190,12 +1199,13 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
 #endif
       if (0 != data_to_transfer)
         {
-                   data_to_transfer = usbWriteEpTxPacket(EP_CONTROL, pbuffer,
-                                                            data_to_transfer, (const void**)&pbuffer);
+          data_to_transfer = usbWriteEpTxPacket(EP_CONTROL, pbuffer,
+              data_to_transfer, (const void**) &pbuffer);
 #if 0
           //TODO: replace this with the code above.
           while (!OSUsbDeviceImpl::Is_usb_tx_ready())
-            ; // Wait Endpoint ready...
+          ; // Wait Endpoint ready...
+          U16 counter;
           for (counter = 0; counter < UsbGetEndpointSize(EP_CONTROL); counter++)
             {
               writeByte(*((char*) pbuffer));
@@ -1203,9 +1213,9 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
               pbuffer = (char*) pbuffer + 1;
               data_to_transfer--;
               if (data_to_transfer == 0)
-                break;
+              break;
             }
-#endif
+
           Usb_send_control_in();
           if (data_to_transfer == 0 && counter
               == UsbGetEndpointSize(EP_CONTROL))// ZLP
@@ -1214,7 +1224,7 @@ OSUsbDeviceImpl::usb_get_descriptor(void)
                 ; // Wait Endpoint ready...
               OSUsbDeviceImpl::Usb_send_in(); // ...and Send ZLP
             }
-
+#endif
         }
       if (Is_usb_nak_out())
         break;
@@ -1490,7 +1500,7 @@ OSUsbDeviceImpl::usb_set_feature(void)
         case TEST_J:
         AVR32_usb_ack_setup_received_free();
         AVR32_usb_ack_control_in_ready_send();
-        while (!AVR32_is_usb_control_in_ready()) ;
+        while (!AVR32_is_usb_control_in_ready());
         Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 2);
         Set_bits(AVR32_USBB_udcon, AVR32_USBB_UDCON_TSTJ_MASK);
         break;
@@ -1498,7 +1508,7 @@ OSUsbDeviceImpl::usb_set_feature(void)
         case TEST_K:
         AVR32_usb_ack_setup_received_free();
         AVR32_usb_ack_control_in_ready_send();
-        while (!AVR32_is_usb_control_in_ready()) ;
+        while (!AVR32_is_usb_control_in_ready());
         Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 2);
         Set_bits(AVR32_USBB_udcon, AVR32_USBB_UDCON_TSTK_MASK);
         break;
@@ -1506,7 +1516,7 @@ OSUsbDeviceImpl::usb_set_feature(void)
         case TEST_SE0_NAK:
         AVR32_usb_ack_setup_received_free();
         AVR32_usb_ack_control_in_ready_send();
-        while (!AVR32_is_usb_control_in_ready()) ;
+        while (!AVR32_is_usb_control_in_ready());
         Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 2);
         break;
 
@@ -1530,7 +1540,7 @@ OSUsbDeviceImpl::usb_set_feature(void)
 
             AVR32_usb_ack_setup_received_free();
             AVR32_usb_ack_control_in_ready_send();
-            while (!AVR32_is_usb_control_in_ready()) ;
+            while (!AVR32_is_usb_control_in_ready());
             Wr_bitfield(AVR32_USBB_udcon, AVR32_USBB_UDCON_SPDCONF_MASK, 2);
             AVR32_usb_disable_endpoint(EP_CONTROL);
             AVR32_usb_unallocate_memory(EP_CONTROL);
@@ -1637,7 +1647,7 @@ OSUsbDeviceImpl::usb_get_interface(void)
   U16 wValue;
 
   // Read wValue
-  wValue =  readWord();
+  wValue = readWord();
   // wValue = Alternate Setting
   // wIndex = Interface
   wInterface = readWord();

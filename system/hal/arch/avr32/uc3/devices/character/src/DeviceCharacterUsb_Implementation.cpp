@@ -668,10 +668,10 @@ DeviceCharacterUsb::specificCdcEndpointInit(
   OSUsbDevice::usb_configure_endpoint(INT_EP, TYPE_INTERRUPT, DIRECTION_IN,
       SIZE_32, ONE_BANK, NYET_ENABLED);
 
-  OSUsbDevice::usb_configure_endpoint(TX_EP, TYPE_BULK, DIRECTION_IN, SIZE_64,
+  OSUsbDevice::usb_configure_endpoint(TX_EP, TYPE_BULK, DIRECTION_IN, EP_SIZE_1_FS,
       TWO_BANKS, NYET_ENABLED);
 
-  OSUsbDevice::usb_configure_endpoint(RX_EP, TYPE_BULK, DIRECTION_OUT, SIZE_64,
+  OSUsbDevice::usb_configure_endpoint(RX_EP, TYPE_BULK, DIRECTION_OUT, EP_SIZE_2_FS,
       TWO_BANKS, NYET_ENABLED);
 #endif
 #if TO_BE_PORTED
