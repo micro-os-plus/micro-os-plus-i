@@ -21,12 +21,15 @@ namespace util
     class Crc16x1021
     {
     public:
-      Crc16x1021();
-      ~Crc16x1021();
-
+      // ----- Constants ------------------------------------------------------
       static const uint16_t INITIAL_VALUE = 0x0000;
       static const uint16_t FINAL_VALUE = 0x0000;
 
+      // ----- Constructors and destructors -----------------------------------
+      Crc16x1021();
+      ~Crc16x1021();
+
+      // ---- Object methods --------------------------------------------------
       void
       setInitialValue(void);
       void
@@ -81,6 +84,8 @@ namespace util
     {
       return isFinalValueCorrect(m_crc);
     }
+
+    // ----- Static methods ---------------------------------------------------
 
   }
 }

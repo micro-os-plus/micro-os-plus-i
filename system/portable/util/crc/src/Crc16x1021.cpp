@@ -16,18 +16,23 @@ namespace util
 {
   namespace crc
   {
+    // ----- Constructor ------------------------------------------------------
+
     Crc16x1021::Crc16x1021()
     {
       OSDeviceDebug::putConstructor_P(PSTR("Crc16x1021"), this);
     }
+
+    // ----- Destructor -------------------------------------------------------
 
     Crc16x1021::~Crc16x1021()
     {
       OSDeviceDebug::putDestructor_P(PSTR("Crc16x1021"), this);
     }
 
-    // ----- Static methods -----------------------------------------------
+    // ----- Static methods ---------------------------------------------------
 
+    // Compute the polynomial for a single byte
     void
     Crc16x1021::computePolynomial(uint16_t& crc, uint8_t b)
     {
@@ -46,6 +51,7 @@ namespace util
       crc = acc;
     }
 
+    // Compute the polynomial for an array of bytes
     void
     Crc16x1021::computePolynomial(uint16_t& crc, uint8_t* pb, std::size_t n)
     {
@@ -55,6 +61,8 @@ namespace util
           computePolynomial(crc, *pb++);
         }
     }
+
+    // ------------------------------------------------------------------------
   }
 }
 
