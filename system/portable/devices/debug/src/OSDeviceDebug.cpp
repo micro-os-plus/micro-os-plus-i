@@ -75,12 +75,12 @@ OSDeviceDebug::commonPutBytes(const char* s, uint_t n)
   return implPutBytes(s, n);
 }
 
-#if defined(OS_DEBUG_CONSTRUCTORS)
 
 // display constructor name and object address
 void
 OSDeviceDebug::putConstructor(const char* pc, const void* p)
 {
+#if defined(OS_DEBUG_CONSTRUCTORS)
   register OSStack_t mask;
 
   mask = criticalEnter();
@@ -91,6 +91,7 @@ OSDeviceDebug::putConstructor(const char* pc, const void* p)
       putNewLine();
     }
   criticalExit(mask);
+#endif /* defined(OS_DEBUG_CONSTRUCTORS) */
 }
 
 // display constructor name and object address
@@ -98,6 +99,7 @@ void
 OSDeviceDebug::putConstructorWithIndex(const char* pc, uint16_t i,
     const void* p)
 {
+#if defined(OS_DEBUG_CONSTRUCTORS)
   register OSStack_t mask;
 
   mask = criticalEnter();
@@ -110,12 +112,14 @@ OSDeviceDebug::putConstructorWithIndex(const char* pc, uint16_t i,
       putNewLine();
     }
   criticalExit(mask);
+#endif /* defined(OS_DEBUG_CONSTRUCTORS) */
 }
 
 // display destructor name and object address
 void
 OSDeviceDebug::putDestructor(const char* pc, const void* p)
 {
+#if defined(OS_DEBUG_CONSTRUCTORS)
   register OSStack_t mask;
 
   mask = criticalEnter();
@@ -127,9 +131,9 @@ OSDeviceDebug::putDestructor(const char* pc, const void* p)
       putNewLine();
     }
   criticalExit(mask);
+#endif /* defined(OS_DEBUG_CONSTRUCTORS) */
 }
 
-#endif /* defined(OS_DEBUG_CONSTRUCTORS) */
 
 void
 OSDeviceDebug::putChar(uchar_t c)
