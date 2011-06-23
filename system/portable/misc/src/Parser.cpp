@@ -49,6 +49,7 @@ OSReturn_t
 Parser::skipTokens(unsigned short nTokens, unsigned char* pSeparators)
 {
   OSReturn_t ret;
+  ret = OSReturn::OS_OK;
 
   for (int i = 0; i < nTokens; ++i)
     {
