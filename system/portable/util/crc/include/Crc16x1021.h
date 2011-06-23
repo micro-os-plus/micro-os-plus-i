@@ -14,9 +14,7 @@ namespace util
   namespace crc
   {
     // Polynomial: x^16 + x^12 + x^5 + 1 (0x1021)
-    // Initial value: 0x0
-
-    // Used in SD/MMC, XMODEM
+    // Used in SD/MMC payload, XMODEM
 
     class Crc16x1021
     {
@@ -36,6 +34,8 @@ namespace util
       computePolynomial(uint8_t b);
       void
       computePolynomial(uint8_t* pb, std::size_t n);
+      uint16_t
+      getComputedValue(void);
       bool
       isFinalValueCorrect(void);
 
@@ -61,25 +61,31 @@ namespace util
 
     // ----- Object inline methods --------------------------------------------
 
-    void
+    inline void
     Crc16x1021::setInitialValue(void)
     {
       m_crc = INITIAL_VALUE;
     }
 
-    void
+    inline void
     Crc16x1021::computePolynomial(uint8_t b)
     {
       computePolynomial(m_crc, b);
     }
 
-    void
+    inline void
     Crc16x1021::computePolynomial(uint8_t* pb, std::size_t n)
     {
       computePolynomial(m_crc, pb, n);
     }
 
-    bool
+    inline uint16_t
+    Crc16x1021::getComputedValue(void)
+    {
+      return m_crc;
+    }
+
+    inline bool
     Crc16x1021::isFinalValueCorrect(void)
     {
       return isFinalValueCorrect(m_crc);
