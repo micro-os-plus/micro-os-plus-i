@@ -90,7 +90,7 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
 #if 0
   // if closed return -1
   if (!m_opened)
-    return OSReturn::OS_DISCONNECTED;
+  return OSReturn::OS_DISCONNECTED;
 
   OSCriticalSection::enter();
 
@@ -121,6 +121,7 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
 #endif
 
   if (!OSUsbDevice::Is_usb_write_enabled()) //If Endpoint full -> flush
+
     {
       implFlush();
     }
@@ -144,24 +145,24 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
   if (!m_opened)
     return OSReturn::OS_DISCONNECTED;
 
-  if(size == 0)
-  {
+  if (size == 0)
+    {
       return 0;
-  }
+    }
 
   status = AVR32_is_usb_in_ready(m_tx_ep);
 
-  if( status == 0 )
-  {
+  if (status == 0)
+    {
       return 0;
-  }
+    }
 
   if (m_txCounter == 0)
-  {
+    {
       // Reset known position inside FIFO
       // data register of selected endpoint
       AVR32_usb_reset_endpoint_fifo_access(m_tx_ep);
-  }
+    }
 
   availableSize = AVR32_usb_get_endpoint_size(m_tx_ep) - m_txCounter;
 
@@ -174,22 +175,23 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
   OSUsbDevice::usbWriteEpTxPacket(m_tx_ep, pBuf, min, NULL);
 
   //If Endpoint full -> flush
-  if(!AVR32_is_usb_write_enabled(m_tx_ep))
-  {
+  if (!AVR32_is_usb_write_enabled(m_tx_ep))
+    {
       m_txCounter = 0;
 
       // acknowledge IN ready and sends current bank
       AVR32_usb_ack_in_ready_send(m_tx_ep);
 
       // check if there is a need for sending a zlp
-      if(min == availableSize)
-      {
+      if (min == availableSize)
+        {
           // wait for previous data to be sent
-          while (!AVR32_is_usb_in_ready(m_tx_ep)) ;
+          while (!AVR32_is_usb_in_ready(m_tx_ep))
+            ;
           // send zlp
           AVR32_usb_ack_in_ready_send(m_tx_ep);
-      }
-  }
+        }
+    }
 
   return min;
 }
@@ -206,9 +208,9 @@ DeviceCharacterUsb::implFlush(void)
   if (m_txCounter != 0)
     {
       if (!AVR32_is_usb_write_enabled(m_tx_ep)) //If Endpoint full, add zlp
-      {
+        {
           zlp = true;
-      }
+        }
 
       AVR32_usb_ack_in_ready_send(m_tx_ep);
       //OSDeviceDebug::putChar('^');
@@ -281,7 +283,12 @@ DeviceCharacterUsb::implReadByte(void)
 
   implReadBytes(&c, sizeof(unsigned char));
 
-  return (int)c;
+#if false
+  OSDeviceDebug::putHex(c);
+  OSDeviceDebug::putChar(' ');
+#endif
+
+  return (int) c;
 }
 
 int
@@ -289,15 +296,15 @@ DeviceCharacterUsb::implReadBytes(unsigned char* pBuf, int size)
 {
   uint32_t min;
 
-  if(size == 0)
-  {
+  if (size == 0)
+    {
       return 0;
-  }
+    }
 
-  if( m_rxCounter == 0 )
-  {
+  if (m_rxCounter == 0)
+    {
       return 0;
-  }
+    }
 
   // available Size to read is: m_rxCounter
   // min will hold the number of bytes to be read
@@ -309,7 +316,7 @@ DeviceCharacterUsb::implReadBytes(unsigned char* pBuf, int size)
   m_rxCounter -= min;
 
   // free current bank
-  if(m_rxCounter == 0)
+  if (m_rxCounter == 0)
     AVR32_usb_free_out(m_rx_ep);
 
   return min;
@@ -333,24 +340,31 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
       if (OSUsbDevice::isInterruptReceiveOut()
           && OSUsbDevice::isInterruptReceiveOutEnabled())
         {
+#if true
           OSDeviceDebug::putString("Vo");
           OSDeviceDebug::putNewLine();
-
+#endif
           // TODO: remove the next line - checks if m_rxCounter is 0
           while (g_usb0->m_rxCounter != 0)
             ;
 
           g_usb0->m_rxCounter = OSUsbDevice::Usb_byte_counter();
-          if(g_usb0->m_rxCounter == 0) // if we have received a zlp
-          {
+          if (g_usb0->m_rxCounter == 0) // if we have received a zlp
+            {
               // acknowledge OUT received and frees current bank
               AVR32_usb_ack_out_received_free(g_usb0->m_rx_ep);
-          }else
-          {
-            OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
-            OSUsbDevice::Usb_ack_receive_out();
-            OSScheduler::eventNotify(g_usb0->getReadEvent());
-          }
+            }
+          else
+            {
+#if false
+              OSDeviceDebug::putString("by");
+              OSDeviceDebug::putDec((uint16_t)g_usb0->m_rxCounter);
+              OSDeviceDebug::putNewLine();
+#endif
+              OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
+              OSUsbDevice::Usb_ack_receive_out();
+              OSScheduler::eventNotify(g_usb0->getReadEvent());
+            }
         }
     }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
@@ -668,11 +682,11 @@ DeviceCharacterUsb::specificCdcEndpointInit(
   OSUsbDevice::usb_configure_endpoint(INT_EP, TYPE_INTERRUPT, DIRECTION_IN,
       SIZE_32, ONE_BANK, NYET_ENABLED);
 
-  OSUsbDevice::usb_configure_endpoint(TX_EP, TYPE_BULK, DIRECTION_IN, EP_SIZE_1_FS,
-      TWO_BANKS, NYET_ENABLED);
+  OSUsbDevice::usb_configure_endpoint(TX_EP, TYPE_BULK, DIRECTION_IN,
+      EP_SIZE_1_FS, TWO_BANKS, NYET_ENABLED);
 
-  OSUsbDevice::usb_configure_endpoint(RX_EP, TYPE_BULK, DIRECTION_OUT, EP_SIZE_2_FS,
-      TWO_BANKS, NYET_ENABLED);
+  OSUsbDevice::usb_configure_endpoint(RX_EP, TYPE_BULK, DIRECTION_OUT,
+      EP_SIZE_2_FS, TWO_BANKS, NYET_ENABLED);
 #endif
 #if TO_BE_PORTED
   OSUsbDevice::endpointSelect(RX_EP);
