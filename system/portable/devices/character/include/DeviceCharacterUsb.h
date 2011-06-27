@@ -23,6 +23,8 @@ public:
   ~DeviceCharacterUsb();
 
   void
+  setConnected(bool flag);
+  void
   setOpened(bool flag);
 
 private:
@@ -97,6 +99,7 @@ private:
   // local members
   int m_device;
 
+  bool m_connected;
   bool m_opened;
   int m_txCounter;
   int m_rxCounter;

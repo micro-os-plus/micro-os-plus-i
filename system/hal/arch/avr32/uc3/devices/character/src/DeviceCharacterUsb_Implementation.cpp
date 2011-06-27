@@ -41,7 +41,8 @@ DeviceCharacterUsb::implOpen()
 
   m_txCounter = 0;
   m_rxCounter = 0;
-  m_opened = false;
+  m_opened = true;
+  m_connected = false;
   return 0;
 }
 
@@ -56,7 +57,7 @@ DeviceCharacterUsb::implIsConnected() const
 {
   //OSDeviceDebug::putString("DeviceCharacterUsb::isConnected()");
   //    OSDeviceDebug::putNewLine();
-  return m_opened;
+  return m_connected;
 }
 
 int
@@ -64,6 +65,8 @@ DeviceCharacterUsb::implClose()
 {
   OSDeviceDebug::putString("DeviceCharacterUsb::close()");
   OSDeviceDebug::putNewLine();
+  
+  m_opened = false;
 
   return 0;
 }
@@ -89,7 +92,7 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
 {
 #if 0
   // if closed return -1
-  if (!m_opened)
+  if (!m_connected)
   return OSReturn::OS_DISCONNECTED;
 
   OSCriticalSection::enter();
@@ -142,7 +145,7 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
   uint32_t availableSize, min;
   int32_t status;
 
-  if (!m_opened)
+  if (!m_connected)
     return OSReturn::OS_DISCONNECTED;
 
   if (size == 0)
@@ -202,7 +205,7 @@ DeviceCharacterUsb::implFlush(void)
   bool zlp = false;
 
   // if closed return -1
-  if (!m_opened)
+  if (!m_connected)
     return OSReturn::OS_DISCONNECTED;
 
   if (m_txCounter != 0)
@@ -585,14 +588,14 @@ DeviceCharacterUsb::cdcSetControlLineState()
 
   if (index == IF0_NB)
     {
-      g_usb0->setOpened(opened);
+      g_usb0->setConnected(opened);
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
       OSDeviceDebug::putString("set ");
 #endif
     }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
   if (index == IF0b_NB)
-  g_usb1->setOpened(opened);
+  g_usb1->setConnected(opened);
 #endif
 
   if (opened)

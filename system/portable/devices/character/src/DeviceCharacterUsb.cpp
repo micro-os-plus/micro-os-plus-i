@@ -59,6 +59,12 @@ DeviceCharacterUsb::setOpened(bool flag)
   m_opened = flag;
 }
 
+void
+DeviceCharacterUsb::setConnected(bool flag)
+{
+  m_connected = flag;
+}
+
 DeviceCharacterUsb *g_usb0;
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
 DeviceCharacterUsb *g_usb1;
