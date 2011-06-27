@@ -42,7 +42,7 @@ DeviceCharacterUsb::implOpen()
   m_txCounter = 0;
   m_rxCounter = 0;
   m_opened = true;
-  m_connected = false;
+  //m_connected = false;
   return 0;
 }
 
@@ -65,7 +65,7 @@ DeviceCharacterUsb::implClose()
 {
   OSDeviceDebug::putString("DeviceCharacterUsb::close()");
   OSDeviceDebug::putNewLine();
-  
+
   m_opened = false;
 
   return 0;
@@ -90,52 +90,50 @@ DeviceCharacterUsb::implGetWriteEvent(void)
 int
 DeviceCharacterUsb::implWriteByte(unsigned char b)
 {
-#if 0
+#if true
   // if closed return -1
   if (!m_connected)
-  return OSReturn::OS_DISCONNECTED;
+    return OSReturn::OS_DISCONNECTED;
 
   OSCriticalSection::enter();
-
-  OSUsbDevice::endpointSelect(m_tx_ep);
-
-  while (!OSUsbDevice::Is_usb_write_enabled())
     {
-      //OSDeviceDebug::putChar('>');
-      //os.sched.eventWait(&m_txCounter);       // Wait Endpoint ready
-      //OSUsbDevice::endpointSelect(m_tx_ep);
-    }
+      OSUsbDevice::endpointSelect(m_tx_ep);
 
-  if (m_txCounter == 0)
-    {
-      OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
-    }
-  OSUsbDevice::writeByte(b);
-  m_txCounter++;
+      while (!OSUsbDevice::Is_usb_write_enabled())
+        {
+          //OSDeviceDebug::putChar('>');
+          //os.sched.eventWait(&m_txCounter);       // Wait Endpoint ready
+          //OSUsbDevice::endpointSelect(m_tx_ep);
+        }
+
+      if (m_txCounter == 0)
+        {
+          OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
+        }
+      OSUsbDevice::writeByte(b);
+      m_txCounter++;
 
 #if defined(OS_DEBUG_DEVICECHARACTERUSB_WRITE)
 
-  OSDeviceDebug::putChar('}');
-  if (b >= ' ')
-  OSDeviceDebug::putChar(b);
-  else
-  OSDeviceDebug::putHex(b);
+      OSDeviceDebug::putChar('}');
+      if (b >= ' ')
+      OSDeviceDebug::putChar(b);
+      else
+      OSDeviceDebug::putHex(b);
 
 #endif
 
-  if (!OSUsbDevice::Is_usb_write_enabled()) //If Endpoint full -> flush
+      if (!OSUsbDevice::Is_usb_write_enabled()) //If Endpoint full -> flush
 
-    {
-      implFlush();
+        {
+          implFlush();
+        }
     }
-
   OSCriticalSection::exit();
 
-  return b;
-#endif
-
+#else
   implWriteBytes(&b, sizeof(unsigned char));
-
+#endif
   return b;
 }
 
@@ -252,35 +250,36 @@ DeviceCharacterUsb::implGetReadEvent(void)
 int
 DeviceCharacterUsb::implReadByte(void)
 {
-#if 0
+#if true
   int c;
 
   OSCriticalSection::enter();
-
-  OSUsbDevice::endpointSelect(m_rx_ep);
-  c = OSUsbDevice::readByte();
-  m_rxCounter--;
-  if (m_rxCounter == 0)
     {
-      //OSUsbDevice::Usb_ack_receive_out();
-      OSUsbDevice::Usb_ack_fifocon();
-    }
+      OSUsbDevice::endpointSelect(m_rx_ep);
+      c = OSUsbDevice::readByte();
+      m_rxCounter--;
+      if (m_rxCounter == 0)
+        {
+          //OSUsbDevice::Usb_ack_receive_out();
+          OSUsbDevice::Usb_ack_fifocon();
+        }
 
 #if defined(OS_DEBUG_DEVICECHARACTERUSB_READ)
 
-  OSDeviceDebug::putChar('{');
-  if (c >= ' ')
-  OSDeviceDebug::putChar(c);
-  else
-  OSDeviceDebug::putHex((unsigned char) c);
+      OSDeviceDebug::putChar('{');
+      if (c >= ' ')
+      OSDeviceDebug::putChar(c);
+      else
+      OSDeviceDebug::putHex((unsigned char) c);
 
 #endif
-
+    }
   OSCriticalSection::exit();
 
   // OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
   return c;
-#endif
+
+#else
 
   unsigned char c;
 
@@ -292,6 +291,8 @@ DeviceCharacterUsb::implReadByte(void)
 #endif
 
   return (int) c;
+#endif
+
 }
 
 int
@@ -581,24 +582,24 @@ DeviceCharacterUsb::cdcSetControlLineState()
   OSDeviceDebug::putString(" ");
 #endif
 
-  bool opened;
-  opened = (value & 0x0001) ? true : false;
+  bool connected;
+  connected = (value & 0x0001) ? true : false;
   // TODO: check this
   //opened = (value) ? true : false;
 
   if (index == IF0_NB)
     {
-      g_usb0->setConnected(opened);
+      g_usb0->m_connected = connected;
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
       OSDeviceDebug::putString("set ");
 #endif
     }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
   if (index == IF0b_NB)
-  g_usb1->setConnected(opened);
+  g_usb1->setConnected(connected);
 #endif
 
-  if (opened)
+  if (connected)
     {
       // TODO: check if it's ok to be here.
       // enable RX interrupt
@@ -643,7 +644,7 @@ DeviceCharacterUsb::cdcSetControlLineState()
     }
 
 #if defined(DEBUG)
-  if (opened)
+  if (connected)
     {
       OSDeviceDebug::putString("DTR ready");
     }
