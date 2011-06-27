@@ -579,9 +579,9 @@ DeviceCharacterUsb::cdcSetControlLineState()
 #endif
 
   bool opened;
-  //opened = (value & 0x0001) ? true : false;
+  opened = (value & 0x0001) ? true : false;
   // TODO: check this
-  opened = (value) ? true : false;
+  //opened = (value) ? true : false;
 
   if (index == IF0_NB)
     {
