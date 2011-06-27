@@ -24,6 +24,9 @@ DeviceCharacterUsb::DeviceCharacterUsb(int device)
   OSDeviceDebug::putNewLine();
 #endif
 
+  m_connected = false;
+  m_opened = false;
+
   m_device = device;
   if (m_device == 0)
     {
@@ -53,6 +56,7 @@ DeviceCharacterUsb::~DeviceCharacterUsb()
   OSDeviceDebug::putDestructor("DeviceCharacterUsb", this);
 }
 
+#if false
 void
 DeviceCharacterUsb::setOpened(bool flag)
 {
@@ -64,6 +68,7 @@ DeviceCharacterUsb::setConnected(bool flag)
 {
   m_connected = flag;
 }
+#endif
 
 DeviceCharacterUsb *g_usb0;
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)

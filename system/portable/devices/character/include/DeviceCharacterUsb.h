@@ -22,10 +22,12 @@ public:
   virtual
   ~DeviceCharacterUsb();
 
+#if false
   void
   setConnected(bool flag);
   void
   setOpened(bool flag);
+#endif
 
 private:
   // implementation virtuals
