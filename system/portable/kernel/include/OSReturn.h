@@ -33,7 +33,8 @@ public:
   static const OSReturn_t OS_NOT_ENOUGH_SPACE = -16;
   static const OSReturn_t OS_BAD_COMMAND = -17;
   static const OSReturn_t OS_NULL_POINTER = -18;
-  static const OSReturn_t OS_BAD_SEQUENCE = -18;
+  static const OSReturn_t OS_BAD_SEQUENCE = -19;
+  static const OSReturn_t OS_NOT_FOUND = -20;
 };
 
 // ----------------------------------------------------------------------------
