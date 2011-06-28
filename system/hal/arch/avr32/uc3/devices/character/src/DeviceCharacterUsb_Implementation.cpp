@@ -53,7 +53,7 @@ DeviceCharacterUsb::implGetOpenEvent(void)
 }
 
 bool
-DeviceCharacterUsb::implIsConnected() const
+DeviceCharacterUsb::implIsConnected()
 {
   //OSDeviceDebug::putString("DeviceCharacterUsb::isConnected()");
   //    OSDeviceDebug::putNewLine();
