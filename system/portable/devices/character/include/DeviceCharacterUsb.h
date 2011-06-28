@@ -40,7 +40,7 @@ private:
   implClose(void);
 
   virtual bool
-  implIsConnected(void) const;
+  implIsConnected(void);
 
   virtual bool
   implCanWrite(void);
