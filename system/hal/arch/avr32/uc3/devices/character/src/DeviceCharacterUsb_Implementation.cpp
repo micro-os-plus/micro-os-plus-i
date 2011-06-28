@@ -114,9 +114,9 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
 
   OSDeviceDebug::putChar('}');
   if (b >= ' ')
-    OSDeviceDebug::putChar(b);
+  OSDeviceDebug::putChar(b);
   else
-    OSDeviceDebug::putHex(b);
+  OSDeviceDebug::putHex(b);
 
 #endif
 
@@ -257,9 +257,9 @@ DeviceCharacterUsb::implReadByte(void)
 
   OSDeviceDebug::putChar('{');
   if (c >= ' ')
-    OSDeviceDebug::putChar(c);
+  OSDeviceDebug::putChar(c);
   else
-    OSDeviceDebug::putHex((unsigned char) c);
+  OSDeviceDebug::putHex((unsigned char) c);
 
 #endif
 
@@ -555,9 +555,9 @@ DeviceCharacterUsb::cdcSetControlLineState()
 #endif
 
   bool connected;
-  //  connected = (value & 0x0001) ? true : false;
+  connected = (value & 0x0001) ? true : false;
   // TODO: check this
-  connected = (value) ? true : false;
+  // connected = (value) ? true : false;
 
   if (index == IF0_NB)
     {
