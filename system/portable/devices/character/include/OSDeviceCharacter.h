@@ -45,7 +45,7 @@ public:
 
   // test if device is in connected state
   bool
-  isConnected(void) const;
+  isConnected(void);
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_SETBAUDRATE)
   // set the baud rate
@@ -204,7 +204,7 @@ protected:
   virtual OSReturn_t
   implClose(void) = 0;
   virtual bool
-  implIsConnected(void) const;
+  implIsConnected(void);
 
   virtual bool
   implCanRead(void) = 0;
