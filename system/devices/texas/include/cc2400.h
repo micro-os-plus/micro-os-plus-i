@@ -77,15 +77,52 @@ namespace device
       class Register
       {
       public:
-        static const RegisterId_t MAIN = 0x01; // Read/Write
-        static const RegisterId_t FSCTRL = 0x02; // R/W
-
-        // TODO: add the other
+        static const RegisterId_t MAIN = 0x00; // Read/Write
+        static const RegisterId_t FSCTRL = 0x01; // R/W
+        static const RegisterId_t FSDIV = 0x02; // R/W
+        static const RegisterId_t MDMCTRL = 0x03; // R/W
+        static const RegisterId_t AGCCTRL = 0x04; // R/W
+        static const RegisterId_t FREND = 0x05; // R/W
+        static const RegisterId_t RSSI = 0x06; // R/W
+        static const RegisterId_t FREQEST = 0x07; // R/W
+        static const RegisterId_t IOCFG = 0x08; // R/W
+        // RESERVED
+        // RESERVED
+        static const RegisterId_t FSMTC = 0x0B; // R/W
+        // RESERVED
+        static const RegisterId_t MANAND = 0x0D; // R/W
+        static const RegisterId_t FSMSTATE = 0x0E; // R/W
+        static const RegisterId_t ADCTST = 0x0F; // R/W
+        static const RegisterId_t RXBPFST = 0x10; // R/W
+        static const RegisterId_t PAMTST = 0x11; // R/W
+        static const RegisterId_t LMTST = 0x12; // R/W
+        static const RegisterId_t MANOR = 0x13; // R/W
+        static const RegisterId_t MDMTST0 = 0x14; // R/W
+        static const RegisterId_t MDMTST1 = 0x15; // R/W
+        static const RegisterId_t DACTST = 0x16; // R/W
+        static const RegisterId_t AGCTST0 = 0x17; // R/W
+        static const RegisterId_t AGCTST1 = 0x18; // R/W
+        static const RegisterId_t AGCTST2 = 0x19; // R/W
+        static const RegisterId_t FSTST0 = 0x1A; // R/W
+        static const RegisterId_t FSTST1 = 0x1B; // R/W
+        static const RegisterId_t FSTST2 = 0x1C; // R/W
+        static const RegisterId_t FSTST3 = 0x1D; // R/W
         static const RegisterId_t MANFIDL = 0x1E; // Read
         static const RegisterId_t MANFIDH = 0x1F; // Read
-        // ...
+        static const RegisterId_t GRMDM = 0x20; // R/W
+        static const RegisterId_t GRDEC = 0x21; // R/W
+        static const RegisterId_t PKTSTATUS = 0x22; // Read
+        static const RegisterId_t INT = 0x23; // R/W
+        // ...RESERVED
+        static const RegisterId_t SYNCL = 0x2C; // R/W
+        static const RegisterId_t SYNCH = 0x2D; // R/W
         static const RegisterId_t SXOSCON = 0x60; // Strobe
-        // ...
+        static const RegisterId_t SFSON = 0x61; // Strobe
+        static const RegisterId_t SRX_REG = 0x62; // Strobe
+        static const RegisterId_t STX_REG = 0x63; // Strobe
+        static const RegisterId_t SRFOFF = 0x64; // Strobe
+        static const RegisterId_t SXOSCOFF = 0x65; // Strobe
+        // .. RESERVED
         static const RegisterId_t FIFOREG = 0x70; // Special
       };
 
@@ -137,7 +174,8 @@ namespace device
     public:
       Cc2400(cc2400::spim_t& spi);
 
-    private:
+      // TODO: make registers public
+    //private:
       cc2400::Registers registers;
     };
 
