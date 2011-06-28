@@ -66,7 +66,7 @@ OSDeviceCharacter::implGetReadEvent(void)
 }
 
 bool
-OSDeviceCharacter::isConnected(void) const
+OSDeviceCharacter::isConnected(void)
 {
   bool flag;
   flag = implIsConnected();
@@ -74,7 +74,7 @@ OSDeviceCharacter::isConnected(void) const
 }
 
 bool
-OSDeviceCharacter::implIsConnected(void) const
+OSDeviceCharacter::implIsConnected(void)
 {
   // must implement it in children classes
   return true;
@@ -86,10 +86,14 @@ int
 OSDeviceCharacter::open(void)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
-  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::open("));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putChar(')');
-  OSDeviceDebug::putNewLine();
+  OSSchedulerLock::enter();
+    {
+      OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::open("));
+      OSDeviceDebug::putPtr(this);
+      OSDeviceDebug::putChar(')');
+      OSDeviceDebug::putNewLine();
+    }
+  OSSchedulerLock::exit();
 #endif
 
   int r;
@@ -103,8 +107,6 @@ OSDeviceCharacter::open(void)
   r = implOpen();
   if (r < 0)
     return r;
-
-  m_isOpened = true;
 
   for (;;)
     {
@@ -148,10 +150,14 @@ OSDeviceCharacter::open(void)
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
-      OSDeviceDebug::putString_P(PSTR("eventWait("));
-      OSDeviceDebug::putHex((unsigned short)event);
-      OSDeviceDebug::putChar(')');
-      OSDeviceDebug::putNewLine();
+      OSSchedulerLock::enter();
+        {
+          OSDeviceDebug::putString_P(PSTR("eventWait("));
+          OSDeviceDebug::putHex((unsigned int) event);
+          OSDeviceDebug::putChar(')');
+          OSDeviceDebug::putNewLine();
+        }
+      OSSchedulerLock::exit();
 #endif
       if (doWait)
         OSScheduler::eventWaitPerform();
@@ -165,7 +171,8 @@ OSDeviceCharacter::open(void)
       if (ret == OSEventWaitReturn::OS_TIMEOUT)
         {
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
-          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::open() return timeout"));
+          OSDeviceDebug::putString_P(
+              PSTR("OSDeviceCharacter::open() return timeout"));
           OSDeviceDebug::putNewLine();
 #endif
           return OSReturn::OS_TIMEOUT;
@@ -179,8 +186,11 @@ OSDeviceCharacter::open(void)
             }
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
         }
-      //OSDeviceDebug::putChar('!');
+      //OSDeviceDebug::putChar('!1');
     }
+
+  // If everything is ok, mark that the device is opened
+  m_isOpened = true;
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
   OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::open() return OK"));
@@ -489,6 +499,7 @@ OSDeviceCharacter::readByte(void)
       OSEvent_t event;
       OSCriticalSection::enter();
         {
+          // when not connected, do not wait, to return error
           canRead = implCanRead() || !implIsConnected();
           if (!canRead)
             {
@@ -649,7 +660,7 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
           av = implAvailableRead();
           if (av > 0)
-            *count = implReadBytes(pBuf, bufSize);
+          *count = implReadBytes(pBuf, bufSize);
           m_countToRead = 0;
           return OSReturn::OS_WOULD_BLOCK;
         }
@@ -759,9 +770,9 @@ OSDeviceCharacter::availableRead(void)
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
 void
 OSDeviceCharacter::setReadMatchArray(unsigned char* match)
-{
-  m_pReadMatchArray = match;
-}
+  {
+    m_pReadMatchArray = match;
+  }
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF)
