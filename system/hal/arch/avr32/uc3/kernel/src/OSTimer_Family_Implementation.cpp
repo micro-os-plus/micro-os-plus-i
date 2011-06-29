@@ -168,6 +168,13 @@ OSTimerTicks::implAcknowledgeInterrupt(void)
 void
 OSTimerSeconds::init(void)
   {
+#if defined(DEBUG)
+
+  OSDeviceDebug::putString_P(PSTR("OSTimerSeconds::init()"));
+  OSDeviceDebug::putNewLine();
+
+#endif
+
 #if defined(OS_INCLUDE_32KHZ_TIMER)
 
     volatile avr32_rtc_t* rtc_reg = &AVR32_RTC;
@@ -176,7 +183,7 @@ OSTimerSeconds::init(void)
       {
         rtc_set_top_value(rtc_reg, (OS_CFG_RTC_TOP / 2) - 1);
 #if defined(DEBUG)
-        OSDeviceDebug::putChar('Q');
+        OSDeviceDebug::putString_P(PSTR("RTC 32KHz"));
         OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
       }
@@ -185,7 +192,7 @@ OSTimerSeconds::init(void)
         rtc_init(rtc_reg, RTC_OSC_RC, 0);
         rtc_set_top_value(rtc_reg, ((115000) / 2) - 1);
 #if defined(DEBUG)
-        OSDeviceDebug::putChar('R');
+        OSDeviceDebug::putString_P(PSTR("RTC RC"));
         OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
       }
@@ -217,6 +224,7 @@ SysSeconds_contextHandler(void)
     OSScheduler::ISR_ledActiveOn();
 #endif /* !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION) */
       {
+        // OSDeviceDebug::putChar('~');
         OSScheduler::timerSeconds.interruptServiceRoutine();
       }
 #if !defined(OS_EXCLUDE_OSTIMERSECONDS_ISR_PREEMPTION)
