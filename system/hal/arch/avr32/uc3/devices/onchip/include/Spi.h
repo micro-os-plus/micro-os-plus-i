@@ -263,7 +263,8 @@ namespace avr32
       registers.writeChipSelect0(
           ((uint32_t) (delayBCT << AVR32_SPI_CSR0_DLYBCT_OFFSET) & AVR32_SPI_CSR0_DLYBCT_MASK) |
           ((uint32_t) (baudRateFactor << AVR32_SPI_CSR0_SCBR_OFFSET) & AVR32_SPI_CSR0_SCBR_MASK) |
-          ((uint32_t) (bitsPerTransfer << AVR32_SPI_CSR0_BITS_OFFSET) & AVR32_SPI_CSR0_BITS_MASK));
+          ((uint32_t) (bitsPerTransfer << AVR32_SPI_CSR0_BITS_OFFSET) & AVR32_SPI_CSR0_BITS_MASK) |
+          2);// hard-coded values for radio modem, i.e. NCPHA=1 and CPOL=0
     }
 
     inline void
