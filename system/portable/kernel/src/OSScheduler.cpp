@@ -153,9 +153,9 @@ OSScheduler::start(void)
       timerTicks.init();
 #endif /* !defined(OS_EXCLUDE_OSTIMER) */
 
-#if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS)
+#if defined(OS_INCLUDE_OSTIMERSECONDS)
       timerSeconds.init();
-#endif /* defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS) */
+#endif /* defined(OS_INCLUDE_OSTIMERSECONDS) */
 
       ms_isRunning = true;
 
