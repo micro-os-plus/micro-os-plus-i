@@ -31,7 +31,6 @@ DeviceCharacterUsb::implOpen()
   if (!flagShouldNotInit)
     {
       // TODO: check if is ok to put it here!
-      OSDeviceDebug::putString("OSUsbDevice::usbDriverInit()");
       flagShouldNotInit = OSUsbDevice::usbDriverInit();
     }
 
