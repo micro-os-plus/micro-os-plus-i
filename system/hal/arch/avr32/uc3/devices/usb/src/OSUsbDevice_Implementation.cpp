@@ -218,6 +218,9 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
 bool
 OSUsbDeviceImpl::usbDriverInit(void)
 {
+  OSDeviceDebug::putString("OSUsbDeviceImpl::usbDriverInit()");
+  OSDeviceDebug::putNewLine();
+
   OSCriticalSection::enter();
     {
 
