@@ -48,10 +48,10 @@ namespace util
 #if false
     uchar_t
     Parser::getCurrentChar(void)
-    {
-      OSDeviceDebug::putChar(*m_pCrt);
-      return *m_pCrt;
-    }
+      {
+        OSDeviceDebug::putChar(*m_pCrt);
+        return *m_pCrt;
+      }
 #endif
 
     void
@@ -201,6 +201,15 @@ namespace util
         num = -n;
       else
         num = n;
+
+      return OSReturn::OS_OK;
+    }
+
+    OSReturn_t
+    Parser::parseByteArray(uint8_t* byteArray)
+    {
+      // TODO: implement it
+      byteArray = byteArray;
 
       return OSReturn::OS_OK;
     }

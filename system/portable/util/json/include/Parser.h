@@ -34,6 +34,9 @@ namespace util
       OSReturn_t
       parseNumber(int32_t& num);
 
+      OSReturn_t
+      parseByteArray(uint8_t* byteArray);
+
       uchar_t
       skipSpaces(void);
 
