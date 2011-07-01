@@ -11,7 +11,7 @@
 
 // Generic logger facility.
 
-typedef uint32_t logLevel_t;
+typedef int32_t logLevel_t;
 typedef int logCode_t;
 
 // common log classes
