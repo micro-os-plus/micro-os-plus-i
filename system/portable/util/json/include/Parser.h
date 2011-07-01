@@ -32,6 +32,9 @@ namespace util
       parseNumber(uint32_t& num);
 
       OSReturn_t
+      parseNumber(uint64_t& num);
+
+      OSReturn_t
       parseNumber(int32_t& num);
 
       OSReturn_t

@@ -168,6 +168,32 @@ namespace util
     }
 
     OSReturn_t
+    Parser::parseNumber(uint64_t& num)
+    {
+      uint64_t n;
+      n = 0;
+
+      uchar_t ch;
+      ch = skipSpaces();
+
+      for (; hasMoreContent(); advanceCurrent())
+        {
+          uchar_t ch;
+          ch = getCurrentChar();
+
+          if ('0' <= ch && ch <= '9')
+            {
+              n = n * 10 + (ch - '0');
+            }
+          else
+            break;
+        }
+      num = n;
+
+      return OSReturn::OS_OK;
+    }
+
+    OSReturn_t
     Parser::parseNumber(int32_t& num)
     {
       int32_t n;
