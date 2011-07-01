@@ -142,6 +142,50 @@ namespace util
     }
 
     OSReturn_t
+    Parser::parseString(uchar_t* string, std::size_t siz)
+    {
+      OSReturn_t r;
+
+      uchar_t ch;
+      ch = skipSpaces();
+
+      r = skipCharacter('"');
+      if (r != OSReturn::OS_OK)
+        return r;
+
+      bool isTooLarge;
+      isTooLarge = false;
+
+      for (; hasMoreContent(); advanceCurrent())
+        {
+          ch = getCurrentChar();
+
+          if (ch == '"')
+            {
+              // Skip over terminating "
+              advanceCurrent();
+              break;
+            }
+
+          if (siz > 1)
+            {
+              *string++ = ch;
+              *string = '\0';
+              --siz;
+            }
+          else
+            {
+              isTooLarge = true;
+            }
+        }
+
+      if (isTooLarge)
+        return OSReturn::OS_NOT_ENOUGH_SPACE;
+
+      return OSReturn::OS_OK;
+    }
+
+    OSReturn_t
     Parser::parseNumber(uint32_t& num)
     {
       uint32_t n;

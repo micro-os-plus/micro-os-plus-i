@@ -29,6 +29,9 @@ namespace util
       parseVariableName(uchar_t* pName, std::size_t siz);
 
       OSReturn_t
+      parseString(uchar_t* pName, std::size_t siz);
+
+      OSReturn_t
       parseNumber(uint32_t& num);
 
       OSReturn_t
