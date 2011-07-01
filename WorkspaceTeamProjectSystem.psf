@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<psf version="2.0">
+<provider id="org.eclipse.team.svn.core.svnnature">
+<project reference="1.0.1,https://micro-os-plus.svn.sourceforge.net/svnroot/micro-os-plus/trunk/Eclipse/system,micro-os-plus,e068d3f8541300101afcc894087b5fa2;https://micro-os-plus.svn.sourceforge.net/svnroot/micro-os-plus/;https://micro-os-plus.svn.sourceforge.net/svnroot/micro-os-plus/;branches;tags;trunk;true;ba4b06f3-5e2e-0410-8656-f0fcc57e5dc0;https://micro-os-plus.svn.sourceforge.net/svnroot/micro-os-plus;;false;&lt;https://micro-os-plus.svn.sourceforge.net:443&gt; SourceForge Subversion area;;0"/>
+</provider>
+<workingSets editPageId="org.eclipse.ui.resourceWorkingSetPage" id="1293634335671_1" label="µOS++ System" name="µOS++ System">
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/micro-os-plus" type="4"/>
+</workingSets>
+</psf>
