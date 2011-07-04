@@ -42,6 +42,8 @@ namespace util
       putNumberArray(uint8_t* pb, std::size_t len);
       void
       putQuotedString(const char* str);
+      void
+      putJsonString(const char* str);
 
     private:
       std::ostream& m_out;

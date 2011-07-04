@@ -127,6 +127,14 @@ namespace util
       m_out << '"';
     }
 
+    void
+    Serialiser::putJsonString(const char* str)
+    {
+      m_out << '{';
+      m_out << str;
+      m_out << '}';
+    }
+
   }
 }
 
