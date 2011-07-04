@@ -17,6 +17,13 @@ OSDeviceDebug::OSDeviceDebug()
 }
 #endif /* OS_EXCLUDE_MULTITASKING */
 
+#if defined(DEBUG) || defined(OS_INCLUDE_GREETING)
+extern const char greeting[] __attribute__((weak));
+
+// Default greeting message
+const char greeting[] = APP_CFGSTR_GREETING;
+#endif /* defined(DEBUG) || defined(OS_INCLUDE_GREETING) */
+
 #if defined(DEBUG)
 
 #if defined(OS_INCLUDE_NAKED_INIT)
@@ -29,11 +36,6 @@ void OSDeviceDebug::nakedEarlyInit(void)
   }
 
 #endif
-
-extern const char greeting[] __attribute__((weak));
-
-// Default greeting message
-const char greeting[] = APP_CFGSTR_GREETING;
 
 void
 OSDeviceDebug::earlyInit(void)
