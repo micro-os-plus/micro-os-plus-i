@@ -11,6 +11,7 @@
 #include "portable/kernel/include/OS.h"
 
 #include "portable/misc/include/Parser.h"
+#include <string.h>
 
 Parser::Parser()
 {

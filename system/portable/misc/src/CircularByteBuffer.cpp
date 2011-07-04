@@ -11,6 +11,7 @@
 #include "portable/kernel/include/OS.h"
 
 #include "portable/misc/include/CircularByteBuffer.h"
+#include <string.h>
 
 CircularByteBuffer::CircularByteBuffer()
 {
