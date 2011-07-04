@@ -287,7 +287,7 @@ OSDeviceDebug::putPC(const char* PROGMEM __attribute__((unused)) pc)
 }
 
 inline void
-OSDeviceDebug::__assert(const char __attribute__((unused)) *func,
+OSDeviceDebug::assert(const char __attribute__((unused)) *func,
     const char __attribute__((unused)) *xfile,
     int __attribute__((unused)) lineno,
     const char __attribute__((unused)) *sexp)
