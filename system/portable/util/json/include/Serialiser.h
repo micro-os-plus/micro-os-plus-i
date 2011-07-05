@@ -43,7 +43,7 @@ namespace util
       void
       putQuotedString(const char* str);
       void
-      putJsonString(const char* str);
+      putUnhandledString(const char* str);
 
     private:
       std::ostream& m_out;

@@ -128,11 +128,9 @@ namespace util
     }
 
     void
-    Serialiser::putJsonString(const char* str)
+    Serialiser::putUnhandledString(const char* str)
     {
-      m_out << '{';
       m_out << str;
-      m_out << '}';
     }
 
   }
