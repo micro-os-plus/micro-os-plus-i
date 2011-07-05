@@ -18,6 +18,7 @@ typedef uchar_t GpsHemisphere_t; // N/S, E/W
 typedef uint8_t GpsDegrees_t; // 0-179
 typedef uint8_t GpsMinutesInteger_t; // 0-59
 typedef uint16_t GpsMinutesDecimals_t; // 0-9999
+typedef uint16_t GpsFix_t;
 
 class GpsCoordinate;
 typedef GpsCoordinate GpsCoordinate_t;
@@ -132,10 +133,17 @@ public:
   void
   setAltitude(GpsAltitude_t m_altitude);
 
+  GpsFix_t
+  getFix();
+
+  void
+  setFix(GpsFix_t fix);
+
 private:
   GpsLatitude_t m_latitude; // N/S
   GpsLongitude_t m_longitude; // E/W
   GpsAltitude_t m_altitude; // altitude in meters, may be negative
+  GpsFix_t m_fix;
 };
 
 // ----------------------------------------------------------------------------
@@ -269,6 +277,18 @@ inline void
 GpsPosition::setAltitude(GpsAltitude_t altitude)
 {
   m_altitude = altitude;
+}
+
+inline GpsFix_t
+GpsPosition::getFix()
+{
+  return m_fix;
+}
+
+inline void
+GpsPosition::setFix(GpsFix_t fix)
+{
+  m_fix = fix;
 }
 
 // ----------------------------------------------------------------------------
