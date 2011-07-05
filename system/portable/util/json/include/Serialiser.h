@@ -39,6 +39,8 @@ namespace util
       void
       putNumber(ulong_t n);
       void
+      putNumber(int n);
+      void
       putNumberArray(uint8_t* pb, std::size_t len);
       void
       putQuotedString(const char* str);

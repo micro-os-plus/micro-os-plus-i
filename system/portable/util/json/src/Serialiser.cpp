@@ -58,6 +58,12 @@ namespace util
     }
 
     void
+    Serialiser::putNumber(int n)
+    {
+      m_out << std::dec << n;
+    }
+
+    void
     Serialiser::putNumberArray(uint8_t* pb, std::size_t len)
     {
       m_out.put(ARRAY_BEGIN);
