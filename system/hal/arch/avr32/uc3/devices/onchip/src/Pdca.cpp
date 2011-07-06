@@ -50,7 +50,7 @@ namespace avr32
       m_isCircular = isCircular;
 
       // init status of each region
-      for (uint_t i = 0 ; i < regionsArraySize ;i++)
+      for (uint_t i = 0; i < regionsArraySize; i++)
         pRegionsArray[i].status = avr32::uc3::pdca::IS_EMPTY_MASK;
     }
 
@@ -87,8 +87,8 @@ namespace avr32
       m_currentRegionIndex = 0;
       m_candidateNotif = 0;
 
-      registers.writeInterruptEnable(
-          AVR32_PDCA_IER_TRC_MASK | AVR32_PDCA_IER_TERR_MASK);
+      registers.writeInterruptEnable(AVR32_PDCA_IER_TRC_MASK
+          | AVR32_PDCA_IER_TERR_MASK);
       // enable channel and transfer
 
       setupReloadMechanism();
@@ -117,9 +117,9 @@ namespace avr32
           // no region to be set next
           m_reloadedRegionIndex = -1;
 #if OS_DEBUG_PDCA
-            OSDeviceDebug::putDec((uint16_t)m_channelId);
-            OSDeviceDebug::putString(" setupReloadMechanism no next region");
-            OSDeviceDebug::putNewLine();
+          OSDeviceDebug::putDec((uint16_t)m_channelId);
+          OSDeviceDebug::putString(" setupReloadMechanism no next region");
+          OSDeviceDebug::putNewLine();
 #endif
           return OSReturn::OS_ITEM_NOT_FOUND;
         }
@@ -151,7 +151,7 @@ namespace avr32
       else
         {
           // get consecutive index, if there are more regions available
-          if (m_regionsArraySize > (uint_t)(actualRegion + 1))
+          if (m_regionsArraySize > (uint_t) (actualRegion + 1))
             {
               nextRegionIndex = actualRegion + 1;
             }
@@ -176,15 +176,15 @@ namespace avr32
     Pdca::abortTransfer(void)
     {
       // disable all interrupt sources
-      registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
-          AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
+      registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK
+          | AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
 
       // disable PDMA channel
       registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
 
       // update remaining numbers of words
-      m_wordsRemaining = registers.readTransferCounter() +
-          registers.readTransferCounterReload();
+      m_wordsRemaining = registers.readTransferCounter()
+          + registers.readTransferCounterReload();
 
       // reset counters
       registers.writeTransferCount(0);
@@ -200,9 +200,8 @@ namespace avr32
     Pdca::registerInterruptHandler(avr32::uc3::intc::InterruptHandler_t handler)
     {
       avr32::uc3::Intc::registerInterruptHandler(
-          (intc::InterruptHandler_t) handler,
-          pdca::INTERRUPT_BASE + m_channelId,
-          avr32::uc3::intc::GroupPriorities::GROUP_03);
+          (intc::InterruptHandler_t) handler, pdca::INTERRUPT_BASE
+              + m_channelId, avr32::uc3::intc::GroupPriorities::GROUP_03);
     }
 
     // ----- PdcaTransmit -----------------------------------------------------
@@ -234,6 +233,10 @@ namespace avr32
     void
     PdcaTransmit::stopTransfer(void)
     {
+      // return if no transfer ongoing
+      if (m_status != avr32::uc3::pdca::STATUS_BUSY)
+        return;
+
       abortTransfer();
       m_status = avr32::uc3::pdca::STATUS_STOPPED;
       // notify
@@ -246,8 +249,8 @@ namespace avr32
       uint32_t interruptFlag;
 
       // find the interrupt source
-      interruptFlag = registers.readInterruptMask() &
-          registers.readInterruptStatus();
+      interruptFlag = registers.readInterruptMask()
+          & registers.readInterruptStatus();
 
       if ((interruptFlag & AVR32_PDCA_IER_TERR_MASK) != 0) // transfer error
         {
@@ -272,18 +275,18 @@ namespace avr32
             }
         }
       if ((interruptFlag & AVR32_PDCA_IER_TRC_MASK) != 0) // transfer complete
-      {
+        {
           // disable PDMA channel
           registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
 
           // disable all interrupt sources
-          registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
-              AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
+          registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK
+              | AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
 
           m_status = avr32::uc3::pdca::STATUS_OK;
           // notify
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
-      }
+        }
     }
 
     // ----- PdcaReceive ------------------------------------------------------
@@ -295,7 +298,8 @@ namespace avr32
     }
 
     OSReturn_t
-    PdcaReceive::readRegion(pdca::RegionAddress_t& region, int &regionIdx, bool doNotBlock)
+    PdcaReceive::readRegion(pdca::RegionAddress_t& region, int &regionIdx,
+        bool doNotBlock)
     {
       int nextRegion;
 
@@ -311,19 +315,21 @@ namespace avr32
         }
 
       // check if the candidate(to be notified) is already transfered
-      if (m_pRegionsArray[m_candidateNotif].status ==
-          avr32::uc3::pdca::IS_TRANFERRED_MASK)
+      if (m_pRegionsArray[m_candidateNotif].status
+          == avr32::uc3::pdca::IS_TRANFERRED_MASK)
         {
           region = &(m_pRegionsArray[m_candidateNotif]);
           regionIdx = m_candidateNotif;
 
           // reset flag as it was signalled
-          m_pRegionsArray[m_candidateNotif].status = avr32::uc3::pdca::IS_EMPTY_MASK;
-                    //avr32::uc3::pdca::IS_SIGNALLED_MASK;
+          m_pRegionsArray[m_candidateNotif].status
+              = avr32::uc3::pdca::IS_EMPTY_MASK;
+          //avr32::uc3::pdca::IS_SIGNALLED_MASK;
           nextRegion = getNextRegionIndex(m_candidateNotif);
           if (nextRegion != -1)
             m_candidateNotif = nextRegion;
-          else // no next region
+          else
+            // no next region
             m_candidateNotif = -1;
           return OSReturn::OS_OK;
         }
@@ -337,8 +343,8 @@ namespace avr32
       OSScheduler::eventWait(m_event);
 
       // should check if m_candidateNotif is transferred
-      if (m_pRegionsArray[m_candidateNotif].status !=
-                avr32::uc3::pdca::IS_TRANFERRED_MASK)
+      if (m_pRegionsArray[m_candidateNotif].status
+          != avr32::uc3::pdca::IS_TRANFERRED_MASK)
         {
 #if OS_DEBUG_PDCA
           OSDeviceDebug::putDec((uint16_t)m_channelId);
@@ -359,14 +365,16 @@ namespace avr32
       regionIdx = m_candidateNotif;
 
       // reset flag as it was signalled
-      m_pRegionsArray[m_candidateNotif].status = avr32::uc3::pdca::IS_EMPTY_MASK;
+      m_pRegionsArray[m_candidateNotif].status
+          = avr32::uc3::pdca::IS_EMPTY_MASK;
       //          avr32::uc3::pdca::IS_SIGNALLED_MASK;
 
       // set next candidate to be notified
       nextRegion = getNextRegionIndex(m_candidateNotif);
       if (nextRegion != -1)
         m_candidateNotif = nextRegion;
-      else // no next region
+      else
+        // no next region
         m_candidateNotif = -1;
       return OSReturn::OS_OK;
     }
@@ -374,10 +382,13 @@ namespace avr32
     void
     PdcaReceive::stopTransfer(void)
     {
+      // return if no transfer ongoing
+      if (m_status != avr32::uc3::pdca::STATUS_BUSY)
+        return;
       abortTransfer();
       m_status = avr32::uc3::pdca::STATUS_STOPPED;
-      m_pRegionsArray[m_candidateNotif].status =
-                      avr32::uc3::pdca::IS_TRANFERRED_MASK;
+      m_pRegionsArray[m_candidateNotif].status
+          = avr32::uc3::pdca::IS_TRANFERRED_MASK;
       // notify
       OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
     }
@@ -388,8 +399,8 @@ namespace avr32
       uint32_t interruptFlag;
 
       // find the interrupt source
-      interruptFlag = registers.readInterruptMask() &
-          registers.readInterruptStatus();
+      interruptFlag = registers.readInterruptMask()
+          & registers.readInterruptStatus();
 
       if ((interruptFlag & AVR32_PDCA_IER_TERR_MASK) != 0) // transfer error
         {
@@ -399,16 +410,16 @@ namespace avr32
 
           abortTransfer();
           // set status to finished
-          m_pRegionsArray[m_candidateNotif].status =
-                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
+          m_pRegionsArray[m_candidateNotif].status
+              = avr32::uc3::pdca::IS_TRANFERRED_MASK;
           m_status = avr32::uc3::pdca::STATUS_ERROR;
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }
       if ((interruptFlag & AVR32_PDCA_IER_RCZ_MASK) != 0) // reload counter zero
         {
           // set status to finished
-          m_pRegionsArray[m_currentRegionIndex].status =
-                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
+          m_pRegionsArray[m_currentRegionIndex].status
+              = avr32::uc3::pdca::IS_TRANFERRED_MASK;
           // notify
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
 
@@ -423,26 +434,23 @@ namespace avr32
             }
         }
       if ((interruptFlag & AVR32_PDCA_IER_TRC_MASK) != 0) // transfer complete
-      {
+        {
           // disable PDMA channel
           registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
 
           // disable all interrupt sources
-          registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK |
-              AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
+          registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK
+              | AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
 
           // set status to finished
-          m_pRegionsArray[m_currentRegionIndex].status =
-                              avr32::uc3::pdca::IS_TRANFERRED_MASK;
+          m_pRegionsArray[m_currentRegionIndex].status
+              = avr32::uc3::pdca::IS_TRANFERRED_MASK;
 
           m_status = avr32::uc3::pdca::STATUS_OK;
           // notify
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
-      }
+        }
     }
-
-
-
 
   }
 }
