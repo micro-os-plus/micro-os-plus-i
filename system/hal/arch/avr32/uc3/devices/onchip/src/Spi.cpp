@@ -58,16 +58,16 @@ namespace avr32
     Spim::writeWaitReadByte(uint8_t value)
     {
       transmitByte(value);
-      OSDeviceDebug::putHex(value);
+      //OSDeviceDebug::putHex(value);
 
       while (!isTransmittedAndReceived())
         ;
-      uint8_t b;
-      b = receiveByte();
-      OSDeviceDebug::putHex(b);
-      OSDeviceDebug::putChar(' ');
-      //return receiveByte();
-      return b;
+      //uint8_t b;
+      //b = receiveByte();
+      //OSDeviceDebug::putHex(b);
+      //OSDeviceDebug::putChar(' ');
+      return receiveByte();
+      //return b;
     }
 
     // Busy wait version of a full Spi word access
