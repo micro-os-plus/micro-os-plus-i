@@ -21,9 +21,7 @@
 #define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
 
 //#define OS_INCLUDE_OSTHREAD_SCHEDULERTICK               (1)
-#define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
 
-#define OS_CFGINT_IDLE_TASK_STACK_SIZE                  (800)
 
 //#define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              (1)
 #define OS_INCLUDE_OSTHREAD_GETSTACKUSED                (1)
@@ -39,8 +37,12 @@
 
 #if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
 
+#define OS_CFGINT_IDLE_THREAD_EXTRA_STACK_SIZE          (800)
+
 //#define OS_EXCLUDE_PREEMPTION                           (1)
 //#define OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION          (1)
+
+#define OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK     (1)
 
 #define OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS    (1)
 #define OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS (1)
@@ -59,6 +61,10 @@
 
 #elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
 
+#elif defined(OS_CONFIG_BOARD_METRILOG_M512)
+
+#define OS_INCLUDE_OSTREAM_LONG                        (1)
+
 #endif /* OS_CONFIG_BOARD_* */
 
 // ----- Debug Definitions ----------------------------------------------------
@@ -68,7 +74,7 @@
 //#define OS_CONFIG_DEBUG_DEVICE_I2C                    1
 //#define OS_CONFIG_DEBUG_DEVICE_USART			1
 
-#define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS       (1)
+#define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS          (1)
 
 //#define OS_DEBUG_OSSCHEDULER_STACKINITIALIZE            (1)
 #define OS_DEBUG_CONSTRUCTORS                           (1)
@@ -76,6 +82,8 @@
 #define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
 
 #define OS_DEBUG_OSSCHEDULER_START                      (1)
+#define OS_DEBUG_OSTIMER_INTERRUPTTICK_MISSED_NOTIFY    (1)
+
 //#define OS_DEBUG_OSSCHEDULER_CONTEXTSWITCH              (1)
 //#define OS_DEBUG_OSSCHEDULER_THREADREGISTER               (1)
 //#define OS_DEBUG_OSSCHEDULER_EVENTWAIT                  (1)
