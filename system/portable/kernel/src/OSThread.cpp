@@ -227,7 +227,7 @@ OSProgramPtr_t OSThread::getProgramCounter(void)
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
 
-void OSThread::virtualWatchdogSet(unsigned short seconds)
+void OSThread::virtualWatchdogSet(uint16_t seconds)
   {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTHREAD_VIRTUALWATCHDOGSET)
     OSDeviceDebug::putString_P(PSTR("vWD("));
@@ -258,7 +258,7 @@ void OSThread::virtualWatchdogCheck(void)
             OSDeviceDebug::putNewLine();
 #endif
 
-            OS::softReset();
+            OSCPU::softReset();
           }
         else
           {
