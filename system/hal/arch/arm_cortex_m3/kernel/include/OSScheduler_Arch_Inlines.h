@@ -67,7 +67,7 @@ inline void OSScheduler::contextRestore(void)
  * Notice: The function context is addressed via R11, not SP, so using the
  * stack as temporary storage should be safe.
  */
-inline void OSScheduler::criticalEnter(void)
+inline void OSCriticalSection::enter(void)
   {
 #if !defined(OS_EXCLUDE_MULTITASKING)
     asm volatile
@@ -83,7 +83,7 @@ inline void OSScheduler::criticalEnter(void)
 /*
  * Pop BASEPRI from the stack, restore interrupts to previous status
  */
-inline void OSScheduler::criticalExit(void)
+inline void OSCriticalSection::exit(void)
   {
 #if !defined(OS_EXCLUDE_MULTITASKING)
     asm volatile
