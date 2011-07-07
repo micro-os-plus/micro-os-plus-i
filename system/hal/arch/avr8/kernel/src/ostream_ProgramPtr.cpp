@@ -38,5 +38,5 @@ std::ostream& operator <<(std::ostream& out, OSProgramPtr_t pc)
     return out;
   }
 
-#endif
+#endif /* defined(OS_INCLUDE_OSTREAM_PROGRAMPTR) && defined(OS_INCLUDE_SEPARATE_PROGMEM) */
 
