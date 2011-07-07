@@ -23,7 +23,7 @@ public:
 
 private:
   // members
-  OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
+  OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + APP_CFGINT_TASKSTRESS_EXTRA_STACK_SIZE) / sizeof(OSStack_t) ];
 
   unsigned int m_minMicros;
   unsigned int m_maxMicros;
