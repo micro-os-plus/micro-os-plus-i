@@ -25,37 +25,39 @@
  * - LED2 = Yellow
  * - LED3 = Green
  * 
- * Usage of these leds is entirely at developper discretion. For embedded boards 
+ * Usage of these leds is entirely at developer discretion. For embedded boards
  * that do not provide an activity led, the Green led is probably a good choice.
  * 
  */
 
-#if !defined(OS_CONFIG_DEBUG_LED1_PORT_INIT)
-#define OS_CONFIG_DEBUG_LED1_PORT_INIT                  DDRB
+#if !defined(OS_CONFIG_DEBUG_LED1_PORT_CONFIG)
+#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                DDRB
 #endif
-#if !defined(OS_CONFIG_DEBUG_LED1_PORT)
-#define OS_CONFIG_DEBUG_LED1_PORT                       PORTB
+#if !defined(OS_CONFIG_DEBUG_LED1_PORT_WRITE)
+#define OS_CONFIG_DEBUG_LED1_PORT_WRITE                 PORTB
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_BIT)
 #define OS_CONFIG_DEBUG_LED1_BIT                        PINB6
 #endif
 
-#if !defined(OS_CONFIG_DEBUG_LED2_PORT_INIT)
-#define OS_CONFIG_DEBUG_LED2_PORT_INIT                  DDRB
+#if !defined(OS_CONFIG_DEBUG_LED2_PORT_CONFIG)
+#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                DDRB
 #endif
-#if !defined(OS_CONFIG_DEBUG_LED2_PORT)
-#define OS_CONFIG_DEBUG_LED2_PORT                       PORTB
+#if !defined(OS_CONFIG_DEBUG_LED2_PORT_WRITE)
+#define OS_CONFIG_DEBUG_LED2_PORT_WRITE                 PORTB
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_BIT)
 #define OS_CONFIG_DEBUG_LED2_BIT                        PINB7
 #endif
 
+// ----------------------------------------------------------------------------
+
 // instead of LED3 we use the green led as activity led
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT_INIT)
-#define OS_CONFIG_ACTIVE_LED_PORT_INIT                  DDRB
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
+#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG                DDRB
 #endif
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT)
-#define OS_CONFIG_ACTIVE_LED_PORT                       PORTB
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_WRITE)
+#define OS_CONFIG_ACTIVE_LED_PORT_WRITE                 PORTB
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
 #define OS_CONFIG_ACTIVE_LED_BIT                        PORTB5
