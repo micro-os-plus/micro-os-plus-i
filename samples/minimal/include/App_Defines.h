@@ -30,6 +30,8 @@
 
 #elif defined(OS_CONFIG_BOARD_TEMPLATE)
 
+#elif defined(OS_CONFIG_BOARD_METRILOG_M512)
+
 #else
 #error "Missing OS_CONFIG_BOARD_* board definition"
 #endif
