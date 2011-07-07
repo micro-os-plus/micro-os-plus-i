@@ -40,6 +40,8 @@ OSDeviceDebug::putString_P(const char* PROGMEM pc)
   OSCriticalSection::exit();
 }
 
+#if defined(OS_DEBUG_CONSTRUCTORS)
+
 // display constructor name and object address
 void
 OSDeviceDebug::putConstructor_P(const char* PROGMEM pc, const void* p)
@@ -91,6 +93,8 @@ OSDeviceDebug::putDestructor_P(const char* PROGMEM pc, const void* p)
     }
   criticalExit(mask);
 }
+
+#endif /* defined(OS_DEBUG_CONSTRUCTORS) */
 
 #endif /* defined(DEBUG) */
 #endif /* defined(OS_CONFIG_ARCH_AVR8) */
