@@ -240,6 +240,7 @@ TIMER2_OVF_vect(void)
     // interrupts disabled in here
     OSScheduler::interruptEnter();
       {
+        //OSDeviceDebug::putChar('#');
         OSScheduler::timerSeconds.interruptServiceRoutine();
       }
     OSScheduler::interruptExit();
