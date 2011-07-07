@@ -432,7 +432,7 @@ OSScheduler::interruptTick(void)
 
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
       if (pt->isInterrupted())
-      ISRcancelThread(pt);
+        ISRcancelThread(pt);
 #endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
     }
 
@@ -450,21 +450,22 @@ OSScheduler::interruptTick(void)
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
 // warning: not synchronised
-void OSScheduler::ISRcancelThread(OSThread* pThread)
-  {
-    if (pThread->isWaiting())
-      {
-        OSEvent_t event;
-        event = pThread->getEvent();
+void
+OSScheduler::ISRcancelThread(OSThread* pThread)
+{
+  if (pThread->isWaiting())
+    {
+      OSEvent_t event;
+      event = pThread->getEvent();
 
-        // cancel all timer related events
-        timerTicks.eventRemove(event);
-        timerSeconds.eventRemove(event);
+      // cancel all timer related events
+      timerTicks.eventRemove(event);
+      timerSeconds.eventRemove(event);
 
-        // cancel current event
-        OSScheduler::eventNotify(event, OSEventWaitReturn::OS_CANCELED);
-      }
-  }
+      // cancel current event
+      OSScheduler::eventNotify(event, OSEventWaitReturn::OS_CANCELED);
+    }
+}
 
 #endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
 
