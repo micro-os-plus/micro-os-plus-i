@@ -41,7 +41,7 @@ namespace util
       parseNumber(int32_t& num);
 
       OSReturn_t
-      parseByteArray(uint8_t* byteArray);
+      parseByteArray(uint8_t* pByteArray, std::size_t size,  std::size_t *pLength);
 
       uchar_t
       skipSpaces(void);
@@ -61,7 +61,6 @@ namespace util
 
       const uchar_t* m_pCrt;
       std::size_t m_remLen;
-
     };
 
     inline bool

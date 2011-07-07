@@ -276,10 +276,41 @@ namespace util
     }
 
     OSReturn_t
-    Parser::parseByteArray(uint8_t* byteArray)
+    Parser::parseByteArray(uint8_t* pByteArray, std::size_t size,
+        std::size_t *pLength)
     {
-      // TODO: implement it
-      byteArray = byteArray;
+      OSReturn_t r;
+
+      uint32_t n_32, i;
+
+      uchar_t ch;
+      ch = skipSpaces();
+
+      r = skipCharacter('[');
+      if (r != OSReturn::OS_OK)
+        return r;
+
+      for (i = 0; hasMoreContent(); i++)
+        {
+          if (i == size)
+              return OSReturn::OS_NOT_ENOUGH_SPACE;
+
+          r = parseNumber(n_32);
+          if (r != OSReturn::OS_OK)
+              return r;
+
+          pByteArray[i] = (uint8_t) n_32;
+
+          r = skipCharacter(',');
+          if (r != OSReturn::OS_OK)
+            break;
+        }
+
+      r = skipCharacter(']');
+      if (r != OSReturn::OS_OK)
+        return r;
+
+      *pLength = i;
 
       return OSReturn::OS_OK;
     }
