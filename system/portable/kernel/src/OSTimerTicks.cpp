@@ -75,7 +75,7 @@ OSTimerTicks::interruptServiceRoutine(void)
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
   SDI12Sensor::interruptTick();
-#endif
+#endif /* defined(OS_INCLUDE_SDI12SENSOR) */
 
 #if defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT)
 
@@ -86,7 +86,7 @@ OSTimerTicks::interruptServiceRoutine(void)
       OSScheduler::timerSeconds.interruptServiceRoutine();
     }
 
-#endif
+#endif /* defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT) */
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
 
@@ -96,11 +96,12 @@ OSTimerTicks::interruptServiceRoutine(void)
       if (OSSchedulerLock::isSet())
         OSDeviceDebug::putChar('L');
     }
-#endif
+
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS) */
 
 #if defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED)
   OS_GPIO_PIN_LOW(OS_CONFIG_OSTIMERTICKS_LED_PORT_CONFIG, OS_CONFIG_OSTIMERTICKS_LED_BIT);
-#endif /* OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED */
+#endif /* defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED) */
 
 }
 
