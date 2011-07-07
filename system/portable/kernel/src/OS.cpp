@@ -37,12 +37,12 @@ OSCPU::saveResetBits(void)
 extern "C" int
 main(void) __attribute__((weak));
 
-#if !defined(OS_EXCLUDE_RESET_HANDLER)
-
 #define OS_CFGLONG_CONSTANT_MARKER (0x12345678)
 #if defined(DEBUG)
-uint_t g_constantMarker = OS_CFGLONG_CONSTANT_MARKER;
+uint32_t g_constantMarker = OS_CFGLONG_CONSTANT_MARKER;
 #endif /* defined(DEBUG) */
+
+#if !defined(OS_EXCLUDE_RESET_HANDLER)
 
 // init value for the stack pointer. defined in linker script
 extern unsigned long __stack_end;
@@ -141,14 +141,6 @@ OS::resetHandler(void)
 
 #endif
 
-#if defined(DEBUG)
-  if (g_constantMarker != OS_CFGLONG_CONSTANT_MARKER)
-    {
-      OSDeviceDebug::putString_P(PSTR("dataInit() failed "));
-      OSDeviceDebug::putHex(g_constantMarker);
-      OSDeviceDebug::putNewLine();
-    }
-#endif /* defined(DEBUG) */
 
   // will call OSScheduler::earlyInit() to init registered threads count
   OS::earlyInit();
@@ -223,6 +215,16 @@ OS::staticConstructorsInit(void)
 int
 main(void)
 {
+
+#if defined(DEBUG)
+  if (g_constantMarker != OS_CFGLONG_CONSTANT_MARKER)
+    {
+      OSDeviceDebug::putString_P(PSTR("dataInit() failed "));
+      OSDeviceDebug::putHex((uint16_t)(g_constantMarker>>16));
+      OSDeviceDebug::putHex((uint16_t)(g_constantMarker&0xFFFF));
+      OSDeviceDebug::putNewLine();
+    }
+#endif /* defined(DEBUG) */
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
