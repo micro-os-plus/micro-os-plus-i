@@ -10,7 +10,6 @@
 
 #include "portable/kernel/include/OS.h"
 
-
 OSTimer::OSTimer(OSTimerStruct_t* pArray, int size)
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSTimer"), this);
@@ -71,9 +70,9 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
           OSCriticalSection::enter();
             {
               if (insert(ticks, event, OSEventWaitReturn::OS_VOID))
-                ret = OSScheduler::eventWait(event);
+              ret = OSScheduler::eventWait(event);
               else
-                ret = OSEventWaitReturn::OS_FAILED;
+              ret = OSEventWaitReturn::OS_FAILED;
             }
           OSCriticalSection::exit();
 #endif
@@ -228,6 +227,10 @@ OSTimer::remove(int i)
   cnt = m_count;
   if (cnt > 0)
     {
+#if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
+      OSDeviceDebug::putString("remove()");
+      OSDeviceDebug::putNewLine();
+#endif
       if (cnt > 1)
         {
           OSTimerStruct_t* p;
@@ -248,13 +251,13 @@ OSTimer::interruptTick(void)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
   OSDeviceDebug::putChar('[');
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK) */
   // decrement timer and eventually wake up related threads
   if (m_count > 0) // is there anything in the list?
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
       OSDeviceDebug::putChar('*');
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK) */
       OSTimerStruct_t* p;
       p = m_pArray;
 
@@ -266,7 +269,7 @@ OSTimer::interruptTick(void)
               OSDeviceDebug::putString("Tick() ");
               OSDeviceDebug::putPtr(p);
               OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK) */
               if (p->event == OSEvent::OS_CUSTOM_TIMER)
                 {
                   Timer *pt;
@@ -276,7 +279,7 @@ OSTimer::interruptTick(void)
                   OSDeviceDebug::putString("Thread ");
                   OSDeviceDebug::putPtr(pt);
                   OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK) */
                   // trigger timer event (run virtual method)
                   pt->timerEvent();
                   // remove top timer from the array
@@ -290,11 +293,16 @@ OSTimer::interruptTick(void)
                 }
               else
                 {
-                  if (OSScheduler::eventNotify(p->event, p->u.ret) != 0)
+                  if (OSScheduler::eventNotify(p->event, p->u.ret) == 0)
                     {
-                      // remove top timer from the array
-                      remove(0);
+                      // Missing task to notify
+#if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK_MISSED_NOTIFY)
+                      OSDeviceDebug::putChar('m');
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK_MISSED_NOTIFY) */
                     }
+                  // remove top timer from the array
+                  remove(0);
+                  // MANDATORY, removing it enters infinite loop
                 }
             }
           while ((p->ticks == 0) && (m_count > 0));
@@ -302,7 +310,7 @@ OSTimer::interruptTick(void)
     }
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
   OSDeviceDebug::putChar(']');
-#endif
+#endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK) */
 }
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */
