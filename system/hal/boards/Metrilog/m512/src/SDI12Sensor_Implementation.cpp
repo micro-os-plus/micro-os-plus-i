@@ -133,17 +133,17 @@ void USART0_RX_vect(void)
       {
         //OSDeviceDebug::putChar('@');
 
-        OSScheduler::ISRledActiveOn();
+        OSScheduler::ISR_ledActiveOn();
 
         SDI12Sensor::interruptRxServiceRoutine();
 
-        if (OSScheduler::requireContextSwitch())
+        if (OSScheduler::isContextSwitchRequired())
           {
-            OSScheduler::contextSwitch();
+            OSScheduler::performContextSwitch();
           }
       }
     OSScheduler::contextRestore();
-    OS::returnFromInterrupt();
+    OSCPU::returnFromInterrupt();
     // interrupts enabled after this point
   }
 
