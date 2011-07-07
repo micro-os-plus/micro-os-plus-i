@@ -119,7 +119,7 @@ public:
   static bool
   storeStringResponse(const char* pStr, unsigned short n = 0);
 #if defined(OS_INCLUDE_SDI12SENSOR)
-  static bool storeUnsignedResponse(unsigned short w, unsigned short n = 0);
+  static bool storeUnsignedResponse(uint16_t w, unsigned short n = 0);
 #endif
 
 #if defined(OS_INCLUDE_SDI12SENSOR_TINY)
@@ -370,7 +370,7 @@ private:
   static volatile bool ms_breakDetectEnable;
 
   // --------------------------------------------
-  // acquisition TASK variables
+  // acquisition thread variables
 
   static SDI12Value_t ms_dValues[OS_CFGINT_SDI12SENSOR_DVALUES_SIZE];
   static unsigned char ms_dCount;
@@ -390,7 +390,7 @@ private:
   static volatile bool ms_bServiceRequest;
 
   // --------------------------------------------
-  // periodic TASK variables
+  // periodic thread variables
 
   static volatile OSTimerTicks_t ms_periodicSeconds;
   static OSTime_t ms_periodicNextSecond;
