@@ -36,6 +36,9 @@ extern void delayWithYield(schedTicks_t n);
 
 #elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
 
+#define APP_CFGINT_TASKBLINK_EXTRA_STACK_SIZE   (30)
+#define APP_CFGINT_TASKSTRESS_EXTRA_STACK_SIZE  (30)
+
 #define APP_CONFIG_LED_PORT_WRITE       PORTD
 #define APP_CONFIG_LED_PORT_CONFIG      DDRD
 #define APP_CONFIG_LED_PORT_TOGGLE      PORTD
@@ -44,7 +47,25 @@ extern void delayWithYield(schedTicks_t n);
 #define APP_CONFIG_LED2                 6
 #define APP_CONFIG_LED3                 5
 
+#elif defined(OS_CONFIG_BOARD_METRILOG_M512)
+
+//#define APP_CFGINT_SIMULTANEOUS_THREADS 9
+
+#define APP_CFGINT_TASKBLINK_EXTRA_STACK_SIZE   (30)
+#define APP_CFGINT_TASKSTRESS_EXTRA_STACK_SIZE  (30)
+
+#define APP_CONFIG_LED_PORT_WRITE       PORTB
+#define APP_CONFIG_LED_PORT_CONFIG      DDRB
+#define APP_CONFIG_LED_PORT_TOGGLE      PORTB
+
+#define APP_CONFIG_LED1                 6
+//#define APP_CONFIG_LED2                 7
+//#define APP_CONFIG_LED3                 5
+
 #elif defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
+
+#define APP_CFGINT_TASKBLINK_EXTRA_STACK_SIZE   (400)
+#define APP_CFGINT_TASKSTRESS_EXTRA_STACK_SIZE  (400)
 
 #define APP_CONFIG_LED_PORT_WRITE       GPIOX
 #define APP_CONFIG_LED_PORT_CONFIG      GPIOX
