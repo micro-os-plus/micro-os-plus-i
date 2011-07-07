@@ -22,7 +22,7 @@ public:
 
 private:
   // members
-  OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t) ];
+  OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + APP_CFGINT_TASKBLINK_EXTRA_STACK_SIZE) / sizeof(OSStack_t) ];
 
   LedVar m_oLed;
   schedTicks_t m_rate;
