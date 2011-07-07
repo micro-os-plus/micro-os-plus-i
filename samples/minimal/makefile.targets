@@ -1,3 +1,6 @@
 
 flash-run:	all
 	openocd -f "../../micro-os-plus/system/scripts/ocd/olimex-arm-usb-ocd-A.cfg" -f "../../micro-os-plus/system/scripts/ocd/stm32.cfg" -f "../../micro-os-plus/system/scripts/ocd/flash-write-prepare.cfg" -c "flash write_image minimal.hex 0x08000000 ihex" -c "mdw 0x00000000 8" -c "reset run" -c "shutdown"
+
+env:
+	env
