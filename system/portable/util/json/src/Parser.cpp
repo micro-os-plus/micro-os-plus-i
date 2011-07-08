@@ -310,7 +310,7 @@ namespace util
       if (r != OSReturn::OS_OK)
         return r;
 
-      *pLength = i;
+      *pLength = i+1;
 
       return OSReturn::OS_OK;
     }
