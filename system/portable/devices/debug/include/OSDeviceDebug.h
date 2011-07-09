@@ -261,22 +261,22 @@ OSDeviceDebug::putDestructor(const char* pc __attribute__((unused)), const void*
 
 #if defined(OS_INCLUDE_SEPARATE_PROGMEM)
 
-inline void OSDeviceDebug::putString_P(const char* __attribute__((unused)) PROGMEM pc)
+inline void OSDeviceDebug::putString_P(const char* PROGMEM pc __attribute__((unused)))
   {
   }
 
 inline void
-OSDeviceDebug::putConstructor_P(const char* __attribute__((unused)) PROGMEM pc, const void* __attribute__((unused)) p)
+OSDeviceDebug::putConstructor_P(const char* PROGMEM pc __attribute__((unused)), const void* p __attribute__((unused)))
   {
   }
 
 inline void
-OSDeviceDebug::putConstructorWithIndex_P(const char* __attribute__((unused)) PROGMEM pc, uint16_t i __attribute__((unused)), const void* __attribute__((unused)) p)
+OSDeviceDebug::putConstructorWithIndex_P(const char* PROGMEM pc __attribute__((unused)), uint16_t i __attribute__((unused)), const void* p __attribute__((unused)))
   {
   }
 
 inline void
-OSDeviceDebug::putDestructor_P(const char* __attribute__((unused)) PROGMEM pc, const void* __attribute__((unused)) p)
+OSDeviceDebug::putDestructor_P(const char* PROGMEM pc __attribute__((unused)), const void* p __attribute__((unused)))
   {
   }
 
