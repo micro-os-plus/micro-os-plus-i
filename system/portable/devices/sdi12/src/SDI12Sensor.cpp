@@ -190,13 +190,20 @@ SDI12Sensor::disableMarking(void)
   ms_cntMarking = 0;
 }
 
+void
+SDI12Sensor::enableBreakDetect(void)
+{
+  ms_breakDetectEnable = true;
+  ms_ticksBRK = OSScheduler::timerTicks.getTicks();
+}
+
 // critical section moved here from OSTimerTicks::interruptServiceRoutine
 void
 SDI12Sensor::interruptTick(void)
 {
   OSCriticalSection::enter();
     {
-      //OSDeviceDebug::putString(".");
+      //OSDeviceDebug::putChar('.');
       if (ms_timerTimeout != 0)
         {
           if (--ms_timerTimeout == 0)
@@ -342,10 +349,11 @@ SDI12Sensor::threadMainSDI12(void)
         usartRxDisable();
         // enable break detection
         //interruptPinChangeEnable();
-        ms_breakDetectEnable = true;
+        enableBreakDetect();
 
         // wait for break and clear condition
-        flags = ms_flags.wait(BREAK);
+        ms_flags.wait(BREAK);
+        flags = ms_flags.get();
 
         pThread->virtualWatchdogSet(OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
@@ -368,10 +376,13 @@ SDI12Sensor::threadMainSDI12(void)
         clearInputBuff();
         usartRxEnable();
 
+        OSDeviceDebug::putChar('(');
         ms_flags.clear(MARKING);
         enableMarking(MARKING8_TICKS);
-        flags = ms_flags.wait(MARKING);
+        ms_flags.wait(MARKING);
+        flags = ms_flags.get();
         disableMarking();
+        OSDeviceDebug::putChar(')');
 
         ms_state = STATE3;
         break;
@@ -384,7 +395,8 @@ SDI12Sensor::threadMainSDI12(void)
           {
             ms_flags.clear(ADDRESS | BREAK | TIMEOUT);
             enableTimeout(TIMEOUT100_TICKS);
-            flags = ms_flags.wait(ADDRESS | BREAK | TIMEOUT);
+            ms_flags.wait(ADDRESS | BREAK | TIMEOUT);
+            flags = ms_flags.get();
             disableTimeout();
           }
         pThreadIdle->setAllowSleep(bIdleAllowDeepSleep);
@@ -416,7 +428,8 @@ SDI12Sensor::threadMainSDI12(void)
 
         ms_flags.clear(EXCLAMATION | MARKING);
         enableMarking(MARKING8_TICKS);
-        flags = ms_flags.wait(EXCLAMATION | MARKING);
+        ms_flags.wait(EXCLAMATION | MARKING);
+        flags = ms_flags.get();
         disableMarking();
 
         if ((flags & EXCLAMATION) != 0)
@@ -498,7 +511,7 @@ SDI12Sensor::threadMainSDI12(void)
 
             // reenable to detect break
             //interruptPinChangeEnable();
-            ms_breakDetectEnable = true;
+            enableBreakDetect();
 
             ms_flags.notify(ACQUIRE);
 
@@ -506,7 +519,8 @@ SDI12Sensor::threadMainSDI12(void)
                 ms_dSeconds + OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
             ms_flags.clear(ACQUIRE_COMPLETED | BREAK);
-            flags = ms_flags.wait(ACQUIRE_COMPLETED | BREAK);
+            ms_flags.wait(ACQUIRE_COMPLETED | BREAK);
+            flags = ms_flags.get();
             //interruptPinChangeDisable();
             ms_breakDetectEnable = false;
 
@@ -515,7 +529,8 @@ SDI12Sensor::threadMainSDI12(void)
                 // initiaite cancellation of M acquisition
                 cancelAcquisition();
                 // wait acquisition to complete
-                flags = ms_flags.wait(ACQUIRE_COMPLETED);
+                ms_flags.wait(ACQUIRE_COMPLETED);
+                flags = ms_flags.get();
 
                 // to stop automatic cancellation notification
                 //ms_bIsCancelled = false;
@@ -597,7 +612,7 @@ SDI12Sensor::threadMainSDI12(void)
 
         // re-enable to detect break
         //interruptPinChangeEnable();
-        ms_breakDetectEnable = true;
+        enableBreakDetect();
 
         ms_flags.notify(ACQUIRE);
 
@@ -605,7 +620,9 @@ SDI12Sensor::threadMainSDI12(void)
             ms_dSeconds + OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
         ms_flags.clear(ACQUIRE_COMPLETED | BREAK);
-        flags = ms_flags.wait(ACQUIRE_COMPLETED | BREAK);
+        ms_flags.wait(ACQUIRE_COMPLETED | BREAK);
+        flags = ms_flags.get();
+
         if (flags & BREAK)
           {
             ms_state = STATE8;
@@ -631,8 +648,9 @@ SDI12Sensor::threadMainSDI12(void)
           {
             ms_flags.clear(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
             enableTimeout(TIMEOUT100_TICKS);
-            flags
-                = ms_flags.wait(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
+            ms_flags.wait(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
+            flags = ms_flags.get();
+
             disableTimeout();
           }
         pThreadIdle->setAllowSleep(bIdleAllowDeepSleep);
@@ -669,7 +687,9 @@ SDI12Sensor::threadMainSDI12(void)
 
         ms_flags.clear(EXCLAMATION | MARKING);
         enableMarking(MARKING8_TICKS);
-        flags = ms_flags.wait(EXCLAMATION | MARKING);
+        ms_flags.wait(EXCLAMATION | MARKING);
+        flags = ms_flags.get();
+
         disableMarking();
 
         if ((flags & EXCLAMATION) != 0)
@@ -686,7 +706,9 @@ SDI12Sensor::threadMainSDI12(void)
               {
                 // cancel C acquisition
                 cancelAcquisition();
-                flags = ms_flags.wait(ACQUIRE_COMPLETED);
+                ms_flags.wait(ACQUIRE_COMPLETED);
+                flags = ms_flags.get();
+
 
                 // to stop automatic cancellation notification
                 //ms_bIsCancelled = false;
@@ -1673,7 +1695,7 @@ SDI12Sensor::threadMainPeriodic(void)
         {
           ms_periodicNextSecond = crtSecond + ms_periodicSeconds;
 
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_THREADMAINPERIODIC)
           OSDeviceDebug::putString(" { ");
           OSDeviceDebug::putDec((unsigned short) crtSecond);
           OSDeviceDebug::putString("s ");
@@ -1687,7 +1709,7 @@ SDI12Sensor::threadMainPeriodic(void)
 
           pThread->virtualWatchdogSet(0);
 
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_THREADMAINPERIODIC)
           OSDeviceDebug::putString(" }");
           OSDeviceDebug::putNewLine();
 #endif
@@ -1713,6 +1735,7 @@ SDI12Sensor::threadMainPeriodic(void)
               OSDeviceDebug::putString(" cancelled");
             }
         }
+      //OSDeviceDebug::putChar('p');
 
       // command complete, loop for next one
     }
@@ -1802,7 +1825,7 @@ SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
           now = OSScheduler::timerTicks.getTicks();
           // break off
           OSDebugLed2::off();
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_INTERRUPTPINCHANGESERVICEROUTINE)
           OSDeviceDebug::putDec(now - ms_ticksBRK);
           OSDeviceDebug::putChar('/');
 #endif
@@ -1812,9 +1835,9 @@ SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
               // break recognized only if pulse longer
               // than MIN_BREAK_TICKS
 
-#if defined(DEBUG)
+//#if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_INTERRUPTPINCHANGESERVICEROUTINE)
               OSDeviceDebug::putChar('#');
-#endif
+//#endif
 
               //if (ms_cancelOnBreak)
               //{
@@ -1839,7 +1862,7 @@ SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
       else
         {
           // break on
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_INTERRUPTPINCHANGESERVICEROUTINE)
           OSDeviceDebug::putChar('\\');
 #endif
 
@@ -1859,7 +1882,7 @@ SDI12Sensor::interruptTxServiceRoutine(void)
       unsigned char ch;
       ch = ms_buf[ms_outIndex++];
 
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_INTERRUPTTXSERVICEROUTINE)
       // show transmitted char on debug
       OSDeviceDebug::putChar(ch);
       //OSDeviceDebug::putChar('_');
@@ -1900,7 +1923,7 @@ SDI12Sensor::interruptRxServiceRoutine(void)
 
   if (isFramingError)
     {
-#if false && defined(DEBUG)
+#if defined(DEBUG)
       OSDeviceDebug::putChar(' ');
       OSDeviceDebug::putHex(ch);
       OSDeviceDebug::putChar('f');
@@ -1909,7 +1932,7 @@ SDI12Sensor::interruptRxServiceRoutine(void)
     }
   else if (isParityError)
     {
-#if false && defined(DEBUG)
+#if defined(DEBUG)
       OSDeviceDebug::putChar(' ');
       OSDeviceDebug::putHex(ch);
       OSDeviceDebug::putChar('p');
@@ -1956,7 +1979,7 @@ SDI12Sensor::interruptRxServiceRoutine(void)
           ms_flags.notify(RX_ERROR);
         }
 
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_INTERRUPTRXSERVICEROUTINE)
       // show received char on debug
       OSDeviceDebug::putChar(ch);
 #endif
