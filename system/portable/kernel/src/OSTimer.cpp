@@ -42,7 +42,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
           event = (OSEvent_t) (OSScheduler::getThreadCurrent());
         }
 
-#if false && defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
       if (OSScheduler::getThreadCurrent()->isInterrupted())
         {
