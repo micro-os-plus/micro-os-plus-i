@@ -34,10 +34,10 @@
 #endif
 
 typedef struct SDI12Value
-  {
-    float value;
-    unsigned char precision; // number of digits after period
-  }SDI12Value_t;
+{
+  float value;
+  unsigned char precision; // number of digits after period
+} SDI12Value_t;
 
 #endif
 
@@ -58,47 +58,65 @@ public:
       const char* pNameSDI12, const unsigned char* pStackSDI12,
       unsigned short stackSizeSDI12, OSThreadPriority_t prioritySDI12);
 
-  virtual ~SDI12Sensor();
+  virtual
+  ~SDI12Sensor();
 
-  virtual void customInit(void);
+  virtual void
+  customInit(void);
 
-  virtual void prepareResponseSendIdentification(void) = 0;
+  virtual void
+  prepareResponseSendIdentification(void) = 0;
 
-  virtual void prepareResponseContinuousMeasurement(unsigned char digit) = 0;
-  static bool storeRValue(int iPos, float value, unsigned int precision);
+  virtual void
+  prepareResponseContinuousMeasurement(unsigned char digit) = 0;
+  static bool
+  storeRValue(int iPos, float value, unsigned int precision);
 
-  virtual void prepareResponseStartMeasurement(unsigned char cmd,
-      unsigned char digit) = 0;
-  static void storeStartMeasurementResponse(unsigned int seconds,
-      unsigned char count);
-  static void storeStartMeasurementDelay(unsigned short delay);
+  virtual void
+  prepareResponseStartMeasurement(unsigned char cmd, unsigned char digit) = 0;
+  static void
+  storeStartMeasurementResponse(unsigned int seconds, unsigned char count);
+  static void
+  storeStartMeasurementDelay(unsigned short delay);
 
-  virtual bool prepareResponseExtendedCommands(const char* pBuf,
-      unsigned int count) = 0;
+  virtual bool
+  prepareResponseExtendedCommands(const char* pBuf, unsigned int count) = 0;
 
-  static bool storeUnsignedResponse(unsigned long l, unsigned short n = 0);
-  static bool storeFloatResponse(float f, unsigned short precision = 6,
-      bool bPlus = false);
+  static bool
+  storeUnsignedResponse(unsigned long l, unsigned short n = 0);
+  static bool
+  storeFloatResponse(float f, unsigned short precision = 6, bool bPlus = false);
 
-  static unsigned char* parseString(unsigned char* pStr, unsigned short len);
-  static float parseFloat(void);
+  static unsigned char*
+  parseString(unsigned char* pStr, unsigned short len);
+  static float
+  parseFloat(void);
 
-  virtual void storeAddressToNonVolatileMemory(unsigned char newAddress) = 0;
+  virtual void
+  storeAddressToNonVolatileMemory(unsigned char newAddress) = 0;
 
-  virtual void prepareMeasuredData(unsigned char cmd, unsigned char digit,
+  virtual void
+  prepareMeasuredData(unsigned char cmd, unsigned char digit,
       unsigned int seconds, unsigned char count) = 0;
-  static bool storeDValue(int iPos, float value, unsigned int precision);
+  static bool
+  storeDValue(int iPos, float value, unsigned int precision);
 
-  virtual void processDelayedActions(void) = 0;
-  static void storeDelayedMode(unsigned char mode);
+  virtual void
+  processDelayedActions(void) = 0;
+  static void
+  storeDelayedMode(unsigned char mode);
 
-  virtual void processPeriodicMeasurements(void);
+  virtual void
+  processPeriodicMeasurements(void);
 
-  static void interruptPinChangeServiceRoutine(unsigned char crt,
-      unsigned char prev);
-  static void interruptRxServiceRoutine(void);
-  static void interruptTxServiceRoutine(void);
-  static void interruptTxCompleteServiceRoutine(void);
+  static void
+  interruptPinChangeServiceRoutine(unsigned char crt, unsigned char prev);
+  static void
+  interruptRxServiceRoutine(void);
+  static void
+  interruptTxServiceRoutine(void);
+  static void
+  interruptTxCompleteServiceRoutine(void);
 
 #endif
 
@@ -119,7 +137,8 @@ public:
   static bool
   storeStringResponse(const char* pStr, unsigned short n = 0);
 #if defined(OS_INCLUDE_SDI12SENSOR)
-  static bool storeUnsignedResponse(uint16_t w, unsigned short n = 0);
+  static bool
+  storeUnsignedResponse(uint16_t w, unsigned short n = 0);
 #endif
 
 #if defined(OS_INCLUDE_SDI12SENSOR_TINY)
@@ -152,18 +171,24 @@ public:
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
 
-  static unsigned int parseUnsigned(void);
-  static OSTime_t getPeriodicNextSecond(void);
+  static unsigned int
+  parseUnsigned(void);
+  static OSTime_t
+  getPeriodicNextSecond(void);
 
-  void cancelPeriodic(void);
-  void cancelAcquisition(void);
-  static bool isAcquisitionCancelled(void);
+  void
+  cancelPeriodic(void);
+  void
+  cancelAcquisition(void);
+  static bool
+  isAcquisitionCancelled(void);
 
   static const unsigned char DELAYED_MODE_NONE = 0;
   static const unsigned char DELAYED_MODE_PROTO = 1;
   static const unsigned char DELAYED_MODE_DACQ = 2;
 
-  static void interruptTick(void);
+  static void
+  interruptTick(void);
 #endif
 
 #if defined(OS_INCLUDE_SDI12SENSOR_TINY)
@@ -179,8 +204,10 @@ public:
 
 protected:
 #if defined(OS_INCLUDE_SDI12SENSOR)
-  virtual void threadMainAcquire(void);
-  virtual void threadMainPeriodic(void);
+  virtual void
+  threadMainAcquire(void);
+  virtual void
+  threadMainPeriodic(void);
 #endif
 
 private:
@@ -227,37 +254,62 @@ private:
   clearInputBuff(void);
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
-  static void init(void);
-  static bool processSystemXCommand(void);
 
-  static void clearDValues(void);
+  static void
+  init(void);
 
-  static void enableTimeout(OSTimerTicks_t ticks);
-  static void disableTimeout(void);
+  static bool
+  processSystemXCommand(void);
 
-  static void enableMarking(OSTimerTicks_t ticks);
-  static void disableMarking(void);
+  static void
+  clearDValues(void);
 
-  static void interruptPinChangeEnable(void);
-  static void interruptPinChangeDisable(void);
+  static void
+  enableTimeout(OSTimerTicks_t ticks);
+  static void
+  disableTimeout(void);
 
-  static bool pinChanged(unsigned char crt, unsigned char prev);
-  static bool pinChangedIsHigh(unsigned char crt);
+  static void
+  enableMarking(OSTimerTicks_t ticks);
+  static void
+  disableMarking(void);
 
-  static void interruptTxCompleteEnable(void);
-  static void interruptTxCompleteDisable(void);
+  static void
+  enableBreakDetect(void);
 
-  static void transmitResponse(void);
+  static void
+  interruptPinChangeEnable(void);
+  static void
+  interruptPinChangeDisable(void);
 
-  static void staticMainSDI12(SDI12Sensor* pt);
-  static void staticMainAcquire(SDI12Sensor* pt);
-  static void staticMainPeriodic(SDI12Sensor* pt);
+  static bool
+  pinChanged(unsigned char crt, unsigned char prev);
+  static bool
+  pinChangedIsHigh(unsigned char crt);
 
-  void threadMainSDI12(void);
-  bool processCommand(void);
+  static void
+  interruptTxCompleteEnable(void);
+  static void
+  interruptTxCompleteDisable(void);
 
-  static unsigned char* putFloat(unsigned char* pBuf, unsigned char* pMax,
-      float f, unsigned char prec = 6);
+  static void
+  transmitResponse(void);
+
+  static void
+  staticMainSDI12(SDI12Sensor* pt);
+  static void
+  staticMainAcquire(SDI12Sensor* pt);
+  static void
+  staticMainPeriodic(SDI12Sensor* pt);
+
+  void
+  threadMainSDI12(void);
+  bool
+  processCommand(void);
+
+  static unsigned char*
+  putFloat(unsigned char* pBuf, unsigned char* pMax, float f,
+      unsigned char prec = 6);
 
   // --------------------------------------------
   // constants
@@ -407,20 +459,23 @@ SDI12Sensor::getOutputBufferSize(void)
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
 
-inline bool SDI12Sensor::isAcquisitionCancelled(void)
-  {
-    return OSScheduler::getThreadCurrent()->isInterrupted();
-  }
+inline bool
+SDI12Sensor::isAcquisitionCancelled(void)
+{
+  return OSScheduler::getThreadCurrent()->isInterrupted();
+}
 
-inline OSTimerTicks_t SDI12Sensor::getPeriodicSeconds(void)
-  {
-    return ms_periodicSeconds;
-  }
+inline OSTimerTicks_t
+SDI12Sensor::getPeriodicSeconds(void)
+{
+  return ms_periodicSeconds;
+}
 
-inline unsigned char SDI12Sensor::getAddress(void)
-  {
-    return ms_ownAddress;
-  }
+inline unsigned char
+SDI12Sensor::getAddress(void)
+{
+  return ms_ownAddress;
+}
 
 #endif
 
