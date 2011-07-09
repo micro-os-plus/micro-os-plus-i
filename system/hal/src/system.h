@@ -72,7 +72,7 @@
 //#if defined(DEBUG)
 
 //#if defined(OS_CONFIG_DEBUG_DEVICE_I2C)
-#include "portable/devices/debug/src/DeviceDebugI2C.cpp"
+#include "portable/devices/debug/src/DeviceDebugI2cImpl.cpp"
 //#elif defined(OS_CONFIG_DEBUG_DEVICE_USART)
 //#include "portable/devices/debug/src/DeviceDebugUsart.cpp"
 //#else
