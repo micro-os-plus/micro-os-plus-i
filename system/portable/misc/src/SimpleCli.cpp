@@ -117,7 +117,7 @@ SimpleCli::parseNext(void)
 
 #ifdef OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE
 
-char
+int8_t
 SimpleCli::parseHexNibble(unsigned char* p, unsigned char* pc)
 {
   unsigned char ch, tmp;
@@ -145,7 +145,7 @@ SimpleCli::parseHexNibble(unsigned char* p, unsigned char* pc)
 #ifdef OS_INCLUDE_SIMPLECLI_PARSE_HEX_CHAR
 
 // Convert two ascii characters to hex
-char
+int8_t
 SimpleCli::parseHex(unsigned char* p, unsigned char* pc)
   {
     unsigned char ch, i, tmp;
@@ -174,7 +174,8 @@ SimpleCli::parseHex(unsigned char* p, unsigned char* pc)
 
 #ifdef OS_INCLUDE_SIMPLECLI_PARSE_HEX_SHORT
 
-char SimpleCli::parseHex(unsigned char* p, unsigned short* pw)
+int8_t
+SimpleCli::parseHex(unsigned char* p, unsigned short* pw)
   {
     unsigned char tmp;
     unsigned short sh;
@@ -201,7 +202,7 @@ char SimpleCli::parseHex(unsigned char* p, unsigned short* pw)
 
 #ifdef OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG
 
-char
+int8_t
 SimpleCli::parseHex(unsigned char* p, unsigned long* pl)
 {
   unsigned char tmp;
@@ -229,7 +230,7 @@ SimpleCli::parseHex(unsigned char* p, unsigned long* pl)
 
 #ifdef OS_INCLUDE_SIMPLECLI_PARSE_UNSIGNED_SHORT
 
-char
+int8_t
 SimpleCli::parseUnsigned(unsigned char* p, unsigned short* pw)
   {
     unsigned short sh;

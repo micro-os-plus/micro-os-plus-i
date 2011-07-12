@@ -27,15 +27,15 @@ public:
   unsigned char* 
   parseNext(void);
 
-  char
+  int8_t
   parseHexNibble(unsigned char* p, unsigned char* pch);
-  char
+  int8_t
   parseHex(unsigned char* p, unsigned char* pch);
-  char
+  int8_t
   parseHex(unsigned char* p, unsigned short* psh);
-  char
+  int8_t
   parseHex(unsigned char* p, unsigned long* plh);
-  char
+  int8_t
   parseUnsigned(unsigned char* p, unsigned short* psh);
 #endif /* defined(OS_INCLUDE_SIMPLECLI_PARSER) */
 
