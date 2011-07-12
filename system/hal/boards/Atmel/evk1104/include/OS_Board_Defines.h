@@ -92,8 +92,8 @@
 #if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
 #define OS_CONFIG_ACTIVE_LED_PORT_CONFIG		        OS_CFGREG_BOARD_LED0_PORT_CONFIG
 #endif
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT)
-#define OS_CONFIG_ACTIVE_LED_PORT                               OS_CFGREG_BOARD_LED0_PORT_WRITE
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_WRITE)
+#define OS_CONFIG_ACTIVE_LED_PORT_WRITE                         OS_CFGREG_BOARD_LED0_PORT_WRITE
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
 #define OS_CONFIG_ACTIVE_LED_BIT			        OS_CFGPIN_BOARD_LED0_PIN
@@ -140,22 +140,22 @@
 #endif
 
 // Default debug led 1 on LED1
-#if !defined(OS_CONFIG_DEBUG_LED1_PORT_WRITE)
-#define OS_CONFIG_DEBUG_LED1_PORT_WRITE                         OS_CFGREG_BOARD_LED1_PORT_CONFIG
-#endif
 #if !defined(OS_CONFIG_DEBUG_LED1_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                        OS_CFGREG_BOARD_LED1_PORT_WRITE
+#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                        OS_CFGREG_BOARD_LED1_PORT_CONFIG
+#endif
+#if !defined(OS_CONFIG_DEBUG_LED1_PORT_WRITE)
+#define OS_CONFIG_DEBUG_LED1_PORT_WRITE                         OS_CFGREG_BOARD_LED1_PORT_WRITE
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_BIT)
 #define OS_CONFIG_DEBUG_LED1_BIT                                OS_CFGPIN_BOARD_LED1_PIN
 #endif
 
 // Default debug led 2 on LED1
-#if !defined(OS_CONFIG_DEBUG_LED2_PORT_WRITE)
-#define OS_CONFIG_DEBUG_LED2_PORT_WRITE                         OS_CFGREG_BOARD_LED2_PORT_CONFIG
-#endif
 #if !defined(OS_CONFIG_DEBUG_LED2_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                        OS_CFGREG_BOARD_LED2_PORT_WRITE
+#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                        OS_CFGREG_BOARD_LED2_PORT_CONFIG
+#endif
+#if !defined(OS_CONFIG_DEBUG_LED2_PORT_WRITE)
+#define OS_CONFIG_DEBUG_LED2_PORT_WRITE                         OS_CFGREG_BOARD_LED2_PORT_WRITE
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_BIT)
 #define OS_CONFIG_DEBUG_LED2_BIT                                OS_CFGPIN_BOARD_LED2_PIN
