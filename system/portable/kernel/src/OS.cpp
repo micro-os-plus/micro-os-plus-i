@@ -99,7 +99,10 @@ OS::resetHandler(void)
   bssInit();
 
   // WARNING: NO CRITICAL SECTIONS BEFORE THIS POINT!
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
   OSScheduler::ms_pThreadRunning = (OSThread*) &idleThread;
+
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
   OSCriticalSection::ms_nestingStackPointer
       = OSScheduler::ms_pThreadRunning->getCriticalSectionNestingStack();
@@ -107,6 +110,8 @@ OS::resetHandler(void)
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
   OSCriticalSection::ms_nestingLevel = 0;
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) */
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 
 #if defined(DEBUG)
   // WARNING: No debug output before this point!
