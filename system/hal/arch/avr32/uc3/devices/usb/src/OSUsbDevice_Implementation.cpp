@@ -19,6 +19,10 @@
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 
+#if !defined(OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY)
+#define OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY    (0)
+#endif /* !defined(OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY) */
+
 // ----- Static data ----------------------------------------------------------
 
 volatile unsigned short OSUsbDeviceImpl::g_usb_event = 0;
