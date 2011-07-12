@@ -506,6 +506,8 @@ OSDeviceDebug::putDec(uint32_t w, uint16_t n)
 }
 #endif /* OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG */
 
+#undef assert
+
 void
 OSDeviceDebug::assert(const char* func, const char* file, int lineno,
     const char* sexp)
@@ -527,7 +529,7 @@ OSDeviceDebug::assert(const char* func, const char* file, int lineno,
       for (;;)
         implWDReset();
     }
-  OSCriticalSection::exit();
+    criticalExit(mask);
 }
 
 // streambuf methods
