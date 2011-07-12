@@ -65,7 +65,7 @@ typedef unsigned int OSEvent_t;
 class OSEvent
 {
 public:
-  static const OSEvent_t OS_NONE = -1;
+  static const OSEvent_t OS_NONE = (0-1);
   static const OSEvent_t OS_ALL = 0;
   static const OSEvent_t OS_TIMEOUT = 1;
   static const OSEvent_t OS_CUSTOM_TIMER = 2;
@@ -79,7 +79,7 @@ typedef unsigned int OSEventWaitReturn_t;
 class OSEventWaitReturn
 {
 public:
-  static const OSEventWaitReturn_t OS_NONE = -1;
+  static const OSEventWaitReturn_t OS_NONE = (0-1);
   static const OSEventWaitReturn_t OS_VOID = 0;
   static const OSEventWaitReturn_t OS_LOCKED = 1;
   static const OSEventWaitReturn_t OS_TIMEOUT = 2;
