@@ -119,7 +119,7 @@ public:
   setReadMatchArray(unsigned char* match);
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
-#if 1
+#if !defined(OS_EXCLUDE_MULTITASKING)
   // OSTimeout::OS_NEVER = no timeout (default)
   // OSTimeout::IMMEDIATELLY = return WOULD_BLOCK if necessary
 
@@ -168,7 +168,7 @@ public:
   OSTimer *
   getWriteTimer(void) const;
 
-#endif
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 
 protected:
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TYPE)
