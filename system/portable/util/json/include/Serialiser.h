@@ -41,8 +41,7 @@ namespace util
       void
       putNumber(int n);
       void
-      putNumberArray(uint8_t* pBuffer, std::size_t pBufferSize,
-          std::size_t freeLength, std::size_t* usedLength);
+      putNumberArray(uint8_t* pb, std::size_t len);
       void
       putQuotedString(const char* str);
       void
