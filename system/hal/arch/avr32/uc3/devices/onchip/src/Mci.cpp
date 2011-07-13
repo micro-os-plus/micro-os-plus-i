@@ -16,7 +16,9 @@ namespace avr32
 {
   namespace uc3
   {
-    Mci::Mci()
+    Mci::Mci() :
+          registers(
+              *reinterpret_cast<mci::Registers*> (mci::Registers::MEMORY_ADDRESS))
     {
       OSDeviceDebug::putConstructor("avr32::uc3::Mci", this);
     }
