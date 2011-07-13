@@ -35,6 +35,7 @@ public:
   static const OSReturn_t OS_NULL_POINTER = -18;
   static const OSReturn_t OS_BAD_SEQUENCE = -19;
   static const OSReturn_t OS_NOT_FOUND = -20;
+  static const OSReturn_t OS_BUSY = -21;
 };
 
 // ----------------------------------------------------------------------------
