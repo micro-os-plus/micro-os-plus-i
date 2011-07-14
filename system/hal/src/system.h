@@ -26,6 +26,8 @@
 //#error "Missing OS_CONFIG_ARCH_* definition"
 //#endif
 
+#include "portable/kernel/src/OSCriticalSection.cpp"
+
 #include "portable/kernel/src/OSThread.cpp"
 
 #include "portable/kernel/src/OSThreadIdle.cpp"
@@ -63,7 +65,7 @@
 //#include "hal/redirect/devices/sdi12/include/SDI12SensorInlines.h"
 
 //#if defined(OS_INCLUDE_SDI12BOOTLOADER)
-#include "portable/devices/sdi12/src/SDI12Bootloader.cpp"
+#include "portable/devices/sdi12/src/SDI12BootLoader.cpp"
 //#endif
 
 //#endif
@@ -73,6 +75,7 @@
 
 //#if defined(OS_CONFIG_DEBUG_DEVICE_I2C)
 #include "portable/devices/debug/src/DeviceDebugI2cImpl.cpp"
+#include "hal/arch/avr8/devices/debug/src/OSDeviceDebug_Implementation.cpp"
 //#elif defined(OS_CONFIG_DEBUG_DEVICE_USART)
 //#include "portable/devices/debug/src/DeviceDebugUsart.cpp"
 //#else
