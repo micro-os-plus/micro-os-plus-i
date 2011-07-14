@@ -26,6 +26,15 @@ namespace avr32
         FUNCTION_A = 0, FUNCTION_B = 1, FUNCTION_C = 2, FUNCTION_D = 3
       } PeripheralFunction_t;
 
+      class PeripheralFunction
+      {
+      public:
+        const static PeripheralFunction_t A = FUNCTION_A;
+        const static PeripheralFunction_t B = FUNCTION_B;
+        const static PeripheralFunction_t C = FUNCTION_C;
+        const static PeripheralFunction_t D = FUNCTION_D;
+      };
+
       typedef enum InterruptMode_e
       {
         PIN_CHANGE = 0, RISING_EDGE = 1, FAILING_EDGE = 2
