@@ -12,11 +12,13 @@
 
 #include "hal/arch/avr32/uc3/devices/onchip/include/Mci.h"
 
-
 namespace avr32
 {
   namespace uc3
   {
+
+    // ---- Constructors & Destructors ----------------------------------------
+
     Mci::Mci() :
           moduleRegisters(
               *reinterpret_cast<mci::ModuleRegisters*> (mci::ModuleRegisters::MEMORY_ADDRESS))
@@ -27,6 +29,13 @@ namespace avr32
       OSDeviceDebug::putNewLine();
     }
 
+    Mci::~Mci()
+    {
+      OSDeviceDebug::putDestructor("avr32::uc3::Mci", this);
+    }
+
+    // ----- Public methods ---------------------------------------------------
+
     void
     Mci::init(Speed_t speed, mci::BusWidth_t busWidth, mci::CardSlot_t cardSlot)
     {
@@ -36,37 +45,37 @@ namespace avr32
       reset();
       disable();
 
-      // Disable all interrupts
-      moduleRegisters.writeInterruptDisable(0xFFFFFFFF);
+      disableAllInterrupts();
 
-      // Clear the Configuration register
-      moduleRegisters.writeConfiguration(0);
-
-      // Clear the Mode register
-      moduleRegisters.writeMode(0);
+      clearConfiguration();
+      clearModeBits();
 
       // Set the Data Timeout Register to 1 Mega Cycles
-      moduleRegisters.writeDataTimeout(MCI_DEFAULT_DTOREG);
+      initDataTimeout(MCI_DEFAULT_DTOLMUL, MCI_DEFAULT_DTOLCYC);
 
-      // Set the Mode register
       initSpeed(speed);
 
-      uint32_t mode;
-      mode = moduleRegisters.readMode();
-
-      mode |= ((MCI_DEFAULT_PWSDIV << AVR32_MCI_MR_PWSDIV)
-          | AVR32_MCI_MR_RDPROOF_MASK | AVR32_MCI_MR_WRPROOF_MASK);
-
-      // Write new configuration
-      moduleRegisters.writeMode(mode);
+      // Set the Mode register
+      enableModeBits(
+          (MCI_DEFAULT_PWSDIV << AVR32_MCI_MR_PWSDIV)
+              | AVR32_MCI_MR_RDPROOF_MASK | AVR32_MCI_MR_WRPROOF_MASK);
 
       // Set the SD/MMC Card register
-      moduleRegisters.writeSdCard(
-          (busWidth >> AVR32_MCI_SDCR_SDCBUS_OFFSET) | (cardSlot
-              >> AVR32_MCI_SDCR_SDCSEL_OFFSET));
+      initSdCardBusWidthAndSlot(busWidth, cardSlot);
 
       // Enable the MCI and the Power Saving
       enable();
+    }
+
+    void
+    Mci::enableModeBits(uint32_t mask)
+    {
+      uint32_t mode;
+      mode = moduleRegisters.readMode(); // Read original mode
+        {
+          mode |= (mask);
+        }
+      moduleRegisters.writeMode(mode); // Write New mode
     }
 
     void
@@ -91,7 +100,7 @@ namespace avr32
       // divided by (2*(CLKDIV+1))
       clkdiv = OS_CFGLONG_PBB_FREQUENCY_HZ / (speed * 2);
       rest = OS_CFGLONG_PBB_FREQUENCY_HZ % (speed * 2);
-      if (rest)
+      if (rest != 0)
         {
           // Ensure that the card_speed can not be higher than expected.
           clkdiv += 1;
@@ -102,12 +111,25 @@ namespace avr32
           clkdiv -= 1;
         }
 
-      // Fill in new clock config to mode
-      mode &= ~AVR32_MCI_MR_CLKDIV_MASK; // Clear previous value
+      OSDeviceDebug::putString("clkdev=");
+      OSDeviceDebug::putHex(clkdiv);
+      OSDeviceDebug::putNewLine();
+
+      // Fill in the new clock divider to mode
+      mode &= ~AVR32_MCI_MR_CLKDIV_MASK; // Clear previous clkdiv value
       mode |= clkdiv; // Set the new one
 
       // Write new configuration
       moduleRegisters.writeMode(mode);
+    }
+
+    void
+    Mci::initSdCardBusWidthAndSlot(mci::BusWidth_t busWidth,
+        mci::CardSlot_t cardSlot)
+    {
+      moduleRegisters.writeSdCard(
+          ((busWidth & 0x3) >> AVR32_MCI_SDCR_SDCBUS_OFFSET)
+              | ((cardSlot & 0x3) >> AVR32_MCI_SDCR_SDCSEL_OFFSET));
     }
 
     mci::StatusRegister_t
@@ -126,7 +148,7 @@ namespace avr32
     }
 
     mci::StatusRegister_t
-    Mci::sendCommand(mci::Command_t cmd, mci::CommandArgument_t arg)
+    Mci::sendCommand(mci::CommandCode_t cmd, mci::CommandArgument_t arg)
     {
       OSDeviceDebug::putString("MCI cmd=");
       OSDeviceDebug::putHex(cmd);
@@ -140,27 +162,28 @@ namespace avr32
       while (!isReady())
         ; // TODO: fix loop
 
-      mci::StatusRegister_t error;
       mci::StatusRegister_t ret;
-
       ret = MCI_SUCCESS;
 
       // Test error  ==> if crc error and response R3 ==> don't check error
-      error = getStatusRegister() & MCI_SR_ERROR;
-      if (error != 0)
+      mci::StatusRegister_t status;
+      status = (getStatusRegister() & MCI_SR_ERROR);
+
+      if (status != 0)
         {
-          // if the command is SEND_OP_COND the CRC error flag is always present (cf : R3 response)
+          // if the command is SEND_OP_COND the CRC error flag
+          // is always present (cf : R3 response)
           if ((cmd != SD_MMC_SDCARD_APP_OP_COND_CMD) && (cmd
               != SD_MMC_MMC_SEND_OP_COND_CMD))
             {
-              if (error != AVR32_MCI_SR_RTOE_MASK)
+              if (status != AVR32_MCI_SR_RTOE_MASK)
                 // filter RTOE error which happens when using the HS mode
-                ret = error;
+                ret = status;
             }
           else
             {
-              if (error != AVR32_MCI_SR_RCRCE_MASK)
-                ret = error;
+              if (status != AVR32_MCI_SR_RCRCE_MASK)
+                ret = status;
             }
         }
 
@@ -170,6 +193,8 @@ namespace avr32
 
       return ret;
     }
+
+  // --------------------------------------------------------------------------
 
   }
 }
