@@ -1,0 +1,3 @@
+TARGET := test-avr32mci
+
+DFU-MCU := at32uc3a3256
