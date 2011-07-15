@@ -12,6 +12,7 @@
 
 #include "hal/arch/avr32/uc3/devices/block/include/MemoryCardMci.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
 
 namespace avr32
 {
@@ -38,15 +39,19 @@ namespace avr32
       m_cardSlot = cardSlot;
     }
 
-    OSReturn_t
-    MemoryCardMci::open(void)
-    {
-      OSDeviceDebug::putString_P(PSTR("avr32::uc3::MemoryCardMci::open()"));
-      OSDeviceDebug::putNewLine();
+    // ----- Private virtual methods --------------------------------------------------
 
+    OSReturn_t
+    MemoryCardMci::implInit()
+    {
       initGpio();
 
       // TODO: check if we need a special HMATRIX config, as in Atmel framework
+
+      avr32::uc3::Pm pm;
+      OSDeviceDebug::putString("PBB Mask=");
+      OSDeviceDebug::putHex(pm.moduleRegisters.readPbbClockMask());
+      OSDeviceDebug::putNewLine();
 
       // init MCI module
       m_mci.init(m_speed, m_busWidth, m_cardSlot);
@@ -55,79 +60,105 @@ namespace avr32
       if (m_mci.sendCommand(SD_MMC_INIT_STATE_CMD, 0xFFFFFFFF) != MCI_SUCCESS)
         return OSReturn::OS_ERROR;
 
-      return OSReturn::OS_NOT_IMPLEMENTED;
-    }
-
-    OSDeviceAddressable::Offset_t
-    MemoryCardMci::getDeviceSize(void)
-    {
-      return 0; // No device
+      return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::readBytes(OSDeviceAddressable::Offset_t offset __attribute__((unused)),
-        uint8_t* pBuf __attribute__((unused)), OSDeviceAddressable::Count_t count __attribute__((unused)))
+    MemoryCardMci::implSendCommand(OSDeviceMemoryCard::CommandCode_t code,
+        OSDeviceMemoryCard::CommandArgument_t arg)
     {
-      OSDeviceDebug::putString_P(PSTR("avr32::uc3::MemoryCardMci::readBytes()"));
+      avr32::uc3::mci::CommandCode_t mciCode;
+
+      switch (code)
+        {
+      case CommandCode::GO_IDLE_STATE:
+        mciCode = SD_MMC_GO_IDLE_STATE_CMD;
+        break;
+
+      case CommandCode::SEND_OP_COND:
+        mciCode = SD_MMC_MMC_SEND_OP_COND_CMD;
+        break;
+
+      case CommandCode::SEND_IF_COND:
+        mciCode = SD_MMC_SD_SEND_IF_COND_CMD;
+        break;
+
+      case CommandCode::APP_CMD:
+        mciCode = SD_MMC_APP_CMD;
+        break;
+
+      case ApplicationCommandCode::SD_SEND_OP_COND:
+        mciCode = SD_MMC_SDCARD_APP_OP_COND_CMD;
+        break;
+
+      default:
+        OSDeviceDebug::putString("unknown cmd=");
+        OSDeviceDebug::putDec((uint16_t) code);
+        OSDeviceDebug::putNewLine();
+
+        return OSReturn::OS_NOT_IMPLEMENTED;
+        }
+      //
+      OSDeviceDebug::putString("SS cmd=");
+      if ((code >> 8) != 0)
+        {
+          OSDeviceDebug::putDec((uint16_t) (code >> 8));
+          OSDeviceDebug::putChar(' ');
+        }
+      OSDeviceDebug::putDec((uint16_t) (code & 0xFF));
+      OSDeviceDebug::putNewLine();
+      return m_mci.sendCommand(mciCode, arg);
+    }
+
+    OSDeviceMemoryCard::Response_t
+    MemoryCardMci::implReadResponse(void)
+    {
+      OSDeviceMemoryCard::Response_t ret;
+      ret = m_mci.moduleRegisters.readResponse(0);
+
+      OSDeviceDebug::putString("rsp=");
+      OSDeviceDebug::putHex(ret);
       OSDeviceDebug::putNewLine();
 
-      return OSReturn::OS_NOT_IMPLEMENTED;
+      return ret;
     }
 
     OSReturn_t
-    MemoryCardMci::writeBytes(OSDeviceAddressable::Offset_t offset __attribute__((unused)),
-        uint8_t* pBuf __attribute__((unused)), OSDeviceAddressable::Count_t count __attribute__((unused)))
+    MemoryCardMci::implWaitBusySignal(void)
     {
-      OSDeviceDebug::putString_P(
-          PSTR("avr32::uc3::MemoryCardMci::writeBytes()"));
-      OSDeviceDebug::putNewLine();
+      // mci_wait_busy_signal()
 
-      return OSReturn::OS_NOT_IMPLEMENTED;
-    }
-
-    OSDeviceAddressable::Alignnment_t
-    MemoryCardMci::getWriteAlignment(void)
-    {
-      return 512; // Default alignment size, from MMC specs
+      return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::close(void)
+    MemoryCardMci::implSetBusWidth(BusWidth_t busWidth __attribute__((unused)))
     {
-      OSDeviceDebug::putString_P(PSTR("avr32::uc3::MemoryCardMci::close()"));
-      OSDeviceDebug::putNewLine();
-
-      return OSReturn::OS_NOT_IMPLEMENTED;
+      // mci_set_bus_size()
+      return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::erase(OSDeviceAddressable::Offset_t offset __attribute__((unused)),
-        OSDeviceAddressable::Count_t count __attribute__((unused)))
+    MemoryCardMci::implSetBlockSize(BlockSize_t size)
     {
-      OSDeviceDebug::putString_P(PSTR("avr32::uc3::MemoryCardMci::erase()"));
-      OSDeviceDebug::putNewLine();
-
-      return OSReturn::OS_NOT_IMPLEMENTED;
-    }
-
-    OSDeviceAddressable::Alignnment_t
-    MemoryCardMci::getEraseAlignment(void)
-    {
-      return 512; // Default alignment size, from MMC specs
+      // mci_set_block_size
+      return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::eraseEntireDevice(void)
+    MemoryCardMci::implSetBlockCount(BlockCount_t count)
     {
-      OSDeviceDebug::putString_P(
-          PSTR("avr32::uc3::MemoryCardMci::eraseEntireDevice()"));
-      OSDeviceDebug::putNewLine();
+      // mci_set_block_count
+      return OSReturn::OS_OK;
+    }
 
-      return OSReturn::OS_NOT_IMPLEMENTED;
+    OSReturn_t
+    MemoryCardMci::mci_set_speed(void)
+    {
+      return OSReturn::OS_OK;
     }
 
     // ----- Private methods --------------------------------------------------
-
     void
     MemoryCardMci::initGpio(void)
     {
