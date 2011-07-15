@@ -195,6 +195,12 @@
 #define OS_INCLUDE_CIRCULARBYTEBUFFER                   (1)
 #endif
 
+// ----- OSDeviceMemoryCard dependencies -------------------------------------
+
+#if !defined(OS_INCLUDE_OSDEVICEMEMORYCARD) && defined(OS_INCLUDE_AVR32_UC3_MEMORYCARDMCI)
+#define OS_INCLUDE_OSDEVICEMEMORYCARD                   (1)
+#endif
+
 // ----- OSDeviceAddressable dependencies -------------------------------------
 
 #if !defined(OS_INCLUDE_OSDEVICEADDRESSABLESYNCHRONISED) && defined(OS_INCLUDE_OSDEVICEADDRESSABLEPARTITION)
@@ -206,6 +212,10 @@
 #endif
 
 #if !defined(OS_INCLUDE_OSDEVICEADDRESSABLE) && defined(OS_INCLUDE_LARGECIRCULARSTORAGE)
+#define OS_INCLUDE_OSDEVICEADDRESSABLE                  (1)
+#endif
+
+#if !defined(OS_INCLUDE_OSDEVICEADDRESSABLE) && defined(OS_INCLUDE_OSDEVICEMEMORYCARD)
 #define OS_INCLUDE_OSDEVICEADDRESSABLE                  (1)
 #endif
 
