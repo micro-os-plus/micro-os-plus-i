@@ -136,6 +136,7 @@ namespace avr32
     {
     public:
       Gpio(gpio::PinNumber_t pin);
+      ~Gpio();
 
       void
       setModeGpio(void);
