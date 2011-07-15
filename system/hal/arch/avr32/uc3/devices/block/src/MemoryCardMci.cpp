@@ -48,10 +48,12 @@ namespace avr32
 
       // TODO: check if we need a special HMATRIX config, as in Atmel framework
 
+#if false
       avr32::uc3::Pm pm;
       OSDeviceDebug::putString("PBB Mask=");
       OSDeviceDebug::putHex(pm.moduleRegisters.readPbbClockMask());
       OSDeviceDebug::putNewLine();
+#endif
 
       // init MCI module
       m_mci.init(m_speed, m_busWidth, m_cardSlot);
