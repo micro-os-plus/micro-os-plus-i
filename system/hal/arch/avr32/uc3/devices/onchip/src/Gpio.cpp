@@ -16,6 +16,8 @@ namespace avr32
 {
   namespace uc3
   {
+    // ----- Constructors & Destructors ---------------------------------------
+
     Gpio::Gpio(gpio::PinNumber_t pin) :
           portRegisters(
               *reinterpret_cast<gpio::PortRegisters*> (gpio::PortRegisters::MEMORY_ADDRESS
@@ -27,6 +29,13 @@ namespace avr32
       m_mask = 1 << (pin & 0x1F);
       m_pin = pin;
     }
+
+    Gpio::~Gpio()
+    {
+      OSDeviceDebug::putDestructor("avr32::uc3::Gpio", this);
+    }
+
+    // ----- Public Methods ---------------------------------------------------
 
     void
     Gpio::configPeripheralFunction(gpio::PeripheralFunction_t func)
@@ -81,6 +90,8 @@ namespace avr32
       gpio.setModePeripheral();
       gpio.configPeripheralFunction(func);
     }
+
+  // --------------------------------------------------------------------------
 
   }
 }
