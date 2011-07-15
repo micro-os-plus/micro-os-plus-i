@@ -27,7 +27,6 @@
                                   AVR32_MCI_SR_RINDE_MASK)
 
 #define MCI_SUCCESS             0 // Successful completion.
-
 // Special Command
 #define MCI_SPCMD_NONE                 (AVR32_MCI_CMDR_SPCMD_NO_SPEC_CMD<<AVR32_MCI_CMDR_SPCMD_OFFSET)  // (MCI) Not a special CMD
 #define MCI_SPCMD_INIT                 (AVR32_MCI_CMDR_SPCMD_INIT_CMD   <<AVR32_MCI_CMDR_SPCMD_OFFSET)  // (MCI) Initialization CMD
@@ -49,7 +48,6 @@
 #define MCI_TRTYP_STREAM               (AVR32_MCI_TRTYP_STREAM     <<AVR32_MCI_TRTYP_OFFSET)            // (MCI) Stream transfer type
 #define MCI_TRTYP_SDIO_BYTE            (AVR32_MCI_TRTYP_SDIO_BYTE  <<AVR32_MCI_TRTYP_OFFSET)            // (MCI) SDIO byte transfer type
 #define MCI_TRTYP_SDIO_BLOCK           (AVR32_MCI_TRTYP_SDIO_BLOCK <<AVR32_MCI_TRTYP_OFFSET)            // (MCI) SDIO block transfer type
-
 #define MCI_OPDCMD                     (AVR32_MCI_OPDCMD_MASK)                                          // (MCI) Open Drain Command
 #define MCI_MAXLAT                     (AVR32_MCI_MAXLAT_MASK)                                          // (MCI) Maximum Latency for Command to respond
 #define MCI_TRDIR                      (AVR32_MCI_TRDIR_MASK)                                           // (MCI) Transfer Direction
@@ -92,7 +90,6 @@
 //*--------------------------------------------
 
 #define SD_MMC_MMC_WRITE_DAT_UNTIL_STOP_CMD      (20 | MCI_TRTYP_STREAM | MCI_SPCMD_NONE | MCI_RSPTYP_48 & ~(MCI_TRDIR) | MCI_TRCMD_START | MCI_MAXLAT )        // MMC
-
 //*------------------------------------------------
 //* Class 4 commands: Block oriented write commands
 //*------------------------------------------------
@@ -101,7 +98,6 @@
 #define SD_MMC_WRITE_MULTIPLE_BLOCK_CMD          (25 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_START | (MCI_TRTYP_MULTIPLE &  ~(MCI_TRDIR)) | MCI_MAXLAT)
 #define SD_MMC_PROGRAM_CSD_CMD                   (27 | MCI_RSPTYP_48 )
 
-
 //*----------------------------------------
 //* Class 6 commands: Group Write protect
 //*----------------------------------------
@@ -109,7 +105,6 @@
 #define SD_MMC_SET_WRITE_PROT_CMD                (28 | MCI_RSPTYP_48)
 #define SD_MMC_CLR_WRITE_PROT_CMD                (29 | MCI_RSPTYP_48)
 #define SD_MMC_SEND_WRITE_PROT_CMD               (30 | MCI_RSPTYP_48)
-
 
 //*----------------------------------------
 //* Class 5 commands: Erase commands
@@ -128,7 +123,6 @@
 //*----------------------------------------
 
 #define SD_MMC_LOCK_UNLOCK                       (42 | MCI_SPCMD_NONE | MCI_RSPTYP_48 | MCI_TRCMD_NO | MCI_MAXLAT)  // no tested
-
 //*-----------------------------------------------
 // Class 8 commands: Application specific commands
 //*-----------------------------------------------
@@ -172,7 +166,7 @@ namespace avr32
       // ----- Type definitions -----------------------------------------------
 
       // These are exactly the register contents
-      typedef uint32_t Command_t;
+      typedef uint32_t CommandCode_t;
       typedef uint32_t CommandArgument_t;
 
       typedef uint32_t StatusRegister_t;
@@ -195,6 +189,23 @@ namespace avr32
         const static CardSlot_t A = 0;
         const static CardSlot_t B = 1;
       };
+
+      typedef uint8_t TimeoutMultiplier_t;
+
+      class TimeoutMultiplier
+      {
+      public:
+        const static TimeoutMultiplier_t _1 = 0;
+        const static TimeoutMultiplier_t _16 = 1;
+        const static TimeoutMultiplier_t _128 = 2;
+        const static TimeoutMultiplier_t _256 = 3;
+        const static TimeoutMultiplier_t _1024 = 4;
+        const static TimeoutMultiplier_t _4096 = 5;
+        const static TimeoutMultiplier_t _65536 = 6;
+        const static TimeoutMultiplier_t _1048576 = 7;
+      };
+
+      typedef uint8_t TimeoutCycles_t;
 
       // ----- Port memory mapped registers -----------------------------------
 
@@ -222,7 +233,8 @@ namespace avr32
 
         regReadOnly_t rdr; //0x0030
         regWriteOnly_t tdr; //0x0034
-        regNotAllocated_t dummy38[2]; //0x0038-0x003C
+        regNotAllocated_t
+            dummy38[(0x0040 - 0x0038) / sizeof(regNotAllocated_t)]; //0x0038-0x003C
 
         regReadOnly_t sr; //0x0040
         regWriteOnly_t ier; //0x0044
@@ -231,16 +243,19 @@ namespace avr32
 
         regReadWrite_t dma; //0x0050
         regReadWrite_t cfg; //0x0054
-        regNotAllocated_t dummy58[(0x0E4 - 0x058) / sizeof(regNotAllocated_t)]; //0x0058-0x00E0
+        regNotAllocated_t
+            dummy58[(0x00E4 - 0x0058) / sizeof(regNotAllocated_t)]; //0x0058-0x00E0
 
         regReadWrite_t wpmr; //0x00E4
         regReadOnly_t wpsr; //0x00E8
-        regNotAllocated_t dummyEC[4]; //0x00EC-0x00F8
+        regNotAllocated_t
+            dummyEC[(0x00FC - 0x00EC) / sizeof(regNotAllocated_t)]; //0x00EC-0x00F8
 
         regReadOnly_t version; //0x00FC
+        regNotAllocated_t dummy100[(0x0200 - 0x0100)
+            / sizeof(regNotAllocated_t)]; //0x0100-0x01FF
 
-        regNotAllocated_t dummy100[(0x200 - 0x100) / sizeof(regNotAllocated_t)]; //0x0100-0x01FF
-        regReadWrite_t fifo[(0x4000 - 0x200) / sizeof(regReadWrite_t)]; //0x00E4
+        regReadWrite_t fifo[(0x4000 - 0x200) / sizeof(regReadWrite_t)]; //0x0200-0x3FFC
 
 
         // ----- Methods ------------------------------------------------------
@@ -336,6 +351,8 @@ namespace avr32
 
       };
 
+      // ----- Inline methods -------------------------------------------------
+
       inline void
       ModuleRegisters::writeControl(uint8_t mask)
       {
@@ -391,7 +408,7 @@ namespace avr32
       }
 
       inline void
-      ModuleRegisters::writeCommand(Command_t value)
+      ModuleRegisters::writeCommand(CommandCode_t value)
       {
         this->cmdr = value;
       }
