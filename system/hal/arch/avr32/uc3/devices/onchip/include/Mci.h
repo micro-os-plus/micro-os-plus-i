@@ -23,12 +23,12 @@ namespace avr32
 
       typedef uint32_t Speed_t;
 
-
     public:
 
       // ----- Constructors & Destructors -------------------------------------
 
       Mci();
+      ~Mci();
 
     public:
 
@@ -38,7 +38,7 @@ namespace avr32
       init(Speed_t speed, mci::BusWidth_t busWidth, mci::CardSlot_t cardSlot);
 
       mci::StatusRegister_t
-      sendCommand(mci::Command_t cmd, mci::CommandArgument_t arg);
+      sendCommand(mci::CommandCode_t cmd, mci::CommandArgument_t arg);
 
     private:
 
@@ -56,11 +56,31 @@ namespace avr32
       void
       initSpeed(Speed_t speed);
 
+      void
+      initSdCardBusWidthAndSlot(mci::BusWidth_t busWidth,
+          mci::CardSlot_t cardSlot);
+
+      void
+      initDataTimeout(mci::TimeoutMultiplier_t multiplier,
+          mci::TimeoutCycles_t cycles);
+
+      void
+      clearModeBits(void);
+
+      void
+      clearConfiguration(void);
+
+      void
+      enableModeBits(uint32_t);
+
       mci::StatusRegister_t
       getStatusRegister(void);
 
       bool
       isReady(void);
+
+      void
+      disableAllInterrupts(void);
 
     public:
 
@@ -82,12 +102,14 @@ namespace avr32
     inline void
     Mci::reset(void)
     {
+      // Reset interface
       moduleRegisters.writeControl(1 << AVR32_MCI_CR_SWRST);
     }
 
     inline void
     Mci::disable(void)
     {
+      // Disable interface and disable power save mode
       moduleRegisters.writeControl(
           (1 << AVR32_MCI_CR_MCIDIS) | (1 << AVR32_MCI_CR_PWSDIS));
     }
@@ -95,9 +117,36 @@ namespace avr32
     inline void
     Mci::enable(void)
     {
-      // Enable the MCI
+      // Enable interface and enable power save
       moduleRegisters.writeControl(
           (1 << AVR32_MCI_CR_MCIEN) | (1 << AVR32_MCI_CR_PWSEN));
+    }
+
+    inline void
+    Mci::disableAllInterrupts(void)
+    {
+      moduleRegisters.writeInterruptDisable(0xFFFFFFFF);
+    }
+
+    inline void
+    Mci::clearConfiguration(void)
+    {
+      moduleRegisters.writeConfiguration(0);
+    }
+
+    inline void
+    Mci::clearModeBits(void)
+    {
+      moduleRegisters.writeMode(0);
+    }
+
+    inline void
+    Mci::initDataTimeout(mci::TimeoutMultiplier_t multiplier,
+        mci::TimeoutCycles_t cycles)
+    {
+      moduleRegisters.writeDataTimeout(
+          ((multiplier & 0x7) << AVR32_MCI_DTOR_DTOMUL_OFFSET)
+              | ((cycles & 0xF) << AVR32_MCI_DTOR_DTOCYC_OFFSET));
     }
 
   // ------------------------------------------------------------------------
