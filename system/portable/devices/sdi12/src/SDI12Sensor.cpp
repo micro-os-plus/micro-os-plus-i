@@ -42,35 +42,35 @@ bool SDI12Sensor::bUseCRC;
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
 
+OSThread* SDI12Sensor::ms_pThread;
+OSThread* SDI12Sensor::ms_pThreadA;
+
+unsigned char SDI12Sensor::ms_doReset;
+volatile OSTimerTicks_t SDI12Sensor::ms_periodicSeconds;
+
+volatile OSTimerTicks_t SDI12Sensor::ms_timerTimeout;
+volatile OSTimerTicks_t SDI12Sensor::ms_timerMarking;
+//bool ms_cancelOnBreak;
+volatile bool SDI12Sensor::ms_breakDetectEnable;
+volatile OSTimerTicks_t SDI12Sensor::ms_cntMarking;
+
 volatile OSTimerTicks_t SDI12Sensor::ms_ticksBRK;
 
 volatile unsigned char SDI12Sensor::ms_outIndex;
 volatile bool SDI12Sensor::ms_useCRC;
 volatile bool SDI12Sensor::ms_cmdCRC;
 
-SDI12Value_t SDI12Sensor::ms_rValues[OS_CFGINT_SDI12SENSOR_RVALUES_SIZE];
-unsigned char SDI12Sensor::ms_rCount;
-
 volatile unsigned char SDI12Sensor::ms_dCmd;
 volatile unsigned char SDI12Sensor::ms_dDigit;
 unsigned int SDI12Sensor::ms_dSeconds;
 volatile unsigned char SDI12Sensor::ms_dIndex;
 
-SDI12Value_t SDI12Sensor::ms_dValues[OS_CFGINT_SDI12SENSOR_DVALUES_SIZE];
-unsigned char SDI12Sensor::ms_dCount;
 
 volatile bool SDI12Sensor::ms_bDAvailable;
 volatile bool SDI12Sensor::ms_bAcquire;
 volatile bool SDI12Sensor::ms_bServiceRequest;
 
-volatile OSTimerTicks_t SDI12Sensor::ms_periodicSeconds;
-
 unsigned char SDI12Sensor::ms_delayedMode;
-
-OSThread* SDI12Sensor::ms_pThread;
-OSThread* SDI12Sensor::ms_pThreadA;
-
-unsigned char SDI12Sensor::ms_doReset;
 
 volatile OSTimerTicks_t SDI12Sensor::ms_exclamationTicks;
 
@@ -81,15 +81,17 @@ OSEventFlags SDI12Sensor::ms_flags;
 unsigned char SDI12Sensor::ms_state;
 volatile OSTimerTicks_t SDI12Sensor::ms_ticksRX;
 bool SDI12Sensor::ms_moreProcessing;
-volatile OSTimerTicks_t SDI12Sensor::ms_timerTimeout;
-volatile OSTimerTicks_t SDI12Sensor::ms_timerMarking;
-//bool ms_cancelOnBreak;
-volatile bool SDI12Sensor::ms_breakDetectEnable;
-volatile OSTimerTicks_t SDI12Sensor::ms_cntMarking;
+
+SDI12Value_t SDI12Sensor::ms_rValues[OS_CFGINT_SDI12SENSOR_RVALUES_SIZE];
+unsigned char SDI12Sensor::ms_rCount;
 
 #if !defined(OS_EXCLUDE_PCINT3_VECT)
 unsigned char SDI12Sensor::ms_prevValue3;
 #endif
+
+SDI12Value_t SDI12Sensor::ms_dValues[OS_CFGINT_SDI12SENSOR_DVALUES_SIZE];
+unsigned char SDI12Sensor::ms_dCount;
+
 
 #endif
 
