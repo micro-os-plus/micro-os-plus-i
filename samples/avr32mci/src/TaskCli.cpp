@@ -301,7 +301,7 @@ TaskCli::cmdMI()
   int r;
   std::ostream& cout = m_cout;
 
-  m_card.setOpenParameters(4000000, avr32::uc3::mci::BusWidth::_1bit,
+  m_card.implementation.setOpenParameters(4000000, avr32::uc3::mci::BusWidth::_1bit,
       avr32::uc3::mci::CardSlot::A);
 
   r = m_card.open();
