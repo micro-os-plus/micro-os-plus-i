@@ -18,7 +18,8 @@ namespace avr32
 {
   namespace uc3
   {
-    MemoryCardMci::MemoryCardMci()
+    MemoryCardMci::MemoryCardMci() :
+      OSDeviceMemoryCard(implementation)
     {
       OSDeviceDebug::putConstructor("avr32::uc3::MemoryCardMci", this);
     }
@@ -28,10 +29,24 @@ namespace avr32
       OSDeviceDebug::putDestructor("avr32::uc3::MemoryCardMci", this);
     }
 
-    // ----- Public methods ---------------------------------------------------
+     // ===== Implementation ===================================================
+
+    MemoryCardMci::Implementation::Implementation()
+    {
+      OSDeviceDebug::putConstructor(
+          "avr32::uc3::MemoryCardMci::Implementation", this);
+    }
+
+    MemoryCardMci::Implementation::~Implementation()
+    {
+      OSDeviceDebug::putDestructor(
+          "avr32::uc3::MemoryCardMci::Implementation", this);
+    }
+
+    // ----- Private virtual methods ------------------------------------------
 
     void
-    MemoryCardMci::setOpenParameters(Mci::Speed_t speed,
+    MemoryCardMci::Implementation::setOpenParameters(Mci::Speed_t speed,
         mci::BusWidth_t busWidth, mci::CardSlot_t cardSlot)
     {
       m_speed = speed;
@@ -39,10 +54,10 @@ namespace avr32
       m_cardSlot = cardSlot;
     }
 
-    // ----- Private virtual methods --------------------------------------------------
+    // ---- Virtuals
 
     OSReturn_t
-    MemoryCardMci::implInit()
+    MemoryCardMci::Implementation::init()
     {
       initGpio();
 
@@ -66,7 +81,8 @@ namespace avr32
     }
 
     OSReturn_t
-    MemoryCardMci::implSendCommand(OSDeviceMemoryCard::CommandCode_t code,
+    MemoryCardMci::Implementation::sendCommand(
+        OSDeviceMemoryCard::CommandCode_t code,
         OSDeviceMemoryCard::CommandArgument_t arg)
     {
       avr32::uc3::mci::CommandCode_t mciCode;
@@ -113,7 +129,7 @@ namespace avr32
     }
 
     OSDeviceMemoryCard::Response_t
-    MemoryCardMci::implReadResponse(void)
+    MemoryCardMci::Implementation::readResponse(void)
     {
       OSDeviceMemoryCard::Response_t ret;
       ret = m_mci.moduleRegisters.readResponse(0);
@@ -126,7 +142,7 @@ namespace avr32
     }
 
     OSReturn_t
-    MemoryCardMci::implWaitBusySignal(void)
+    MemoryCardMci::Implementation::waitBusySignal(void)
     {
       // mci_wait_busy_signal()
 
@@ -134,35 +150,35 @@ namespace avr32
     }
 
     OSReturn_t
-    MemoryCardMci::implSetBusWidth(BusWidth_t busWidth __attribute__((unused)))
+    MemoryCardMci::Implementation::setBusWidth(BusWidth_t busWidth __attribute__((unused)))
     {
       // mci_set_bus_size()
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::implSetBlockSize(BlockSize_t size)
+    MemoryCardMci::Implementation::setBlockSize(BlockSize_t size)
     {
       // mci_set_block_size
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::implSetBlockCount(BlockCount_t count)
+    MemoryCardMci::Implementation::setBlockCount(BlockCount_t count)
     {
       // mci_set_block_count
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::mci_set_speed(void)
+    MemoryCardMci::Implementation::mci_set_speed(void)
     {
       return OSReturn::OS_OK;
     }
 
     // ----- Private methods --------------------------------------------------
     void
-    MemoryCardMci::initGpio(void)
+    MemoryCardMci::Implementation::initGpio(void)
     {
       OSDeviceDebug::putString("avr32::uc3::MemoryCardMci::initGpio()");
       OSDeviceDebug::putNewLine();

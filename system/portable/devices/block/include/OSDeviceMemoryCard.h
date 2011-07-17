@@ -31,10 +31,12 @@
 #define OCR_MSK_HC                0x40000000 // High Capacity flag
 #define OCR_MSK_VOLTAGE_3_2V_3_3V 0x00100000 // Voltage 3.2V to 3.3V flag
 #define OCR_MSK_VOLTAGE_ALL       0x00FF8000 // All Voltage flag
+
 //! RCA register
 #define RCA_RESERVE_ADR           0x00000000
 #define RCA_MSK_ADR               0xFFFF0000
 #define RCA_DEFAULT_ADR           0x0001FFFF // It can be changed
+
 //! CSD register
 #define CSD_REG_SIZE              0x10
 #define CSD_STRUCT_1_0            0x00
@@ -72,6 +74,7 @@
 #define MMC_RCV_STATE             ((U32)0x00000A00)  // rcv state
 #define MMC_TRAN_STATE_MSK        ((U32)0xE0020E00)
 #define MMC_TRAN_STATE            ((U32)0x00000800)  // tran state
+
 //! Flag error of "Card Status" in R1
 #define CS_FLAGERROR_RD_WR  (CS_ADR_OUT_OF_RANGE|CS_ADR_MISALIGN|CS_BLOCK_LEN_ERROR|CS_ERASE_SEQ_ERROR|CS_ILLEGAL_COMMAND|CS_CARD_ERROR)
 #define CS_ADR_OUT_OF_RANGE (1<<31)
@@ -105,12 +108,15 @@
 #define MMC_R1_ILLEGAL_COM                0x04
 #define MMC_R1_ERASE_RESET                0x02
 #define MMC_R1_IDLE_STATE                 0x01
+
 // Data Start tokens
 #define MMC_STARTBLOCK_READ               0xFE  ///< when received from card, indicates that a block of data will follow
 #define MMC_STARTBLOCK_WRITE              0xFE  ///< when sent to card, indicates that a block of data will follow
 #define MMC_STARTBLOCK_MWRITE             0xFC
+
 // Data Stop tokens
 #define MMC_STOPTRAN_WRITE                0xFD
+
 // Data Error Token values
 #define MMC_DE_MASK                       0x1F
 #define MMC_DE_ERROR                      0x01
@@ -118,11 +124,13 @@
 #define MMC_DE_ECC_FAIL                   0x04
 #define MMC_DE_OUT_OF_RANGE               0x04
 #define MMC_DE_CARD_LOCKED                0x04
+
 // Data Response Token values
 #define MMC_DR_MASK                       0x1F
 #define MMC_DR_ACCEPT                     0x05
 #define MMC_DR_REJECT_CRC                 0x0B
 #define MMC_DR_REJECT_WRITE_ERROR         0x0D
+
 // Arguments of MMC_SWITCH command
 #define MMC_SWITCH_WRITE          ((U8)03)
 #define MMC_SWITCH_BUS_WIDTH      ((U8)183)
@@ -133,6 +141,7 @@
 #define MMC_SWITCH_VAL_1BIT       ((U8)00)
 #define MMC_SWITCH_VAL_4BIT       ((U8)01)
 #define MMC_SWITCH_VAL_8BIT       ((U8)02)
+
 // Arguments of MMC_LOCK_UNLOCK command
 #define CMD_FULL_ERASE           0x08
 #define CMD_UNLOCK               0x00
@@ -495,11 +504,56 @@ public:
   typedef uint_t BlockSize_t;
   typedef uint_t BlockCount_t;
 
+  class Implementation
+  {
+  public:
+
+#if defined(DEBUG)
+    Implementation();
+    virtual
+    ~Implementation();
+#endif /* defined(DEBUG) */
+
+    friend class OSDeviceMemoryCard;
+
+  private:
+
+    // ----- Implementation methods -------------------------------------------
+
+    virtual OSReturn_t
+    init(void) = 0;
+
+    virtual OSReturn_t
+    sendCommand(CommandCode_t code, CommandArgument_t arg) = 0;
+
+    virtual Response_t
+    readResponse(void) = 0;
+
+    virtual OSReturn_t
+    waitBusySignal(void) = 0;
+
+    virtual OSReturn_t
+    setBusWidth(BusWidth_t busWidth) = 0;
+
+    virtual OSReturn_t
+    setBlockSize(BlockSize_t size) = 0;
+
+    virtual OSReturn_t
+    setBlockCount(BlockCount_t count) = 0;
+
+    virtual OSReturn_t
+    mci_set_speed() = 0;
+
+  };
+
+  typedef Implementation Implementation_t;
+
+
 public:
 
   // ----- Constructors & Destructors -----------------------------------------
 
-  OSDeviceMemoryCard();
+  OSDeviceMemoryCard(Implementation& impl);
 
   virtual
   ~OSDeviceMemoryCard();
@@ -548,31 +602,6 @@ public:
   getEraseAlignment(void);
 
 private:
-  // ----- Implementation methods ---------------------------------------------
-
-  virtual OSReturn_t
-  implInit(void) = 0;
-
-  virtual OSReturn_t
-  implSendCommand(CommandCode_t code, CommandArgument_t arg) = 0;
-
-  virtual Response_t
-  implReadResponse(void) = 0;
-
-  virtual OSReturn_t
-  implWaitBusySignal(void) = 0;
-
-  virtual OSReturn_t
-  implSetBusWidth(BusWidth_t busWidth) = 0;
-
-  virtual OSReturn_t
-  implSetBlockSize(BlockSize_t size) = 0;
-
-  virtual OSReturn_t
-  implSetBlockCount(BlockCount_t count) = 0;
-
-  virtual OSReturn_t
-  mci_set_speed() = 0;
 
   OSReturn_t
   getCsd(void);
@@ -592,6 +621,8 @@ private:
 
   uint8_t m_cardType;
   bool m_isInitialised;
+
+  Implementation_t& m_implementation;
 
   // --------------------------------------------------------------------------
 };

@@ -12,7 +12,8 @@
 
 #include "portable/devices/block/include/OSDeviceMemoryCard.h"
 
-OSDeviceMemoryCard::OSDeviceMemoryCard()
+OSDeviceMemoryCard::OSDeviceMemoryCard(Implementation& impl) :
+  m_implementation(impl)
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceMemoryCard"), this);
 }
@@ -22,13 +23,27 @@ OSDeviceMemoryCard::~OSDeviceMemoryCard()
   OSDeviceDebug::putDestructor_P(PSTR("OSDeviceMemoryCard"), this);
 }
 
+#if defined(DEBUG)
+OSDeviceMemoryCard::Implementation::Implementation()
+{
+  OSDeviceDebug::putConstructor_P(PSTR("OSDeviceMemoryCard::Implementation"),
+      this);
+}
+
+OSDeviceMemoryCard::Implementation::~Implementation()
+{
+  OSDeviceDebug::putDestructor_P(PSTR("OSDeviceMemoryCard::Implementation"),
+      this);
+}
+#endif /* defined(DEBUG) */
+
 OSReturn_t
 OSDeviceMemoryCard::open(void)
 {
   OSDeviceDebug::putString("OSDeviceMemoryCard::open()");
   OSDeviceDebug::putNewLine();
 
-  implInit();
+  m_implementation.init();
 
   // Default card is not known.
   m_cardType = UNKNOWN_CARD;
@@ -37,26 +52,26 @@ OSDeviceMemoryCard::open(void)
 
   //-- (CMD0)
   // Set card in idle state
-  ret = implSendCommand(CommandCode::GO_IDLE_STATE, 0xFFFFFFFF);
+  ret = m_implementation.sendCommand(CommandCode::GO_IDLE_STATE, 0xFFFFFFFF);
   if (ret != OSReturn::OS_OK)
     return ret;
 
   uint32_t u32_response;
 
-  sd_mmc_init_step1:
+  step1:
   // (CMD1)
   // To send its Operating Conditions Register contents command only supported by MMC card
-  if (implSendCommand(CommandCode::SEND_OP_COND,
+  if (m_implementation.sendCommand(CommandCode::SEND_OP_COND,
       OCR_MSK_BUSY | OCR_MSK_VOLTAGE_ALL | OCR_MSK_HC) == OSReturn::OS_OK)
     {
       // MMC cards always respond to MMC_SEND_OP_COND
       m_cardType = MMC_CARD;
-      u32_response = implReadResponse();
+      u32_response = m_implementation.readResponse();
       if (!(u32_response & OCR_MSK_BUSY))
         {
           // here card busy, it did not completed its initialization process
           // resend command MMC_SEND_OP_COND
-          goto sd_mmc_init_step1;
+          goto step1;
           // loop until it is ready
         }
       if (0 != (u32_response & OCR_MSK_HC))
@@ -71,21 +86,21 @@ OSDeviceMemoryCard::open(void)
 
       //-- (CMD8)
       // enables to expand new functionality to some existing commands supported only by SD HC card
-      if (implSendCommand(CommandCode::SEND_IF_COND, 0x000001AA)
+      if (m_implementation.sendCommand(CommandCode::SEND_IF_COND, 0x000001AA)
           == OSReturn::OS_OK)
         {
           // It is a SD HC
-          if (0x000001AA == implReadResponse())
+          if (0x000001AA == m_implementation.readResponse())
             {
               m_cardType |= SD_CARD_V2;
             }
         }
 
-      sd_mmc_init_step2:
+      step2:
       //-- (CMD55)
       // Indicates to the card that the next command is an application specific command rather than a standard command
       // CMD55 shall always precede ACMD41
-      ret = implSendCommand(CommandCode::APP_CMD, 0);
+      ret = m_implementation.sendCommand(CommandCode::APP_CMD, 0);
       if (ret != OSReturn::OS_OK)
         return ret;
 
@@ -94,24 +109,26 @@ OSDeviceMemoryCard::open(void)
       if (SD_CARD_V2 & m_cardType)
         {
           // Sends host capacity support information (HCS)
-          ret = implSendCommand(ApplicationCommandCode::SD_SEND_OP_COND,
+          ret = m_implementation.sendCommand(
+              ApplicationCommandCode::SD_SEND_OP_COND,
               OCR_MSK_BUSY | OCR_MSK_VOLTAGE_3_2V_3_3V | OCR_MSK_HC);
           if (ret != OSReturn::OS_OK)
             return ret;
         }
       else
         {
-          ret = implSendCommand(ApplicationCommandCode::SD_SEND_OP_COND,
+          ret = m_implementation.sendCommand(
+              ApplicationCommandCode::SD_SEND_OP_COND,
               OCR_MSK_BUSY | OCR_MSK_VOLTAGE_3_2V_3_3V);
           if (ret != OSReturn::OS_OK)
             return ret;
         }
-      u32_response = implReadResponse();
+      u32_response = m_implementation.readResponse();
 
       if (!(u32_response & OCR_MSK_BUSY))
         {
           // Card Busy, resend ACMD41 precede of CMD55
-          goto sd_mmc_init_step2;
+          goto step2;
         }
       // Card read then check HC type
       if (u32_response & OCR_MSK_HC)
@@ -148,7 +165,7 @@ OSDeviceMemoryCard::open(void)
   if (SD_CARD & m_cardType)
     {
       // For SD  card, you receiv address of card
-      g_u32_card_rca[slot] = implReadResponse() & RCA_MSK_ADR;
+      g_u32_card_rca[slot] = readResponse() & RCA_MSK_ADR;
     }
 
   //-- (CMD9)
@@ -164,7 +181,7 @@ OSDeviceMemoryCard::open(void)
   return ret;
 
   // Wait end of busy
-  implWaitBusySignal();// read busy state on DAT0
+  waitBusySignal();// read busy state on DAT0
 
   // Get clock by checking the extended CSD register
   if (MMC_CARD_V4 & m_cardType)
@@ -191,7 +208,7 @@ OSDeviceMemoryCard::open(void)
       return ret;
 
       g_u8_card_bus_width[slot] = MCI_BUS_SIZE_4_BIT;
-      ret = implSetBusSize(MCI_BUS_SIZE_4_BIT);
+      ret = setBusSize(MCI_BUS_SIZE_4_BIT);
       if (ret != OSReturn::OS_OK)
       return ret;
     }
@@ -213,9 +230,9 @@ OSDeviceMemoryCard::open(void)
               return ret;
             }
           // Wait end of busy
-          implWaitBusySignal();// read busy state on DAT0
+          waitBusySignal();// read busy state on DAT0
           g_u8_card_bus_width[slot] = MCI_BUS_SIZE_8_BIT;
-          ret = implSetBusWidth(mci, MCI_BUS_SIZE_8_BIT);
+          ret = setBusWidth(mci, MCI_BUS_SIZE_8_BIT);
           if (ret != OSReturn::OS_OK)
           return ret;
         }
@@ -234,7 +251,7 @@ OSDeviceMemoryCard::open(void)
           return ret;
         }
       // Wait end of busy
-      implWaitBusySignal();
+      waitBusySignal();
     }
 
   if (SD_CARD_V2 & m_cardType)
@@ -250,8 +267,8 @@ OSDeviceMemoryCard::open(void)
 #define SDMMC_SWITCH_FUNC_G5_KEEP     (0xf << 16) /**< Group 5 No influence */
 #define SDMMC_SWITCH_FUNC_G6_KEEP     (0xf << 20) /**< Group 6 No influence */
 
-      implSetBlockSize(512 / 8); // CMD6 512 bits status
-      implSetBlockCount(1);
+      setBlockSize(512 / 8); // CMD6 512 bits status
+      setBlockCount(1);
 
       //-- (CMD6)
       // Check if we can enter into the High Speed mode.
@@ -262,7 +279,7 @@ OSDeviceMemoryCard::open(void)
           return ret;
         }
       // Wait end of busy
-      implWaitBusySignal();// read busy state on DAT0
+      waitBusySignal();// read busy state on DAT0
 
       bool b_hs_supported = false;
         {
@@ -329,7 +346,7 @@ OSDeviceMemoryCard::open(void)
       return ret;
 
       // Wait end of busy
-      implWaitBusySignal();// read busy state on DAT0
+      waitBusySignal();// read busy state on DAT0
 
       //-- (CMD9)
       // Read & analyse CSD register
@@ -343,7 +360,7 @@ OSDeviceMemoryCard::open(void)
       return ret;
 
       // Wait end of busy
-      implWaitBusySignal();// read busy state on DAT0
+      waitBusySignal();// read busy state on DAT0
     }
 
   sd_mmc_init_step3:
@@ -355,7 +372,7 @@ OSDeviceMemoryCard::open(void)
   if (sd_mmc_mci_cmd_send_status(slot) != TRUE)
   return FALSE;
 
-  if ((implReadResponse() & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
+  if ((readResponse() & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
   return OSReturn::OS_ERROR;
 
   //-- (CMD16)
@@ -397,7 +414,7 @@ OSDeviceMemoryCard::getDeviceSize(void)
 }
 
 bool
-OSDeviceMemoryCard::sd_mmc_mci_cmd_send_status(uint8_t slot)
+OSDeviceMemoryCard::sd_mmc_mci_cmd_send_status(uint8_t slot  __attribute__((unused)))
 {
 #if false
   if (slot > MCI_LAST_SLOTS)
@@ -413,7 +430,7 @@ OSDeviceMemoryCard::sd_mmc_mci_cmd_send_status(uint8_t slot)
 }
 
 bool
-OSDeviceMemoryCard::sd_mmc_set_block_len(uint8_t slot, uint16_t length)
+OSDeviceMemoryCard::sd_mmc_set_block_len(uint8_t slot  __attribute__((unused)), uint16_t length __attribute__((unused)))
 {
 #if false
   if (slot > MCI_LAST_SLOTS)

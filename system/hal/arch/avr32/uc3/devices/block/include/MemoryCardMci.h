@@ -18,10 +18,63 @@ namespace avr32
   {
     class MemoryCardMci : public OSDeviceMemoryCard
     {
-    public:
+    private:
 
-      // ----- Type definitions -----------------------------------------------
+      // ---- Implementation class --------------------------------------------
 
+      class Implementation : public OSDeviceMemoryCard::Implementation
+      {
+      public:
+        Implementation();
+        virtual
+        ~Implementation();
+
+        void
+        setOpenParameters(Mci::Speed_t speed, mci::BusWidth_t busWidth,
+            mci::CardSlot_t cardSlot);
+
+        friend class OSDeviceMemoryCard;
+
+      private:
+        virtual OSReturn_t
+        init();
+
+        virtual OSReturn_t
+        sendCommand(CommandCode_t code, CommandArgument_t arg);
+
+        virtual OSDeviceMemoryCard::Response_t
+        readResponse(void);
+
+        virtual OSReturn_t
+        waitBusySignal(void);
+
+        virtual OSReturn_t
+        setBusWidth(BusWidth_t busWidth);
+
+        virtual OSReturn_t
+        setBlockSize(BlockSize_t size);
+
+        virtual OSReturn_t
+        setBlockCount(BlockCount_t count);
+
+        virtual OSReturn_t
+        mci_set_speed(void);
+
+      private:
+
+        // ---- Local methods -------------------------------------------------
+
+        void
+        initGpio(void);
+
+      public:
+        avr32::uc3::Mci m_mci;
+
+        Mci::Speed_t m_speed;
+        mci::BusWidth_t m_busWidth;
+        mci::CardSlot_t m_cardSlot;
+
+      };
 
     public:
 
@@ -34,56 +87,13 @@ namespace avr32
 
     public:
 
-      // ----- Public methods -------------------------------------------------
+      // ----- public members ------------------------------------------------
 
-      void
-      setOpenParameters(Mci::Speed_t speed, mci::BusWidth_t busWidth,
-          mci::CardSlot_t cardSlot);
-
-    private:
-
-      // ----- Private methods ------------------------------------------------
-
-      virtual OSReturn_t
-      implInit();
-
-      virtual OSReturn_t
-      implSendCommand(CommandCode_t code, CommandArgument_t arg);
-
-      virtual OSDeviceMemoryCard::Response_t
-      implReadResponse(void);
-
-      virtual OSReturn_t
-      implWaitBusySignal(void);
-
-      virtual OSReturn_t
-      implSetBusWidth(BusWidth_t busWidth);
-
-      virtual OSReturn_t
-      implSetBlockSize(BlockSize_t size);
-
-      virtual OSReturn_t
-      implSetBlockCount(BlockCount_t count);
-
-      virtual OSReturn_t
-      mci_set_speed(void);
-
-      // ----
-      void
-      initGpio(void);
-
-    private:
-
-      // ----- Private members ------------------------------------------------
-
-      avr32::uc3::Mci m_mci;
-
-      Mci::Speed_t m_speed;
-      mci::BusWidth_t m_busWidth;
-      mci::CardSlot_t m_cardSlot;
+      Implementation implementation;
 
       // ----------------------------------------------------------------------
     };
+
   }
 }
 
