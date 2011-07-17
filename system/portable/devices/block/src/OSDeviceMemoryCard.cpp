@@ -49,6 +49,7 @@ OSDeviceMemoryCard::open(void)
 
   // Default card is not known.
   m_cardType = UNKNOWN_CARD;
+  g_u32_card_size = 0;
 
   OSReturn_t ret;
 
@@ -71,7 +72,7 @@ OSDeviceMemoryCard::open(void)
       u32_response = m_implementation.readResponse();
       if (!(u32_response & OCR_MSK_BUSY))
         {
-          // here card busy, it did not completed its initialization process
+          // here card busy, it did not completed its initialisation process
           // resend command MMC_SEND_OP_COND
           goto step1;
           // loop until it is ready
@@ -386,7 +387,7 @@ OSDeviceMemoryCard::open(void)
   // Set the card block length to 512B
   ret = sd_mmc_set_block_len(slot, SD_MMC_SECTOR_SIZE);
   if (ret != OSReturn::OS_OK)
-  return ret;
+    return ret;
 
   // USB Test Unit Attention requires a state "busy" between "not present" and "ready" state
   // otherwise never report card change
@@ -487,6 +488,10 @@ OSDeviceMemoryCard::getCsd(void)
       g_u32_card_size = ((max_Read_DataBlock_Length * blocknr) / 512);
     }
 
+  OSDeviceDebug::putString("getCsd() size=");
+  OSDeviceDebug::putDec(g_u32_card_size * 512);
+  OSDeviceDebug::putNewLine();
+
   return OSReturn::OS_OK;
 }
 
@@ -542,7 +547,7 @@ OSDeviceMemoryCard::sd_mmc_get_ext_csd(void)
 OSDeviceAddressable::Offset_t
 OSDeviceMemoryCard::getDeviceSize(void)
 {
-  return 0; // No device
+  return g_u32_card_size * 512;
 }
 
 bool
