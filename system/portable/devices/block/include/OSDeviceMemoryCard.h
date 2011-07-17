@@ -31,12 +31,10 @@
 #define OCR_MSK_HC                0x40000000 // High Capacity flag
 #define OCR_MSK_VOLTAGE_3_2V_3_3V 0x00100000 // Voltage 3.2V to 3.3V flag
 #define OCR_MSK_VOLTAGE_ALL       0x00FF8000 // All Voltage flag
-
 //! RCA register
 #define RCA_RESERVE_ADR           0x00000000
 #define RCA_MSK_ADR               0xFFFF0000
 #define RCA_DEFAULT_ADR           0x0001FFFF // It can be changed
-
 //! CSD register
 #define CSD_REG_SIZE              0x10
 #define CSD_STRUCT_1_0            0x00
@@ -74,7 +72,6 @@
 #define MMC_RCV_STATE             ((U32)0x00000A00)  // rcv state
 #define MMC_TRAN_STATE_MSK        ((U32)0xE0020E00)
 #define MMC_TRAN_STATE            ((U32)0x00000800)  // tran state
-
 //! Flag error of "Card Status" in R1
 #define CS_FLAGERROR_RD_WR  (CS_ADR_OUT_OF_RANGE|CS_ADR_MISALIGN|CS_BLOCK_LEN_ERROR|CS_ERASE_SEQ_ERROR|CS_ILLEGAL_COMMAND|CS_CARD_ERROR)
 #define CS_ADR_OUT_OF_RANGE (1<<31)
@@ -382,7 +379,7 @@ public:
 
   typedef uint16_t CommandClass_t;
 
-  const static uint_t COMMAND_CLASS_SHIFT = 0;
+  const static uint_t COMMAND_CLASS_SHIFT = 8;
 
   class CommandClass
   {
@@ -401,7 +398,7 @@ public:
     const static CommandClass_t RESERVED_11 = 11;
   };
 
-  typedef uint8_t CommandCode_t;
+  typedef uint16_t CommandCode_t;
 
   class CommandCode
   {
@@ -465,6 +462,9 @@ public:
     // Application Specific Commands
     const static CommandCode_t SET_BUS_WIDTH = (6
         | (CommandClass::APPLICATION_8 << COMMAND_CLASS_SHIFT));
+    // ???
+    const static CommandCode_t SEND_EXT_CSD = (8 | (CommandClass::APPLICATION_8
+        << COMMAND_CLASS_SHIFT));
     const static CommandCode_t SD_STATUS = (13 | (CommandClass::APPLICATION_8
         << COMMAND_CLASS_SHIFT));
     const static CommandCode_t SEND_NUM_WR_BLOCKS = (22
@@ -501,8 +501,12 @@ public:
     const static BusWidth_t _8 = 8;
   };
 
-  typedef uint_t BlockSize_t;
+  typedef uint32_t BlockLength_t;
   typedef uint_t BlockCount_t;
+
+  // ==========================================================================
+
+  // Base class for implementation classes
 
   class Implementation
   {
@@ -518,7 +522,7 @@ public:
 
   private:
 
-    // ----- Implementation methods -------------------------------------------
+    // ----- Abstract methods ------------------------------------------------
 
     virtual OSReturn_t
     init(void) = 0;
@@ -536,18 +540,26 @@ public:
     setBusWidth(BusWidth_t busWidth) = 0;
 
     virtual OSReturn_t
-    setBlockSize(BlockSize_t size) = 0;
+    setBlockLength(BlockLength_t length) = 0;
 
     virtual OSReturn_t
     setBlockCount(BlockCount_t count) = 0;
 
     virtual OSReturn_t
-    mci_set_speed() = 0;
+    mci_set_speed(void) = 0;
+
+    virtual OSReturn_t
+    mci_select_card(void) = 0;
+
+    virtual bool
+    mci_rx_ready(void) = 0;
+
+    virtual uint32_t
+    mci_rd_data(void) = 0;
 
   };
 
   typedef Implementation Implementation_t;
-
 
 public:
 
@@ -621,6 +633,10 @@ private:
 
   uint8_t m_cardType;
   bool m_isInitialised;
+
+  uint32_t g_u32_card_rca;
+  uint16_t g_u16_card_freq;
+  uint32_t g_u32_card_size;
 
   Implementation_t& m_implementation;
 

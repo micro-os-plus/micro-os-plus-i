@@ -12,6 +12,8 @@
 
 #include "portable/devices/block/include/OSDeviceMemoryCard.h"
 
+#include "hal/arch/avr32/lib/include/compiler.h"
+
 OSDeviceMemoryCard::OSDeviceMemoryCard(Implementation& impl) :
   m_implementation(impl)
 {
@@ -136,52 +138,55 @@ OSDeviceMemoryCard::open(void)
           m_cardType |= SD_CARD_HC; // Card SD High Capacity
         }
     }
-#if false
   // Here card ready and type (MMC <V4, MMC V4, MMC HC, SD V1, SD V2 HC) detected
 
   //-- (CMD2)
   // Send CID
-  ret = implSendCommand(SD_MMC_ALL_SEND_CID_CMD, 0);
+  ret = m_implementation.sendCommand(CommandCode::ALL_SEND_CID, 0);
   if (ret != OSReturn::OS_OK)
-  return ret;
+    return ret;
 
   //-- (CMD3)
   // Set relative address
   if (MMC_CARD & m_cardType)
     {
       // For MMC card, you send an address to card
-      g_u32_card_rca[slot] = RCA_DEFAULT_ADR;
-      ret = implSendCommand(SD_MMC_SET_RELATIVE_ADDR_CMD, RCA_DEFAULT_ADR);
+      g_u32_card_rca = RCA_DEFAULT_ADR;
+      ret = m_implementation.sendCommand(CommandCode::SEND_RELATIVE_ADDR,
+          RCA_DEFAULT_ADR);
       if (ret != OSReturn::OS_OK)
-      return ret;
+        return ret;
     }
   else
     {
       // For SD  card, you ask an address to card
-      ret = implSendCommand(SD_MMC_SET_RELATIVE_ADDR_CMD, RCA_RESERVE_ADR);
+      ret = m_implementation.sendCommand(CommandCode::SEND_RELATIVE_ADDR,
+          RCA_RESERVE_ADR);
       if (ret != OSReturn::OS_OK)
-      return ret;
+        return ret;
     }
   if (SD_CARD & m_cardType)
     {
-      // For SD  card, you receiv address of card
-      g_u32_card_rca[slot] = readResponse() & RCA_MSK_ADR;
+      // For SD  card, you receive address of card
+      g_u32_card_rca = m_implementation.readResponse() & RCA_MSK_ADR;
     }
 
   //-- (CMD9)
   // Read & analyse CSD register
   ret = getCsd();
   if (ret != OSReturn::OS_OK)
-  return ret;
+    return ret;
 
   //-- (CMD7)-R1b
   // select card
-  ret = implSendCommand(SD_MMC_SEL_DESEL_CARD_CMD, g_u32_card_rca[slot]);
+  ret = m_implementation.sendCommand(CommandCode::SELECT_DESELECT_CARD,
+      g_u32_card_rca);
   if (ret != OSReturn::OS_OK)
-  return ret;
+    return ret;
 
   // Wait end of busy
-  waitBusySignal();// read busy state on DAT0
+  m_implementation.waitBusySignal();// read busy state on DAT0
+
 
   // Get clock by checking the extended CSD register
   if (MMC_CARD_V4 & m_cardType)
@@ -190,8 +195,10 @@ OSDeviceMemoryCard::open(void)
       //-- (CMD8)
       ret = sd_mmc_get_ext_csd();
       if (ret != OSReturn::OS_OK)
-      return ret;
+        return ret;
     }
+
+#if false
 
   // set bus width
   if (SD_CARD & m_cardType)
@@ -267,7 +274,7 @@ OSDeviceMemoryCard::open(void)
 #define SDMMC_SWITCH_FUNC_G5_KEEP     (0xf << 16) /**< Group 5 No influence */
 #define SDMMC_SWITCH_FUNC_G6_KEEP     (0xf << 20) /**< Group 6 No influence */
 
-      setBlockSize(512 / 8); // CMD6 512 bits status
+      setBlockLenght(512 / 8); // CMD6 512 bits status
       setBlockCount(1);
 
       //-- (CMD6)
@@ -397,13 +404,138 @@ OSDeviceMemoryCard::open(void)
 OSReturn_t
 OSDeviceMemoryCard::getCsd(void)
 {
-  // sd_mmc_mci_get_csd()
+  csd_t csd;
+
+  uint32_t max_Read_DataBlock_Length;
+  uint32_t mult;
+  uint32_t blocknr;
+  uint8_t tmp;
+  const uint16_t freq_unit[4] =
+    { 10, 100, 1000, 10000 };
+  const uint8_t mult_fact[16] =
+    { 0, 10, 12, 13, 15, 20, 26, 30, 35, 40, 45, 52, 55, 60, 70, 80 }; // MMC tabs...
+
+  // Select Slot card before any other command.
+  m_implementation.mci_select_card();
+
+  //-- (CMD9)
+  if (m_implementation.sendCommand(CommandCode::SEND_CSD, g_u32_card_rca)
+      != OSReturn::OS_OK)
+    return OSReturn::OS_ERROR;
+
+  csd.csd[0] = m_implementation.readResponse();
+  csd.csd[1] = m_implementation.readResponse();
+  csd.csd[2] = m_implementation.readResponse();
+  csd.csd[3] = m_implementation.readResponse();
+
+  //-- Read "System specification version", only available on MMC card
+  // field: SPEC_VERS (only on MMC)
+  if (MMC_CARD & m_cardType) // TO BE ADDED
+    {
+      if (CSD_SPEC_VER_4_0 == (MSB0(csd.csd[0]) & CSD_MSK_SPEC_VER))
+        {
+          m_cardType |= MMC_CARD_V4;
+        }
+    }
+
+  //-- Compute MMC/SD speed
+  // field: TRAN_SPEED (CSD V1 & V2 are the same)
+  g_u16_card_freq = mult_fact[csd.csd_v1.tranSpeed >> 3]; // Get Multiplier factor
+  if (SD_CARD & m_cardType)
+    {
+      // SD card don't have same frequency that MMC card
+      if (26 == g_u16_card_freq)
+        {
+          g_u16_card_freq = 25;
+        }
+      else if (52 == g_u16_card_freq)
+        {
+          g_u16_card_freq = 50;
+        }
+    }
+  g_u16_card_freq *= freq_unit[csd.csd_v1.tranSpeed & 0x07]; // Get transfer rate unit
+
+  //-- Compute card size in number of block
+  // field: WRITE_BL_LEN, READ_BL_LEN, C_SIZE (CSD V1 & V2 are not the same)
+  if (SD_CARD_HC & m_cardType)
+    {
+      g_u32_card_size = (csd.csd_v2.deviceSizeH << 16)
+          + (csd.csd_v2.deviceSizeL & 0xFFff);
+
+      // memory capacity = (C_SIZE+1) * 1K sector
+      g_u32_card_size = (g_u32_card_size + 1) << 10; // unit 512B
+    }
+  else
+    {
+      // Check block size
+      tmp = csd.csd_v1.writeBlLen; // WRITE_BL_LEN
+      if (tmp < CSD_BLEN_512)
+        return OSReturn::OS_ERROR; // block size < 512B not supported by firmware
+
+      tmp = csd.csd_v1.readBlLen; // READ_BL_LEN
+      if (tmp < CSD_BLEN_512)
+        return OSReturn::OS_ERROR; // block size < 512B not supported by firmware
+
+      //// Compute Memory Capacity
+      // compute MULT
+      mult = 1 << (csd.csd_v1.cSizeMult + 2);
+      max_Read_DataBlock_Length = 1 << csd.csd_v1.readBlLen;
+      // compute MSB of C_SIZE
+      blocknr = csd.csd_v1.deviceSizeH << 2;
+      // compute MULT * (LSB of C-SIZE + MSB already computed + 1) = BLOCKNR
+      blocknr = mult * (blocknr + csd.csd_v1.deviceSizeL + 1);
+      g_u32_card_size = ((max_Read_DataBlock_Length * blocknr) / 512);
+    }
+
   return OSReturn::OS_OK;
 }
 
 OSReturn_t
 OSDeviceMemoryCard::sd_mmc_get_ext_csd(void)
 {
+  uint8_t i;
+  uint32_t val;
+
+  // Select Slot card before any other command.
+  m_implementation.mci_select_card();
+
+  m_implementation.setBlockLength(SD_MMC_SECTOR_SIZE); // Ext CSD = 512B size
+  m_implementation.setBlockCount(1);
+
+  //** (CMD8)
+  // read the extended CSD
+  if (m_implementation.sendCommand(ApplicationCommandCode::SEND_EXT_CSD, 0)
+      != OSReturn::OS_OK)
+    return OSReturn::OS_ERROR;
+
+  // READ_EXT_CSD   // discard bytes not used
+  for (i = (512L / 8); i != 0; i--)
+    {
+      while (!(m_implementation.mci_rx_ready()))
+        ;
+      m_implementation.mci_rd_data();
+      while (!(m_implementation.mci_rx_ready()))
+        ;
+      if (((64 - 26) == i) && (m_cardType & MMC_CARD_HC))
+        {
+          // If MMC HC then read Sector Count
+          g_u32_card_size = m_implementation.mci_rd_data();
+        }
+      else
+        {
+          val = m_implementation.mci_rd_data();
+          if ((64 - 24) == i)
+            { // Read byte at offset 196
+              if (MSB0(val) & 0x02)
+                g_u16_card_freq = 52 * 1000;
+              else
+                g_u16_card_freq = 26 * 1000;
+            }
+        }
+    }
+
+  return TRUE;
+
   return OSReturn::OS_OK;
 }
 

@@ -40,7 +40,7 @@ namespace avr32
         init();
 
         virtual OSReturn_t
-        sendCommand(CommandCode_t code, CommandArgument_t arg);
+        sendCommand(CommandCode_t commandCode, CommandArgument_t commandArg);
 
         virtual OSDeviceMemoryCard::Response_t
         readResponse(void);
@@ -52,13 +52,22 @@ namespace avr32
         setBusWidth(BusWidth_t busWidth);
 
         virtual OSReturn_t
-        setBlockSize(BlockSize_t size);
+        setBlockLength(BlockLength_t length);
 
         virtual OSReturn_t
         setBlockCount(BlockCount_t count);
 
         virtual OSReturn_t
         mci_set_speed(void);
+
+        virtual OSReturn_t
+        mci_select_card(void);
+
+        virtual bool
+        mci_rx_ready(void);
+
+        virtual uint32_t
+        mci_rd_data(void);
 
       private:
 

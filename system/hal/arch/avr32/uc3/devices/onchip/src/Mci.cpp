@@ -148,16 +148,16 @@ namespace avr32
     }
 
     mci::StatusRegister_t
-    Mci::sendCommand(mci::CommandCode_t cmd, mci::CommandArgument_t arg)
+    Mci::sendCommand(mci::CommandWord_t cmdWord, mci::CommandArgument_t cmdArg)
     {
-      OSDeviceDebug::putString("MCI cmd=");
-      OSDeviceDebug::putHex(cmd);
+      OSDeviceDebug::putString("MCI cmdWord=");
+      OSDeviceDebug::putHex(cmdWord);
       OSDeviceDebug::putString(", arg=");
-      OSDeviceDebug::putHex(arg);
+      OSDeviceDebug::putHex(cmdArg);
       OSDeviceDebug::putNewLine();
 
-      moduleRegisters.writeArgument(arg);
-      moduleRegisters.writeCommand(cmd);
+      moduleRegisters.writeArgument(cmdArg);
+      moduleRegisters.writeCommand(cmdWord);
 
       while (!isReady())
         ; // TODO: fix loop
@@ -173,8 +173,8 @@ namespace avr32
         {
           // if the command is SEND_OP_COND the CRC error flag
           // is always present (cf : R3 response)
-          if ((cmd != SD_MMC_SDCARD_APP_OP_COND_CMD) && (cmd
-              != SD_MMC_MMC_SEND_OP_COND_CMD))
+          if ((cmdWord != mci::CommandWord::SD_MMC_SDCARD_APP_OP_COND_CMD)
+              && (cmdWord != mci::CommandWord::SD_MMC_MMC_SEND_OP_COND_CMD))
             {
               if (status != AVR32_MCI_SR_RTOE_MASK)
                 // filter RTOE error which happens when using the HS mode
@@ -192,6 +192,40 @@ namespace avr32
       OSDeviceDebug::putNewLine();
 
       return ret;
+    }
+
+    void
+    Mci::setBlockLength(BlockLength_t length)
+    {
+
+      uint32_t mode;
+      mode = moduleRegisters.readMode(); // Read original mode
+        {
+          mode &= ~AVR32_MCI_MR_BLKLEN_MASK; // Clear previous BLKLEN
+          mode |= (length << AVR32_MCI_MR_BLKLEN_OFFSET); // Set the new value
+        }
+      moduleRegisters.writeMode(mode); // Write New mode
+    }
+
+    void
+    Mci::setBlockCount(BlockCount_t cnt)
+    {
+      union u_blkr
+      {
+        unsigned long blkr;
+        avr32_mci_blkr_t BLKR;
+      };
+      union u_blkr val;
+
+      val.blkr = moduleRegisters.readBlock();
+      val.BLKR.bcnt = cnt;
+      moduleRegisters.writeBlock(val.blkr);
+    }
+
+    bool
+    Mci::mci_rx_ready(void)
+    {
+      return (getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK) != 0;
     }
 
   // --------------------------------------------------------------------------

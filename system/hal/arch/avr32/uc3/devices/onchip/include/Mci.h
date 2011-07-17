@@ -23,6 +23,9 @@ namespace avr32
 
       typedef uint32_t Speed_t;
 
+      typedef uint32_t BlockLength_t;
+      typedef uint16_t BlockCount_t;
+
     public:
 
       // ----- Constructors & Destructors -------------------------------------
@@ -38,7 +41,26 @@ namespace avr32
       init(Speed_t speed, mci::BusWidth_t busWidth, mci::CardSlot_t cardSlot);
 
       mci::StatusRegister_t
-      sendCommand(mci::CommandCode_t cmd, mci::CommandArgument_t arg);
+      sendCommand(mci::CommandWord_t cmdWord, mci::CommandArgument_t cmdArg);
+
+      void
+      initSdCardBusWidthAndSlot(mci::BusWidth_t busWidth,
+          mci::CardSlot_t cardSlot);
+
+      void
+      setBlockLength(uint32_t length);
+
+      uint32_t
+      mci_rd_data(void);
+
+      bool
+      mci_rx_ready(void);
+
+      void
+      setBlockCount(BlockCount_t cnt);
+
+      mci::StatusRegister_t
+      getStatusRegister(void);
 
     private:
 
@@ -57,10 +79,6 @@ namespace avr32
       initSpeed(Speed_t speed);
 
       void
-      initSdCardBusWidthAndSlot(mci::BusWidth_t busWidth,
-          mci::CardSlot_t cardSlot);
-
-      void
       initDataTimeout(mci::TimeoutMultiplier_t multiplier,
           mci::TimeoutCycles_t cycles);
 
@@ -72,9 +90,6 @@ namespace avr32
 
       void
       enableModeBits(uint32_t);
-
-      mci::StatusRegister_t
-      getStatusRegister(void);
 
       bool
       isReady(void);
@@ -147,6 +162,12 @@ namespace avr32
       moduleRegisters.writeDataTimeout(
           ((multiplier & 0x7) << AVR32_MCI_DTOR_DTOMUL_OFFSET)
               | ((cycles & 0xF) << AVR32_MCI_DTOR_DTOCYC_OFFSET));
+    }
+
+    inline uint32_t
+    Mci::mci_rd_data(void)
+    {
+      return moduleRegisters.readReceiveData();
     }
 
   // ------------------------------------------------------------------------

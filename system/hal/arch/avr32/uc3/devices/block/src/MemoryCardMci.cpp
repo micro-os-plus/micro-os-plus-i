@@ -29,7 +29,7 @@ namespace avr32
       OSDeviceDebug::putDestructor("avr32::uc3::MemoryCardMci", this);
     }
 
-     // ===== Implementation ===================================================
+    // ===== Implementation ===================================================
 
     MemoryCardMci::Implementation::Implementation()
     {
@@ -39,11 +39,11 @@ namespace avr32
 
     MemoryCardMci::Implementation::~Implementation()
     {
-      OSDeviceDebug::putDestructor(
-          "avr32::uc3::MemoryCardMci::Implementation", this);
+      OSDeviceDebug::putDestructor("avr32::uc3::MemoryCardMci::Implementation",
+          this);
     }
 
-    // ----- Private virtual methods ------------------------------------------
+    // ----- Public methods ---------------------------------------------------
 
     void
     MemoryCardMci::Implementation::setOpenParameters(Mci::Speed_t speed,
@@ -54,10 +54,10 @@ namespace avr32
       m_cardSlot = cardSlot;
     }
 
-    // ---- Virtuals
+    // ---- Private virtuals Methods ------------------------------------------
 
     OSReturn_t
-    MemoryCardMci::Implementation::init()
+    MemoryCardMci::Implementation::init(void)
     {
       initGpio();
 
@@ -74,7 +74,8 @@ namespace avr32
       m_mci.init(m_speed, m_busWidth, m_cardSlot);
 
       // Wait for 1ms, then wait for 74 more clock cycles (see MMC norms)
-      if (m_mci.sendCommand(SD_MMC_INIT_STATE_CMD, 0xFFFFFFFF) != MCI_SUCCESS)
+      if (m_mci.sendCommand(mci::CommandWord::SD_MMC_INIT_STATE_CMD, 0xFFFFFFFF)
+          != MCI_SUCCESS)
         return OSReturn::OS_ERROR;
 
       return OSReturn::OS_OK;
@@ -82,50 +83,74 @@ namespace avr32
 
     OSReturn_t
     MemoryCardMci::Implementation::sendCommand(
-        OSDeviceMemoryCard::CommandCode_t code,
-        OSDeviceMemoryCard::CommandArgument_t arg)
+        OSDeviceMemoryCard::CommandCode_t commandCode,
+        OSDeviceMemoryCard::CommandArgument_t commnadArg)
     {
-      avr32::uc3::mci::CommandCode_t mciCode;
+      avr32::uc3::mci::CommandWord_t commandWord;
 
-      switch (code)
+      switch (commandCode)
         {
       case CommandCode::GO_IDLE_STATE:
-        mciCode = SD_MMC_GO_IDLE_STATE_CMD;
+        commandWord = mci::CommandWord::SD_MMC_GO_IDLE_STATE_CMD;
         break;
 
       case CommandCode::SEND_OP_COND:
-        mciCode = SD_MMC_MMC_SEND_OP_COND_CMD;
+        commandWord = mci::CommandWord::SD_MMC_MMC_SEND_OP_COND_CMD;
         break;
 
       case CommandCode::SEND_IF_COND:
-        mciCode = SD_MMC_SD_SEND_IF_COND_CMD;
+        commandWord = mci::CommandWord::SD_MMC_SD_SEND_IF_COND_CMD;
         break;
 
       case CommandCode::APP_CMD:
-        mciCode = SD_MMC_APP_CMD;
+        commandWord = mci::CommandWord::SD_MMC_APP_CMD;
         break;
 
+      case CommandCode::ALL_SEND_CID:
+        commandWord = mci::CommandWord::SD_MMC_ALL_SEND_CID_CMD;
+        break;
+
+      case CommandCode::SEND_RELATIVE_ADDR:
+        commandWord = mci::CommandWord::SD_MMC_SET_RELATIVE_ADDR_CMD;
+        break;
+
+      case CommandCode::SEND_CSD:
+        commandWord = mci::CommandWord::SD_MMC_SEND_CSD_CMD;
+        break;
+
+      case CommandCode::SELECT_DESELECT_CARD:
+        commandWord = mci::CommandWord::SD_MMC_SEL_DESEL_CARD_CMD;
+        break;
+
+        // Application commands
       case ApplicationCommandCode::SD_SEND_OP_COND:
-        mciCode = SD_MMC_SDCARD_APP_OP_COND_CMD;
+        commandWord = mci::CommandWord::SD_MMC_SDCARD_APP_OP_COND_CMD;
+        break;
+
+      case ApplicationCommandCode::SEND_EXT_CSD:
+        commandWord = mci::CommandWord::SD_MMC_SEND_EXT_CSD_CMD;
         break;
 
       default:
         OSDeviceDebug::putString("unknown cmd=");
-        OSDeviceDebug::putDec((uint16_t) code);
+        OSDeviceDebug::putDec((uint16_t) commandCode);
         OSDeviceDebug::putNewLine();
 
         return OSReturn::OS_NOT_IMPLEMENTED;
         }
-      //
-      OSDeviceDebug::putString("SS cmd=");
-      if ((code >> 8) != 0)
+
+      // -----
+
+      OSDeviceDebug::putString("SD cmd=");
+      if ((commandCode >> 8) != 0)
         {
-          OSDeviceDebug::putDec((uint16_t) (code >> 8));
+          OSDeviceDebug::putDec((uint16_t) (commandCode >> 8));
           OSDeviceDebug::putChar(' ');
         }
-      OSDeviceDebug::putDec((uint16_t) (code & 0xFF));
+      OSDeviceDebug::putDec((uint16_t) (commandCode & 0xFF));
       OSDeviceDebug::putNewLine();
-      return m_mci.sendCommand(mciCode, arg);
+
+      return m_mci.sendCommand(commandWord, commnadArg);
     }
 
     OSDeviceMemoryCard::Response_t
@@ -139,6 +164,14 @@ namespace avr32
       OSDeviceDebug::putNewLine();
 
       return ret;
+    }
+
+    OSReturn_t
+    MemoryCardMci::Implementation::mci_select_card(void)
+    {
+      m_mci.initSdCardBusWidthAndSlot(m_busWidth, m_cardSlot);
+
+      return OSReturn::OS_OK;
     }
 
     OSReturn_t
@@ -157,14 +190,14 @@ namespace avr32
     }
 
     OSReturn_t
-    MemoryCardMci::Implementation::setBlockSize(BlockSize_t size)
+    MemoryCardMci::Implementation::setBlockLength(BlockLength_t length __attribute__((unused)))
     {
       // mci_set_block_size
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::Implementation::setBlockCount(BlockCount_t count)
+    MemoryCardMci::Implementation::setBlockCount(BlockCount_t count __attribute__((unused)))
     {
       // mci_set_block_count
       return OSReturn::OS_OK;
@@ -174,6 +207,18 @@ namespace avr32
     MemoryCardMci::Implementation::mci_set_speed(void)
     {
       return OSReturn::OS_OK;
+    }
+
+    bool
+    MemoryCardMci::Implementation::mci_rx_ready(void)
+    {
+      return m_mci.mci_rx_ready();
+    }
+
+    uint32_t
+    MemoryCardMci::Implementation::mci_rd_data(void)
+    {
+      return (m_mci.getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK) != 0;
     }
 
     // ----- Private methods --------------------------------------------------
