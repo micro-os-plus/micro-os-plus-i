@@ -350,6 +350,7 @@ TaskCli::cmdMI()
       bInit = false;
 #else
       cout << "Card opened" << std::endl;
+      cout << "Size=" << m_card.getDeviceSize()/1024/1024 << " MB" << std::endl;
 #endif
     }
 }
