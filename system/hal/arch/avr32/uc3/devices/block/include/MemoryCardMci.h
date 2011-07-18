@@ -58,16 +58,19 @@ namespace avr32
         setBlockCount(BlockCount_t count);
 
         virtual OSReturn_t
-        mci_set_speed(void);
+        mci_set_speed(uint32_t speed);
 
         virtual OSReturn_t
-        mci_select_card(void);
+        mci_select_card(BusWidth_t busWidth);
 
         virtual bool
         mci_rx_ready(void);
 
         virtual uint32_t
         mci_rd_data(void);
+
+        virtual void
+        setHighSpeedMode(void);
 
       private:
 

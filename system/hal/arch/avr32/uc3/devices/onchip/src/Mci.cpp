@@ -111,7 +111,9 @@ namespace avr32
           clkdiv -= 1;
         }
 
-      OSDeviceDebug::putString("clkdev=");
+      OSDeviceDebug::putString("speed=");
+      OSDeviceDebug::putDec(speed);
+      OSDeviceDebug::putString(", clkdev=");
       OSDeviceDebug::putHex(clkdiv);
       OSDeviceDebug::putNewLine();
 
@@ -150,7 +152,7 @@ namespace avr32
     mci::StatusRegister_t
     Mci::sendCommand(mci::CommandWord_t cmdWord, mci::CommandArgument_t cmdArg)
     {
-      OSDeviceDebug::putString("MCI cmdWord=");
+      OSDeviceDebug::putString("mci cmdWord");
       OSDeviceDebug::putHex(cmdWord);
       OSDeviceDebug::putString(", arg=");
       OSDeviceDebug::putHex(cmdArg);
@@ -187,7 +189,7 @@ namespace avr32
             }
         }
 
-      OSDeviceDebug::putString("MCI ret=");
+      OSDeviceDebug::putString("mci ret=");
       OSDeviceDebug::putHex(ret);
       OSDeviceDebug::putNewLine();
 

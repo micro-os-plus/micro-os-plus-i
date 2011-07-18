@@ -72,8 +72,11 @@
 #define MMC_RCV_STATE             ((U32)0x00000A00)  // rcv state
 #define MMC_TRAN_STATE_MSK        ((U32)0xE0020E00)
 #define MMC_TRAN_STATE            ((U32)0x00000800)  // tran state
+
+#if false
 //! Flag error of "Card Status" in R1
 #define CS_FLAGERROR_RD_WR  (CS_ADR_OUT_OF_RANGE|CS_ADR_MISALIGN|CS_BLOCK_LEN_ERROR|CS_ERASE_SEQ_ERROR|CS_ILLEGAL_COMMAND|CS_CARD_ERROR)
+
 #define CS_ADR_OUT_OF_RANGE (1<<31)
 #define CS_ADR_MISALIGN     (1<<30)
 #define CS_BLOCK_LEN_ERROR  (1<<29)
@@ -95,6 +98,7 @@
 #define CS_READY_FOR_DATA   (1<<8)
 #define CS_SWITCH_ERROR     (1<<7)
 #define CS_APP_CMD          (1<<5)
+#endif
 
 // R1 Response bit-defines
 #define MMC_R1_BUSY                       0x80  ///< R1 response: bit indicates card is busy
@@ -380,6 +384,7 @@ public:
   typedef uint16_t CommandClass_t;
 
   const static uint_t COMMAND_CLASS_SHIFT = 8;
+  const static uint_t COMMAND_CODE_MASK = 0xFF;
 
   class CommandClass
   {
@@ -396,6 +401,8 @@ public:
     const static CommandClass_t IO_MODE__9 = 9;
     const static CommandClass_t SWITCH_10 = 10;
     const static CommandClass_t RESERVED_11 = 11;
+
+    const static CommandClass_t MMC = 0x8000;
   };
 
   typedef uint16_t CommandCode_t;
@@ -483,8 +490,42 @@ public:
   {
   public:
     // Class 10 - v1.10 - 34-37, 50, 57
-    const static CommandCode_t SWITCH_FUNC = (6 | (CommandClass::SWITCH_10
+    const static CommandCode_t SD_SWITCH_FUNC = (6 | (CommandClass::SWITCH_10
         << COMMAND_CLASS_SHIFT));
+    const static CommandCode_t MMC_SWITCH_FUNC = (6 | (CommandClass::SWITCH_10
+        << COMMAND_CLASS_SHIFT) | CommandClass::MMC);
+  };
+
+  typedef uint32_t CardStatus_t;
+
+  class CardStatus
+  {
+  public:
+    const static CardStatus_t ADR_OUT_OF_RANGE = (1 << 31);
+    const static CardStatus_t ADR_MISALIGN = (1 << 30);
+    const static CardStatus_t BLOCK_LEN_ERROR = (1 << 29);
+    const static CardStatus_t ERASE_SEQ_ERROR = (1 << 28);
+    const static CardStatus_t ERASE_PARAM = (1 << 27);
+    const static CardStatus_t WP_VIOLATION = (1 << 26);
+    const static CardStatus_t CARD_IS_LOCKED = (1 << 25);
+    const static CardStatus_t LOCK_UNLOCK_ = (1 << 24);
+    const static CardStatus_t COM_CRC_ERROR = (1 << 23);
+    const static CardStatus_t ILLEGAL_COMMAND = (1 << 22);
+    const static CardStatus_t CARD_ECC_FAILED = (1 << 21);
+    const static CardStatus_t CARD_ERROR = (1 << 20);
+    const static CardStatus_t EXEC_ERROR = (1 << 19);
+    const static CardStatus_t UNDERRUN = (1 << 18);
+    const static CardStatus_t OVERRUN = (1 << 17);
+    const static CardStatus_t CIDCSD_OVERWRITE = (1 << 16);
+    const static CardStatus_t WP_ERASE_SKIP = (1 << 15);
+    const static CardStatus_t ERASE_RESET = (1 << 13);
+    const static CardStatus_t READY_FOR_DATA = (1 << 8);
+    const static CardStatus_t SWITCH_ERROR = (1 << 7);
+    const static CardStatus_t APP_CMD = (1 << 5);
+
+    const static CardStatus_t FLAGERROR_RD_WR = (ADR_OUT_OF_RANGE
+        | ADR_MISALIGN | BLOCK_LEN_ERROR | ERASE_SEQ_ERROR | ILLEGAL_COMMAND
+        | CARD_ERROR);
   };
 
   typedef uint32_t CommandArgument_t;
@@ -496,9 +537,9 @@ public:
   class BusWidth
   {
   public:
-    const static BusWidth_t _1 = 1;
-    const static BusWidth_t _4 = 4;
-    const static BusWidth_t _8 = 8;
+    const static BusWidth_t _1 = 0;
+    const static BusWidth_t _4 = 2;
+    const static BusWidth_t _8 = 3;
   };
 
   typedef uint32_t BlockLength_t;
@@ -546,10 +587,10 @@ public:
     setBlockCount(BlockCount_t count) = 0;
 
     virtual OSReturn_t
-    mci_set_speed(void) = 0;
+    mci_set_speed(uint32_t speed) = 0;
 
     virtual OSReturn_t
-    mci_select_card(void) = 0;
+    mci_select_card(BusWidth_t busWidth) = 0;
 
     virtual bool
     mci_rx_ready(void) = 0;
@@ -557,6 +598,8 @@ public:
     virtual uint32_t
     mci_rd_data(void) = 0;
 
+    virtual void
+    setHighSpeedMode(void) = 0;
   };
 
   typedef Implementation Implementation_t;
@@ -621,15 +664,17 @@ private:
   OSReturn_t
   sd_mmc_get_ext_csd(void);
 
-  bool
-  sd_mmc_set_block_len(uint8_t slot, uint16_t length);
+  OSReturn_t
+  sd_mmc_set_block_len(uint16_t length);
 
-  bool
-  sd_mmc_mci_cmd_send_status(uint8_t slot);
+  OSReturn_t
+  sd_mmc_mci_cmd_send_status(void);
 
 private:
 
   // ----- Private members ----------------------------------------------------
+
+  bool isOpened;
 
   uint8_t m_cardType;
   bool m_isInitialised;
@@ -637,6 +682,7 @@ private:
   uint32_t g_u32_card_rca;
   uint16_t g_u16_card_freq;
   uint32_t g_u32_card_size;
+  BusWidth_t g_u8_card_bus_width;
 
   Implementation_t& m_implementation;
 

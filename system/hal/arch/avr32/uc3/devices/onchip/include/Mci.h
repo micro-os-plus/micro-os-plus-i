@@ -62,6 +62,10 @@ namespace avr32
       mci::StatusRegister_t
       getStatusRegister(void);
 
+      void
+       initSpeed(Speed_t speed);
+
+
     private:
 
       // ----- Private methods ------------------------------------------------
@@ -75,10 +79,7 @@ namespace avr32
       void
       enable(void);
 
-      void
-      initSpeed(Speed_t speed);
-
-      void
+       void
       initDataTimeout(mci::TimeoutMultiplier_t multiplier,
           mci::TimeoutCycles_t cycles);
 
