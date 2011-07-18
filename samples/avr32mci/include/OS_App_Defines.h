@@ -38,11 +38,14 @@
 
 //#define OS_INCLUDE_TASKBLINK                            (1)
 
+#define OS_INCLUDE_OS_BUSYWAITMICROS                    (1)
+
 #define OS_INCLUDE_AVR32_UC3_MCI                        (1)
 #define OS_INCLUDE_AVR32_UC3_GPIO                       (1)
 #define OS_INCLUDE_AVR32_UC3_PM                         (1)
 
 #define OS_INCLUDE_AVR32_UC3_MEMORYCARDMCI              (1)
+#define OS_INCLUDE_OSDEVICEMEMORYCARD                   (1)
 
 // ----------------------------------------------------------------------------
 

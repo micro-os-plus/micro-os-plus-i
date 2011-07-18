@@ -93,21 +93,21 @@ TaskCli::threadMain(void)
 
           if (c == std::traits::eof())
             {
-              if (os.isDebug)
+              if (os.isDebug())
                 clog << "disconnected" << std::endl;
 
               break;
             }
           else if (c == OSReturn::OS_TIMEOUT)
             {
-              if (os.isDebug)
+              if (os.isDebug())
                 clog << "timeout" << std::endl;
 
               break;
             }
           else if (c < 0)
             {
-              if (os.isDebug)
+              if (os.isDebug())
                 clog << "error -" << std::dec << (int) (-c) << std::endl;
 
               break;
@@ -301,7 +301,7 @@ TaskCli::cmdMI()
   int r;
   std::ostream& cout = m_cout;
 
-  m_card.implementation.setOpenParameters(4000000, avr32::uc3::mci::BusWidth::_1bit,
+  m_card.implementation.setOpenParameters(400000, avr32::uc3::mci::BusWidth::_1bit,
       avr32::uc3::mci::CardSlot::A);
 
   r = m_card.open();
