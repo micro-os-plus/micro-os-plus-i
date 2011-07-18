@@ -9,7 +9,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-#include "OSDeviceAddressable.h"
+#include "OSDeviceBlock.h"
 
 //! Number of bits for addresses within sectors.
 #define SD_MMC_SECTOR_BITS     9
@@ -375,7 +375,7 @@ typedef struct
   };
 } rep3_t;
 
-class OSDeviceMemoryCard : public OSDeviceAddressable
+class OSDeviceMemoryCard : public OSDeviceBlock
 {
 public:
 
@@ -619,42 +619,32 @@ public:
   virtual OSReturn_t
   open(void);
 
-  // Read exactly count bytes, in the given buffer.
-  // Offset need not be aligned.
+  // Read exactly count blocks, in the given buffer.
   virtual OSReturn_t
-  readBytes(OSDeviceAddressable::Offset_t offset, uint8_t* pBuf,
-      OSDeviceAddressable::Count_t count);
+  readBlocks(OSDeviceBlock::BlockNumber_t blockNumber, uint8_t* pBuf,
+      OSDeviceBlock::BlockCount_t count);
 
-  // Write the given buffer. Offset need to be aligned with
-  // getWriteAlignement() and count should be multiple of it.
+  // Write the count blocks, from the given buffer.
   virtual OSReturn_t
-  writeBytes(OSDeviceAddressable::Offset_t offset, uint8_t* pBuf,
-      OSDeviceAddressable::Count_t count);
+  writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber, uint8_t* pBuf,
+      OSDeviceBlock::BlockCount_t count);
 
   // Prepare device for entering sleep
   virtual OSReturn_t
   close(void);
 
-  // Erase part of the device, aligned to page if needed.
+  // Erase part of the device.
   virtual OSReturn_t
-  erase(OSDeviceAddressable::Offset_t offset,
-      OSDeviceAddressable::Count_t count);
+  erase(OSDeviceBlock::BlockNumber_t blockNumber,
+      OSDeviceBlock::BlockCount_t count);
 
-  // Erase the entire device
-  virtual OSReturn_t
-  eraseEntireDevice(void);
-
-  // Return the full size, in bytes, of the device.
-  virtual OSDeviceAddressable::Offset_t
+  // Return the full size, in blocks, of the device.
+  virtual OSDeviceBlock::BlockNumber_t
   getDeviceSize(void);
 
-  // Return the write block size, to be used as alignment.
-  virtual OSDeviceAddressable::Alignnment_t
-  getWriteAlignment(void);
-
-  // Return the erase page size, to be used as alignment.
-  virtual OSDeviceAddressable::Alignnment_t
-  getEraseAlignment(void);
+  // Return the device block size, in bytes.
+  virtual OSDeviceBlock::BlockSize_t
+  getBlockSize(void);
 
 private:
 

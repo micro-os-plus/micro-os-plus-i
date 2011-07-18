@@ -239,7 +239,7 @@ OSDeviceMemoryCard::open(void)
                   | ((uint32_t) MMC_SWITCH_VAL_8BIT << 8)
                   | ((uint32_t) MMC_SWITCH_CMD_SET));
           if (ret != OSReturn::OS_OK)
-              return ret;
+            return ret;
 
           // Wait end of busy
           m_implementation.waitBusySignal();// read busy state on DAT0
@@ -261,7 +261,7 @@ OSDeviceMemoryCard::open(void)
               | ((uint32_t) MMC_SWITCH_VAL_HS << 8)
               | ((uint32_t) MMC_SWITCH_CMD_SET));
       if (ret != OSReturn::OS_OK)
-          return ret;
+        return ret;
 
       // Wait end of busy
       m_implementation.waitBusySignal();
@@ -288,7 +288,7 @@ OSDeviceMemoryCard::open(void)
       ret = m_implementation.sendCommand(SwitchCommandCode::SD_SWITCH_FUNC,
           SDMMC_SWITCH_FUNC_MODE_CHECK | SDMMC_SWITCH_FUNC_HIGH_SPEED);
       if (ret != OSReturn::OS_OK)
-          return ret;
+        return ret;
 
       // Wait end of busy
       m_implementation.waitBusySignal();// read busy state on DAT0
@@ -320,7 +320,7 @@ OSDeviceMemoryCard::open(void)
               | SDMMC_SWITCH_FUNC_G3_KEEP | SDMMC_SWITCH_FUNC_G2_KEEP
               | SDMMC_SWITCH_FUNC_HIGH_SPEED);
       if (ret != OSReturn::OS_OK)
-          return ret;
+        return ret;
 
       for (i = 0; i < (512L / 8); i += 4)
         {
@@ -367,7 +367,7 @@ OSDeviceMemoryCard::open(void)
   // Set clock
   m_implementation.mci_set_speed(g_u16_card_freq * 1000);
 
-  //-- (CMD13)
+  // -- (CMD13)
   // Check if card is ready, the card must be in TRAN state
   ret = sd_mmc_mci_cmd_send_status();
   if (ret != OSReturn::OS_OK)
@@ -376,7 +376,7 @@ OSDeviceMemoryCard::open(void)
   if ((m_implementation.readResponse() & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
     return OSReturn::OS_ERROR;
 
-  //-- (CMD16)
+  // -- (CMD16)
   // Set the card block length to 512B
   ret = sd_mmc_set_block_len(SD_MMC_SECTOR_SIZE);
   if (ret != OSReturn::OS_OK)
@@ -397,29 +397,23 @@ OSDeviceMemoryCard::open(void)
 }
 
 OSReturn_t
-OSDeviceMemoryCard::readBytes(OSDeviceAddressable::Offset_t offset __attribute__((unused)),
-    uint8_t* pBuf __attribute__((unused)), OSDeviceAddressable::Count_t count __attribute__((unused)))
+OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
+    uint8_t* pBuf __attribute__((unused)), OSDeviceBlock::BlockCount_t count __attribute__((unused)))
 {
-  OSDeviceDebug::putString("OSDeviceMemoryCard::readBytes()");
+  OSDeviceDebug::putString("OSDeviceMemoryCard::readBlocks()");
   OSDeviceDebug::putNewLine();
 
   return OSReturn::OS_NOT_IMPLEMENTED;
 }
 
 OSReturn_t
-OSDeviceMemoryCard::writeBytes(OSDeviceAddressable::Offset_t offset __attribute__((unused)),
-    uint8_t* pBuf __attribute__((unused)), OSDeviceAddressable::Count_t count __attribute__((unused)))
+OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
+    uint8_t* pBuf __attribute__((unused)), OSDeviceBlock::BlockCount_t count __attribute__((unused)))
 {
-  OSDeviceDebug::putString("OSDeviceMemoryCard::writeBytes()");
+  OSDeviceDebug::putString("OSDeviceMemoryCard::writeBlocks()");
   OSDeviceDebug::putNewLine();
 
   return OSReturn::OS_NOT_IMPLEMENTED;
-}
-
-OSDeviceAddressable::Alignnment_t
-OSDeviceMemoryCard::getWriteAlignment(void)
-{
-  return 512; // Default alignment size, from MMC specs
 }
 
 OSReturn_t
@@ -434,8 +428,8 @@ OSDeviceMemoryCard::close(void)
 }
 
 OSReturn_t
-OSDeviceMemoryCard::erase(OSDeviceAddressable::Offset_t offset __attribute__((unused)),
-    OSDeviceAddressable::Count_t count __attribute__((unused)))
+OSDeviceMemoryCard::erase(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
+    OSDeviceBlock::BlockCount_t count __attribute__((unused)))
 {
   OSDeviceDebug::putString("OSDeviceMemoryCard::erase()");
   OSDeviceDebug::putNewLine();
@@ -443,19 +437,17 @@ OSDeviceMemoryCard::erase(OSDeviceAddressable::Offset_t offset __attribute__((un
   return OSReturn::OS_NOT_IMPLEMENTED;
 }
 
-OSDeviceAddressable::Alignnment_t
-OSDeviceMemoryCard::getEraseAlignment(void)
+OSDeviceBlock::BlockNumber_t
+OSDeviceMemoryCard::getDeviceSize(void)
 {
-  return 512; // Default alignment size, from MMC specs
+  return g_u32_card_size;
 }
 
-OSReturn_t
-OSDeviceMemoryCard::eraseEntireDevice(void)
+// Return the device block size, in bytes.
+OSDeviceBlock::BlockSize_t
+OSDeviceMemoryCard::getBlockSize(void)
 {
-  OSDeviceDebug::putString("OSDeviceMemoryCard::eraseEntireDevice()");
-  OSDeviceDebug::putNewLine();
-
-  return OSReturn::OS_NOT_IMPLEMENTED;
+  return 512;
 }
 
 // ----- Private methods ------------------------------------------------------
@@ -600,12 +592,6 @@ OSDeviceMemoryCard::sd_mmc_get_ext_csd(void)
   return TRUE;
 
   return OSReturn::OS_OK;
-}
-
-OSDeviceAddressable::Offset_t
-OSDeviceMemoryCard::getDeviceSize(void)
-{
-  return g_u32_card_size * 512;
 }
 
 OSReturn_t

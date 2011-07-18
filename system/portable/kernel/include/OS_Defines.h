@@ -197,8 +197,8 @@
 
 // ----- OSDeviceMemoryCard dependencies -------------------------------------
 
-#if !defined(OS_INCLUDE_OSDEVICEMEMORYCARD) && defined(OS_INCLUDE_AVR32_UC3_MEMORYCARDMCI)
-#define OS_INCLUDE_OSDEVICEMEMORYCARD                   (1)
+#if !defined(OS_INCLUDE_OSDEVICEBLOCK) && defined(OS_INCLUDE_AVR32_UC3_MEMORYCARDMCI)
+#define OS_INCLUDE_OSDEVICEBLOCK                        (1)
 #endif
 
 // ----- OSDeviceAddressable dependencies -------------------------------------
@@ -215,8 +215,10 @@
 #define OS_INCLUDE_OSDEVICEADDRESSABLE                  (1)
 #endif
 
-#if !defined(OS_INCLUDE_OSDEVICEADDRESSABLE) && defined(OS_INCLUDE_OSDEVICEMEMORYCARD)
-#define OS_INCLUDE_OSDEVICEADDRESSABLE                  (1)
+// ----- OSDeviceBlock dependencies -------------------------------------------
+
+#if !defined(OS_INCLUDE_OSDEVICEBLOCK) && defined(OS_INCLUDE_OSDEVICEMEMORYCARD)
+#define OS_INCLUDE_OSDEVICEBLOCK                        (1)
 #endif
 
 // ----------------------------------------------------------------------------
