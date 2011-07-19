@@ -27,7 +27,7 @@ private:
   void cmdMC(void);
   void cmdST(void);
   void cmdRI(void);
-  void cmdRD(unsigned long l, unsigned short v);
+  void cmdMR(unsigned long l);
   void cmdX(unsigned short v);
 
   // members
@@ -43,7 +43,7 @@ private:
 
   bool bInit;
 
-  unsigned char m_buf[1024];
+  unsigned int m_buf[512/4];
   };
 
 #endif /* TASKCLI_H_ */
