@@ -65,6 +65,7 @@ namespace avr32
       void
        initSpeed(Speed_t speed);
 
+      bool mci_crc_error(void);
 
     private:
 

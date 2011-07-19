@@ -149,10 +149,21 @@ namespace avr32
       return ((getStatusRegister() & AVR32_MCI_SR_CMDRDY_MASK) != 0);
     }
 
+    bool  Mci::mci_crc_error(void)
+    {
+      if( getStatusRegister()&AVR32_MCI_SR_DCRCE_MASK )
+      {
+          shadowStatusRegister&=~AVR32_MCI_SR_DCRCE_MASK;
+        return true;
+      }
+      else
+        return false;
+    }
+
     mci::StatusRegister_t
     Mci::sendCommand(mci::CommandWord_t cmdWord, mci::CommandArgument_t cmdArg)
     {
-      OSDeviceDebug::putString("mci cmdWord");
+      OSDeviceDebug::putString("mci cmdWord=");
       OSDeviceDebug::putHex(cmdWord);
       OSDeviceDebug::putString(", arg=");
       OSDeviceDebug::putHex(cmdArg);

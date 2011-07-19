@@ -72,6 +72,9 @@ namespace avr32
         virtual void
         setHighSpeedMode(void);
 
+        virtual bool
+        mci_crc_error(void);
+
       private:
 
         // ---- Local methods -------------------------------------------------

@@ -130,6 +130,14 @@ namespace avr32
         commandWord = mci::CommandWord::SD_MMC_SEND_STATUS_CMD;
         break;
 
+      case CommandCode::READ_MULTIPLE_BLOCK:
+        commandWord = mci::CommandWord::SD_MMC_READ_MULTIPLE_BLOCK_CMD;
+        break;
+
+      case CommandCode::STOP_TRANSMISSION:
+        commandWord = mci::CommandWord::SD_MMC_STOP_READ_TRANSMISSION_CMD;
+        break;
+
         // ----- Application commands -----------------------------------------
       case ApplicationCommandCode::SD_SEND_OP_COND:
         commandWord = mci::CommandWord::SD_MMC_SDCARD_APP_OP_COND_CMD;
@@ -153,7 +161,7 @@ namespace avr32
         break;
 
       default:
-        OSDeviceDebug::putString("unknown cmd=");
+        OSDeviceDebug::putString("unknown CMD");
         OSDeviceDebug::putDec((uint16_t) commandCode);
         OSDeviceDebug::putNewLine();
 
@@ -161,7 +169,7 @@ namespace avr32
         }
 
       // -----
-
+#if defined(DEBUG)
       OSDeviceMemoryCard::CommandClass_t cmsClass;
       cmsClass = (commandCode >> OSDeviceMemoryCard::COMMAND_CLASS_SHIFT);
       if (cmsClass == OSDeviceMemoryCard::CommandClass::APPLICATION_8)
@@ -183,6 +191,7 @@ namespace avr32
       OSDeviceDebug::putDec(
           (uint16_t) (commandCode & OSDeviceMemoryCard::COMMAND_CODE_MASK));
       OSDeviceDebug::putNewLine();
+#endif /* defined(DEBUG) */
 
       return m_mci.sendCommand(commandWord, commnadArg);
     }
@@ -253,7 +262,13 @@ namespace avr32
     uint32_t
     MemoryCardMci::Implementation::mci_rd_data(void)
     {
-      return (m_mci.getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK) != 0;
+      return ((m_mci.getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK)) != 0;
+    }
+
+    bool
+    MemoryCardMci::Implementation::mci_crc_error(void)
+    {
+      return m_mci.mci_crc_error();
     }
 
     void

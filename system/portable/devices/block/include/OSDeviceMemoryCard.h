@@ -72,7 +72,6 @@
 #define MMC_RCV_STATE             ((U32)0x00000A00)  // rcv state
 #define MMC_TRAN_STATE_MSK        ((U32)0xE0020E00)
 #define MMC_TRAN_STATE            ((U32)0x00000800)  // tran state
-
 #if false
 //! Flag error of "Card Status" in R1
 #define CS_FLAGERROR_RD_WR  (CS_ADR_OUT_OF_RANGE|CS_ADR_MISALIGN|CS_BLOCK_LEN_ERROR|CS_ERASE_SEQ_ERROR|CS_ILLEGAL_COMMAND|CS_CARD_ERROR)
@@ -428,7 +427,7 @@ public:
     // Class 2
     const static CommandCode_t SET_BLOCKLEN = 16;
     const static CommandCode_t READ_SINGLE_BLOCK = 17;
-    const static CommandCode_t READ_MULTIPE_BLOCK = 18;
+    const static CommandCode_t READ_MULTIPLE_BLOCK = 18;
     const static CommandCode_t SEND_TUNING_BLOCK = 19;
     const static CommandCode_t SPEED_CLASS_CONTROL = 20;
     const static CommandCode_t SET_BLOCK_COUNT = 23;
@@ -501,25 +500,28 @@ public:
   class CardStatus
   {
   public:
-    const static CardStatus_t ADR_OUT_OF_RANGE = (1 << 31);
+    const static CardStatus_t ADR_OUT_OF_RANGE = (1 << 31); // 0x80000000
     const static CardStatus_t ADR_MISALIGN = (1 << 30);
     const static CardStatus_t BLOCK_LEN_ERROR = (1 << 29);
     const static CardStatus_t ERASE_SEQ_ERROR = (1 << 28);
     const static CardStatus_t ERASE_PARAM = (1 << 27);
     const static CardStatus_t WP_VIOLATION = (1 << 26);
     const static CardStatus_t CARD_IS_LOCKED = (1 << 25);
-    const static CardStatus_t LOCK_UNLOCK_ = (1 << 24);
-    const static CardStatus_t COM_CRC_ERROR = (1 << 23);
-    const static CardStatus_t ILLEGAL_COMMAND = (1 << 22);
-    const static CardStatus_t CARD_ECC_FAILED = (1 << 21);
-    const static CardStatus_t CARD_ERROR = (1 << 20);
-    const static CardStatus_t EXEC_ERROR = (1 << 19);
-    const static CardStatus_t UNDERRUN = (1 << 18);
-    const static CardStatus_t OVERRUN = (1 << 17);
-    const static CardStatus_t CIDCSD_OVERWRITE = (1 << 16);
-    const static CardStatus_t WP_ERASE_SKIP = (1 << 15);
+    const static CardStatus_t LOCK_UNLOCK_ = (1 << 24); // 0x01000000
+
+    const static CardStatus_t COM_CRC_ERROR = (1 << 23); // 0x00800000
+    const static CardStatus_t ILLEGAL_COMMAND = (1 << 22); // 0x00400000
+    const static CardStatus_t CARD_ECC_FAILED = (1 << 21); // 0x00200000
+    const static CardStatus_t CARD_ERROR = (1 << 20); // 0x00100000
+    const static CardStatus_t EXEC_ERROR = (1 << 19); // 0x00080000
+    const static CardStatus_t UNDERRUN = (1 << 18); // 0x00040000
+    const static CardStatus_t OVERRUN = (1 << 17); // 0x00020000
+    const static CardStatus_t CIDCSD_OVERWRITE = (1 << 16); // 0x00010000
+
+    const static CardStatus_t WP_ERASE_SKIP = (1 << 15); // 0x00008000
     const static CardStatus_t ERASE_RESET = (1 << 13);
-    const static CardStatus_t READY_FOR_DATA = (1 << 8);
+
+    const static CardStatus_t READY_FOR_DATA = (1 << 8); // 0x00000080
     const static CardStatus_t SWITCH_ERROR = (1 << 7);
     const static CardStatus_t APP_CMD = (1 << 5);
 
@@ -600,6 +602,9 @@ public:
 
     virtual void
     setHighSpeedMode(void) = 0;
+
+    virtual bool
+    mci_crc_error(void) = 0;
   };
 
   typedef Implementation Implementation_t;
@@ -660,6 +665,21 @@ private:
   OSReturn_t
   sd_mmc_mci_cmd_send_status(void);
 
+  OSReturn_t
+  sd_mmc_mci_read_open(OSDeviceBlock::BlockNumber_t pos,
+      OSDeviceBlock::BlockCount_t nb_sector);
+
+  void
+  sd_mmc_mci_read_multiple_sector_2_ram(void *ram,
+      OSDeviceBlock::BlockCount_t nb_sector);
+
+  void
+  sd_mmc_mci_write_multiple_sector_from_ram(const void *ram,
+      OSDeviceBlock::BlockCount_t nb_sector);
+
+  OSReturn_t
+  sd_mmc_mci_read_close(void);
+
 private:
 
   // ----- Private members ----------------------------------------------------
@@ -673,6 +693,8 @@ private:
   uint16_t g_u16_card_freq;
   uint32_t g_u32_card_size;
   BusWidth_t g_u8_card_bus_width;
+
+  volatile uint32_t gl_ptr_mem;
 
   Implementation_t& m_implementation;
 
