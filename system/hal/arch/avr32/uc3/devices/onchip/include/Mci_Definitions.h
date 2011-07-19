@@ -252,7 +252,7 @@ namespace avr32
         // ----------------------------------------
 
         const static CommandWord_t SD_MMC_LOCK_UNLOCK = (42 | MCI_SPCMD_NONE
-            | MCI_RSPTYP_48 | MCI_TRCMD_NO | MCI_MAXLAT); // no tested
+            | MCI_RSPTYP_48 | MCI_TRCMD_NO | MCI_MAXLAT); // not tested
 
         // -----------------------------------------------
         //  Class 8 commands: Application specific commands

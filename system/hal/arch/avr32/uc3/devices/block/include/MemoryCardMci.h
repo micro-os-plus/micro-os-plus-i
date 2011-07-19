@@ -30,8 +30,7 @@ namespace avr32
         ~Implementation();
 
         void
-        setOpenParameters(Mci::Speed_t speed, mci::BusWidth_t busWidth,
-            mci::CardSlot_t cardSlot);
+        setOpenParameters(mci::CardSlot_t cardSlot);
 
         friend class OSDeviceMemoryCard;
 
@@ -58,22 +57,22 @@ namespace avr32
         setBlockCount(BlockCount_t count);
 
         virtual OSReturn_t
-        mci_set_speed(uint32_t speed);
+        setSpeed(uint32_t speed);
 
         virtual OSReturn_t
-        mci_select_card(BusWidth_t busWidth);
+        selectCard(BusWidth_t busWidth);
 
         virtual bool
-        mci_rx_ready(void);
+        isRxReady(void);
 
         virtual uint32_t
-        mci_rd_data(void);
+        readData(void);
 
         virtual void
         setHighSpeedMode(void);
 
         virtual bool
-        mci_crc_error(void);
+        isCrcError(void);
 
       private:
 

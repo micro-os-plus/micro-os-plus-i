@@ -38,7 +38,7 @@ namespace avr32
       // ----- Public methods -------------------------------------------------
 
       void
-      init(Speed_t speed, mci::BusWidth_t busWidth, mci::CardSlot_t cardSlot);
+      init(mci::CardSlot_t cardSlot);
 
       mci::StatusRegister_t
       sendCommand(mci::CommandWord_t cmdWord, mci::CommandArgument_t cmdArg);
@@ -51,10 +51,10 @@ namespace avr32
       setBlockLength(uint32_t length);
 
       uint32_t
-      mci_rd_data(void);
+      readData(void);
 
       bool
-      mci_rx_ready(void);
+      isRxReady(void);
 
       void
       setBlockCount(BlockCount_t cnt);
@@ -63,9 +63,10 @@ namespace avr32
       getStatusRegister(void);
 
       void
-       initSpeed(Speed_t speed);
+      configSpeed(Speed_t speed);
 
-      bool mci_crc_error(void);
+      bool
+      isCrcError(void);
 
     private:
 
@@ -80,7 +81,7 @@ namespace avr32
       void
       enable(void);
 
-       void
+      void
       initDataTimeout(mci::TimeoutMultiplier_t multiplier,
           mci::TimeoutCycles_t cycles);
 
@@ -94,7 +95,7 @@ namespace avr32
       enableModeBits(uint32_t);
 
       bool
-      isReady(void);
+      wasLastCommandSent(void);
 
       void
       disableAllInterrupts(void);
@@ -109,7 +110,7 @@ namespace avr32
 
       // ----- Private members ------------------------------------------------
 
-      mci::StatusRegister_t shadowStatusRegister;
+      mci::StatusRegister_t m_shadowStatusRegister;
 
       // ----------------------------------------------------------------------
     };
@@ -167,9 +168,14 @@ namespace avr32
     }
 
     inline uint32_t
-    Mci::mci_rd_data(void)
+    Mci::readData(void)
     {
-      return moduleRegisters.readReceiveData();
+      uint32_t ret;
+
+      ret = moduleRegisters.readReceiveData();
+      OSDeviceDebug::putHex(ret);
+      OSDeviceDebug::putChar(' ');
+      return ret;
     }
 
   // ------------------------------------------------------------------------

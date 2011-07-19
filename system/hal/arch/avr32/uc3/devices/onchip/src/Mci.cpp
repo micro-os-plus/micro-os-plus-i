@@ -37,10 +37,12 @@ namespace avr32
     // ----- Public methods ---------------------------------------------------
 
     void
-    Mci::init(Speed_t speed, mci::BusWidth_t busWidth, mci::CardSlot_t cardSlot)
+    Mci::init(mci::CardSlot_t cardSlot)
     {
       OSDeviceDebug::putString("avr32::uc3::Mci::init()");
       OSDeviceDebug::putNewLine();
+
+      m_shadowStatusRegister = 0;
 
       reset();
       disable();
@@ -53,7 +55,8 @@ namespace avr32
       // Set the Data Timeout Register to 1 Mega Cycles
       initDataTimeout(MCI_DEFAULT_DTOLMUL, MCI_DEFAULT_DTOLCYC);
 
-      initSpeed(speed);
+      // Start with low speed
+      configSpeed(400000);
 
       // Set the Mode register
       enableModeBits(
@@ -61,7 +64,7 @@ namespace avr32
               | AVR32_MCI_MR_RDPROOF_MASK | AVR32_MCI_MR_WRPROOF_MASK);
 
       // Set the SD/MMC Card register
-      initSdCardBusWidthAndSlot(busWidth, cardSlot);
+      initSdCardBusWidthAndSlot(mci::BusWidth::_1bit, cardSlot);
 
       // Enable the MCI and the Power Saving
       enable();
@@ -79,7 +82,7 @@ namespace avr32
     }
 
     void
-    Mci::initSpeed(Speed_t speed)
+    Mci::configSpeed(Speed_t speed)
     {
       uint32_t mode;
       mode = moduleRegisters.readMode();
@@ -137,25 +140,29 @@ namespace avr32
     mci::StatusRegister_t
     Mci::getStatusRegister(void)
     {
-      shadowStatusRegister = (shadowStatusRegister & (AVR32_MCI_SR_DTOE_MASK
+      // The trick here is to preserve some bits across calls.
+      // Currently only AVR32_MCI_SR_DCRCE_MASK is used, and cleared
+      // in isCrcError()
+      m_shadowStatusRegister = (m_shadowStatusRegister & (AVR32_MCI_SR_DTOE_MASK
           | AVR32_MCI_SR_DCRCE_MASK | AVR32_MCI_SR_CSTOE_MASK
           | AVR32_MCI_SR_BLKOVRE_MASK)) | moduleRegisters.readStatus();
-      return shadowStatusRegister;
+      return m_shadowStatusRegister;
     }
 
     bool
-    Mci::isReady(void)
+    Mci::wasLastCommandSent(void)
     {
       return ((getStatusRegister() & AVR32_MCI_SR_CMDRDY_MASK) != 0);
     }
 
-    bool  Mci::mci_crc_error(void)
+    bool
+    Mci::isCrcError(void)
     {
-      if( getStatusRegister()&AVR32_MCI_SR_DCRCE_MASK )
-      {
-          shadowStatusRegister&=~AVR32_MCI_SR_DCRCE_MASK;
-        return true;
-      }
+      if (getStatusRegister() & AVR32_MCI_SR_DCRCE_MASK)
+        {
+          m_shadowStatusRegister &= ~AVR32_MCI_SR_DCRCE_MASK;
+          return true;
+        }
       else
         return false;
     }
@@ -163,7 +170,9 @@ namespace avr32
     mci::StatusRegister_t
     Mci::sendCommand(mci::CommandWord_t cmdWord, mci::CommandArgument_t cmdArg)
     {
-      OSDeviceDebug::putString("mci cmdWord=");
+      OSDeviceDebug::putString("mci cmd=");
+      OSDeviceDebug::putDec(cmdWord & 0x3F);
+      OSDeviceDebug::putString(", cmdWord=");
       OSDeviceDebug::putHex(cmdWord);
       OSDeviceDebug::putString(", arg=");
       OSDeviceDebug::putHex(cmdArg);
@@ -172,7 +181,7 @@ namespace avr32
       moduleRegisters.writeArgument(cmdArg);
       moduleRegisters.writeCommand(cmdWord);
 
-      while (!isReady())
+      while (!wasLastCommandSent())
         ; // TODO: fix loop
 
       mci::StatusRegister_t ret;
@@ -236,9 +245,14 @@ namespace avr32
     }
 
     bool
-    Mci::mci_rx_ready(void)
+    Mci::isRxReady(void)
     {
-      return (getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK) != 0;
+      bool isRxReady;
+      isRxReady = (getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK) != 0;
+      if (!isRxReady)
+        OSDeviceDebug::putChar('W');
+
+      return isRxReady;
     }
 
   // --------------------------------------------------------------------------

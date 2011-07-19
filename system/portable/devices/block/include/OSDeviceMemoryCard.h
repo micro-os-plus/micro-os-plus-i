@@ -72,33 +72,6 @@
 #define MMC_RCV_STATE             ((U32)0x00000A00)  // rcv state
 #define MMC_TRAN_STATE_MSK        ((U32)0xE0020E00)
 #define MMC_TRAN_STATE            ((U32)0x00000800)  // tran state
-#if false
-//! Flag error of "Card Status" in R1
-#define CS_FLAGERROR_RD_WR  (CS_ADR_OUT_OF_RANGE|CS_ADR_MISALIGN|CS_BLOCK_LEN_ERROR|CS_ERASE_SEQ_ERROR|CS_ILLEGAL_COMMAND|CS_CARD_ERROR)
-
-#define CS_ADR_OUT_OF_RANGE (1<<31)
-#define CS_ADR_MISALIGN     (1<<30)
-#define CS_BLOCK_LEN_ERROR  (1<<29)
-#define CS_ERASE_SEQ_ERROR  (1<<28)
-#define CS_ERASE_PARAM      (1<<27)
-#define CS_WP_VIOLATION     (1<<26)
-#define CS_CARD_IS_LOCKED   (1<<25)
-#define CS_LOCK_UNLOCK_     (1<<24)
-#define CS_COM_CRC_ERROR    (1<<23)
-#define CS_ILLEGAL_COMMAND  (1<<22)
-#define CS_CARD_ECC_FAILED  (1<<21)
-#define CS_CARD_ERROR       (1<<20)
-#define CS_EXEC_ERROR       (1<<19)
-#define CS_UNDERRUN         (1<<18)
-#define CS_OVERRUN          (1<<17)
-#define CS_CIDCSD_OVERWRITE (1<<16)
-#define CS_WP_ERASE_SKIP    (1<<15)
-#define CS_ERASE_RESET      (1<<13)
-#define CS_READY_FOR_DATA   (1<<8)
-#define CS_SWITCH_ERROR     (1<<7)
-#define CS_APP_CMD          (1<<5)
-#endif
-
 // R1 Response bit-defines
 #define MMC_R1_BUSY                       0x80  ///< R1 response: bit indicates card is busy
 #define MMC_R1_PARAMETER                  0x40
@@ -519,15 +492,30 @@ public:
     const static CardStatus_t CIDCSD_OVERWRITE = (1 << 16); // 0x00010000
 
     const static CardStatus_t WP_ERASE_SKIP = (1 << 15); // 0x00008000
-    const static CardStatus_t ERASE_RESET = (1 << 13);
+    const static CardStatus_t CARD_ECC_DISABLE = (1 << 14); // 0x00004000
+    const static CardStatus_t ERASE_RESET = (1 << 13); // 0x00002000
+    const static CardStatus_t CURRENT_STATE_SHIFT = 9;
+    const static CardStatus_t CURRENT_STATE_MASK = (0xF << CURRENT_STATE_SHIFT); // 0x00001E00
+    const static CardStatus_t READY_FOR_DATA = (1 << 8); // 0x00000100
 
-    const static CardStatus_t READY_FOR_DATA = (1 << 8); // 0x00000080
-    const static CardStatus_t SWITCH_ERROR = (1 << 7);
+
+    const static CardStatus_t SWITCH_ERROR = (1 << 7); // 0x00000080
     const static CardStatus_t APP_CMD = (1 << 5);
 
     const static CardStatus_t FLAGERROR_RD_WR = (ADR_OUT_OF_RANGE
         | ADR_MISALIGN | BLOCK_LEN_ERROR | ERASE_SEQ_ERROR | ILLEGAL_COMMAND
         | CARD_ERROR);
+
+    const static CardStatus_t CURRENT_STATE_IDLE = (0x0);
+    const static CardStatus_t CURRENT_STATE_READY = (0x1);
+    const static CardStatus_t CURRENT_STATE_IDENT = (0x2);
+    const static CardStatus_t CURRENT_STATE_STBY = (0x3);
+    const static CardStatus_t CURRENT_STATE_TRAN = (0x4);
+    const static CardStatus_t CURRENT_STATE_DATA = (0x5);
+    const static CardStatus_t CURRENT_STATE_RCV = (0x6);
+    const static CardStatus_t CURRENT_STATE_PRG = (0x7);
+    const static CardStatus_t CURRENT_STATE_DIS = (0x8);
+
   };
 
   typedef uint32_t CommandArgument_t;
@@ -589,22 +577,22 @@ public:
     setBlockCount(BlockCount_t count) = 0;
 
     virtual OSReturn_t
-    mci_set_speed(uint32_t speed) = 0;
+    setSpeed(uint32_t speed) = 0;
 
     virtual OSReturn_t
-    mci_select_card(BusWidth_t busWidth) = 0;
+    selectCard(BusWidth_t busWidth) = 0;
 
     virtual bool
-    mci_rx_ready(void) = 0;
+    isRxReady(void) = 0;
 
     virtual uint32_t
-    mci_rd_data(void) = 0;
+    readData(void) = 0;
 
     virtual void
     setHighSpeedMode(void) = 0;
 
     virtual bool
-    mci_crc_error(void) = 0;
+    isCrcError(void) = 0;
   };
 
   typedef Implementation Implementation_t;
@@ -654,31 +642,33 @@ public:
 private:
 
   OSReturn_t
+  init(void);
+
+  OSReturn_t
   getCsd(void);
 
   OSReturn_t
-  sd_mmc_get_ext_csd(void);
+  getExtendedCsd(void);
 
   OSReturn_t
-  sd_mmc_set_block_len(uint16_t length);
+  setBlockLength(uint16_t length);
 
   OSReturn_t
-  sd_mmc_mci_cmd_send_status(void);
+  sendStatus(void);
 
   OSReturn_t
-  sd_mmc_mci_read_open(OSDeviceBlock::BlockNumber_t pos,
-      OSDeviceBlock::BlockCount_t nb_sector);
+  prepareRead(OSDeviceBlock::BlockNumber_t blockNumber,
+      OSDeviceBlock::BlockCount_t count);
 
   void
-  sd_mmc_mci_read_multiple_sector_2_ram(void *ram,
-      OSDeviceBlock::BlockCount_t nb_sector);
-
-  void
-  sd_mmc_mci_write_multiple_sector_from_ram(const void *ram,
-      OSDeviceBlock::BlockCount_t nb_sector);
+  transferReadSectors(void *pBuf, OSDeviceBlock::BlockCount_t count);
 
   OSReturn_t
-  sd_mmc_mci_read_close(void);
+  cleanupRead(void);
+
+  void
+  transferWriteSectors(const void *pBuf,
+      OSDeviceBlock::BlockCount_t count);
 
 private:
 
@@ -689,12 +679,12 @@ private:
   uint8_t m_cardType;
   bool m_isInitialised;
 
-  uint32_t g_u32_card_rca;
-  uint16_t g_u16_card_freq;
-  uint32_t g_u32_card_size;
-  BusWidth_t g_u8_card_bus_width;
+  uint32_t m_cardRca;
+  uint16_t m_cardFrequency;
+  uint32_t m_cardSize;
+  BusWidth_t m_cardBusWidth;
 
-  volatile uint32_t gl_ptr_mem;
+  volatile uint32_t m_ptrMem;
 
   Implementation_t& m_implementation;
 

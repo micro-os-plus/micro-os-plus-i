@@ -46,11 +46,8 @@ namespace avr32
     // ----- Public methods ---------------------------------------------------
 
     void
-    MemoryCardMci::Implementation::setOpenParameters(Mci::Speed_t speed,
-        mci::BusWidth_t busWidth, mci::CardSlot_t cardSlot)
+    MemoryCardMci::Implementation::setOpenParameters(mci::CardSlot_t cardSlot)
     {
-      m_speed = speed;
-      m_busWidth = busWidth;
       m_cardSlot = cardSlot;
     }
 
@@ -71,12 +68,12 @@ namespace avr32
 #endif
 
       // init MCI module
-      m_mci.init(m_speed, m_busWidth, m_cardSlot);
+      m_mci.init(m_cardSlot);
 
       // Wait for 1ms, then wait for 74 more clock cycles (see MMC norms)
       if (m_mci.sendCommand(mci::CommandWord::SD_MMC_INIT_STATE_CMD, 0xFFFFFFFF)
           != MCI_SUCCESS)
-        return OSReturn::OS_ERROR;
+        return OSReturn::OS_NOT_INITIALIZED;
 
       return OSReturn::OS_OK;
     }
@@ -128,6 +125,10 @@ namespace avr32
 
       case CommandCode::SEND_STATUS:
         commandWord = mci::CommandWord::SD_MMC_SEND_STATUS_CMD;
+        break;
+
+      case CommandCode::READ_SINGLE_BLOCK:
+        commandWord = mci::CommandWord::SD_MMC_READ_SINGLE_BLOCK_CMD;
         break;
 
       case CommandCode::READ_MULTIPLE_BLOCK:
@@ -193,7 +194,10 @@ namespace avr32
       OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) */
 
-      return m_mci.sendCommand(commandWord, commnadArg);
+      if (m_mci.sendCommand(commandWord, commnadArg) != MCI_SUCCESS)
+        return OSReturn::OS_BAD_COMMAND;
+      else
+        return OSReturn::OS_OK;
     }
 
     OSDeviceMemoryCard::Response_t
@@ -210,7 +214,7 @@ namespace avr32
     }
 
     OSReturn_t
-    MemoryCardMci::Implementation::mci_select_card(BusWidth_t busWidth)
+    MemoryCardMci::Implementation::selectCard(BusWidth_t busWidth)
     {
       m_mci.initSdCardBusWidthAndSlot(busWidth, m_cardSlot);
 
@@ -221,6 +225,9 @@ namespace avr32
     MemoryCardMci::Implementation::waitBusySignal(void)
     {
       // mci_wait_busy_signal()
+      while (!(m_mci.getStatusRegister() & AVR32_MCI_SR_NOTBUSY_MASK)) {
+        OSDeviceDebug::putChar('w');
+      }
 
       return OSReturn::OS_OK;
     }
@@ -228,47 +235,56 @@ namespace avr32
     OSReturn_t
     MemoryCardMci::Implementation::setBusWidth(BusWidth_t busWidth __attribute__((unused)))
     {
-      // mci_set_bus_size()
+      uint32_t mci_sdcr_register;
+
+      // Warning: this code assumes that the MCI and the MemoryCardMci bus width
+      // notation are identical!
+
+      mci_sdcr_register = m_mci.moduleRegisters.readSdCard();
+      mci_sdcr_register &= ~AVR32_MCI_SDCR_SDCBUS_MASK; // Clear previous buswidth
+      mci_sdcr_register |= (busWidth << AVR32_MCI_SDCR_SDCBUS_OFFSET);
+      m_mci.moduleRegisters.writeSdCard(mci_sdcr_register);
+
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
     MemoryCardMci::Implementation::setBlockLength(BlockLength_t length __attribute__((unused)))
     {
-      // mci_set_block_size
+      m_mci.setBlockLength(length);
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
     MemoryCardMci::Implementation::setBlockCount(BlockCount_t count __attribute__((unused)))
     {
-      // mci_set_block_count
+      m_mci.setBlockCount(count);
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::Implementation::mci_set_speed(uint32_t speed)
+    MemoryCardMci::Implementation::setSpeed(uint32_t speed)
     {
-      m_mci.initSpeed(speed);
+      m_mci.configSpeed(speed);
       return OSReturn::OS_OK;
     }
 
     bool
-    MemoryCardMci::Implementation::mci_rx_ready(void)
+    MemoryCardMci::Implementation::isRxReady(void)
     {
-      return m_mci.mci_rx_ready();
+      return m_mci.isRxReady();
     }
 
     uint32_t
-    MemoryCardMci::Implementation::mci_rd_data(void)
+    MemoryCardMci::Implementation::readData(void)
     {
       return ((m_mci.getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK)) != 0;
     }
 
     bool
-    MemoryCardMci::Implementation::mci_crc_error(void)
+    MemoryCardMci::Implementation::isCrcError(void)
     {
-      return m_mci.mci_crc_error();
+      return m_mci.isCrcError();
     }
 
     void
