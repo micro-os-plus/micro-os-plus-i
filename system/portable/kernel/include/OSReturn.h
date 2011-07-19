@@ -39,6 +39,7 @@ public:
   static const OSReturn_t OS_NOT_IMPLEMENTED = -22;
   static const OSReturn_t OS_BUSY = -23;
   static const OSReturn_t OS_BAD_STATE = -24;
+  static const OSReturn_t OS_TOO_SHORT = -9;
 };
 
 // ----------------------------------------------------------------------------
