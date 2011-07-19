@@ -400,10 +400,23 @@ OSReturn_t
 OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
     uint8_t* pBuf __attribute__((unused)), OSDeviceBlock::BlockCount_t count __attribute__((unused)))
 {
-  OSDeviceDebug::putString("OSDeviceMemoryCard::readBlocks()");
+  OSDeviceDebug::putString("OSDeviceMemoryCard::readBlocks() ");
+  OSDeviceDebug::putDec(blockNumber);
+  OSDeviceDebug::putChar(' ');
+  OSDeviceDebug::putDec(count);
   OSDeviceDebug::putNewLine();
 
-  return OSReturn::OS_NOT_IMPLEMENTED;
+  OSReturn_t ret;
+
+  ret = sd_mmc_mci_read_open(blockNumber, count);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  sd_mmc_mci_read_multiple_sector_2_ram(pBuf, count);
+
+  ret = sd_mmc_mci_read_close();
+
+  return ret;
 }
 
 OSReturn_t
@@ -601,6 +614,7 @@ OSDeviceMemoryCard::sd_mmc_mci_cmd_send_status()
   m_implementation.mci_select_card(g_u8_card_bus_width);
 
   OSReturn_t ret;
+  // -- (CMD13)
   ret = m_implementation.sendCommand(CommandCode::SEND_STATUS, g_u32_card_rca);
   if (ret != OSReturn::OS_OK)
     return ret;
@@ -615,16 +629,181 @@ OSDeviceMemoryCard::sd_mmc_set_block_len(uint16_t length)
   m_implementation.mci_select_card(g_u8_card_bus_width);
 
   OSReturn_t ret;
+  // -- (CMD16)
   ret = m_implementation.sendCommand(CommandCode::SET_BLOCKLEN, length);
   if (ret != OSReturn::OS_OK)
     return ret;
 
   // check response, card must be in TRAN state
   if ((m_implementation.readResponse() & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
-    return OSReturn::OS_ERROR;
+    return OSReturn::OS_BAD_STATE;
 
   m_implementation.setBlockLength(length);
   m_implementation.setBlockCount(1);
+
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+OSDeviceMemoryCard::sd_mmc_mci_read_open(OSDeviceBlock::BlockNumber_t pos,
+    OSDeviceBlock::BlockCount_t nb_sector)
+{
+  uint32_t addr;
+
+  // Select Slot card before any other command.
+  m_implementation.mci_select_card(g_u8_card_bus_width);
+
+  // Set the global memory ptr at a Byte address.
+  gl_ptr_mem = pos; // used to manage a standby/restart access
+
+  // wait for MMC not busy
+  m_implementation.waitBusySignal();
+
+  addr = gl_ptr_mem;
+  // send command
+  if ((!(SD_CARD_HC & m_cardType)) && (!(MMC_CARD_HC & m_cardType)))
+    {
+      addr <<= 9; // For NO HC card the address must be translate in byte address
+    }
+
+  OSReturn_t ret;
+
+  // -- (CMD13)
+  // Necessary to clear flag error "ADDRESS_OUT_OF_RANGE" (ID LABO = MMC15)
+  ret = m_implementation.sendCommand(CommandCode::SEND_STATUS, g_u32_card_rca);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  m_implementation.setBlockLength(SD_MMC_SECTOR_SIZE);
+  m_implementation.setBlockCount(nb_sector);
+
+  // -- (CMD18)
+  ret = m_implementation.sendCommand(CommandCode::READ_MULTIPLE_BLOCK, addr);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  // check response
+  if ((m_implementation.readResponse() & CardStatus::FLAGERROR_RD_WR) != 0)
+      return OSReturn::OS_ERROR;
+
+  return OSReturn::OS_OK;
+}
+
+void
+OSDeviceMemoryCard::sd_mmc_mci_read_multiple_sector_2_ram(void *ram,
+    OSDeviceBlock::BlockCount_t nb_sector)
+{
+  U32 wordsToRead;
+  int *pRam = (int*)ram;
+
+  // Read data
+  while (nb_sector > 0)
+    {
+      wordsToRead = (SD_MMC_SECTOR_SIZE / sizeof(*pRam));
+      while (wordsToRead > 0)
+        {
+          while (!(m_implementation.mci_rx_ready()))
+            ;
+          *pRam++ = m_implementation.mci_rd_data();
+          while (!(m_implementation.mci_rx_ready()))
+            ;
+          *pRam++ = m_implementation.mci_rd_data();
+          while (!(m_implementation.mci_rx_ready()))
+            ;
+          *pRam++ = m_implementation.mci_rd_data();
+          while (!(m_implementation.mci_rx_ready()))
+            ;
+          *pRam++ = m_implementation.mci_rd_data();
+          while (!(m_implementation.mci_rx_ready()))
+            ;
+          *pRam++ = m_implementation.mci_rd_data();
+          while (!(m_implementation.mci_rx_ready()))
+            ;
+          *pRam++ = m_implementation. mci_rd_data();
+          while (!(m_implementation.mci_rx_ready()))
+            ;
+          *pRam++ = m_implementation.mci_rd_data();
+          while (!(m_implementation.mci_rx_ready()))
+            ;
+          *pRam++ = m_implementation.mci_rd_data();
+          wordsToRead -= 8;
+        }
+      nb_sector--;
+    }
+}
+
+#if false
+void
+OSDeviceMemoryCard::sd_mmc_mci_write_multiple_sector_from_ram(const void *ram,
+    OSDeviceBlock::BlockCount_t nb_sector)
+{
+  U32 wordsToWrite;
+  const unsigned int *pRam = ram;
+
+  // Write Data
+  while (nb_sector > 0)
+    {
+      wordsToWrite = (SD_MMC_SECTOR_SIZE / sizeof(*pRam));
+      while (wordsToWrite > 0)
+        {
+          while (!m_implementation.mci_tx_ready())
+            ;
+          m_implementation.mci_wr_data(*pRam++);
+          while (!m_implementation.mci_tx_ready())
+            ;
+          m_implementation.mci_wr_data(*pRam++);
+          while (!m_implementation.mci_tx_ready())
+            ;
+          m_implementation.mci_wr_data(*pRam++);
+          while (!m_implementation.mci_tx_ready())
+            ;
+          m_implementation.mci_wr_data(*pRam++);
+          while (!m_implementation.mci_tx_ready())
+            ;
+          m_implementation.mci_wr_data(*pRam++);
+          while (!m_implementation.mci_tx_ready())
+            ;
+          m_implementation.mci_wr_data(*pRam++);
+          while (!m_implementation.mci_tx_ready())
+            ;
+          m_implementation.mci_wr_data(*pRam++);
+          while (!m_implementation.mci_tx_ready())
+            ;
+          m_implementation.mci_wr_data(*pRam++);
+          wordsToWrite -= 8;
+        }
+      nb_sector--;
+    }
+}
+#endif
+
+OSReturn_t
+OSDeviceMemoryCard::sd_mmc_mci_read_close(void)
+{
+  if (m_implementation.mci_crc_error())
+    {
+      return OSReturn::OS_BAD_CHECKSUM; // An CRC error has been seen
+    }
+
+  m_implementation.waitBusySignal();
+
+  OSReturn_t ret;
+
+  ret
+      = m_implementation.sendCommand(CommandCode::STOP_TRANSMISSION, 0xffffffff);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  /*
+   if( (mci_overrun_error(mci)) )
+   {
+   return FALSE;
+   }
+
+   if( (mci_underrun_error(mci)) )
+   {
+   return FALSE;
+   }*/
 
   return OSReturn::OS_OK;
 }
