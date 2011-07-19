@@ -165,8 +165,8 @@ TaskCli::lineProcess()
   unsigned char c;
   unsigned long l;
   unsigned short u;
-  unsigned char v;
-  unsigned char i;
+  //unsigned char v;
+  //unsigned char i;
 
   //int r;
 
@@ -235,53 +235,12 @@ TaskCli::lineProcess()
           if (cli.parseHex(p, &l) < 0)
             goto err;
 
-          //cmdRD(l, 512 / 4);
+          cmdMR(l);
         }
       else if (c == 'z')
         {
           //m_card.close();
           bInit = true;
-        }
-      else
-        goto err;
-    }
-  else if (c == 'r')
-    {
-      // flight recorder test commands
-      ++p;
-      c = *p;
-      if (c == '\0')
-        goto err;
-
-      c |= 0x20;
-      ++p;
-      if (*p != '\0')
-        goto err;
-
-      if (c == 'i')
-        {
-          if ((p = cli.parseNext()) != 0)
-            goto err;
-
-          //cmdRI();
-        }
-      else if (c == 'd')
-        {
-          if ((p = cli.parseNext()) == 0)
-            goto err;
-
-          if (cli.parseHex(p, &l) < 0)
-            goto err;
-
-          if ((p = cli.parseNext()) != 0 && cli.parseHexNibble(p, &i) == 0)
-            {
-              v = i;
-            }
-          else
-            {
-              v = 0;
-            }
-          //cmdRD(l, v);
         }
       else
         goto err;
@@ -301,8 +260,7 @@ TaskCli::cmdMI()
   int r;
   std::ostream& cout = m_cout;
 
-  m_card.implementation.setOpenParameters(400000, avr32::uc3::mci::BusWidth::_1bit,
-      avr32::uc3::mci::CardSlot::A);
+  m_card.implementation.setOpenParameters( avr32::uc3::mci::CardSlot::A);
 
   r = m_card.open();
 
@@ -350,7 +308,8 @@ TaskCli::cmdMI()
       bInit = false;
 #else
       cout << "Card opened" << std::endl;
-      cout << "Size=" << m_card.getDeviceSize()/1024/1024 << " MB" << std::endl;
+      cout << "Size=" << m_card.getDeviceSize() << " blks, " << m_card.getDeviceSize() * m_card.getBlockSize() / 1024 /1024 << " MB"
+          << std::endl;
 #endif
     }
 }
@@ -713,83 +672,62 @@ void TaskCli::cmdRI()
         bInit = false;
       }
   }
-
-void TaskCli::cmdRD(unsigned long l, unsigned short v)
-  {
-    int r;
-    ostream& cout = m_cout;
-
-    if (bInit)
-      {
-        r = m_card.open();
-        if (r < 0)
-          {
-            cout << endl;
-            cout << 'I'<< dec << r;
-            return;
-          }
-        bInit = false;
-      }
-
-    unsigned short len;
-    len = ( (v == 0) ? MMC_BUFSIZE : (v * 4) );
-
-#if 1
-
-    r = m_card.setBlkLen(len);
-    if (r != 0)
-      {
-        cout << endl;
-        cout << 'B'<< dec << r;
-        return;
-      }
 #endif
 
-    OS_CONFIG_USBINT_LED_PORT &= ~_BV( PORTD0 );
+void
+TaskCli::cmdMR(unsigned long l)
+{
+  int r;
+  std::ostream& cout = m_cout;
 
-    r = m_card.readBuffer( (l << MMC_BSHIFT), m_buf, len);
-    if (r != 0)
-      {
-        cout << endl;
-        cout << 'R' << dec << r;
-        return;
-      }
-    OS_CONFIG_USBINT_LED_PORT |= _BV( PORTD0 );
+  if (bInit)
+    {
+      r = m_card.open();
+      if (r < 0)
+        {
+          cout << std::endl;
+          cout << 'I' << std::dec << r;
+          return;
+        }
+      bInit = false;
+    }
 
-    cout << endl << '$'<< hex;
+  //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
 
-    unsigned int i;
-    unsigned char cxor;
-    for (i = 0, cxor = 0; i < len; ++i)
-      {
-        unsigned char b;
-        b = m_buf[ i ];
+  r = m_card.readBlocks(l, (uint8_t*)m_buf, 1);
+  if (r != 0)
+    {
+      cout << std::endl;
+      cout << 'R' << std::dec << r;
+      return;
+    }
+  //OS_CONFIG_USBINT_LED_PORT |= _BV(PORTD0);
 
-#if 0
+  cout << std::endl;
 
-        unsigned char c;
-        c = ( ( b >> 4 ) & 0x0F );
-        cout.put( c < 10 ? c + '0' : c + 'A' - 10 );
-        //dev.writeByte( c < 10 ? c + '0' : c + 'A' - 10 );
+  unsigned int i;
+  //unsigned char cxor;
+  for (i = 0; i < 512; ++i)
+    {
+      unsigned char b;
+      b = m_buf[i];
 
-        c = ( b & 0x0F );
-        cout.put( c < 10 ? c + '0' : c + 'A' - 10 );
-        //dev.writeByte( c < 10 ? c + '0' : c + 'A' - 10 );
-#else
+      cout.width(2);
+      cout << (unsigned short) b ;
 
-        cout.width( 2);
-        cout << ( unsigned short ) b;
-#endif
+      if ((i % 16) == 15)
+        {
+          cout << std::endl;
+        }
+      else
+        {
+          cout << ' ';
+        }
+    }
+  cout.flush();
+  //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
 
-        cxor ^= b;
-      }
-    cout.width( 2);
-    cout << '*' << ( unsigned short ) cxor;
-    cout.flush();
-    OS_CONFIG_USBINT_LED_PORT &= ~_BV( PORTD0 );
-
-  }
-#endif
+}
 
 void
 TaskCli::cmdST()
