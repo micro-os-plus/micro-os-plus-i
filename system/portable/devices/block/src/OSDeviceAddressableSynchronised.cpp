@@ -12,12 +12,21 @@
 
 #include "portable/devices/block/include/OSDeviceAddressableSynchronised.h"
 
+#if false
 OSDeviceAddressableSynchronised::OSDeviceAddressableSynchronised(
     OSDeviceAddressable& dev) :
   m_dev(dev)
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceAddressableSynchronised"), this);
 }
+#else
+OSDeviceAddressableSynchronised::OSDeviceAddressableSynchronised(
+   )
+{
+  OSDeviceDebug::putConstructor_P(PSTR("OSDeviceAddressableSynchronised"), this);
+}
+#endif
+
 
 OSDeviceAddressableSynchronised::~OSDeviceAddressableSynchronised()
 {

@@ -14,12 +14,12 @@
 class OSDeviceAddressableSynchronised : public OSDeviceAddressable
 {
 public:
-  OSDeviceAddressableSynchronised(OSDeviceAddressable& dev);
-  virtual
+  OSDeviceAddressableSynchronised();
+  //OSDeviceAddressableSynchronised(OSDeviceAddressable& dev);
   ~OSDeviceAddressableSynchronised();
 
 private:
-  OSDeviceAddressable& m_dev;
+  //OSDeviceAddressable& m_dev;
 };
 
 #endif /* OSDEVICEADDRESSABLESYNCHRONISED_H_ */
