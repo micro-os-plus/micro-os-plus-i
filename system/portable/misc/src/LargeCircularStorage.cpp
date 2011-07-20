@@ -12,7 +12,7 @@
 
 // ----------------------------------------------------------------------------
 
-LargeCircularStorage::LargeCircularStorage(OSDeviceAddressable& dev) :
+LargeCircularStorage::LargeCircularStorage(OSDeviceBlock& dev) :
   m_dev(dev)
 {
   debug.putConstructor_P(PSTR("GpsCoordinate"), this);

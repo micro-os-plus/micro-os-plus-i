@@ -628,7 +628,7 @@ public:
 
   // Erase part of the device.
   virtual OSReturn_t
-  erase(OSDeviceBlock::BlockNumber_t blockNumber,
+  eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
       OSDeviceBlock::BlockCount_t count);
 
   // Return the full size, in blocks, of the device.
@@ -667,8 +667,7 @@ private:
   cleanupRead(void);
 
   void
-  transferWriteSectors(const void *pBuf,
-      OSDeviceBlock::BlockCount_t count);
+  transferWriteSectors(const void *pBuf, OSDeviceBlock::BlockCount_t count);
 
 private:
 

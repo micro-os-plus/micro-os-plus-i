@@ -67,7 +67,7 @@ OSDeviceBlock::close(void)
 }
 
 OSReturn_t
-OSDeviceBlock::erase(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
+OSDeviceBlock::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
     OSDeviceBlock::BlockCount_t count __attribute__((unused)))
 {
   OSDeviceDebug::putString_P(PSTR("OSDeviceBlock::erase()"));

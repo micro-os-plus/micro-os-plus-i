@@ -103,6 +103,22 @@
 #include "portable/devices/block/include/OSDeviceAddressablePartition.h"
 #endif
 
+// -----
+
+#if defined(OS_INCLUDE_OSDEVICEBLOCK)
+#include "portable/devices/block/include/OSDeviceBlock.h"
+#endif
+
+#if defined(OS_INCLUDE_OSDEVICEBLOCKSYNCHRONISED)
+#include "portable/devices/block/include/OSDeviceBlockSynchronised.h"
+#endif
+
+#if defined(OS_INCLUDE_OSDEVICEBLOCKPARTITION)
+#include "portable/devices/block/include/OSDeviceBlockPartition.h"
+#endif
+
+// -----
+
 #if defined(OS_INCLUDE_LARGECIRCULARSTORAGE)
 #include "portable/misc/include/LargeCircularStorage.h"
 #endif

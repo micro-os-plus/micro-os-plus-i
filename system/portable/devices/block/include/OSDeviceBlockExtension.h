@@ -4,69 +4,77 @@
  *      This file is part of the uOS++ distribution.
  */
 
-#ifndef OSDEVICEBLOCK_H_
-#define OSDEVICEBLOCK_H_
+#ifndef OSDEVICEBLOCKEXTENSION_H_
+#define OSDEVICEBLOCKEXTENSION_H_
 
 #include "portable/kernel/include/OS.h"
 
-// The interface design was in general intended to be generic,
-// but the fact is that it was modelled to be better accommodate SD Cards.
+#include "portable/devices/block/include/OSDeviceBlock.h"
 
-// The transfer unit is a block, in general 512 bytes long.
-
-class OSDeviceBlock
+class OSDeviceBlockExtension : public OSDeviceBlock
 {
 public:
 
-  // ----- Type definitions ---------------------------------------------------
+  // ----- Constructors & destructors -------------------------------------------
 
-  typedef uint32_t BlockNumber_t;
-  typedef uint16_t BlockCount_t;
-  typedef uint32_t BlockSize_t;
-
-public:
-
-  // ----- Constructors & Destructors -----------------------------------------
-
-  OSDeviceBlock();
-
+  OSDeviceBlockExtension(OSDeviceBlock& parent);
   virtual
-  ~OSDeviceBlock();
+  ~OSDeviceBlockExtension();
 
   // ----- Public methods -----------------------------------------------------
 
   // Prepare the device for operations.
   virtual OSReturn_t
-  open(void) = 0;
+  open(void);
 
   // Read exactly count blocks, in the given buffer.
   virtual OSReturn_t
   readBlocks(OSDeviceBlock::BlockNumber_t blockNumber, uint8_t* pBuf,
-      OSDeviceBlock::BlockCount_t count) = 0;
+      OSDeviceBlock::BlockCount_t count);
 
   // Write the count blocks, from the given buffer.
   virtual OSReturn_t
   writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber, uint8_t* pBuf,
-      OSDeviceBlock::BlockCount_t count) = 0;
+      OSDeviceBlock::BlockCount_t count);
 
   // Prepare device for entering sleep
   virtual OSReturn_t
-  close(void) = 0;
+  close(void);
 
   // Erase part of the device.
   virtual OSReturn_t
   eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
-      OSDeviceBlock::BlockCount_t count) = 0;
+      OSDeviceBlock::BlockCount_t count);
 
   // Return the full size, in blocks, of the device.
   virtual OSDeviceBlock::BlockNumber_t
-  getDeviceSize(void) = 0;
+  getDeviceSize(void);
 
   // Return the device block size, in bytes.
   virtual OSDeviceBlock::BlockSize_t
-  getBlockSize(void) = 0;
+  getBlockSize(void);
+
+  OSDeviceBlock&
+  getParent(void);
+
+protected:
+
+  // ----- Members ------------------------------------------------------------
+
+  OSDeviceBlock& m_parent;
 
   // --------------------------------------------------------------------------
+
 };
 
-#endif /* OSDEVICEBLOCK_H_ */
+// ----- Inline methods -------------------------------------------------------
+
+inline OSDeviceBlock&
+OSDeviceBlockExtension::getParent(void)
+{
+  return m_parent;
+}
+
+// ----------------------------------------------------------------------------
+
+#endif /* OSDEVICEADDRESSABLEPARTITION_H_ */

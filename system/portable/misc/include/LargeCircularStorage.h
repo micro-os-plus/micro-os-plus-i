@@ -14,11 +14,11 @@
 class LargeCircularStorage
 {
 public:
-  LargeCircularStorage(OSDeviceAddressable& dev);
+  LargeCircularStorage(OSDeviceBlock& dev);
   ~LargeCircularStorage();
 
 private:
-  OSDeviceAddressable& m_dev;
+  OSDeviceBlock& m_dev;
 };
 
 // ----------------------------------------------------------------------------

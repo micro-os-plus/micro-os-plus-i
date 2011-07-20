@@ -105,7 +105,7 @@ OSDeviceMemoryCard::close(void)
 }
 
 OSReturn_t
-OSDeviceMemoryCard::erase(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
+OSDeviceMemoryCard::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
     OSDeviceBlock::BlockCount_t count __attribute__((unused)))
 {
   OSDeviceDebug::putString("OSDeviceMemoryCard::erase()");
