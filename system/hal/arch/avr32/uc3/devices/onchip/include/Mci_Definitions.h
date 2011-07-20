@@ -11,8 +11,11 @@
 
 // Driver Default Value Configuration
 #define MCI_DEFAULT_PWSDIV      0x07    // Power Saving Divider.
+
 #define MCI_DEFAULT_DTOLMUL     0x07    // Data Timeout Multiplier.
-#define MCI_DEFAULT_DTOLCYC     0x02    // Data Timeout Cycle Number.
+//#define MCI_DEFAULT_DTOLCYC     0x02    // Data Timeout Cycle Number.
+#define MCI_DEFAULT_DTOLCYC     0x0F    // Data Timeout Cycle Number.
+
 #define MCI_DEFAULT_DTOREG      (MCI_DEFAULT_DTOLMUL<<AVR32_MCI_DTOR_DTOMUL_OFFSET) | \
                                 (MCI_DEFAULT_DTOLCYC<<AVR32_MCI_DTOR_DTOCYC_OFFSET)
 
