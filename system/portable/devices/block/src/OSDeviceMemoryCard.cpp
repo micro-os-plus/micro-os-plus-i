@@ -66,13 +66,17 @@ OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attrib
   OSDeviceDebug::putDec(count);
   OSDeviceDebug::putNewLine();
 
+  m_implementation.init();
+  init();
+
   OSReturn_t ret;
 
   ret = prepareRead(blockNumber, count);
-  if (ret != OSReturn::OS_OK)
+  if ( ret != OSReturn::OS_OK)
     return ret;
 
   transferReadSectors(pBuf, count);
+  //ret = OSReturn::OS_OK;
 
   ret = cleanupRead();
 
@@ -495,6 +499,9 @@ OSDeviceMemoryCard::init(void)
 
   isOpened = true;
 
+  //ret = m_implementation.sendCommand(CommandCode::SEND_STATUS, m_cardRca);
+  //m_implementation.readResponse();
+
   return OSReturn::OS_OK;
 }
 
@@ -558,8 +565,8 @@ OSDeviceMemoryCard::getCsd(void)
   // field: WRITE_BL_LEN, READ_BL_LEN, C_SIZE (CSD V1 & V2 are not the same)
   if (SD_CARD_HC & m_cardType)
     {
-      m_cardSize = (csd.csd_v2.deviceSizeH << 16)
-          + (csd.csd_v2.deviceSizeL & 0xFFff);
+      m_cardSize = (csd.csd_v2.deviceSizeH << 16) + (csd.csd_v2.deviceSizeL
+          & 0xFFff);
 
       // memory capacity = (C_SIZE+1) * 1K sector
       m_cardSize = (m_cardSize + 1) << 10; // unit 512B
@@ -719,6 +726,8 @@ OSDeviceMemoryCard::prepareRead(OSDeviceBlock::BlockNumber_t pos,
   ret = m_implementation.sendCommand(CommandCode::SEND_STATUS, m_cardRca);
   if (ret != OSReturn::OS_OK)
     return ret;
+
+  //m_implementation.readResponse();
 
   m_implementation.setBlockLength(SD_MMC_SECTOR_SIZE);
   m_implementation.setBlockCount(nb_sector);
