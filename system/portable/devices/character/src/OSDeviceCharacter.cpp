@@ -111,6 +111,8 @@ OSDeviceCharacter::open(void)
   for (;;)
     {
       OSEvent_t event;
+      event = getOpenEvent(); // default value
+
       bool isConnected;
       bool doWait;
       doWait = false;
