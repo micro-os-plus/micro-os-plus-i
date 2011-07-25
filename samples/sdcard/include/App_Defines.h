@@ -18,11 +18,15 @@
 // Notice: do not use parenthesis! (the values will be stringified)
 #define APP_CFGINT_VERSION_MAJOR                        1
 #define APP_CFGINT_VERSION_MINOR                        2
-#define APP_CFGINT_VERSION_REVISION                     1239
+#define APP_CFGINT_VERSION_REVISION                     2301
 
 // ----------------------------------------------------------------------------
 
 #if defined(OS_CONFIG_BOARD_ATMEL_STK525)
+
+#define OS_CONFIG_APP_LED_PORT_INIT     DDRD
+#define OS_CONFIG_APP_LED_PORT          PORTD
+#define OS_CONFIG_APP_LED_BIT           PORTD5
 
 #elif defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
 
@@ -33,10 +37,6 @@
 #endif
 
 // ----------------------------------------------------------------------------
-
-#define OS_CONFIG_APP_LED_PORT_INIT     DDRD
-#define OS_CONFIG_APP_LED_PORT          PORTD
-#define OS_CONFIG_APP_LED_BIT           PORTD5
 
 #define MMC_BUFSIZE                     (96+4+4)
 #define MMC_CID_OFFSET                  20

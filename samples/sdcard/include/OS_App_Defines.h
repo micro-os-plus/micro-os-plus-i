@@ -32,13 +32,14 @@
 
 #define OS_INCLUDE_OSDEVICECHARACTER_STREAMBUF            1
 
-#define OS_INCLUDE_DEVICECHARACTER_TYPE                 1
+#define OS_INCLUDE_OSDEVICECHARACTER_TYPE                 1
 
 #define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
 #define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
 
 #define OS_CFGBOOL_DEVCHAR_USB_COM_CONTEXT_SWITCH       (true)
 
+#define OS_INCLUDE_SIMPLECLI_PARSER                     1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_SHORT            1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG             1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE           1
@@ -66,12 +67,18 @@
 #define OS_INCLUDE_TASKBLINK                            1
 
 #if defined(DEBUG)
-// One of the following must be defined in Makefile or project
-//#define OS_CONFIG_DEBUG_DEVICE_I2C                    1
-//#define OS_CONFIG_DEBUG_DEVICE_USART			1
 
-#define OS_DEBUG_OSDEVICECHARACTER_OPEN                 1
+#define OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS          (1)
 
-#endif
+#define OS_DEBUG_CONSTRUCTORS                           (1)
+#define OS_DEBUG_INIT_SECTIONS                          (1)
+#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
+
+#define OS_DEBUG_OSSCHEDULER_START                      (1)
+
+//#define OS_DEBUG_OSDEVICECHARACTER_OPEN                 1
+
+#endif /* defined(DEBUG) */
+
 
 #endif /*OS_APP_DEFINES_H_ */

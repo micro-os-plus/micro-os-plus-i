@@ -38,8 +38,8 @@ private:
   unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 150];
   OSDeviceCharacter & m_dev;
 
-  istream m_cin;
-  ostream m_cout;
+  std::istream m_cin;
+  std::ostream m_cout;
   SimpleCli m_cli;
   DeviceMemCard & m_card;
 
