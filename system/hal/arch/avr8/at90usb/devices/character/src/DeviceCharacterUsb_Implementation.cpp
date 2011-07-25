@@ -62,7 +62,7 @@ DeviceCharacterUsb::implGetOpenEvent(void)
 }
 
 bool
-DeviceCharacterUsb::implIsConnected() const
+DeviceCharacterUsb::implIsConnected()
 {
   //OSDeviceDebug::putString("DeviceCharacterUsb::isConnected()");
   //    OSDeviceDebug::putNewLine();
@@ -473,14 +473,14 @@ DeviceCharacterUsb::cdcSetControlLineState()
 
   if (index == IF0_NB)
     {
-      g_usb0->setOpened(opened);
+      g_usb0->m_opened = opened;
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
       OSDeviceDebug::putString("set ");
 #endif
     }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
   if (index == IF0b_NB)
-  g_usb1->setOpened(opened);
+  g_usb1->m_opened = opened;
 #endif
 
   if (opened)
