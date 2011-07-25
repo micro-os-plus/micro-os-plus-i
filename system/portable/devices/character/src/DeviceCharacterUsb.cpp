@@ -16,13 +16,7 @@
 
 DeviceCharacterUsb::DeviceCharacterUsb(int device)
 {
-#if defined(DEBUG) && defined(OS_DEBUG_CONSTRUCTORS)
-  OSDeviceDebug::putString("DeviceCharacterUsb(");
-  OSDeviceDebug::putDec((unsigned short) device);
-  OSDeviceDebug::putString(")=");
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putNewLine();
-#endif
+  OSDeviceDebug::putConstructorWithIndex_P(PSTR("DeviceCharacterUsb"), (unsigned short) device, this);
 
   m_connected = false;
   m_opened = false;
