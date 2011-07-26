@@ -355,7 +355,7 @@ namespace avr32
       PdcaReceive(pdca::ChannelId_t id);
 
       OSReturn_t
-      readRegion(pdca::RegionAddress_t& region, int &regionIdx, bool doNotBlock);
+      readRegion(pdca::Region_t& region, int &regionIdx, bool doNotBlock);
       void
       stopTransfer(void);
 

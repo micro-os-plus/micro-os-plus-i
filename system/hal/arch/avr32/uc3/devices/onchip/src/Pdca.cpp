@@ -298,7 +298,7 @@ namespace avr32
     }
 
     OSReturn_t
-    PdcaReceive::readRegion(pdca::RegionAddress_t& region, int &regionIdx,
+    PdcaReceive::readRegion(pdca::Region_t& region, int &regionIdx,
         bool doNotBlock)
     {
       int nextRegion;
@@ -318,7 +318,7 @@ namespace avr32
       if (m_pRegionsArray[m_candidateNotif].status
           == avr32::uc3::pdca::IS_TRANFERRED_MASK)
         {
-          region = &(m_pRegionsArray[m_candidateNotif]);
+          region = (m_pRegionsArray[m_candidateNotif]);
           regionIdx = m_candidateNotif;
 
           // reset flag as it was signalled
@@ -361,7 +361,7 @@ namespace avr32
       OSDeviceDebug::putNewLine();
 #endif
 
-      region = &(m_pRegionsArray[m_candidateNotif]);
+      region = (m_pRegionsArray[m_candidateNotif]);
       regionIdx = m_candidateNotif;
 
       // reset flag as it was signalled
