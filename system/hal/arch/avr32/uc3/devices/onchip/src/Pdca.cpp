@@ -51,7 +51,10 @@ namespace avr32
 
       // init status of each region
       for (uint_t i = 0; i < regionsArraySize; i++)
-        pRegionsArray[i].status = avr32::uc3::pdca::IS_EMPTY_MASK;
+        {
+          pRegionsArray[i].status = avr32::uc3::pdca::IS_EMPTY_MASK;
+          pRegionsArray[i].externStatus = avr32::uc3::pdca::EXT_STATUS_OK;
+        }
     }
 
     OSReturn_t
@@ -83,7 +86,8 @@ namespace avr32
       // set first region to be used in transfer
       registers.writeMemoryAddress(m_pRegionsArray[0].address);
       registers.writeTransferCount(m_pRegionsArray[0].size);
-      //while (registers.readStatus())
+      m_pRegionsArray[0].externStatus
+                = avr32::uc3::pdca::EXT_STATUS_OK;
       m_currentRegionIndex = 0;
       m_candidateNotif = 0;
 
@@ -128,6 +132,9 @@ namespace avr32
       m_reloadedRegionIndex = nextRegion;
       registers.writeInterruptDisable(AVR32_PDCA_IDR_TRC_MASK);
       registers.writeInterruptEnable(AVR32_PDCA_IER_RCZ_MASK);
+      // clear external status
+      m_pRegionsArray[nextRegion].externStatus
+          = avr32::uc3::pdca::EXT_STATUS_OK;
 #if OS_DEBUG_PDCA
       OSDeviceDebug::putDec((uint16_t)m_channelId);
       OSDeviceDebug::putString(" reloaded ");
@@ -182,9 +189,8 @@ namespace avr32
       // disable PDMA channel
       registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
 
-      // update remaining numbers of words
-      m_wordsRemaining = registers.readTransferCounter()
-          + registers.readTransferCounterReload();
+      // update remaining numbers of words from the current transfer
+      m_wordsRemaining = registers.readTransferCounter();
 
       // reset counters
       registers.writeTransferCount(0);
@@ -318,7 +324,7 @@ namespace avr32
       if (m_pRegionsArray[m_candidateNotif].status
           == avr32::uc3::pdca::IS_TRANFERRED_MASK)
         {
-          region = (m_pRegionsArray[m_candidateNotif]);
+          region = m_pRegionsArray[m_candidateNotif];
           regionIdx = m_candidateNotif;
 
           // reset flag as it was signalled
@@ -361,7 +367,7 @@ namespace avr32
       OSDeviceDebug::putNewLine();
 #endif
 
-      region = (m_pRegionsArray[m_candidateNotif]);
+      region = m_pRegionsArray[m_candidateNotif];
       regionIdx = m_candidateNotif;
 
       // reset flag as it was signalled
@@ -389,6 +395,9 @@ namespace avr32
       m_status = avr32::uc3::pdca::STATUS_STOPPED;
       m_pRegionsArray[m_candidateNotif].status
           = avr32::uc3::pdca::IS_TRANFERRED_MASK;
+      m_pRegionsArray[m_candidateNotif].externStatus
+          = avr32::uc3::pdca::EXT_STATUS_STOPPED;
+      m_pRegionsArray[m_candidateNotif].wordsRemaining = m_wordsRemaining;
       // notify
       OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
     }
@@ -412,6 +421,8 @@ namespace avr32
           // set status to finished
           m_pRegionsArray[m_candidateNotif].status
               = avr32::uc3::pdca::IS_TRANFERRED_MASK;
+          m_pRegionsArray[m_candidateNotif].externStatus
+              = avr32::uc3::pdca::EXT_STATUS_ERROR;
           m_status = avr32::uc3::pdca::STATUS_ERROR;
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }

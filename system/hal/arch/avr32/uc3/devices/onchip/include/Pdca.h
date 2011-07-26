@@ -40,8 +40,17 @@ namespace avr32
         IS_EMPTY_MASK = 0, // not used
         IS_PREPARED_MASK = 1, // region is loaded into PDCA's registers
         IS_TRANFERRED_MASK = 2, // region is transferred
-        IS_SIGNALLED_MASK = 3 // region is signalled to the upper layer
-      }RegionStatus_t;
+        IS_SIGNALLED_MASK = 3
+      // region is signalled to the upper layer
+      } RegionStatus_t;
+
+      typedef enum RegionExternStatus_e
+      {
+        // Define masks for each region
+        EXT_STATUS_OK = 0, // not used
+        EXT_STATUS_STOPPED = 1,
+        EXT_STATUS_ERROR = 2
+      } RegionExternStatus_t;
 
       typedef struct Region_s
       {
@@ -49,6 +58,8 @@ namespace avr32
         RegionAddress_t address;
         RegionSize_t size;
         RegionStatus_t status;
+        RegionExternStatus_t externStatus;
+        uint16_t wordsRemaining;
       } Region_t;
 
       typedef enum PeripheralId_e
@@ -343,7 +354,6 @@ namespace avr32
       stopTransfer(void);
       void
       interruptServiceRoutine(void);
-
 
     };
 
