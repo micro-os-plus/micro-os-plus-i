@@ -8,10 +8,12 @@
 #define DEVICE_TEXAS_CC2400_H_
 
 #include "portable/kernel/include/OS.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
 
 #include "hal/arch/avr32/uc3/devices/onchip/include/Spi.h"
+#include "portable/devices/generic/include/ChipSelectActiveLow.h"
 
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
@@ -164,6 +166,16 @@ namespace device
         void
         writeByteContinuously(uint8_t value);
 
+        void
+        setSpiToRadioSpeed(void);
+        void
+        setSpiHighSpeed(void);
+
+        void
+        switchToTxMode();
+
+        void
+        initSpi();
       private:
         spim_t& m_spi;
       };
@@ -172,14 +184,130 @@ namespace device
     class Cc2400
     {
     public:
-      Cc2400(cc2400::spim_t& spi);
+      Cc2400(cc2400::spim_t& spi, ChipSelectActiveLow& cs,
+          avr32::uc3::Gpio& m_mdmClkEn, avr32::uc3::Gpio& m_mdmGio1,
+          avr32::uc3::Gpio& m_mdmGio6, avr32::uc3::Gpio& m_mdmRxStrb,
+          avr32::uc3::Gpio& m_mdmTxStrb, avr32::uc3::Gpio& m_mdmPktRdy,
+          avr32::uc3::Gpio& m_mdmFifoRdy, avr32::uc3::Gpio& m_mdmPwrEnIo,
+          avr32::uc3::Gpio& m_mdmPwrEnCore);
 
       // TODO: make registers public
-    //private:
-      cc2400::Registers registers;
+
+      // power OFF the modem
+      void
+      powerOff(void);
+
+      // power ON the modem in 2 phases
+      void
+      powerOnPhase1(void);
+      void
+      powerOnPhase2(void);
+
+      // set all registers to default value
+      void
+      configureRegisters();
+
+      // do the calibration, and return its status
+      bool
+      isCalibrationOk(bool isDebug);
+
+      // clear FIFO buffer
+      void
+      clearFifoBuffer();
+
+      // returns value of last RSSI measured by modem in RX mode
+      int16_t
+      readRssiValue(void);
+
+      // returns current value of FSM
+      uint16_t
+      readFsmState(device::texas::cc2400::Status_t &status);
+
+      void
+      prepareTx(uint16_t frecv,
+          device::texas::cc2400::TxPowerLevel_t txPowerLevel);
+
+      void
+      prepareRx(uint16_t frecv);
+
+      void
+      switchToTxMode(void);
+
+      void
+      switchToRxMode(void);
+
+      void
+      switchToIdleMode(void);
+
+      bool
+      isTxComplete();
+
+      void
+      enableFifoInterrupt(avr32::uc3::intc::InterruptHandler_t handler,
+          avr32::uc3::gpio::InterruptMode_t mode);
+
+      void
+      disableFifoInterrupt(void);
+
+      device::texas::cc2400::Registers registers;
+
+    private:
+      //  assert CS, writes a CC2400 register, de-assert CS
+      device::texas::cc2400::Status_t
+      writeRegUseCs(device::texas::cc2400::RegisterId_t reg, uint16_t value);
+
+      // the offset of RSSI register
+      static const int16_t m_rssiOffset = -54;
+
+      ChipSelectActiveLow& m_cs;
+      // Radio Interface (Modem) pins
+      avr32::uc3::Gpio& m_mdmClkEn;
+      avr32::uc3::Gpio& m_mdmGio1;
+      avr32::uc3::Gpio& m_mdmGio6;
+      avr32::uc3::Gpio& m_mdmRxStrb;
+      avr32::uc3::Gpio& m_mdmTxStrb;
+      avr32::uc3::Gpio& m_mdmPktRdy;
+      avr32::uc3::Gpio& m_mdmFifoRdy;
+
+      // Radio Interface (Power supplies) pins
+      avr32::uc3::Gpio& m_mdmPwrEnIo;
+      avr32::uc3::Gpio& m_mdmPwrEnCore;
+
     };
 
     // ===== Inline methods ===================================================
+
+    inline void
+    Cc2400::switchToTxMode(void)
+    {
+      m_mdmTxStrb.setPinLow();
+    }
+
+    inline void
+    Cc2400::switchToRxMode(void)
+    {
+      m_mdmRxStrb.setPinLow();
+    }
+
+    inline void
+    Cc2400::switchToIdleMode(void)
+    {
+      m_mdmTxStrb.setPinLow();
+      m_mdmRxStrb.setPinLow();
+    }
+
+    inline bool
+    Cc2400::isTxComplete(void)
+    {
+      return (!m_mdmPktRdy.isPinHigh());
+    }
+
+    inline void
+    Cc2400::disableFifoInterrupt(void)
+    {
+      m_mdmFifoRdy.clearInterruptRequested();
+      m_mdmFifoRdy.disableInterrupt();
+    }
 
     namespace cc2400
     {
@@ -205,6 +333,27 @@ namespace device
       Status::isFsLock(Status_t status)
       {
         return (status & FS_LOCK) != 0;
+      }
+
+      inline void
+      Registers::setSpiToRadioSpeed(void)
+      {
+        m_spi.configChipSelect(16, 0, avr32::uc3::spi::BITS_8);
+      }
+
+      inline void
+      Registers::setSpiHighSpeed(void)
+      {
+        m_spi.configChipSelect(1, 0, avr32::uc3::spi::BITS_8);
+      }
+
+      inline void
+      Registers::initSpi(void)
+      {
+        m_spi.init();
+        // set SPI max speed, no delay between bytes, 8-bit word size
+        setSpiHighSpeed();
+        m_spi.enable();
       }
 
     }
