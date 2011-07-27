@@ -549,6 +549,9 @@ public:
     ~Implementation();
 #endif /* defined(DEBUG) */
 
+    virtual bool
+    isUsingSpi(void);
+
     friend class OSDeviceMemoryCard;
 
   private:
@@ -593,7 +596,9 @@ public:
 
     virtual bool
     isCrcError(void) = 0;
+
   };
+
 
   typedef Implementation Implementation_t;
 
@@ -638,6 +643,9 @@ public:
   // Return the device block size, in bytes.
   virtual OSDeviceBlock::BlockSize_t
   getBlockSize(void);
+
+  Implementation_t&
+  getImplementation(void);
 
 private:
 
@@ -687,7 +695,15 @@ private:
 
   Implementation_t& m_implementation;
 
+
   // --------------------------------------------------------------------------
 };
+
+inline OSDeviceMemoryCard::Implementation_t&
+OSDeviceMemoryCard::getImplementation(void)
+{
+  return m_implementation;
+}
+
 
 #endif /* OSDEVICEMEMORYCARD_H_ */
