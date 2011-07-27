@@ -15,7 +15,7 @@ class TaskCli : public OSThread
   {
 public:
   // active object constructor
-  TaskCli(const char* pName, OSDeviceCharacter& dev, avr32::uc3::MemoryCardMci& card);
+  TaskCli(const char* pName, OSDeviceCharacter& dev, OSDeviceMemoryCard& card);
 
   // actual thread main code
   virtual void threadMain(void);
@@ -37,7 +37,7 @@ private:
   std::istream m_cin;
   std::ostream m_cout;
   SimpleCli m_cli;
-  avr32::uc3::MemoryCardMci& m_card;
+  OSDeviceMemoryCard& m_card;
 
   unsigned char m_line[80];
 
