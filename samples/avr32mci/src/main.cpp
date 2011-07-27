@@ -6,16 +6,25 @@
 
 #include "portable/kernel/include/uOS.h"
 
-#include "hal/arch/avr32/uc3/devices/onchip/include/Mci.h"
+#if defined(APP_INCLUDE_MEMORYCARDSPI)
+#include "hal/arch/avr32/uc3/devices/block/include/MemoryCardSpi.h"
+#else
+//#include "hal/arch/avr32/uc3/devices/onchip/include/Mci.h"
 #include "hal/arch/avr32/uc3/devices/block/include/MemoryCardMci.h"
+#endif /* defined(APP_INCLUDE_MEMORYCARDSPI) */
+
 #include "TaskCli.h"
 
-// ------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Cli Tasks
 
 //avr32::uc3::Mci mci;
 
-avr32::uc3::MemoryCardMci card;
+#if defined(APP_INCLUDE_MEMORYCARDSPI)
+avr32::uc3::MemoryCardSpi card(avr32::uc3::spi::MODULE_1, 41);
+#else
+avr32::uc3::MemoryCardMci card(avr32::uc3::mci::CardSlot::B);
+#endif /* defined(APP_INCLUDE_MEMORYCARDSPI) */
 
 // USB device
 DeviceCharacterUsb devUsb;
@@ -23,7 +32,7 @@ DeviceCharacterUsb devUsb;
 // active objects allocated on static storage
 TaskCli taskCli("usb", devUsb, card);
 
-// ------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Blink Task
 
 // active objects allocated on static storage
