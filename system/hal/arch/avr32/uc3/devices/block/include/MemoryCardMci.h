@@ -18,19 +18,19 @@ namespace avr32
   {
     class MemoryCardMci : public OSDeviceMemoryCard
     {
-    private:
+    public:
 
       // ---- Implementation class --------------------------------------------
 
       class Implementation : public OSDeviceMemoryCard::Implementation
       {
       public:
-        Implementation();
+        Implementation(mci::CardSlot_t cardSlot);
         virtual
         ~Implementation();
 
-        void
-        setOpenParameters(mci::CardSlot_t cardSlot);
+        //void
+        //setOpenParameters(void);
 
         friend class OSDeviceMemoryCard;
 
@@ -94,7 +94,7 @@ namespace avr32
 
       // ----- Constructors & Destructors -------------------------------------
 
-      MemoryCardMci();
+      MemoryCardMci(mci::CardSlot_t cardSlot);
 
       virtual
       ~MemoryCardMci();

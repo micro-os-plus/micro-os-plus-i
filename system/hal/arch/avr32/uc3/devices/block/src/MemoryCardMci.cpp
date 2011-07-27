@@ -11,15 +11,15 @@
 #if defined(OS_INCLUDE_AVR32_UC3_MEMORYCARDMCI)
 
 #include "hal/arch/avr32/uc3/devices/block/include/MemoryCardMci.h"
-#include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
-#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
+//#include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
+//#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
 
 namespace avr32
 {
   namespace uc3
   {
-    MemoryCardMci::MemoryCardMci() :
-      OSDeviceMemoryCard(implementation)
+    MemoryCardMci::MemoryCardMci(mci::CardSlot_t cardSlot) :
+      OSDeviceMemoryCard(implementation), implementation(cardSlot)
     {
       OSDeviceDebug::putConstructor("avr32::uc3::MemoryCardMci", this);
     }
@@ -31,10 +31,12 @@ namespace avr32
 
     // ===== Implementation ===================================================
 
-    MemoryCardMci::Implementation::Implementation()
+    MemoryCardMci::Implementation::Implementation(mci::CardSlot_t cardSlot)
     {
       OSDeviceDebug::putConstructor(
           "avr32::uc3::MemoryCardMci::Implementation", this);
+
+      m_cardSlot = cardSlot;
     }
 
     MemoryCardMci::Implementation::~Implementation()
@@ -45,11 +47,10 @@ namespace avr32
 
     // ----- Public methods ---------------------------------------------------
 
-    void
-    MemoryCardMci::Implementation::setOpenParameters(mci::CardSlot_t cardSlot)
-    {
-      m_cardSlot = cardSlot;
-    }
+    //    void
+    //    MemoryCardMci::Implementation::setOpenParameters(void)
+    //    {
+    //    }
 
     // ---- Private virtuals Methods ------------------------------------------
 
@@ -218,6 +219,10 @@ namespace avr32
     {
       m_mci.initSdCardBusWidthAndSlot(busWidth, m_cardSlot);
 
+      OSDeviceDebug::putString("sdc=");
+      OSDeviceDebug::putHex(m_mci.moduleRegisters.readSdCard());
+      OSDeviceDebug::putNewLine();
+
       return OSReturn::OS_OK;
     }
 
@@ -225,9 +230,11 @@ namespace avr32
     MemoryCardMci::Implementation::waitBusySignal(void)
     {
       // mci_wait_busy_signal()
-      while (!(m_mci.getStatusRegister() & AVR32_MCI_SR_NOTBUSY_MASK)) {
-        OSDeviceDebug::putChar('w');
-      }
+      while (!(m_mci.getStatusRegister() & AVR32_MCI_SR_NOTBUSY_MASK))
+        {
+          OSDeviceDebug::putChar('w');
+          OSScheduler::yield();
+        }
 
       return OSReturn::OS_OK;
     }
@@ -243,6 +250,11 @@ namespace avr32
       mci_sdcr_register = m_mci.moduleRegisters.readSdCard();
       mci_sdcr_register &= ~AVR32_MCI_SDCR_SDCBUS_MASK; // Clear previous buswidth
       mci_sdcr_register |= (busWidth << AVR32_MCI_SDCR_SDCBUS_OFFSET);
+
+      OSDeviceDebug::putString(" bwsdc=");
+      OSDeviceDebug::putHex(mci_sdcr_register);
+      OSDeviceDebug::putNewLine();
+
       m_mci.moduleRegisters.writeSdCard(mci_sdcr_register);
 
       return OSReturn::OS_OK;
@@ -278,7 +290,8 @@ namespace avr32
     uint32_t
     MemoryCardMci::Implementation::readData(void)
     {
-      return ((m_mci.getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK)) != 0;
+      return m_mci.readData();
+      //return ((m_mci.getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK)) != 0;
     }
 
     bool
@@ -308,6 +321,7 @@ namespace avr32
       OSDeviceDebug::putString("avr32::uc3::MemoryCardMci::initGpio()");
       OSDeviceDebug::putNewLine();
 
+#if false
       // CLK
       avr32::uc3::Gpio::configPeripheralModeAndFunction(27,
           avr32::uc3::gpio::PeripheralFunction::A);
@@ -344,6 +358,8 @@ namespace avr32
           avr32::uc3::Gpio::configPeripheralModeAndFunction(36,
               avr32::uc3::gpio::PeripheralFunction::A);
         }
+#endif
+
     }
 
   // --------------------------------------------------------------------------
