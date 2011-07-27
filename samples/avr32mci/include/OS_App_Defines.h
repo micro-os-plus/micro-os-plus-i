@@ -44,7 +44,12 @@
 #define OS_INCLUDE_AVR32_UC3_GPIO                       (1)
 #define OS_INCLUDE_AVR32_UC3_PM                         (1)
 
+#define OS_INCLUDE_AVR32_UC3_SPI                        (1)
+
+#define OS_INCLUDE_CHIPSELECTACTIVELOW                  (1)
+
 #define OS_INCLUDE_AVR32_UC3_MEMORYCARDMCI              (1)
+#define OS_INCLUDE_AVR32_UC3_MEMORYCARDSPI              (1)
 #define OS_INCLUDE_OSDEVICEMEMORYCARD                   (1)
 
 // ----------------------------------------------------------------------------
