@@ -9,6 +9,8 @@
 #include "TaskCli.h"
 #include "portable/kernel/include/ostream_OSThread.h"
 
+#include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
+
 /*
  * Active object constructor. 
  * Initialise parent system thread, initialise member objects
@@ -17,7 +19,7 @@
  */
 
 TaskCli::TaskCli(const char* pName, OSDeviceCharacter& dev,
-    avr32::uc3::MemoryCardMci& card) :
+    OSDeviceMemoryCard& card) :
   OSThread(pName, m_stack, (OSStackSize_t) sizeof(m_stack)), m_dev(dev),
       m_cin(&m_dev), m_cout(&m_dev), m_cli(m_line, sizeof(m_line)),
       m_card(card)
@@ -65,6 +67,26 @@ TaskCli::threadMain(void)
    OS_CONFIG_USBINT_LED_PORT_INIT |= _BV( PORTD0 );
    OS_CONFIG_USBINT_LED_PORT_INIT |= _BV( PORTD1 );
    */
+
+  // init EVK1104 MCI pins for the SD 4 bits connector
+
+  // CLK
+  avr32::uc3::Gpio::configPeripheralModeAndFunction(27,
+      avr32::uc3::gpio::PeripheralFunction::A);
+
+  // CMD0 (connected to card 0 CMD)
+  avr32::uc3::Gpio::configPeripheralModeAndFunction(15,
+      avr32::uc3::gpio::PeripheralFunction::A);
+
+  // DATA[0-3] (connected to card 0 DATA[0-3]
+  avr32::uc3::Gpio::configPeripheralModeAndFunction(19,
+      avr32::uc3::gpio::PeripheralFunction::A);
+  avr32::uc3::Gpio::configPeripheralModeAndFunction(18,
+      avr32::uc3::gpio::PeripheralFunction::A);
+  avr32::uc3::Gpio::configPeripheralModeAndFunction(17,
+      avr32::uc3::gpio::PeripheralFunction::A);
+  avr32::uc3::Gpio::configPeripheralModeAndFunction(16,
+      avr32::uc3::gpio::PeripheralFunction::A);
 
   // thread endless loop
   for (;;)
@@ -260,7 +282,17 @@ TaskCli::cmdMI()
   int r;
   std::ostream& cout = m_cout;
 
-  m_card.implementation.setOpenParameters( avr32::uc3::mci::CardSlot::A);
+  OSDeviceMemoryCard::Implementation& impl = m_card.getImplementation();
+
+  if (impl.isUsingSpi())
+    {
+      // TODO: add
+    }
+  else
+    {
+      // TODO: add
+      //static_cast<avr32::uc3::MemoryCardMci::Implementation&> (impl).setOpenParameters();
+    }
 
   r = m_card.open();
 
@@ -308,8 +340,9 @@ TaskCli::cmdMI()
       bInit = false;
 #else
       cout << "Card opened" << std::endl;
-      cout << "Size=" << m_card.getDeviceSize() << " blks, " << m_card.getDeviceSize() * m_card.getBlockSize() / 1024 /1024 << " MB"
-          << std::endl;
+      cout << "Size=" << std::dec << m_card.getDeviceSize() << " blks, "
+          << m_card.getDeviceSize() * m_card.getBlockSize() / 1024 / 1024
+          << " MB" << std::endl;
 #endif
     }
 }
@@ -694,7 +727,7 @@ TaskCli::cmdMR(unsigned long l)
 
   //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
 
-  r = m_card.readBlocks(l, (uint8_t*)m_buf, 1);
+  r = m_card.readBlocks(l, (uint8_t*) m_buf, 1);
   if (r != 0)
     {
       cout << std::endl;
@@ -706,24 +739,30 @@ TaskCli::cmdMR(unsigned long l)
   cout << std::endl;
 
   unsigned int i;
+
+  uint8_t* p;
+  p = (uint8_t*)&m_buf[0];
+
   //unsigned char cxor;
-  for (i = 0; i < 512; ++i)
+  for (i = 0; i < 512; ++i, ++p)
     {
-      unsigned char b;
-      b = m_buf[i];
+      uint8_t b;
+      b = *p;
 
       cout.width(2);
-      cout << (unsigned short) b ;
+      cout << std::hex << (unsigned short) b;
 
       if ((i % 16) == 15)
         {
           cout << std::endl;
+          cout.flush();
         }
       else
         {
           cout << ' ';
         }
     }
+
   cout.flush();
   //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
 
