@@ -21,7 +21,7 @@ namespace avr32
               *reinterpret_cast<spi::Registers*> (spi::Registers::MEMORY_ADDRESS
                   + ((module % 2) * spi::Registers::MEMORY_OFFSET)))
     {
-      OSDeviceDebug::putConstructor("avr32::uc3::Spim", this);
+      OSDeviceDebug::putConstructorWithIndex("avr32::uc3::Spim", module, this);
     }
 
     Spim::~Spim()
