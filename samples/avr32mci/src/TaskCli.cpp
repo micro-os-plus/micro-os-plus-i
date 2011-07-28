@@ -68,7 +68,7 @@ TaskCli::threadMain(void)
    OS_CONFIG_USBINT_LED_PORT_INIT |= _BV( PORTD1 );
    */
 
-  // init EVK1104 MCI pins for the SD 4 bits connector
+  // init EVK1104 MCI pins for the SD 4 bits connector, slot B
 
   // CLK
   avr32::uc3::Gpio::configPeripheralModeAndFunction(27,
@@ -155,7 +155,7 @@ TaskCli::threadMain(void)
     }
 }
 
-static const char str_help[] = "mi|mc|mr | ri|rd | st";
+static const char str_help[] = "mo|mc|mi|mr n|mw n|st";
 static const char str_unknown[] = "Cmd?";
 
 /*
@@ -163,14 +163,16 @@ static const char str_unknown[] = "Cmd?";
  * 
  * Accepted commands:
  * 
- * 	mi 		- memory init
- * 	mc 		- memory config
+ * 	mo 		- memory open
+ * 	mc 		- memory close
+ *
  * 	mr blk	 	- memory read
+ * 	mw blk          - memory write
+ *      me blk          - memory erase
  * 
+ *      mi              - memory info
+ *
  * 	st 		- show threads
- * 
- * 	ri		- recorder info
- * 	rd blk w	- read data
  */
 
 void
@@ -186,7 +188,7 @@ TaskCli::lineProcess()
   unsigned char *p;
   unsigned char c;
   uint32_t l;
-  unsigned short u;
+  //unsigned short u;
   //unsigned char v;
   //unsigned char i;
 
@@ -222,16 +224,6 @@ TaskCli::lineProcess()
       else
         goto err;
     }
-  else if (c == 'x')
-    {
-      if ((p = cli.parseNext()) == 0)
-        goto err;
-
-      if (cli.parseHex(p, &u) < 0)
-        goto err;
-
-      //cmdX(u);
-    }
   else if (c == 'm')
     {
       // test commands
@@ -241,13 +233,17 @@ TaskCli::lineProcess()
         goto err;
 
       c |= 0x20;
-      if (c == 'i')
+      if (c == 'o')
         {
-          cmdMI();
+          cmdMO();
         }
       else if (c == 'c')
         {
-          cmdMC();
+          m_card.close();
+        }
+      else if (c == 'i')
+        {
+          cmdMI();
         }
       else if (c == 'r')
         {
@@ -259,10 +255,15 @@ TaskCli::lineProcess()
 
           cmdMR(l);
         }
-      else if (c == 'z')
+      else if (c == 'w')
         {
-          //m_card.close();
-          bInit = true;
+          if ((p = cli.parseNext()) == 0)
+            goto err;
+
+          if (cli.parseUnsigned(p, &l) < 0)
+            goto err;
+
+          cmdMW(l);
         }
       else
         goto err;
@@ -277,7 +278,39 @@ TaskCli::lineProcess()
 }
 
 void
-TaskCli::cmdMI()
+TaskCli::dumpHex(uint8_t* p, int len)
+{
+  std::ostream& cout = m_cout;
+
+  int i;
+  for (i = 0; i < len; ++i, ++p)
+    {
+      uint8_t b;
+      b = *p;
+
+      if ((i % 16) == 0)
+        {
+          cout.width(4);
+          cout << std::hex << (unsigned short) i << ' ';
+        }
+      cout.width(2);
+      cout << std::hex << (unsigned short) b;
+
+      if ((i % 16) == 15)
+        {
+          cout << std::endl;
+          cout.flush();
+        }
+      else
+        {
+          cout << ' ';
+        }
+    }
+  cout.flush();
+}
+
+void
+TaskCli::cmdMO()
 {
   int r;
   std::ostream& cout = m_cout;
@@ -357,7 +390,7 @@ const char * speedUnits[] =
   { "100Kb/s", "1Mb/s", "10Mb/s", "100Mb/s", "?", "?", "?", "?s" };
 
 void
-TaskCli::cmdMC()
+TaskCli::cmdMI()
 {
 #if false
   int r;
@@ -714,18 +747,6 @@ TaskCli::cmdMR(unsigned long l)
   int r;
   std::ostream& cout = m_cout;
 
-  if (bInit)
-    {
-      r = m_card.open();
-      if (r < 0)
-        {
-          cout << std::endl;
-          cout << 'I' << std::dec << r;
-          return;
-        }
-      bInit = false;
-    }
-
   //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
 
   r = m_card.readBlocks(l, (uint8_t*) m_buf, 1);
@@ -739,32 +760,58 @@ TaskCli::cmdMR(unsigned long l)
 
   cout << std::endl;
 
-  unsigned int i;
+  dumpHex((uint8_t*) m_buf, 512);
+  //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
+
+}
+
+void
+TaskCli::cmdMW(unsigned long l)
+{
+  int r;
+  std::ostream& cout = m_cout;
 
   uint8_t* p;
-  p = (uint8_t*)&m_buf[0];
+  p = (uint8_t*) &m_buf[0];
 
-  //unsigned char cxor;
+  int i;
   for (i = 0; i < 512; ++i, ++p)
     {
       uint8_t b;
-      b = *p;
 
-      cout.width(2);
-      cout << std::hex << (unsigned short) b;
-
-      if ((i % 16) == 15)
-        {
-          cout << std::endl;
-          cout.flush();
-        }
+      if ((i % 16) == 0)
+        b = i / 16;
+      else if ((i % 16) == 1)
+        b = (l >> 24);
+      else if ((i % 16) == 2)
+        b = (l >> 16);
+      else if ((i % 16) == 3)
+        b = (l >> 8);
+      else if ((i % 16) == 4)
+        b = l;
       else
-        {
-          cout << ' ';
-        }
+        b = i;
+
+      *p = b;
     }
 
-  cout.flush();
+#if false
+  dumpHex((uint8_t*) m_buf, 512);
+#endif
+
+  //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
+
+  r = m_card.writeBlocks(l, (uint8_t*) m_buf, 1);
+  if (r != 0)
+    {
+      cout << std::endl;
+      cout << 'R' << std::dec << r;
+      return;
+    }
+  //OS_CONFIG_USBINT_LED_PORT |= _BV(PORTD0);
+
+  cout << std::endl;
+
   //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
 
 }

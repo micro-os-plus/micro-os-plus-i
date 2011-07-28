@@ -23,15 +23,21 @@ public:
 private:
   void lineProcess(void);
 
-  void cmdMI(void);
+  void cmdMO(void);
   void cmdMC(void);
-  void cmdST(void);
-  void cmdRI(void);
+
+  void cmdMI(void);
+
   void cmdMR(unsigned long l);
-  void cmdX(unsigned short v);
+  void cmdMW(unsigned long l);
+
+  void dumpHex(uint8_t* p, int len);
+
+  void cmdST(void);
 
   // members
   OSStack_t m_stack[OSThread::STACK_MINIMAL_SIZE + 150];
+
   OSDeviceCharacter& m_dev;
 
   std::istream m_cin;
