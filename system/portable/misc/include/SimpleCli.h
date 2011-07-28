@@ -37,6 +37,11 @@ public:
   parseHex(unsigned char* p, unsigned long* plh);
   int8_t
   parseUnsigned(unsigned char* p, unsigned short* psh);
+#if defined(OS_INCLUDE_SIMPLECLI_PARSE_UNSIGNED_LONG)
+  int8_t
+  parseUnsigned(unsigned char* p, uint32_t* pl);
+#endif /* defined(OS_INCLUDE_SIMPLECLI_PARSE_UNSIGNED_LONG) */
+
 #endif /* defined(OS_INCLUDE_SIMPLECLI_PARSER) */
 
 private:
