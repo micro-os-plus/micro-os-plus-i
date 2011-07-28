@@ -39,7 +39,7 @@ namespace avr32
     void
     Mci::initialise(mci::CardSlot_t cardSlot)
     {
-      OSDeviceDebug::putString("avr32::uc3::Mci::init()");
+      OSDeviceDebug::putString("avr32::uc3::Mci::initialise()");
       OSDeviceDebug::putNewLine();
 
       m_shadowStatusRegister = 0;
@@ -126,11 +126,13 @@ namespace avr32
           clkdiv -= 1;
         }
 
+#if defined(OS_DEBUG_AVR32_UC3_MCI_CONFIGURECLOCKFREQUENCYHZ)
       OSDeviceDebug::putString("Mci freq=");
       OSDeviceDebug::putDec(frequency);
       OSDeviceDebug::putString("Hz, clkdev=");
       OSDeviceDebug::putHex(clkdiv);
       OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_AVR32_UC3_MCI_CONFIGURECLOCKFREQUENCYHZ) */
 
       // Fill in the new clock divider to mode
       mode &= ~AVR32_MCI_MR_CLKDIV_MASK; // Clear previous clkdiv value
@@ -162,6 +164,20 @@ namespace avr32
       moduleRegisters.writeSdCard(
           ((busWidth & 0x3) >> AVR32_MCI_SDCR_SDCBUS_OFFSET)
               | ((cardSlot & 0x3) >> AVR32_MCI_SDCR_SDCSEL_OFFSET));
+    }
+
+    void
+    Mci::configureHighSpeedMode(void)
+    {
+      union u_cfg
+      {
+        unsigned long cfg;
+        avr32_mci_cfg_t CFG;
+      };
+      union u_cfg val;
+      val.cfg = moduleRegisters.readConfiguration();
+      val.CFG.hsmode = 1;
+      moduleRegisters.writeConfiguration(val.cfg);
     }
 
     mci::StatusRegister_t
@@ -210,6 +226,7 @@ namespace avr32
     mci::StatusRegister_t
     Mci::sendCommand(mci::CommandWord_t cmdWord, mci::CommandArgument_t cmdArg)
     {
+#if defined(OS_DEBUG_AVR32_UC3_MCI_SENDCOMMAND)
       OSDeviceDebug::putString("Mci cmd=");
       OSDeviceDebug::putDec(cmdWord & 0x3F);
       OSDeviceDebug::putString(", cmdWord=");
@@ -217,6 +234,7 @@ namespace avr32
       OSDeviceDebug::putString(", arg=");
       OSDeviceDebug::putHex(cmdArg);
       OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_AVR32_UC3_MCI_SENDCOMMAND) */
 
       moduleRegisters.writeArgument(cmdArg);
       moduleRegisters.writeCommand(cmdWord);
@@ -249,9 +267,11 @@ namespace avr32
             }
         }
 
+#if defined(OS_DEBUG_AVR32_UC3_MCI_SENDCOMMAND)
       OSDeviceDebug::putString("Mci ret=");
       OSDeviceDebug::putHex(ret);
       OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_AVR32_UC3_MCI_SENDCOMMAND) */
 
       return ret;
     }
@@ -298,8 +318,10 @@ namespace avr32
 
       ret = moduleRegisters.readReceiveData();
 
+#if defined(OS_DEBUG_AVR32_UC3_MCI_READDATA)
       OSDeviceDebug::putHex(ret);
       OSDeviceDebug::putChar(' ');
+#endif /* defined(OS_DEBUG_AVR32_UC3_MCI_READDATA) */
 
       return ret;
     }
@@ -318,8 +340,10 @@ namespace avr32
     void
     Mci::writeData(uint32_t value)
     {
+#if defined(OS_DEBUG_AVR32_UC3_MCI_WRITEDATA)
       OSDeviceDebug::putHex(value);
       OSDeviceDebug::putChar(' ');
+#endif /* defined(OS_DEBUG_AVR32_UC3_MCI_WRITEDATA) */
 
       moduleRegisters.writeTransmitData(value);
     }

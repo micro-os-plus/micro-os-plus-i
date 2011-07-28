@@ -29,9 +29,6 @@ namespace avr32
         virtual
         ~Implementation();
 
-        //void
-        //setOpenParameters(void);
-
         friend class OSDeviceMemoryCard;
 
       private:
@@ -69,7 +66,7 @@ namespace avr32
         readData(void);
 
         virtual void
-        setHighSpeedMode(void);
+        configureHighSpeedMode(void);
 
         virtual bool
         isCrcError(void);
@@ -80,17 +77,21 @@ namespace avr32
         virtual void
         writeData(uint32_t data);
 
+        void
+        transferIncommingBytes(void *pBuf, size_t bytes);
+
+        virtual void
+        transferOutgoingBytes(void *pBuf, size_t bytes);
+
       private:
 
         // ---- Local methods -------------------------------------------------
-
-        void
-        initGpio(void);
 
         avr32::uc3::mci::BusWidth_t
         convertBusWidth(BusWidth_t busWidth);
 
       public:
+
         avr32::uc3::Mci m_mci;
 
         Mci::ClockFrequencyHz_t m_speed;
@@ -110,7 +111,7 @@ namespace avr32
 
     public:
 
-      // ----- public members -------------------------------------------------
+      // ----- Public members -------------------------------------------------
 
       Implementation implementation;
 
@@ -120,7 +121,7 @@ namespace avr32
     inline avr32::uc3::mci::BusWidth_t
     MemoryCardMci::Implementation::convertBusWidth(BusWidth_t busWidth)
     {
-      // The AVR32 bus width uses the same values, nothing to do
+      // The AVR32 bus width uses the same encoding, so nothing to do
       return busWidth;
     }
   }

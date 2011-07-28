@@ -62,6 +62,9 @@ namespace avr32
       void
       configureBusWidth(mci::BusWidth_t busWidth);
 
+      void
+      configureHighSpeedMode(void);
+
       bool
       isBusy(void);
 

@@ -593,7 +593,7 @@ public:
     readData(void) = 0;
 
     virtual void
-    setHighSpeedMode(void) = 0;
+    configureHighSpeedMode(void) = 0;
 
     virtual bool
     isCrcError(void) = 0;
@@ -603,6 +603,12 @@ public:
 
     virtual void
     writeData(uint32_t value) = 0;
+
+    virtual void
+    transferIncommingBytes(void *pBuf, size_t bytes) = 0;
+
+    virtual void
+    transferOutgoingBytes(void *pBuf, size_t bytes) = 0;
 
   };
 
@@ -679,9 +685,6 @@ private:
 
   OSReturn_t
   prepareReadBlock(OSDeviceBlock::BlockNumber_t blockNumber);
-
-  void
-  transferReadBlocks(void *pBuf, OSDeviceBlock::BlockCount_t count);
 
   OSReturn_t
   finaliseReadBlocks(void);

@@ -11,8 +11,6 @@
 #if defined(OS_INCLUDE_AVR32_UC3_MEMORYCARDMCI)
 
 #include "hal/arch/avr32/uc3/devices/block/include/MemoryCardMci.h"
-//#include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
-//#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
 
 namespace avr32
 {
@@ -45,19 +43,12 @@ namespace avr32
           this);
     }
 
-    // ----- Public methods ---------------------------------------------------
-
-    //    void
-    //    MemoryCardMci::Implementation::setOpenParameters(void)
-    //    {
-    //    }
-
-    // ---- Private virtuals Methods ------------------------------------------
+    // ---- Private virtuals methods ------------------------------------------
 
     OSReturn_t
     MemoryCardMci::Implementation::initialise(void)
     {
-      initGpio();
+      //initGpio();
 
       // TODO: check if we need a special HMATRIX config, as in Atmel framework
 
@@ -140,6 +131,10 @@ namespace avr32
         commandWord = mci::CommandWord::SD_MMC_STOP_READ_TRANSMISSION_CMD;
         break;
 
+      case CommandCode::WRITE_BLOCK:
+        commandWord = mci::CommandWord::SD_MMC_WRITE_BLOCK_CMD;
+        break;
+
         // ----- Application commands -----------------------------------------
       case ApplicationCommandCode::SD_SEND_OP_COND:
         commandWord = mci::CommandWord::SD_MMC_SDCARD_APP_OP_COND_CMD;
@@ -171,12 +166,12 @@ namespace avr32
         }
 
       // -----
-#if defined(DEBUG)
+#if defined(OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_SENDCOMMAND)
       OSDeviceDebug::putString("MC ");
       OSDeviceMemoryCard::CommandClass_t cmsClass;
       cmsClass = (commandCode >> OSDeviceMemoryCard::COMMAND_CLASS_SHIFT);
       if (cmsClass == OSDeviceMemoryCard::CommandClass::APPLICATION_8)
-        OSDeviceDebug::putString("ACMD");
+      OSDeviceDebug::putString("ACMD");
       else
         {
           if (cmsClass == OSDeviceMemoryCard::CommandClass::SWITCH_10)
@@ -194,7 +189,7 @@ namespace avr32
       OSDeviceDebug::putDec(
           (uint16_t) (commandCode & OSDeviceMemoryCard::COMMAND_CODE_MASK));
       OSDeviceDebug::putNewLine();
-#endif /* defined(DEBUG) */
+#endif /* defined(OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_SENDCOMMAND) */
 
       if (m_mci.sendCommand(commandWord, commnadArg) != MCI_SUCCESS)
         return OSReturn::OS_BAD_COMMAND;
@@ -208,9 +203,11 @@ namespace avr32
       OSDeviceMemoryCard::Response_t ret;
       ret = m_mci.moduleRegisters.readResponse(0);
 
+#if defined(OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_READRESPONSE)
       OSDeviceDebug::putString("MC R1=");
       OSDeviceDebug::putHex(ret);
       OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_READRESPONSE) */
 
       return ret;
     }
@@ -220,9 +217,11 @@ namespace avr32
     {
       m_mci.configureSdCardBusWidthAndSlot(m_busWidth, m_cardSlot);
 
+#if defined(OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_SELECTCARD)
       OSDeviceDebug::putString("MC sdc=");
       OSDeviceDebug::putHex(m_mci.moduleRegisters.readSdCard());
       OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_SELECTCARD) */
 
       return OSReturn::OS_OK;
     }
@@ -242,7 +241,8 @@ namespace avr32
     }
 
     OSReturn_t
-    MemoryCardMci::Implementation::configureBlockLengthBytes(BlockLength_t length)
+    MemoryCardMci::Implementation::configureBlockLengthBytes(
+        BlockLength_t length)
     {
       m_mci.configureBlockLengthBytes(length);
       return OSReturn::OS_OK;
@@ -282,17 +282,9 @@ namespace avr32
     }
 
     void
-    MemoryCardMci::Implementation::setHighSpeedMode(void)
+    MemoryCardMci::Implementation::configureHighSpeedMode(void)
     {
-      union u_cfg
-      {
-        unsigned long cfg;
-        avr32_mci_cfg_t CFG;
-      };
-      union u_cfg val;
-      val.cfg = m_mci.moduleRegisters.readConfiguration();
-      val.CFG.hsmode = 1;
-      m_mci.moduleRegisters.writeConfiguration(val.cfg);
+      m_mci.configureHighSpeedMode();
     }
 
     bool
@@ -307,52 +299,111 @@ namespace avr32
       m_mci.writeData(value);
     }
 
-    // ----- Private methods --------------------------------------------------
     void
-    MemoryCardMci::Implementation::initGpio(void)
+    MemoryCardMci::Implementation::transferIncommingBytes(void *pBuf,
+        size_t bytes)
     {
-      OSDeviceDebug::putString("avr32::uc3::MemoryCardMci::initGpio()");
-      OSDeviceDebug::putNewLine();
 
 #if false
-      // CLK
-      avr32::uc3::Gpio::configPeripheralModeAndFunction(27,
-          avr32::uc3::gpio::PeripheralFunction::A);
-
-      if (m_cardSlot == avr32::uc3::mci::CardSlot::A)
-        {
-          // CMD0 (connected to card 0 CMD)
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(28,
-              avr32::uc3::gpio::PeripheralFunction::A);
-
-          // DATA[0-3] (connected to card 0 DATA[0-3]
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(29,
-              avr32::uc3::gpio::PeripheralFunction::A);
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(30,
-              avr32::uc3::gpio::PeripheralFunction::A);
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(31,
-              avr32::uc3::gpio::PeripheralFunction::A);
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(32,
-              avr32::uc3::gpio::PeripheralFunction::A);
-        }
-      else
-        {
-          // CMD1 (connected to card 1 CMD)
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(15,
-              avr32::uc3::gpio::PeripheralFunction::A);
-
-          // DATA[4-7] (connected to card 0 DATA[0-3]
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(33,
-              avr32::uc3::gpio::PeripheralFunction::A);
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(34,
-              avr32::uc3::gpio::PeripheralFunction::A);
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(35,
-              avr32::uc3::gpio::PeripheralFunction::A);
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(36,
-              avr32::uc3::gpio::PeripheralFunction::A);
-        }
+      OSDeviceDebug::putString("ptr=");
+      OSDeviceDebug::putPtr(pLong);
+      OSDeviceDebug::putString(", bytes=");
+      OSDeviceDebug::putDec(bytes);
+      OSDeviceDebug::putNewLine();
 #endif
 
+      uint32_t wordsToRead;
+
+      // Warning: buffer must be word aligned
+      uint32_t* pLong = (uint32_t*) pBuf;
+
+      wordsToRead = (bytes / sizeof(*pLong));
+
+      while (wordsToRead > 0)
+        {
+          while (!(isRxReady()))
+            ;
+          *pLong++ = readData();
+
+          while (!(isRxReady()))
+            ;
+          *pLong++ = readData();
+
+          while (!(isRxReady()))
+            ;
+          *pLong++ = readData();
+
+          while (!(isRxReady()))
+            ;
+          *pLong++ = readData();
+
+          while (!(isRxReady()))
+            ;
+          *pLong++ = readData();
+
+          while (!(isRxReady()))
+            ;
+          *pLong++ = readData();
+
+          while (!(isRxReady()))
+            ;
+          *pLong++ = readData();
+
+          while (!(isRxReady()))
+            ;
+          *pLong++ = readData();
+
+          wordsToRead -= 8;
+        }
+      //OSDeviceDebug::putString("done");
+      //OSDeviceDebug::putNewLine();
+    }
+
+    void
+    MemoryCardMci::Implementation::transferOutgoingBytes(void *pBuf,
+        size_t bytes)
+    {
+      uint32_t wordsToWrite;
+      const uint32_t *pLong = (const uint32_t *) pBuf;
+
+      wordsToWrite = (bytes / sizeof(*pLong));
+
+      while (wordsToWrite > 0)
+        {
+          while (!isTxReady())
+            ;
+          writeData(*pLong++);
+
+          while (!isTxReady())
+            ;
+          writeData(*pLong++);
+
+          while (!isTxReady())
+            ;
+          writeData(*pLong++);
+
+          while (!isTxReady())
+            ;
+          writeData(*pLong++);
+
+          while (!isTxReady())
+            ;
+          writeData(*pLong++);
+
+          while (!isTxReady())
+            ;
+          writeData(*pLong++);
+
+          while (!isTxReady())
+            ;
+          writeData(*pLong++);
+
+          while (!isTxReady())
+            ;
+          writeData(*pLong++);
+
+          wordsToWrite -= 8;
+        }
     }
 
   // --------------------------------------------------------------------------
