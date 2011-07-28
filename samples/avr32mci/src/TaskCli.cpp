@@ -185,7 +185,7 @@ TaskCli::lineProcess()
 
   unsigned char *p;
   unsigned char c;
-  unsigned long l;
+  uint32_t l;
   unsigned short u;
   //unsigned char v;
   //unsigned char i;
@@ -254,7 +254,7 @@ TaskCli::lineProcess()
           if ((p = cli.parseNext()) == 0)
             goto err;
 
-          if (cli.parseHex(p, &l) < 0)
+          if (cli.parseUnsigned(p, &l) < 0)
             goto err;
 
           cmdMR(l);
@@ -294,6 +294,7 @@ TaskCli::cmdMI()
       //static_cast<avr32::uc3::MemoryCardMci::Implementation&> (impl).setOpenParameters();
     }
 
+  m_card.close();
   r = m_card.open();
 
   if (r < 0)
