@@ -25,6 +25,7 @@
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_SHORT            (1)
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG             (1)
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE           (1)
+#define OS_INCLUDE_SIMPLECLI_PARSE_UNSIGNED_LONG        (1)
 
 #define OS_INCLUDE_OSDEVICECHARACTER                    (1)
 #define OS_INCLUDE_DEVICECHARACTERUSB                   (1)
@@ -49,7 +50,7 @@
 #define OS_INCLUDE_CHIPSELECTACTIVELOW                  (1)
 
 #define OS_INCLUDE_AVR32_UC3_MEMORYCARDMCI              (1)
-#define OS_INCLUDE_AVR32_UC3_MEMORYCARDSPI              (1)
+//#define OS_INCLUDE_AVR32_UC3_MEMORYCARDSPI              (1)
 #define OS_INCLUDE_OSDEVICEMEMORYCARD                   (1)
 
 // ----------------------------------------------------------------------------
