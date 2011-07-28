@@ -21,7 +21,7 @@ OSDeviceMemoryCard::OSDeviceMemoryCard(Implementation& impl) :
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceMemoryCard"), this);
 
-  isOpened = false;
+  m_isOpened = false;
 }
 
 OSDeviceMemoryCard::~OSDeviceMemoryCard()
@@ -51,12 +51,19 @@ OSDeviceMemoryCard::open(void)
   OSDeviceDebug::putString("OSDeviceMemoryCard::open()");
   OSDeviceDebug::putNewLine();
 
-  return init();
+  if (m_isOpened)
+    return OSReturn::OS_ALREADY_OPENED;
+
+  OSReturn_t ret;
+  ret = initialise();
+
+  m_isOpened = true;
+  return ret;
 }
 
 OSReturn_t
-OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
-    uint8_t* pBuf __attribute__((unused)), OSDeviceBlock::BlockCount_t count __attribute__((unused)))
+OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
+    uint8_t* pBuf, OSDeviceBlock::BlockCount_t count)
 {
   OSDeviceDebug::putString("OSDeviceMemoryCard::readBlocks() ");
   OSDeviceDebug::putDec(blockNumber);
@@ -64,30 +71,78 @@ OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attrib
   OSDeviceDebug::putDec(count);
   OSDeviceDebug::putNewLine();
 
-  //init();
+  if (!m_isOpened)
+    return OSReturn::OS_NOT_OPENED;
 
   OSReturn_t ret;
+  ret = OSReturn::OS_OK;
 
-  ret = prepareRead(blockNumber, count);
-  if (ret != OSReturn::OS_OK)
-    return ret;
+  if (blockNumber >= m_cardSizeBlocks)
+    return OSReturn::OS_SIZE_EXCEEDED;
 
-  transferReadSectors(pBuf, count);
-  //ret = OSReturn::OS_OK;
+  if (count == 1)
+    {
+      ret = prepareReadBlock(blockNumber);
+      if (ret != OSReturn::OS_OK)
+        return ret;
 
-  ret = cleanupRead();
+      transferReadBlocks(pBuf, 1);
 
+      ret = finaliseReadBlock();
+    }
+  else
+    {
+      ret = prepareReadBlocks(blockNumber, count);
+      if (ret != OSReturn::OS_OK)
+        return ret;
+
+      transferReadBlocks(pBuf, count);
+
+      ret = finaliseReadBlocks();
+    }
   return ret;
 }
 
 OSReturn_t
-OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
-    uint8_t* pBuf __attribute__((unused)), OSDeviceBlock::BlockCount_t count __attribute__((unused)))
+OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
+    uint8_t* pBuf, OSDeviceBlock::BlockCount_t count)
 {
-  OSDeviceDebug::putString("OSDeviceMemoryCard::writeBlocks()");
+  OSDeviceDebug::putString("OSDeviceMemoryCard::writeBlocks() ");
+  OSDeviceDebug::putDec(blockNumber);
+  OSDeviceDebug::putChar(' ');
+  OSDeviceDebug::putDec(count);
   OSDeviceDebug::putNewLine();
 
-  return OSReturn::OS_NOT_IMPLEMENTED;
+  if (!m_isOpened)
+    return OSReturn::OS_NOT_OPENED;
+
+  OSReturn_t ret;
+  ret = OSReturn::OS_OK;
+
+  if (blockNumber >= m_cardSizeBlocks)
+    return OSReturn::OS_SIZE_EXCEEDED;
+
+  if (count == 1)
+    {
+      ret = prepareWriteBlock(blockNumber);
+      if (ret != OSReturn::OS_OK)
+        return ret;
+
+      transferWriteBlocks(pBuf, 1);
+
+      ret = finaliseWriteBlock();
+    }
+  else
+    {
+      ret = prepareWriteBlocks(blockNumber, count);
+      if (ret != OSReturn::OS_OK)
+        return ret;
+
+      transferReadBlocks(pBuf, count);
+
+      ret = finaliseWriteBlocks();
+    }
+  return ret;
 }
 
 OSReturn_t
@@ -96,7 +151,7 @@ OSDeviceMemoryCard::close(void)
   OSDeviceDebug::putString("OSDeviceMemoryCard::close()");
   OSDeviceDebug::putNewLine();
 
-  isOpened = false;
+  m_isOpened = false;
 
   return OSReturn::OS_NOT_IMPLEMENTED;
 }
@@ -114,7 +169,7 @@ OSDeviceMemoryCard::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attri
 OSDeviceBlock::BlockNumber_t
 OSDeviceMemoryCard::getDeviceSize(void)
 {
-  return m_cardSize;
+  return m_cardSizeBlocks;
 }
 
 // Return the device block size, in bytes.
@@ -134,16 +189,23 @@ OSDeviceMemoryCard::Implementation::isUsingSpi(void)
 
 // ----- Private methods ------------------------------------------------------
 
+void
+OSDeviceMemoryCard::waitNotBusy(void)
+{
+  while (m_implementation.isBusy())
+    OSScheduler::yield();
+}
+
 OSReturn_t
-OSDeviceMemoryCard::init(void)
+OSDeviceMemoryCard::initialise(void)
 {
 
-  m_implementation.init();
+  m_implementation.initialise();
 
   // Default card is not known.
   m_cardType = UNKNOWN_CARD;
-  m_cardSize = 0;
-  m_cardBusWidth = BusWidth::_1;
+  m_cardSizeBlocks = 0;
+  m_implementation.configureBusWidth(BusWidth::_1);
 
   OSReturn_t ret;
 
@@ -294,7 +356,7 @@ OSDeviceMemoryCard::init(void)
   m_implementation.readResponse();
 
   // Wait end of busy
-  m_implementation.waitBusySignal();// read busy state on DAT0
+  waitNotBusy();// read busy state on DAT0
 #endif
 
   // Get clock by checking the extended CSD register
@@ -310,30 +372,36 @@ OSDeviceMemoryCard::init(void)
   //#define OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_MULTIBIT             (1)
 
 #if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_MULTIBIT)
-  // set bus width to 4 bit
+  // set bus width to multiple bits
   if (SD_CARD & m_cardType)
     {
       // set 4-bit bus for SD Card
+
       //-- (CMD55)
       ret = m_implementation.sendCommand(CommandCode::APP_CMD, m_cardRca);
       if (ret != OSReturn::OS_OK)
       return ret;
 
-      // -- (CMD6)
+      // -- (ACMD6)
       ret = m_implementation.sendCommand(ApplicationCommandCode::SET_BUS_WIDTH,
           BusWidth::_4);
       if (ret != OSReturn::OS_OK)
       return ret;
 
       m_cardBusWidth = BusWidth::_4;
-      ret = m_implementation.setBusWidth(BusWidth::_4);
+      ret = m_implementation.configureBusWidth(BusWidth::_4);
       if (ret != OSReturn::OS_OK)
       return ret;
-    }
-  else // MMC bus width management
 
+      OSDeviceDebug::putString("SD bw=4");
+      OSDeviceDebug::putNewLine();
+    }
+  else
     {
       // set 8-bit bus for MMC Card
+
+      // TODO: configure to allow only 4 bit
+
       if (MMC_CARD_V4 & m_cardType)
         {
           // -- (CMD6)-R1b
@@ -348,17 +416,17 @@ OSDeviceMemoryCard::init(void)
           return ret;
 
           // Wait end of busy
-          m_implementation.waitBusySignal();// read busy state on DAT0
+          waitNotBusy();// read busy state on DAT0
 
           m_cardBusWidth = BusWidth::_8;
-          ret = m_implementation.setBusWidth(BusWidth::_8);
+          ret = m_implementation.configureBusWidth(BusWidth::_8);
           if (ret != OSReturn::OS_OK)
           return ret;
         }
     }
 #endif
 
-  //#define OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_HIGHSPEED            (1)
+#define OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_HIGHSPEED            (1)
 
 #if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_HIGHSPEED)
   if (MMC_CARD_V4 & m_cardType)
@@ -368,14 +436,14 @@ OSDeviceMemoryCard::init(void)
       ret = m_implementation.sendCommand(
           SwitchCommandCode::MMC_SWITCH_FUNC,
           ((uint32_t) MMC_SWITCH_WRITE << 24)
-          | ((uint32_t) MMC_SWITCH_HIGH_SPEED << 16)
-          | ((uint32_t) MMC_SWITCH_VAL_HS << 8)
-          | ((uint32_t) MMC_SWITCH_CMD_SET));
+              | ((uint32_t) MMC_SWITCH_HIGH_SPEED << 16)
+              | ((uint32_t) MMC_SWITCH_VAL_HS << 8)
+              | ((uint32_t) MMC_SWITCH_CMD_SET));
       if (ret != OSReturn::OS_OK)
-      return ret;
+        return ret;
 
       // Wait end of busy
-      m_implementation.waitBusySignal();
+      waitNotBusy();
     }
 #endif
 
@@ -393,24 +461,24 @@ OSDeviceMemoryCard::init(void)
 #define SDMMC_SWITCH_FUNC_G5_KEEP     (0xf << 16) /**< Group 5 No influence */
 #define SDMMC_SWITCH_FUNC_G6_KEEP     (0xf << 20) /**< Group 6 No influence */
 
-      m_implementation.setBlockLength(512 / 8); // CMD6 512 bits status
-      m_implementation.setBlockCount(1);
+      m_implementation.configureBlockLengthBytes(512 / 8); // CMD6 512 bits status
+      m_implementation.configureBlockCount(1);
       // -- (CMD6)
       // Check if we can enter into the High Speed mode.
       ret = m_implementation.sendCommand(SwitchCommandCode::SD_SWITCH_FUNC,
           SDMMC_SWITCH_FUNC_MODE_CHECK | SDMMC_SWITCH_FUNC_HIGH_SPEED);
       if (ret != OSReturn::OS_OK)
-      return ret;
+        return ret;
 
       // Wait end of busy
-      m_implementation.waitBusySignal();// read busy state on DAT0
+      waitNotBusy();// read busy state on DAT0
 
       bool b_hs_supported = false;
 
       uint8_t i;
-      for (i = 0; i < (512L / 8); i += 4)
+      for (i = 0; i < (512 / 8); i += 4)
         {
-          volatile uint32_t data;
+          uint32_t data;
           while (!(m_implementation.isRxReady()))
             {
               ;
@@ -419,28 +487,33 @@ OSDeviceMemoryCard::init(void)
           if (i == 16)
             {
               if (((data >> 24) & 0xf) == 1)
-              b_hs_supported = true;
-              break;
+                b_hs_supported = true;
+              //break;
             }
         }
 
       if (!b_hs_supported)
-      goto step3;
+        {
+          OSDeviceDebug::putString("HS not supported");
+          OSDeviceDebug::putNewLine();
+
+          goto step3;
+        }
 
       ret = m_implementation.sendCommand(
           SwitchCommandCode::SD_SWITCH_FUNC,
           SDMMC_SWITCH_FUNC_MODE_SWITCH | SDMMC_SWITCH_FUNC_G6_KEEP
-          | SDMMC_SWITCH_FUNC_G5_KEEP | SDMMC_SWITCH_FUNC_G4_KEEP
-          | SDMMC_SWITCH_FUNC_G3_KEEP | SDMMC_SWITCH_FUNC_G2_KEEP
-          | SDMMC_SWITCH_FUNC_HIGH_SPEED);
+              | SDMMC_SWITCH_FUNC_G5_KEEP | SDMMC_SWITCH_FUNC_G4_KEEP
+              | SDMMC_SWITCH_FUNC_G3_KEEP | SDMMC_SWITCH_FUNC_G2_KEEP
+              | SDMMC_SWITCH_FUNC_HIGH_SPEED);
       if (ret != OSReturn::OS_OK)
-      return ret;
+        return ret;
 
-      for (i = 0; i < (512L / 8); i += 4)
+      for (i = 0; i < (512 / 8); i += 4)
         {
-          volatile uint32_t data;
+          uint32_t data;
           while (!(m_implementation.isRxReady()))
-          ;
+            ;
           data = m_implementation.readData();
         }
 
@@ -455,10 +528,10 @@ OSDeviceMemoryCard::init(void)
       // deselect card
       ret = m_implementation.sendCommand(CommandCode::SELECT_DESELECT_CARD, 0);
       if (ret != OSReturn::OS_OK)
-      return ret;
+        return ret;
 
       // Wait end of busy
-      m_implementation.waitBusySignal();// read busy state on DAT0
+      waitNotBusy();// read busy state on DAT0
 #endif
 
 #if false
@@ -475,28 +548,32 @@ OSDeviceMemoryCard::init(void)
       return ret;
 
       // Wait end of busy
-      m_implementation.waitBusySignal();// read busy state on DAT0
+      m_implementation.waitNotBusy();// read busy state on DAT0
 #endif
     }
 
   step3:
 
-  //#define OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_CARDFREQUENCY        (1)
+#define OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_CARDFREQUENCY        (1)
 
 #if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_CARDFREQUENCY)
   // Set clock
-  m_implementation.setSpeed(m_cardFrequency * 1000);
+  m_implementation.configureClockFrequencyHz(m_cardFrequencyKHz * 1000);
 #endif
 
-#if false
+#if true
   // -- (CMD13)
   // Check if card is ready, the card must be in TRAN state
   ret = sendStatus();
   if (ret != OSReturn::OS_OK)
-  return ret;
+    return ret;
 
   if ((m_implementation.readResponse() & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
-  return OSReturn::OS_BAD_STATE;
+    return OSReturn::OS_BAD_STATE;
+
+  OSDeviceDebug::putString("tran state");
+  OSDeviceDebug::putNewLine();
+
 #endif
 
   // -- (CMD16)
@@ -515,7 +592,7 @@ OSDeviceMemoryCard::init(void)
   OSDeviceDebug::putHex(m_cardType);
   OSDeviceDebug::putNewLine();
 
-  isOpened = true;
+  m_isOpened = true;
 
   //ret = m_implementation.sendCommand(CommandCode::SEND_STATUS, m_cardRca);
   //m_implementation.readResponse();
@@ -526,7 +603,7 @@ OSDeviceMemoryCard::init(void)
 OSReturn_t
 OSDeviceMemoryCard::getCsd(void)
 {
-  csd_t csd;
+  csd_t csd; // Structure allocated on stack!
 
   uint32_t max_Read_DataBlock_Length;
   uint32_t mult;
@@ -538,7 +615,7 @@ OSDeviceMemoryCard::getCsd(void)
     { 0, 10, 12, 13, 15, 20, 26, 30, 35, 40, 45, 52, 55, 60, 70, 80 }; // MMC tabs...
 
   // Select Slot card before any other command.
-  m_implementation.selectCard(m_cardBusWidth);
+  m_implementation.selectCard();
 
   //-- (CMD9)
   if (m_implementation.sendCommand(CommandCode::SEND_CSD, m_cardRca)
@@ -564,30 +641,30 @@ OSDeviceMemoryCard::getCsd(void)
 
   //-- Compute MMC/SD speed
   // field: TRAN_SPEED (CSD V1 & V2 are the same)
-  m_cardFrequency = mult_fact[csd.csd_v1.tranSpeed >> 3]; // Get Multiplier factor
+  m_cardFrequencyKHz = mult_fact[csd.csd_v1.tranSpeed >> 3]; // Get Multiplier factor
   if (SD_CARD & m_cardType)
     {
       // SD card don't have same frequency that MMC card
-      if (26 == m_cardFrequency)
+      if (26 == m_cardFrequencyKHz)
         {
-          m_cardFrequency = 25;
+          m_cardFrequencyKHz = 25;
         }
-      else if (52 == m_cardFrequency)
+      else if (52 == m_cardFrequencyKHz)
         {
-          m_cardFrequency = 50;
+          m_cardFrequencyKHz = 50;
         }
     }
-  m_cardFrequency *= freq_unit[csd.csd_v1.tranSpeed & 0x07]; // Get transfer rate unit
+  m_cardFrequencyKHz *= freq_unit[csd.csd_v1.tranSpeed & 0x07]; // Get transfer rate unit
 
   //-- Compute card size in number of block
   // field: WRITE_BL_LEN, READ_BL_LEN, C_SIZE (CSD V1 & V2 are not the same)
   if (SD_CARD_HC & m_cardType)
     {
-      m_cardSize = (csd.csd_v2.deviceSizeH << 16) + (csd.csd_v2.deviceSizeL
-          & 0xFFff);
+      m_cardSizeBlocks = (csd.csd_v2.deviceSizeH << 16)
+          + (csd.csd_v2.deviceSizeL & 0xFFff);
 
       // memory capacity = (C_SIZE+1) * 1K sector
-      m_cardSize = (m_cardSize + 1) << 10; // unit 512B
+      m_cardSizeBlocks = (m_cardSizeBlocks + 1) << 10; // unit 512B
     }
   else
     {
@@ -596,15 +673,9 @@ OSDeviceMemoryCard::getCsd(void)
       if (tmp < CSD_BLEN_512)
         return OSReturn::OS_TOO_SHORT; // block size < 512B not supported by firmware
 
-      //if (tmp > CSD_BLEN_512)
-      //  return OSReturn::OS_TOO_LONG; // block size > 512B not supported by firmware
-
       tmp = csd.csd_v1.readBlLen; // READ_BL_LEN
       if (tmp < CSD_BLEN_512)
         return OSReturn::OS_TOO_SHORT; // block size < 512B not supported by firmware
-
-      //if (tmp > CSD_BLEN_512)
-      //  return OSReturn::OS_TOO_LONG; // block size > 512B not supported by firmware
 
       //// Compute Memory Capacity
       // compute MULT
@@ -614,11 +685,11 @@ OSDeviceMemoryCard::getCsd(void)
       blocknr = csd.csd_v1.deviceSizeH << 2;
       // compute MULT * (LSB of C-SIZE + MSB already computed + 1) = BLOCKNR
       blocknr = mult * (blocknr + csd.csd_v1.deviceSizeL + 1);
-      m_cardSize = ((max_Read_DataBlock_Length * blocknr) / 512);
+      m_cardSizeBlocks = ((max_Read_DataBlock_Length * blocknr) / 512);
     }
 
   OSDeviceDebug::putString("getCsd() size=");
-  OSDeviceDebug::putDec(m_cardSize * 512 / 1024 / 1024);
+  OSDeviceDebug::putDec(m_cardSizeBlocks * 512 / 1024 / 1024);
   OSDeviceDebug::putString(" MB");
   OSDeviceDebug::putNewLine();
 
@@ -632,10 +703,10 @@ OSDeviceMemoryCard::getExtendedCsd(void)
   uint32_t val;
 
   // Select Slot card before any other command.
-  m_implementation.selectCard(m_cardBusWidth);
+  m_implementation.selectCard();
 
-  m_implementation.setBlockLength(SD_MMC_SECTOR_SIZE); // Ext CSD = 512B size
-  m_implementation.setBlockCount(1);
+  m_implementation.configureBlockLengthBytes(SD_MMC_SECTOR_SIZE); // Ext CSD = 512B size
+  m_implementation.configureBlockCount(1);
 
   //** (CMD8)
   // read the extended CSD
@@ -654,7 +725,7 @@ OSDeviceMemoryCard::getExtendedCsd(void)
       if (((64 - 26) == i) && (m_cardType & MMC_CARD_HC))
         {
           // If MMC HC then read Sector Count
-          m_cardSize = m_implementation.readData();
+          m_cardSizeBlocks = m_implementation.readData();
         }
       else
         {
@@ -662,9 +733,9 @@ OSDeviceMemoryCard::getExtendedCsd(void)
           if ((64 - 24) == i)
             { // Read byte at offset 196
               if (MSB0(val) & 0x02)
-                m_cardFrequency = 52 * 1000;
+                m_cardFrequencyKHz = 52 * 1000;
               else
-                m_cardFrequency = 26 * 1000;
+                m_cardFrequencyKHz = 26 * 1000;
             }
         }
     }
@@ -678,7 +749,7 @@ OSReturn_t
 OSDeviceMemoryCard::sendStatus()
 {
   // Select Slot card before any other command.
-  m_implementation.selectCard(m_cardBusWidth);
+  m_implementation.selectCard();
 
   OSReturn_t ret;
   // -- (CMD13)
@@ -693,7 +764,7 @@ OSReturn_t
 OSDeviceMemoryCard::setBlockLength(uint16_t length)
 {
   // Select Slot card before any other command.
-  m_implementation.selectCard(m_cardBusWidth);
+  m_implementation.selectCard();
 
   OSReturn_t ret;
   // -- (CMD16)
@@ -705,32 +776,28 @@ OSDeviceMemoryCard::setBlockLength(uint16_t length)
   if ((m_implementation.readResponse() & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
     return OSReturn::OS_BAD_STATE;
 
-  m_implementation.setBlockLength(length);
-  m_implementation.setBlockCount(1);
+  m_implementation.configureBlockLengthBytes(length);
+  m_implementation.configureBlockCount(1);
 
   return OSReturn::OS_OK;
 }
 
 OSReturn_t
-OSDeviceMemoryCard::prepareRead(OSDeviceBlock::BlockNumber_t pos,
-    OSDeviceBlock::BlockCount_t nb_sector)
+OSDeviceMemoryCard::prepareReadBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
+    OSDeviceBlock::BlockCount_t count)
 {
-  uint32_t addr;
-
-  OSDeviceDebug::putString("1 ");
+  //OSDeviceDebug::putString("1 ");
 
   // Select Slot card before any other command.
-  m_implementation.selectCard(m_cardBusWidth);
-  OSDeviceDebug::putString("2 ");
-
-  // Set the global memory ptr at a Byte address.
-  m_ptrMem = pos; // used to manage a standby/restart access
+  m_implementation.selectCard();
+  //OSDeviceDebug::putString("2 ");
 
   // wait for MMC not busy
-  m_implementation.waitBusySignal();
-  OSDeviceDebug::putString("3 ");
+  waitNotBusy();
+  //OSDeviceDebug::putString("3 ");
 
-  addr = m_ptrMem;
+  uint32_t addr;
+  addr = blockNumber;
   // send command
   if ((!(SD_CARD_HC & m_cardType)) && (!(MMC_CARD_HC & m_cardType)))
     {
@@ -739,29 +806,58 @@ OSDeviceMemoryCard::prepareRead(OSDeviceBlock::BlockNumber_t pos,
 
   OSReturn_t ret;
 
-#if false
   // -- (CMD13)
   // Necessary to clear flag error "ADDRESS_OUT_OF_RANGE" (ID LABO = MMC15)
   ret = m_implementation.sendCommand(CommandCode::SEND_STATUS, m_cardRca);
   if (ret != OSReturn::OS_OK)
-  return ret;
+    return ret;
 
   m_implementation.readResponse();
-#endif
 
-  m_implementation.setBlockLength(SD_MMC_SECTOR_SIZE);
-  m_implementation.setBlockCount(nb_sector);
+  m_implementation.configureBlockLengthBytes(SD_MMC_SECTOR_SIZE);
+  m_implementation.configureBlockCount(count);
 
-#if false
   // -- (CMD18)
   ret = m_implementation.sendCommand(CommandCode::READ_MULTIPLE_BLOCK, addr);
   if (ret != OSReturn::OS_OK)
-  return ret;
+    return ret;
 
   // check response
   if ((m_implementation.readResponse() & CardStatus::FLAGERROR_RD_WR) != 0)
-  return OSReturn::OS_ERROR;
-#else
+    return OSReturn::OS_ERROR;
+
+  OSDeviceDebug::putString("read open ok");
+  OSDeviceDebug::putNewLine();
+
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+OSDeviceMemoryCard::prepareReadBlock(OSDeviceBlock::BlockNumber_t blockNumber)
+{
+  //OSDeviceDebug::putString("1 ");
+
+  // Select Slot card before any other command.
+  m_implementation.selectCard();
+  //OSDeviceDebug::putString("2 ");
+
+  // wait for MMC not busy
+  waitNotBusy();
+  OSDeviceDebug::putString("3 ");
+
+  uint32_t addr;
+  addr = blockNumber;
+
+  // For NO HC card the address must be translate to a byte address
+  if ((!(SD_CARD_HC & m_cardType)) && (!(MMC_CARD_HC & m_cardType)))
+    {
+      addr <<= 9;
+    }
+
+  OSReturn_t ret;
+
+  m_implementation.configureBlockLengthBytes(SD_MMC_SECTOR_SIZE);
+  m_implementation.configureBlockCount(1); // might not be needed
 
   // -- (CMD17)
   ret = m_implementation.sendCommand(CommandCode::READ_SINGLE_BLOCK, addr);
@@ -772,7 +868,6 @@ OSDeviceMemoryCard::prepareRead(OSDeviceBlock::BlockNumber_t pos,
   if ((m_implementation.readResponse() & CardStatus::FLAGERROR_RD_WR) != 0)
     return OSReturn::OS_ERROR;
 
-#endif
   OSDeviceDebug::putString("read open ok");
   OSDeviceDebug::putNewLine();
 
@@ -780,106 +875,69 @@ OSDeviceMemoryCard::prepareRead(OSDeviceBlock::BlockNumber_t pos,
 }
 
 void
-OSDeviceMemoryCard::transferReadSectors(void *pBuf,
-    OSDeviceBlock::BlockCount_t nb_sector)
+OSDeviceMemoryCard::transferReadBlocks(void *pBuf,
+    OSDeviceBlock::BlockCount_t count)
 {
   uint32_t wordsToRead;
   // Warning: buffer must be word aligned
-  uint32_t* pRam = (uint32_t*) pBuf;
+  uint32_t* pLong = (uint32_t*) pBuf;
 
   // Read data
-  while (nb_sector > 0)
-    {
-      wordsToRead = (SD_MMC_SECTOR_SIZE / sizeof(*pRam));
+  wordsToRead = (SD_MMC_SECTOR_SIZE / sizeof(*pLong));
 
-      OSDeviceDebug::putString("ptr=");
-      OSDeviceDebug::putPtr(pRam);
-      OSDeviceDebug::putString(", words=");
-      OSDeviceDebug::putDec(wordsToRead);
-      OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString("ptr=");
+  OSDeviceDebug::putPtr(pLong);
+  OSDeviceDebug::putString(", words=");
+  OSDeviceDebug::putDec(wordsToRead);
+  OSDeviceDebug::putNewLine();
+
+  while (count-- > 0)
+    {
+      wordsToRead = (SD_MMC_SECTOR_SIZE / sizeof(*pLong));
 
       while (wordsToRead > 0)
         {
           while (!(m_implementation.isRxReady()))
             ;
-          *pRam++ = m_implementation.readData();
+          *pLong++ = m_implementation.readData();
+
           while (!(m_implementation.isRxReady()))
             ;
-          *pRam++ = m_implementation.readData();
+          *pLong++ = m_implementation.readData();
+
           while (!(m_implementation.isRxReady()))
             ;
-          *pRam++ = m_implementation.readData();
+          *pLong++ = m_implementation.readData();
+
           while (!(m_implementation.isRxReady()))
             ;
-          *pRam++ = m_implementation.readData();
+          *pLong++ = m_implementation.readData();
+
           while (!(m_implementation.isRxReady()))
             ;
-          *pRam++ = m_implementation.readData();
+          *pLong++ = m_implementation.readData();
+
           while (!(m_implementation.isRxReady()))
             ;
-          *pRam++ = m_implementation. readData();
+          *pLong++ = m_implementation. readData();
+
           while (!(m_implementation.isRxReady()))
             ;
-          *pRam++ = m_implementation.readData();
+          *pLong++ = m_implementation.readData();
+
           while (!(m_implementation.isRxReady()))
             ;
-          *pRam++ = m_implementation.readData();
+          *pLong++ = m_implementation.readData();
+
           wordsToRead -= 8;
         }
-      nb_sector--;
     }
-
   OSDeviceDebug::putString("done");
   OSDeviceDebug::putNewLine();
 }
 
-#if false
-void
-OSDeviceMemoryCard::transferWriteSectors(const void *ram,
-    OSDeviceBlock::BlockCount_t nb_sector)
-  {
-    U32 wordsToWrite;
-    const unsigned int *pRam = ram;
-
-    // Write Data
-    while (nb_sector > 0)
-      {
-        wordsToWrite = (SD_MMC_SECTOR_SIZE / sizeof(*pRam));
-        while (wordsToWrite > 0)
-          {
-            while (!m_implementation.mci_tx_ready())
-            ;
-            m_implementation.mci_wr_data(*pRam++);
-            while (!m_implementation.mci_tx_ready())
-            ;
-            m_implementation.mci_wr_data(*pRam++);
-            while (!m_implementation.mci_tx_ready())
-            ;
-            m_implementation.mci_wr_data(*pRam++);
-            while (!m_implementation.mci_tx_ready())
-            ;
-            m_implementation.mci_wr_data(*pRam++);
-            while (!m_implementation.mci_tx_ready())
-            ;
-            m_implementation.mci_wr_data(*pRam++);
-            while (!m_implementation.mci_tx_ready())
-            ;
-            m_implementation.mci_wr_data(*pRam++);
-            while (!m_implementation.mci_tx_ready())
-            ;
-            m_implementation.mci_wr_data(*pRam++);
-            while (!m_implementation.mci_tx_ready())
-            ;
-            m_implementation.mci_wr_data(*pRam++);
-            wordsToWrite -= 8;
-          }
-        nb_sector--;
-      }
-  }
-#endif
-
 OSReturn_t
-OSDeviceMemoryCard::cleanupRead(void)
+OSDeviceMemoryCard::finaliseReadBlocks(void)
 {
   if (m_implementation.isCrcError())
     {
@@ -887,7 +945,7 @@ OSDeviceMemoryCard::cleanupRead(void)
     }
 
 #if false
-  m_implementation.waitBusySignal();
+  m_implementation.waitNotBusy();
 
   OSReturn_t ret;
 
@@ -911,5 +969,97 @@ OSDeviceMemoryCard::cleanupRead(void)
   return OSReturn::OS_OK;
 }
 
+OSReturn_t
+OSDeviceMemoryCard::finaliseReadBlock(void)
+{
+  if (m_implementation.isCrcError())
+    {
+      return OSReturn::OS_BAD_CHECKSUM; // An CRC error has been seen
+    }
+
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+OSDeviceMemoryCard::prepareWriteBlock(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)))
+{
+  //uint32_t addr;
+
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+OSDeviceMemoryCard::prepareWriteBlocks(
+    OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)), OSDeviceBlock::BlockCount_t count __attribute__((unused)))
+{
+  //uint32_t addr;
+
+  return OSReturn::OS_ERROR;
+}
+
+void
+OSDeviceMemoryCard::transferWriteBlocks(const void *pBuf,
+    OSDeviceBlock::BlockCount_t count)
+{
+  uint32_t wordsToWrite;
+  const uint32_t *pLong = (const uint32_t *) pBuf;
+
+  // Write Data
+  while (count-- > 0)
+    {
+      wordsToWrite = (SD_MMC_SECTOR_SIZE / sizeof(*pLong));
+
+      while (wordsToWrite > 0)
+        {
+          while (!m_implementation.isTxReady())
+            ;
+          m_implementation.writeData(*pLong++);
+
+          while (!m_implementation.isTxReady())
+            ;
+          m_implementation.writeData(*pLong++);
+
+          while (!m_implementation.isTxReady())
+            ;
+          m_implementation.writeData(*pLong++);
+
+          while (!m_implementation.isTxReady())
+            ;
+          m_implementation.writeData(*pLong++);
+
+          while (!m_implementation.isTxReady())
+            ;
+          m_implementation.writeData(*pLong++);
+
+          while (!m_implementation.isTxReady())
+            ;
+          m_implementation.writeData(*pLong++);
+
+          while (!m_implementation.isTxReady())
+            ;
+          m_implementation.writeData(*pLong++);
+
+          while (!m_implementation.isTxReady())
+            ;
+          m_implementation.writeData(*pLong++);
+
+          wordsToWrite -= 8;
+        }
+    }
+}
+
+OSReturn_t
+OSDeviceMemoryCard::finaliseWriteBlock(void)
+{
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+OSDeviceMemoryCard::finaliseWriteBlocks(void)
+{
+  return OSReturn::OS_ERROR;
+}
+
 // ----------------------------------------------------------------------------
+
 #endif /* defined(OS_INCLUDE_OSDEVICEMEMORYCARD) */

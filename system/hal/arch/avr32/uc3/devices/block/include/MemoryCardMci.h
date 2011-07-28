@@ -36,7 +36,7 @@ namespace avr32
 
       private:
         virtual OSReturn_t
-        init();
+        initialise();
 
         virtual OSReturn_t
         sendCommand(CommandCode_t commandCode, CommandArgument_t commandArg);
@@ -44,23 +44,23 @@ namespace avr32
         virtual OSDeviceMemoryCard::Response_t
         readResponse(void);
 
-        virtual OSReturn_t
-        waitBusySignal(void);
+        virtual bool
+        isBusy(void);
 
         virtual OSReturn_t
-        setBusWidth(BusWidth_t busWidth);
+        configureBusWidth(BusWidth_t busWidth);
 
         virtual OSReturn_t
-        setBlockLength(BlockLength_t length);
+        configureBlockLengthBytes(BlockLength_t length);
 
         virtual OSReturn_t
-        setBlockCount(BlockCount_t count);
+        configureBlockCount(BlockCount_t count);
 
         virtual OSReturn_t
-        setSpeed(uint32_t speed);
+        configureClockFrequencyHz(ClockFrequencyHz_t frequency);
 
         virtual OSReturn_t
-        selectCard(BusWidth_t busWidth);
+        selectCard(void);
 
         virtual bool
         isRxReady(void);
@@ -74,6 +74,12 @@ namespace avr32
         virtual bool
         isCrcError(void);
 
+        virtual bool
+        isTxReady(void);
+
+        virtual void
+        writeData(uint32_t data);
+
       private:
 
         // ---- Local methods -------------------------------------------------
@@ -81,10 +87,13 @@ namespace avr32
         void
         initGpio(void);
 
+        avr32::uc3::mci::BusWidth_t
+        convertBusWidth(BusWidth_t busWidth);
+
       public:
         avr32::uc3::Mci m_mci;
 
-        Mci::Speed_t m_speed;
+        Mci::ClockFrequencyHz_t m_speed;
         mci::BusWidth_t m_busWidth;
         mci::CardSlot_t m_cardSlot;
 
@@ -101,13 +110,19 @@ namespace avr32
 
     public:
 
-      // ----- public members ------------------------------------------------
+      // ----- public members -------------------------------------------------
 
       Implementation implementation;
 
       // ----------------------------------------------------------------------
     };
 
+    inline avr32::uc3::mci::BusWidth_t
+    MemoryCardMci::Implementation::convertBusWidth(BusWidth_t busWidth)
+    {
+      // The AVR32 bus width uses the same values, nothing to do
+      return busWidth;
+    }
   }
 }
 

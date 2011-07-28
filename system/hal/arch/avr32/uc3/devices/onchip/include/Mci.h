@@ -21,7 +21,7 @@ namespace avr32
 
       // ----- Type definitions -----------------------------------------------
 
-      typedef uint32_t Speed_t;
+      typedef uint32_t ClockFrequencyHz_t;
 
       typedef uint32_t BlockLength_t;
       typedef uint16_t BlockCount_t;
@@ -37,49 +37,65 @@ namespace avr32
 
       // ----- Public methods -------------------------------------------------
 
+      uint32_t
+      getInputClockFrequencyHz(void);
+
       void
-      init(mci::CardSlot_t cardSlot);
+      initialise(mci::CardSlot_t cardSlot);
 
       mci::StatusRegister_t
       sendCommand(mci::CommandWord_t cmdWord, mci::CommandArgument_t cmdArg);
 
       void
-      initSdCardBusWidthAndSlot(mci::BusWidth_t busWidth,
+      configureSdCardBusWidthAndSlot(mci::BusWidth_t busWidth,
           mci::CardSlot_t cardSlot);
 
       void
-      setBlockLength(uint32_t length);
+      configureBlockLengthBytes(uint32_t length);
+
+      void
+      configureBlockCount(BlockCount_t cnt);
+
+      void
+      configureClockFrequencyHz(ClockFrequencyHz_t speed);
+
+      void
+      configureBusWidth(mci::BusWidth_t busWidth);
+
+      bool
+      isBusy(void);
+
+      bool
+      isRxReady(void);
 
       uint32_t
       readData(void);
 
       bool
-      isRxReady(void);
-
-      void
-      setBlockCount(BlockCount_t cnt);
-
-      mci::StatusRegister_t
-      getStatusRegister(void);
-
-      void
-      configSpeed(Speed_t speed);
+      isTxReady(void);
 
       bool
       isCrcError(void);
+
+      void
+      writeData(uint32_t value);
+
+      // ---
+      mci::StatusRegister_t
+      getStatusRegister(void);
 
     private:
 
       // ----- Private methods ------------------------------------------------
 
       void
-      reset(void);
+      softwareReset(void);
 
       void
-      disable(void);
+      disableInterface(void);
 
       void
-      enable(void);
+      enableInterface(void);
 
       void
       initDataTimeout(mci::TimeoutMultiplier_t multiplier,
@@ -95,7 +111,7 @@ namespace avr32
       enableModeBits(uint32_t);
 
       bool
-      wasLastCommandSent(void);
+      isCommandReady(void);
 
       void
       disableAllInterrupts(void);
@@ -117,25 +133,31 @@ namespace avr32
 
     // ----- Inline methods ---------------------------------------------------
 
+    inline uint32_t
+    Mci::getInputClockFrequencyHz(void)
+    {
+      return OS_CFGLONG_PBB_FREQUENCY_HZ;
+    }
+
     inline void
-    Mci::reset(void)
+    Mci::softwareReset(void)
     {
       // Reset interface
       moduleRegisters.writeControl(1 << AVR32_MCI_CR_SWRST);
     }
 
     inline void
-    Mci::disable(void)
+    Mci::disableInterface(void)
     {
-      // Disable interface and disable power save mode
+      // Disable interface and disableInterface power save mode
       moduleRegisters.writeControl(
           (1 << AVR32_MCI_CR_MCIDIS) | (1 << AVR32_MCI_CR_PWSDIS));
     }
 
     inline void
-    Mci::enable(void)
+    Mci::enableInterface(void)
     {
-      // Enable interface and enable power save
+      // Enable interface and enableInterface power save
       moduleRegisters.writeControl(
           (1 << AVR32_MCI_CR_MCIEN) | (1 << AVR32_MCI_CR_PWSEN));
     }
@@ -165,17 +187,6 @@ namespace avr32
       moduleRegisters.writeDataTimeout(
           ((multiplier & 0x7) << AVR32_MCI_DTOR_DTOMUL_OFFSET)
               | ((cycles & 0xF) << AVR32_MCI_DTOR_DTOCYC_OFFSET));
-    }
-
-    inline uint32_t
-    Mci::readData(void)
-    {
-      uint32_t ret;
-
-      ret = moduleRegisters.readReceiveData();
-      OSDeviceDebug::putHex(ret);
-      OSDeviceDebug::putChar(' ');
-      return ret;
     }
 
   // ------------------------------------------------------------------------

@@ -534,6 +534,7 @@ public:
 
   typedef uint32_t BlockLength_t;
   typedef uint_t BlockCount_t;
+  typedef uint32_t ClockFrequencyHz_t;
 
   // ==========================================================================
 
@@ -559,7 +560,7 @@ public:
     // ----- Abstract methods ------------------------------------------------
 
     virtual OSReturn_t
-    init(void) = 0;
+    initialise(void) = 0;
 
     virtual OSReturn_t
     sendCommand(CommandCode_t code, CommandArgument_t arg) = 0;
@@ -567,23 +568,23 @@ public:
     virtual Response_t
     readResponse(void) = 0;
 
-    virtual OSReturn_t
-    waitBusySignal(void) = 0;
+    virtual bool
+    isBusy(void) = 0;
 
     virtual OSReturn_t
-    setBusWidth(BusWidth_t busWidth) = 0;
+    configureBusWidth(BusWidth_t busWidth) = 0;
 
     virtual OSReturn_t
-    setBlockLength(BlockLength_t length) = 0;
+    configureBlockLengthBytes(BlockLength_t length) = 0;
 
     virtual OSReturn_t
-    setBlockCount(BlockCount_t count) = 0;
+    configureBlockCount(BlockCount_t count) = 0;
 
     virtual OSReturn_t
-    setSpeed(uint32_t speed) = 0;
+    configureClockFrequencyHz(ClockFrequencyHz_t frequency) = 0;
 
     virtual OSReturn_t
-    selectCard(BusWidth_t busWidth) = 0;
+    selectCard(void) = 0;
 
     virtual bool
     isRxReady(void) = 0;
@@ -597,8 +598,13 @@ public:
     virtual bool
     isCrcError(void) = 0;
 
-  };
+    virtual bool
+    isTxReady(void) = 0;
 
+    virtual void
+    writeData(uint32_t value) = 0;
+
+  };
 
   typedef Implementation Implementation_t;
 
@@ -650,7 +656,10 @@ public:
 private:
 
   OSReturn_t
-  init(void);
+  initialise(void);
+
+  void
+  waitNotBusy(void);
 
   OSReturn_t
   getCsd(void);
@@ -665,36 +674,52 @@ private:
   sendStatus(void);
 
   OSReturn_t
-  prepareRead(OSDeviceBlock::BlockNumber_t blockNumber,
+  prepareReadBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
       OSDeviceBlock::BlockCount_t count);
 
+  OSReturn_t
+  prepareReadBlock(OSDeviceBlock::BlockNumber_t blockNumber);
+
   void
-  transferReadSectors(void *pBuf, OSDeviceBlock::BlockCount_t count);
+  transferReadBlocks(void *pBuf, OSDeviceBlock::BlockCount_t count);
 
   OSReturn_t
-  cleanupRead(void);
+  finaliseReadBlocks(void);
+
+  OSReturn_t
+  finaliseReadBlock(void);
+
+  OSReturn_t
+  prepareWriteBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
+      OSDeviceBlock::BlockCount_t count);
+
+  OSReturn_t
+  prepareWriteBlock(OSDeviceBlock::BlockNumber_t blockNumber);
 
   void
-  transferWriteSectors(const void *pBuf, OSDeviceBlock::BlockCount_t count);
+  transferWriteBlocks(const void *pBuf, OSDeviceBlock::BlockCount_t count);
+
+  OSReturn_t
+  finaliseWriteBlocks(void);
+
+  OSReturn_t
+  finaliseWriteBlock(void);
 
 private:
 
   // ----- Private members ----------------------------------------------------
 
-  bool isOpened;
-
-  uint8_t m_cardType;
-  bool m_isInitialised;
-
-  uint32_t m_cardRca;
-  uint16_t m_cardFrequency;
-  uint32_t m_cardSize;
-  BusWidth_t m_cardBusWidth;
-
-  volatile uint32_t m_ptrMem;
-
   Implementation_t& m_implementation;
 
+  bool m_isOpened;
+
+  uint8_t m_cardType;
+
+  uint32_t m_cardRca;
+  uint16_t m_cardFrequencyKHz;
+  uint32_t m_cardSizeBlocks;
+
+  bool m_isInitialised;
 
   // --------------------------------------------------------------------------
 };
@@ -704,6 +729,5 @@ OSDeviceMemoryCard::getImplementation(void)
 {
   return m_implementation;
 }
-
 
 #endif /* OSDEVICEMEMORYCARD_H_ */

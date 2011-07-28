@@ -875,7 +875,7 @@ unsigned short DeviceMemCard::getWriteBufferSize(void)
     return 512; // TODO: get from card structures
   }
 
-void DeviceMemCard::waitWhileBusy(void)
+void DeviceMemCard::waitNotBusy(void)
   {
     safeSelectOn();
 

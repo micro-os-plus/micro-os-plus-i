@@ -55,7 +55,7 @@ namespace avr32
     // ---- Private virtuals Methods ------------------------------------------
 
     OSReturn_t
-    MemoryCardMci::Implementation::init(void)
+    MemoryCardMci::Implementation::initialise(void)
     {
       initGpio();
 
@@ -68,8 +68,8 @@ namespace avr32
       OSDeviceDebug::putNewLine();
 #endif
 
-      // init MCI module
-      m_mci.init(m_cardSlot);
+      // initialise MCI module
+      m_mci.initialise(m_cardSlot);
 
       // Wait for 1ms, then wait for 74 more clock cycles (see MMC norms)
       if (m_mci.sendCommand(mci::CommandWord::SD_MMC_INIT_STATE_CMD, 0xFFFFFFFF)
@@ -172,6 +172,7 @@ namespace avr32
 
       // -----
 #if defined(DEBUG)
+      OSDeviceDebug::putString("MC ");
       OSDeviceMemoryCard::CommandClass_t cmsClass;
       cmsClass = (commandCode >> OSDeviceMemoryCard::COMMAND_CLASS_SHIFT);
       if (cmsClass == OSDeviceMemoryCard::CommandClass::APPLICATION_8)
@@ -207,7 +208,7 @@ namespace avr32
       OSDeviceMemoryCard::Response_t ret;
       ret = m_mci.moduleRegisters.readResponse(0);
 
-      OSDeviceDebug::putString("R1=");
+      OSDeviceDebug::putString("MC R1=");
       OSDeviceDebug::putHex(ret);
       OSDeviceDebug::putNewLine();
 
@@ -215,69 +216,50 @@ namespace avr32
     }
 
     OSReturn_t
-    MemoryCardMci::Implementation::selectCard(BusWidth_t busWidth)
+    MemoryCardMci::Implementation::selectCard()
     {
-      m_mci.initSdCardBusWidthAndSlot(busWidth, m_cardSlot);
+      m_mci.configureSdCardBusWidthAndSlot(m_busWidth, m_cardSlot);
 
-      OSDeviceDebug::putString("sdc=");
+      OSDeviceDebug::putString("MC sdc=");
       OSDeviceDebug::putHex(m_mci.moduleRegisters.readSdCard());
       OSDeviceDebug::putNewLine();
 
       return OSReturn::OS_OK;
     }
 
-    OSReturn_t
-    MemoryCardMci::Implementation::waitBusySignal(void)
+    bool
+    MemoryCardMci::Implementation::isBusy(void)
     {
-      // mci_wait_busy_signal()
-      while (!(m_mci.getStatusRegister() & AVR32_MCI_SR_NOTBUSY_MASK))
-        {
-          OSDeviceDebug::putChar('w');
-          OSScheduler::yield();
-        }
+      return m_mci.isBusy();
+    }
 
+    OSReturn_t
+    MemoryCardMci::Implementation::configureBusWidth(BusWidth_t busWidth)
+    {
+      m_busWidth = convertBusWidth(busWidth);
+      m_mci.configureBusWidth(m_busWidth);
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::Implementation::setBusWidth(BusWidth_t busWidth __attribute__((unused)))
+    MemoryCardMci::Implementation::configureBlockLengthBytes(BlockLength_t length)
     {
-      uint32_t mci_sdcr_register;
-
-      // Warning: this code assumes that the MCI and the MemoryCardMci bus width
-      // notation are identical!
-
-      mci_sdcr_register = m_mci.moduleRegisters.readSdCard();
-      mci_sdcr_register &= ~AVR32_MCI_SDCR_SDCBUS_MASK; // Clear previous buswidth
-      mci_sdcr_register |= (busWidth << AVR32_MCI_SDCR_SDCBUS_OFFSET);
-
-      OSDeviceDebug::putString(" bwsdc=");
-      OSDeviceDebug::putHex(mci_sdcr_register);
-      OSDeviceDebug::putNewLine();
-
-      m_mci.moduleRegisters.writeSdCard(mci_sdcr_register);
-
+      m_mci.configureBlockLengthBytes(length);
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::Implementation::setBlockLength(BlockLength_t length __attribute__((unused)))
+    MemoryCardMci::Implementation::configureBlockCount(BlockCount_t count)
     {
-      m_mci.setBlockLength(length);
+      m_mci.configureBlockCount(count);
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardMci::Implementation::setBlockCount(BlockCount_t count __attribute__((unused)))
+    MemoryCardMci::Implementation::configureClockFrequencyHz(
+        ClockFrequencyHz_t frequency)
     {
-      m_mci.setBlockCount(count);
-      return OSReturn::OS_OK;
-    }
-
-    OSReturn_t
-    MemoryCardMci::Implementation::setSpeed(uint32_t speed)
-    {
-      m_mci.configSpeed(speed);
+      m_mci.configureClockFrequencyHz(frequency);
       return OSReturn::OS_OK;
     }
 
@@ -291,7 +273,6 @@ namespace avr32
     MemoryCardMci::Implementation::readData(void)
     {
       return m_mci.readData();
-      //return ((m_mci.getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK)) != 0;
     }
 
     bool
@@ -312,6 +293,18 @@ namespace avr32
       val.cfg = m_mci.moduleRegisters.readConfiguration();
       val.CFG.hsmode = 1;
       m_mci.moduleRegisters.writeConfiguration(val.cfg);
+    }
+
+    bool
+    MemoryCardMci::Implementation::isTxReady(void)
+    {
+      return m_mci.isTxReady();
+    }
+
+    void
+    MemoryCardMci::Implementation::writeData(uint32_t value)
+    {
+      m_mci.writeData(value);
     }
 
     // ----- Private methods --------------------------------------------------

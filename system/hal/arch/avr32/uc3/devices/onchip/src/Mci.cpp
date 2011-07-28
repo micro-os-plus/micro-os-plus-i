@@ -37,15 +37,15 @@ namespace avr32
     // ----- Public methods ---------------------------------------------------
 
     void
-    Mci::init(mci::CardSlot_t cardSlot)
+    Mci::initialise(mci::CardSlot_t cardSlot)
     {
       OSDeviceDebug::putString("avr32::uc3::Mci::init()");
       OSDeviceDebug::putNewLine();
 
       m_shadowStatusRegister = 0;
 
-      reset();
-      disable();
+      softwareReset();
+      disableInterface();
 
       disableAllInterrupts();
 
@@ -56,18 +56,27 @@ namespace avr32
       initDataTimeout(MCI_DEFAULT_DTOLMUL, MCI_DEFAULT_DTOLCYC);
 
       // Start with low speed
-      configSpeed(400000);
+      configureClockFrequencyHz(400000);
 
       // Set the Mode register
+      // The two bits, Read Proof Enable and Write Proof Enable in the
+      // MR register (MR.RDPROOF and MR.WRPROOF) allow stopping the
+      // MCI Clock (CLK) during read or write access if the internal
+      // FIFO is full. This will guarantee data integrity, not bandwidth
       enableModeBits(
           (MCI_DEFAULT_PWSDIV << AVR32_MCI_MR_PWSDIV)
               | AVR32_MCI_MR_RDPROOF_MASK | AVR32_MCI_MR_WRPROOF_MASK);
 
       // Set the SD/MMC Card register
-      initSdCardBusWidthAndSlot(mci::BusWidth::_1bit, cardSlot);
+      // Start with bus width = 1bit
+      configureSdCardBusWidthAndSlot(mci::BusWidth::_1bit, cardSlot);
 
       // Enable the MCI and the Power Saving
-      enable();
+      // The Power Save Mode Enable bit in the CR register (CR.PWSEN)
+      // saves power by dividing the MCI clock (CLK) by 2PWSDIV + 1
+      // when the bus is inactive. The Power Saving Divider field locates
+      // in the Mode Register (MR.PWSDIV).
+      enableInterface();
     }
 
     void
@@ -82,12 +91,12 @@ namespace avr32
     }
 
     void
-    Mci::configSpeed(Speed_t speed)
+    Mci::configureClockFrequencyHz(ClockFrequencyHz_t frequency)
     {
       uint32_t mode;
       mode = moduleRegisters.readMode();
 
-      if (speed > AVR32_MCI_HSDIS_MAX_FREQ)
+      if (frequency > AVR32_MCI_HSDIS_MAX_FREQ)
         {
           // Use of the High Speed mode of the MCI macro.
           uint16_t config;
@@ -101,22 +110,25 @@ namespace avr32
 
       // Multimedia Card Interface clock (MCCK or MCI_CK) is Master Clock (MCK)
       // divided by (2*(CLKDIV+1))
-      clkdiv = OS_CFGLONG_PBB_FREQUENCY_HZ / (speed * 2);
-      rest = OS_CFGLONG_PBB_FREQUENCY_HZ % (speed * 2);
+      clkdiv = getInputClockFrequencyHz() / (frequency * 2);
+      rest = getInputClockFrequencyHz() % (frequency * 2);
       if (rest != 0)
         {
           // Ensure that the card_speed can not be higher than expected.
           clkdiv += 1;
         }
 
+      // The Multimedia Card Interface Clock (CLK) is CLK_MCI
+      // divided by (2*(CLKDIV+1)).
+
       if (clkdiv > 0)
         {
           clkdiv -= 1;
         }
 
-      OSDeviceDebug::putString("speed=");
-      OSDeviceDebug::putDec(speed);
-      OSDeviceDebug::putString(", clkdev=");
+      OSDeviceDebug::putString("Mci freq=");
+      OSDeviceDebug::putDec(frequency);
+      OSDeviceDebug::putString("Hz, clkdev=");
       OSDeviceDebug::putHex(clkdiv);
       OSDeviceDebug::putNewLine();
 
@@ -129,7 +141,22 @@ namespace avr32
     }
 
     void
-    Mci::initSdCardBusWidthAndSlot(mci::BusWidth_t busWidth,
+    Mci::configureBusWidth(mci::BusWidth_t busWidth)
+    {
+      uint32_t sdReg;
+
+      sdReg = moduleRegisters.readSdCard();
+
+      // Clear previous buswidth
+      sdReg &= ~AVR32_MCI_SDCR_SDCBUS_MASK;
+      // Include new busWidth
+      sdReg |= ((busWidth & 0x3) << AVR32_MCI_SDCR_SDCBUS_OFFSET);
+
+      moduleRegisters.writeSdCard(sdReg);
+    }
+
+    void
+    Mci::configureSdCardBusWidthAndSlot(mci::BusWidth_t busWidth,
         mci::CardSlot_t cardSlot)
     {
       moduleRegisters.writeSdCard(
@@ -143,14 +170,26 @@ namespace avr32
       // The trick here is to preserve some bits across calls.
       // Currently only AVR32_MCI_SR_DCRCE_MASK is used, and cleared
       // in isCrcError()
-      m_shadowStatusRegister = (m_shadowStatusRegister & (AVR32_MCI_SR_DTOE_MASK
+
+      // Preserve only the 4 given bits
+      m_shadowStatusRegister &= (AVR32_MCI_SR_DTOE_MASK
           | AVR32_MCI_SR_DCRCE_MASK | AVR32_MCI_SR_CSTOE_MASK
-          | AVR32_MCI_SR_BLKOVRE_MASK)) | moduleRegisters.readStatus();
+          | AVR32_MCI_SR_BLKOVRE_MASK);
+
+      // Include new status bits
+      m_shadowStatusRegister |= moduleRegisters.readStatus();
+
       return m_shadowStatusRegister;
     }
 
     bool
-    Mci::wasLastCommandSent(void)
+    Mci::isBusy(void)
+    {
+      return ((getStatusRegister() & AVR32_MCI_SR_NOTBUSY_MASK) == 0);
+    }
+
+    bool
+    Mci::isCommandReady(void)
     {
       return ((getStatusRegister() & AVR32_MCI_SR_CMDRDY_MASK) != 0);
     }
@@ -160,6 +199,7 @@ namespace avr32
     {
       if (getStatusRegister() & AVR32_MCI_SR_DCRCE_MASK)
         {
+          // Clear the shadow bit
           m_shadowStatusRegister &= ~AVR32_MCI_SR_DCRCE_MASK;
           return true;
         }
@@ -170,7 +210,7 @@ namespace avr32
     mci::StatusRegister_t
     Mci::sendCommand(mci::CommandWord_t cmdWord, mci::CommandArgument_t cmdArg)
     {
-      OSDeviceDebug::putString("mci cmd=");
+      OSDeviceDebug::putString("Mci cmd=");
       OSDeviceDebug::putDec(cmdWord & 0x3F);
       OSDeviceDebug::putString(", cmdWord=");
       OSDeviceDebug::putHex(cmdWord);
@@ -181,8 +221,8 @@ namespace avr32
       moduleRegisters.writeArgument(cmdArg);
       moduleRegisters.writeCommand(cmdWord);
 
-      while (!wasLastCommandSent())
-        ; // TODO: fix loop
+      while (!isCommandReady())
+        ; // TODO: reset WD
 
       mci::StatusRegister_t ret;
       ret = MCI_SUCCESS;
@@ -209,7 +249,7 @@ namespace avr32
             }
         }
 
-      OSDeviceDebug::putString("mci ret=");
+      OSDeviceDebug::putString("Mci ret=");
       OSDeviceDebug::putHex(ret);
       OSDeviceDebug::putNewLine();
 
@@ -217,31 +257,27 @@ namespace avr32
     }
 
     void
-    Mci::setBlockLength(BlockLength_t length)
+    Mci::configureBlockLengthBytes(BlockLength_t length)
     {
-
       uint32_t mode;
       mode = moduleRegisters.readMode(); // Read original mode
         {
           mode &= ~AVR32_MCI_MR_BLKLEN_MASK; // Clear previous BLKLEN
-          mode |= (length << AVR32_MCI_MR_BLKLEN_OFFSET); // Set the new value
+          mode |= ((length & 0xFFFF) << AVR32_MCI_MR_BLKLEN_OFFSET); // Set the new value
         }
       moduleRegisters.writeMode(mode); // Write New mode
     }
 
     void
-    Mci::setBlockCount(BlockCount_t cnt)
+    Mci::configureBlockCount(BlockCount_t cnt)
     {
-      union u_blkr
-      {
-        unsigned long blkr;
-        avr32_mci_blkr_t BLKR;
-      };
-      union u_blkr val;
-
-      val.blkr = moduleRegisters.readBlock();
-      val.BLKR.bcnt = cnt;
-      moduleRegisters.writeBlock(val.blkr);
+      uint32_t value;
+      value = moduleRegisters.readBlock(); // Read original mode
+        {
+          value &= ~AVR32_MCI_BLKR_BCNT_MASK; // Clear previous BCNT
+          value |= ((cnt & 0xFFFF) << AVR32_MCI_BCNT_OFFSET); // Set the new value
+        }
+      moduleRegisters.writeBlock(value); // Write New mode
     }
 
     bool
@@ -253,6 +289,39 @@ namespace avr32
         OSDeviceDebug::putChar('W');
 
       return isRxReady;
+    }
+
+    uint32_t
+    Mci::readData(void)
+    {
+      uint32_t ret;
+
+      ret = moduleRegisters.readReceiveData();
+
+      OSDeviceDebug::putHex(ret);
+      OSDeviceDebug::putChar(' ');
+
+      return ret;
+    }
+
+    bool
+    Mci::isTxReady(void)
+    {
+      bool isTxReady;
+      isTxReady = (getStatusRegister() & AVR32_MCI_SR_TXRDY_MASK) != 0;
+      if (!isTxReady)
+        OSDeviceDebug::putChar('W');
+
+      return isTxReady;
+    }
+
+    void
+    Mci::writeData(uint32_t value)
+    {
+      OSDeviceDebug::putHex(value);
+      OSDeviceDebug::putChar(' ');
+
+      moduleRegisters.writeTransmitData(value);
     }
 
   // --------------------------------------------------------------------------

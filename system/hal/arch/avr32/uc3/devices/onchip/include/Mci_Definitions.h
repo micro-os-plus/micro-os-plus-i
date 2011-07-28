@@ -507,7 +507,7 @@ namespace avr32
       inline void
       ModuleRegisters::writeBlock(uint32_t value)
       {
-        this->cmdr = value;
+        this->blkr = value;
       }
 
       inline uint32_t
