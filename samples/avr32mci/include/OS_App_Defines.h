@@ -68,6 +68,8 @@
 //#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
 //#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
 
+//#define OS_DEBUG_AVR32_UC3_MCI_READDATA                 (1)
+
 #endif /* DEBUG */
 
 // ----------------------------------------------------------------------------
