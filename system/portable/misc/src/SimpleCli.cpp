@@ -30,7 +30,7 @@ SimpleCli::~SimpleCli()
 int
 SimpleCli::readLine(std::istream& cin, std::ostream& cout)
 {
-  unsigned char*  pc;
+  unsigned char* pc;
   int c;
 
   for (pc = m_pLine;;)
@@ -90,10 +90,10 @@ SimpleCli::parseReset(void)
   m_pNext = m_pLine;
 }
 
-unsigned char* 
+unsigned char*
 SimpleCli::parseNext(void)
 {
-  unsigned char*  pc;
+  unsigned char* pc;
   unsigned char c;
 
   for (; c = *m_pNext, c == ' ' || c == '\t'; ++m_pNext)
@@ -176,27 +176,27 @@ SimpleCli::parseHex(unsigned char* p, unsigned char* pc)
 
 int8_t
 SimpleCli::parseHex(unsigned char* p, unsigned short* pw)
-  {
-    unsigned char tmp;
-    unsigned short sh;
+{
+  unsigned char tmp;
+  unsigned short sh;
 
-    sh = 0;
-    while ((tmp = *p) != '\0')
-      {
-        sh <<= 4;
-        if ('0' <= tmp && tmp <= '9')
+  sh = 0;
+  while ((tmp = *p) != '\0')
+    {
+      sh <<= 4;
+      if ('0' <= tmp && tmp <= '9')
         sh |= (tmp - '0');
-        else if ('a' <= tmp && tmp <= 'f')
+      else if ('a' <= tmp && tmp <= 'f')
         sh |= (tmp - (unsigned char) 'a' + 10);
-        else if ('A' <= tmp && tmp <= 'F')
+      else if ('A' <= tmp && tmp <= 'F')
         sh |= (tmp - (unsigned char) 'A' + 10);
-        else
+      else
         return -1;
-        ++p;
-      }
-    *pw = sh;
-    return 0;
-  }
+      ++p;
+    }
+  *pw = sh;
+  return 0;
+}
 
 #endif /* OS_INCLUDE_SIMP<ECLI_PARSE_HEX_SHORT */
 
@@ -251,6 +251,30 @@ SimpleCli::parseUnsigned(unsigned char* p, unsigned short* pw)
   }
 
 #endif /* OS_INCLUDE_SIMPLECLI_PARSE_UNSIGNED_SHORT */
+
+#if defined(OS_INCLUDE_SIMPLECLI_PARSE_UNSIGNED_LONG)
+
+int8_t
+SimpleCli::parseUnsigned(unsigned char* p, uint32_t* pl)
+{
+  uint32_t l;
+  uchar_t ch;
+
+  l = 0;
+  while ((ch = *p) != '\0')
+    {
+      l *= 10;
+      if ('0' <= ch && ch <= '9')
+        l += (ch - '0');
+      else
+        return -1;
+      ++p;
+    }
+  *pl = l;
+  return 0;
+}
+
+#endif /* defined(OS_INCLUDE_SIMPLECLI_PARSE_UNSIGNED_LONG) */
 
 #endif /* defined(OS_INCLUDE_SIMPLECLI_PARSER) */
 
