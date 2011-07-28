@@ -40,7 +40,7 @@ namespace avr32
 
       private:
         virtual OSReturn_t
-        init();
+        initialise();
 
         virtual OSReturn_t
         sendCommand(CommandCode_t commandCode, CommandArgument_t commandArg);
@@ -49,19 +49,19 @@ namespace avr32
         readResponse(void);
 
         virtual OSReturn_t
-        waitBusySignal(void);
+        waitWhileBusy(void);
 
         virtual OSReturn_t
-        setBusWidth(BusWidth_t busWidth);
+        configureBusWidth(BusWidth_t busWidth);
 
         virtual OSReturn_t
-        setBlockLength(BlockLength_t length);
+        configureBlockLength(BlockLength_t length);
 
         virtual OSReturn_t
-        setBlockCount(BlockCount_t count);
+        configureBlockCount(BlockCount_t count);
 
         virtual OSReturn_t
-        setSpeed(uint32_t speed);
+        configureClockFrequencyHz(uint32_t speed);
 
         virtual OSReturn_t
         selectCard(BusWidth_t busWidth);
@@ -71,6 +71,12 @@ namespace avr32
 
         virtual uint32_t
         readData(void);
+
+        virtual bool
+        isTxReady(void);
+
+        virtual void
+        writeData(uint32_t value);
 
         virtual void
         setHighSpeedMode(void);
@@ -90,7 +96,7 @@ namespace avr32
         avr32::uc3::Gpio m_gpio;
         ChipSelectActiveLow m_cs;
 
-        //Mci::Speed_t m_speed;
+        //Mci::ClockFrequencyHz_t m_speed;
         //mci::BusWidth_t m_busWidth;
         //mci::CardSlot_t m_cardSlot;
 

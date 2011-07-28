@@ -59,7 +59,7 @@ namespace avr32
     // ---- Private virtuals Methods ------------------------------------------
 
     OSReturn_t
-    MemoryCardSpi::Implementation::init(void)
+    MemoryCardSpi::Implementation::initialise(void)
     {
 #if false
       initGpio();
@@ -73,8 +73,8 @@ namespace avr32
       OSDeviceDebug::putNewLine();
 #endif
 
-      // init MCI module
-      m_mci.init(m_cardSlot);
+      // initialise MCI module
+      m_mci.initialise(m_cardSlot);
 
       // Wait for 1ms, then wait for 74 more clock cycles (see MMC norms)
       if (m_mci.sendCommand(mci::CommandWord::SD_MMC_INIT_STATE_CMD, 0xFFFFFFFF)
@@ -238,13 +238,13 @@ namespace avr32
     MemoryCardSpi::Implementation::selectCard(BusWidth_t busWidth __attribute__((unused)))
     {
 #if false
-      m_mci.initSdCardBusWidthAndSlot(busWidth, m_cardSlot);
+      m_mci.configureSdCardBusWidthAndSlot(busWidth, m_cardSlot);
 #endif
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardSpi::Implementation::waitBusySignal(void)
+    MemoryCardSpi::Implementation::waitNotBusy(void)
     {
 #if false
       // mci_wait_busy_signal()
@@ -257,7 +257,7 @@ namespace avr32
     }
 
     OSReturn_t
-    MemoryCardSpi::Implementation::setBusWidth(BusWidth_t busWidth __attribute__((unused)))
+    MemoryCardSpi::Implementation::configureBusWidth(BusWidth_t busWidth __attribute__((unused)))
     {
 #if false
       uint32_t mci_sdcr_register;
@@ -274,28 +274,28 @@ namespace avr32
     }
 
     OSReturn_t
-    MemoryCardSpi::Implementation::setBlockLength(BlockLength_t length __attribute__((unused)))
+    MemoryCardSpi::Implementation::configureBlockLengthBytes(BlockLength_t length __attribute__((unused)))
     {
 #if false
-      m_mci.setBlockLength(length);
+      m_mci.configureBlockLengthBytes(length);
 #endif
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardSpi::Implementation::setBlockCount(BlockCount_t count __attribute__((unused)))
+    MemoryCardSpi::Implementation::configureBlockCount(BlockCount_t count __attribute__((unused)))
     {
 #if false
-      m_mci.setBlockCount(count);
+      m_mci.configureBlockCount(count);
 #endif
       return OSReturn::OS_OK;
     }
 
     OSReturn_t
-    MemoryCardSpi::Implementation::setSpeed(uint32_t speed __attribute__((unused)))
+    MemoryCardSpi::Implementation::configureClockFrequencyHz(uint32_t speed __attribute__((unused)))
     {
 #if false
-      m_mci.configSpeed(speed);
+      m_mci.configureClockFrequencyHz(speed);
 #endif
       return OSReturn::OS_OK;
     }
@@ -344,6 +344,18 @@ namespace avr32
       val.CFG.hsmode = 1;
       m_mci.moduleRegisters.writeConfiguration(val.cfg);
 #endif
+    }
+
+    bool
+    MemoryCardSpi::Implementation::isTxReady(void)
+    {
+      return false;
+    }
+
+    void
+    MemoryCardSpi::Implementation::writeData(uint32_t value __attribute__((unused)))
+    {
+      ;
     }
 
     // ----- Private methods --------------------------------------------------
