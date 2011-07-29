@@ -149,6 +149,9 @@
 #if !defined(OS_CONFIG_DEBUG_LED1_BIT)
 #define OS_CONFIG_DEBUG_LED1_BIT                                OS_CFGPIN_BOARD_LED1_PIN
 #endif
+#if !defined(OS_CONFIG_DEBUG_LED1_ISACTIVE_LOW)
+#define OS_CONFIG_DEBUG_LED1_ISACTIVE_LOW                      OS_CFGBOOL_BOARD_LED1_ISACTIVE_LOW
+#endif
 
 // Default debug led 2 on LED1
 #if !defined(OS_CONFIG_DEBUG_LED2_PORT_CONFIG)
@@ -159,6 +162,9 @@
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_BIT)
 #define OS_CONFIG_DEBUG_LED2_BIT                                OS_CFGPIN_BOARD_LED2_PIN
+#endif
+#if !defined(OS_CONFIG_DEBUG_LED2_ISACTIVE_LOW)
+#define OS_CONFIG_DEBUG_LED2_ISACTIVE_LOW                      OS_CFGBOOL_BOARD_LED2_ISACTIVE_LOW
 #endif
 
 #if defined(DEBUG) && !defined(OS_CONFIG_DEBUG_DEVICE_I2C)
