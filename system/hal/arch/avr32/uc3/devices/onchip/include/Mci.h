@@ -78,6 +78,9 @@ namespace avr32
       isTxReady(void);
 
       bool
+      isTransferDone(void);
+
+      bool
       isCrcError(void);
 
       void
