@@ -11,6 +11,7 @@
 #include "portable/kernel/include/OS.h"
 
 #include "portable/devices/block/include/OSDeviceMemoryCard.h"
+#include "portable/devices/debug/include/OSDebugLed1.h"
 
 #include "hal/arch/avr32/lib/include/compiler.h"
 
@@ -57,7 +58,9 @@ OSDeviceMemoryCard::open(void)
   OSReturn_t ret;
   ret = initialise();
 
-  m_isOpened = true;
+  if (ret == OSReturn::OS_OK)
+    m_isOpened = true;
+
   return ret;
 }
 
@@ -84,13 +87,16 @@ OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
 
   if (count == 1)
     {
-      ret = prepareReadBlock(blockNumber);
-      if (ret != OSReturn::OS_OK)
-        return ret;
-
-      m_implementation.transferIncommingBytes(pBuf, SD_MMC_SECTOR_SIZE);
-
-      ret = finaliseReadBlock();
+      OSDebugLed1::on();
+        {
+          ret = prepareReadBlock(blockNumber);
+          if (ret == OSReturn::OS_OK)
+            {
+              m_implementation.transferIncommingBytes(pBuf, SD_MMC_SECTOR_SIZE);
+              ret = finaliseReadBlock();
+            }
+        }
+      OSDebugLed1::off();
     }
   else
     {
@@ -103,15 +109,20 @@ OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
 
       ret = finaliseReadBlocks();
 #else
-      for (; count > 0; count--, blockNumber++, pBuf += 512)
+      for (; (count > 0) && (ret == OSReturn::OS_OK); count--, blockNumber++, pBuf
+          += 512)
         {
-          ret = prepareReadBlock(blockNumber);
-          if (ret != OSReturn::OS_OK)
-            return ret;
-
-          m_implementation.transferIncommingBytes(pBuf, SD_MMC_SECTOR_SIZE);
-
-          ret = finaliseReadBlock();
+          OSDebugLed1::on();
+            {
+              ret = prepareReadBlock(blockNumber);
+              if (ret == OSReturn::OS_OK)
+                {
+                  m_implementation.transferIncommingBytes(pBuf,
+                      SD_MMC_SECTOR_SIZE);
+                  ret = finaliseReadBlock();
+                }
+            }
+          OSDebugLed1::off();
         }
 #endif
     }
@@ -122,7 +133,7 @@ OSReturn_t
 OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
     uint8_t* pBuf, OSDeviceBlock::BlockCount_t count)
 {
-#if false
+#if true
   OSDeviceDebug::putString("OSDeviceMemoryCard::writeBlocks() ");
   OSDeviceDebug::putDec(blockNumber);
   OSDeviceDebug::putChar(' ');
@@ -141,13 +152,16 @@ OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
 
   if (count == 1)
     {
-      ret = prepareWriteBlock(blockNumber);
-      if (ret != OSReturn::OS_OK)
-        return ret;
-
-      m_implementation.transferOutgoingBytes(pBuf, SD_MMC_SECTOR_SIZE);
-
-      ret = finaliseWriteBlock();
+      OSDebugLed1::on();
+        {
+          ret = prepareWriteBlock(blockNumber);
+          if (ret == OSReturn::OS_OK)
+            {
+              m_implementation.transferOutgoingBytes(pBuf, SD_MMC_SECTOR_SIZE);
+              ret = finaliseWriteBlock();
+            }
+        }
+      OSDebugLed1::off();
     }
   else
     {
@@ -160,19 +174,24 @@ OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
 
       ret = finaliseWriteBlocks();
 #else
-      for (; count > 0; count--, blockNumber++, pBuf += 512)
+      for (; (count > 0) && (ret == OSReturn::OS_OK); count--, blockNumber++, pBuf
+          += 512)
         {
-          ret = prepareWriteBlock(blockNumber);
-          if (ret != OSReturn::OS_OK)
-            return ret;
-
-          m_implementation.transferOutgoingBytes(pBuf, SD_MMC_SECTOR_SIZE);
-
-          ret = finaliseWriteBlock();
+          OSDebugLed1::on();
+            {
+              ret = prepareWriteBlock(blockNumber);
+              if (ret == OSReturn::OS_OK)
+                {
+                  m_implementation.transferOutgoingBytes(pBuf,
+                      SD_MMC_SECTOR_SIZE);
+                  ret = finaliseWriteBlock();
+                }
+            }
+          OSDebugLed1::off();
         }
 #endif
-
     }
+
   return ret;
 }
 
@@ -190,13 +209,104 @@ OSDeviceMemoryCard::close(void)
 }
 
 OSReturn_t
+OSDeviceMemoryCard::prepareAccess(void)
+{
+  OSReturn_t ret;
+  ret = OSReturn::OS_OK;
+
+  m_implementation.selectCard();
+
+#if true
+
+  // Enter Data Transfer Mode (tran)
+
+  // select card
+  // -- (CMD7)-R1b
+  ret = executeCommand(CommandCode::SELECT_DESELECT_CARD, m_cardRca);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  // -- (CMD16)
+  // Set the card block length to 512B
+  ret = executeCommand(CommandCode::SET_BLOCKLEN, SD_MMC_SECTOR_SIZE);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+#endif
+
+  return ret;
+}
+
+OSReturn_t
 OSDeviceMemoryCard::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)),
     OSDeviceBlock::BlockCount_t count __attribute__((unused)))
 {
-  OSDeviceDebug::putString("OSDeviceMemoryCard::erase()");
+#if false
+  OSDeviceDebug::putString("OSDeviceMemoryCard::erase(");
+  OSDeviceDebug::putDec(blockNumber);
+  OSDeviceDebug::putString(", ");
+  OSDeviceDebug::putDec(count);
+  OSDeviceDebug::putString(")");
   OSDeviceDebug::putNewLine();
+#endif
 
-  return OSReturn::OS_NOT_IMPLEMENTED;
+  if (!m_isOpened)
+    return OSReturn::OS_NOT_OPENED;
+
+  OSReturn_t ret;
+  ret = OSReturn::OS_OK;
+
+  if (count <= 0)
+    return OSReturn::OS_BAD_PARAMETER;
+
+  if (blockNumber >= m_cardSizeBlocks)
+    return OSReturn::OS_SIZE_EXCEEDED;
+
+  if (blockNumber + count > m_cardSizeBlocks)
+    return OSReturn::OS_SIZE_EXCEEDED;
+
+  uint32_t addr1;
+  uint32_t addr2;
+
+  addr1 = blockNumber;
+  addr2 = blockNumber + count - 1;
+
+  // For NO HC card the address must be translate to a byte address
+  if ((!(SD_CARD_HC & m_cardType)) && (!(MMC_CARD_HC & m_cardType)))
+    {
+      addr1 <<= 9;
+      addr2 <<= 9;
+      addr2 += 511;
+    }
+
+  OSDebugLed1::on();
+    {
+      // Select Slot card and prepare access
+      ret = prepareAccess();
+      if (ret != OSReturn::OS_OK)
+        return ret;
+
+      ret = executeCommand(CommandCode::ERASE_WR_BLK_START, addr1);
+      if (ret != OSReturn::OS_OK)
+        return ret;
+
+      ret = executeCommand(CommandCode::ERASE_WR_BLK_END, addr2);
+      if (ret != OSReturn::OS_OK)
+        return ret;
+
+      ret = executeCommand(CommandCode::ERASE, 0);
+
+#if false
+      while (!m_implementation.isTransferDone())
+        {
+          OSDeviceDebug::putChar('f');
+          OSScheduler::yield();
+        }
+#endif
+    }
+  OSDebugLed1::off();
+
+  return ret;
 }
 
 OSDeviceBlock::BlockNumber_t
@@ -242,6 +352,8 @@ OSDeviceMemoryCard::waitNotBusy(void)
 OSReturn_t
 OSDeviceMemoryCard::initialise(void)
 {
+  OSDebugLed1::init();
+
   m_implementation.initialise();
 
   // Default card is not known.
@@ -257,28 +369,25 @@ OSDeviceMemoryCard::initialise(void)
   if (ret != OSReturn::OS_OK)
     return ret;
 
-  uint32_t u32_response;
-
   step1:
+  // First check if MMC, by trying to read OCR (only supported by MMC)
   // -- (CMD1)
-  // To send its Operating Conditions Register contents command only supported by MMC card
-  if (m_implementation.sendCommand(CommandCode::SEND_OP_COND,
-      OCR_MSK_BUSY | OCR_MSK_VOLTAGE_ALL | OCR_MSK_HC) == OSReturn::OS_OK)
+  ret = executeCommand(CommandCode::SEND_OP_COND,
+      OCR_MSK_BUSY | OCR_MSK_VOLTAGE_ALL | OCR_MSK_HC);
+  if (ret == OSReturn::OS_OK)
     {
-      // MMC cards always respond to MMC_SEND_OP_COND
+      // MMC cards always respond to SEND_OP_COND
       m_cardType = MMC_CARD;
       OSDeviceDebug::putString("MMC_CARD ");
       OSDeviceDebug::putNewLine();
 
-      u32_response = m_implementation.readResponse();
-      if (!(u32_response & OCR_MSK_BUSY))
+      if (!(m_response & OCR_MSK_BUSY))
         {
-          // here card busy, it did not completed its initialisation process
-          // resend command MMC_SEND_OP_COND
+          // Here the card is busy, it did not complete the initialisation process
+          // Resend command SEND_OP_COND and loop until it is ready
           goto step1;
-          // loop until it is ready
         }
-      if (0 != (u32_response & OCR_MSK_HC))
+      if ((m_response & OCR_MSK_HC) != 0)
         {
           m_cardType |= MMC_CARD_HC;
           OSDeviceDebug::putString("MMC_CARD_HC ");
@@ -292,13 +401,13 @@ OSDeviceMemoryCard::initialise(void)
       OSDeviceDebug::putString("SD_CARD ");
       OSDeviceDebug::putNewLine();
 
+      // Enables to expand new functionality to some existing commands
+      // supported only by SD v2.0 cards
       // -- (CMD8)
-      // enables to expand new functionality to some existing commands supported only by SD HC card
-      if (m_implementation.sendCommand(CommandCode::SEND_IF_COND, 0x000001AA)
+      if (executeCommand(CommandCode::SEND_IF_COND, 0x000001AA)
           == OSReturn::OS_OK)
         {
-          // It is a SD HC
-          if (0x000001AA == m_implementation.readResponse())
+          if (m_response == 0x000001AA)
             {
               m_cardType |= SD_CARD_V2;
               OSDeviceDebug::putString("SD_CARD_V2 ");
@@ -306,99 +415,85 @@ OSDeviceMemoryCard::initialise(void)
             }
         }
 
-      step2:
-      // -- (CMD55)
-      // Indicates to the card that the next command is an application specific command rather than a standard command
-      // CMD55 shall always precede ACMD41
-      ret = m_implementation.sendCommand(CommandCode::APP_CMD, 0);
-      if (ret != OSReturn::OS_OK)
-        return ret;
+      step2: //
 
-      // -- (ACMD41)
-      // Sends host OCR register
+      uint32_t arg;
+
       if (SD_CARD_V2 & m_cardType)
         {
-          // Sends host capacity support information (HCS)
-          ret = m_implementation.sendCommand(
-              ApplicationCommandCode::SD_SEND_OP_COND,
-              OCR_MSK_BUSY | OCR_MSK_VOLTAGE_3_2V_3_3V | OCR_MSK_HC);
-          if (ret != OSReturn::OS_OK)
-            return ret;
+          arg = OCR_MSK_BUSY | OCR_MSK_VOLTAGE_3_2V_3_3V | OCR_MSK_HC;
         }
       else
         {
-          ret = m_implementation.sendCommand(
-              ApplicationCommandCode::SD_SEND_OP_COND,
-              OCR_MSK_BUSY | OCR_MSK_VOLTAGE_3_2V_3_3V);
-          if (ret != OSReturn::OS_OK)
-            return ret;
+          arg = OCR_MSK_BUSY | OCR_MSK_VOLTAGE_3_2V_3_3V;
         }
-      u32_response = m_implementation.readResponse();
 
-      if (!(u32_response & OCR_MSK_BUSY))
+      // Sends host capacity support information (HCS)
+      // -- (ACMD41)
+      ret = executeCommand(ApplicationCommandCode::SD_SEND_OP_COND, arg);
+      if (ret != OSReturn::OS_OK)
+        return ret;
+
+      if (!(m_response & OCR_MSK_BUSY))
         {
           // Card Busy, resend ACMD41 preceded by CMD55
           goto step2;
         }
       // Card read then check HC type
-      if (u32_response & OCR_MSK_HC)
+      if (m_response & OCR_MSK_HC)
         {
           m_cardType |= SD_CARD_HC; // Card SD High Capacity
           OSDeviceDebug::putString("SD_CARD_HC ");
           OSDeviceDebug::putNewLine();
         }
     }
-  // Here card ready and type (MMC <V4, MMC V4, MMC HC, SD V1, SD V2 HC) detected
 
-  // -- (CMD2)
+  // Card is ready and type is detected
+
   // Send CID
-  ret = m_implementation.sendCommand(CommandCode::ALL_SEND_CID, 0);
+  // -- (CMD2)
+  ret = executeCommand(CommandCode::ALL_SEND_CID, 0);
   if (ret != OSReturn::OS_OK)
     return ret;
 
-  // -- (CMD3)
   // Set relative address
+  // -- (CMD3)
   if (MMC_CARD & m_cardType)
     {
       // For MMC card, you send an address to card
       m_cardRca = RCA_DEFAULT_ADR;
-      ret = m_implementation.sendCommand(CommandCode::SEND_RELATIVE_ADDR,
-          RCA_DEFAULT_ADR);
+      ret = executeCommand(CommandCode::SEND_RELATIVE_ADDR, RCA_DEFAULT_ADR);
       if (ret != OSReturn::OS_OK)
         return ret;
     }
   else
     {
       // For SD  card, you ask an address to card
-      ret = m_implementation.sendCommand(CommandCode::SEND_RELATIVE_ADDR,
-          RCA_RESERVE_ADR);
+      ret = executeCommand(CommandCode::SEND_RELATIVE_ADDR, RCA_RESERVE_ADR);
       if (ret != OSReturn::OS_OK)
         return ret;
 
       // For SD card, you receive the address of the card
-      m_cardRca = m_implementation.readResponse() & RCA_MSK_ADR;
+      m_cardRca = m_response & RCA_MSK_ADR;
     }
 
-  // -- (CMD9)
   // Read & analyse CSD register
+  // -- (CMD9)
   ret = getCsd();
   if (ret != OSReturn::OS_OK)
     return ret;
 
-#if true
+  // Don't think getExtendedCsd() needs this
+#if false
+
   // Enter Data Transfer Mode (tran)
 
-  // -- (CMD7)-R1b
   // select card
-  ret = m_implementation.sendCommand(CommandCode::SELECT_DESELECT_CARD,
-      m_cardRca);
+  // -- (CMD7)-R1b
+  ret = executeCommand(CommandCode::SELECT_DESELECT_CARD, m_cardRca);
   if (ret != OSReturn::OS_OK)
-    return ret;
+  return ret;
 
-  m_implementation.readResponse();
-
-  // Wait end of busy
-  waitNotBusy();// read busy state on DAT0
 #endif
 
   // Get clock by checking the extended CSD register
@@ -412,9 +507,22 @@ OSDeviceMemoryCard::initialise(void)
     }
 
   // TODO: fix this, currently it does not work properly
-//#define OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_MULTIBIT             (1)
+#define OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_MULTIBIT             (1)
 
 #if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_MULTIBIT)
+
+#if true
+
+  // Enter Data Transfer Mode (tran)
+
+  // select card
+  // -- (CMD7)-R1b
+  ret = executeCommand(CommandCode::SELECT_DESELECT_CARD, m_cardRca);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+#endif
+
   // set bus width to multiple bits
   if (SD_CARD & m_cardType)
     {
@@ -431,19 +539,19 @@ OSDeviceMemoryCard::initialise(void)
       if (ret != OSReturn::OS_OK)
         return ret;
 
-      //m_cardBusWidth = BusWidth::_4;
+#if true
       ret = m_implementation.configureBusWidth(BusWidth::_4);
       if (ret != OSReturn::OS_OK)
         return ret;
 
       OSDeviceDebug::putString("SD bw=4");
       OSDeviceDebug::putNewLine();
+#endif
     }
   else
     {
       // set 8-bit bus for MMC Card
-
-      // TODO: configure to allow only 4 bit
+      // TODO: allow 4 bit too
 
       if (MMC_CARD_V4 & m_cardType)
         {
@@ -472,11 +580,24 @@ OSDeviceMemoryCard::initialise(void)
 #define OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_HIGHSPEED            (1)
 
 #if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_INIT_HIGHSPEED)
+
+#if true
+
+  // Enter Data Transfer Mode (tran)
+
+  // select card
+  // -- (CMD7)-R1b
+  ret = executeCommand(CommandCode::SELECT_DESELECT_CARD, m_cardRca);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+#endif
+
   if (MMC_CARD_V4 & m_cardType)
     {
       // -- (CMD6)-R1b
       // set high speed interface timing
-      ret = m_implementation.sendCommand(
+      ret = executeCommand(
           SwitchCommandCode::MMC_SWITCH_FUNC,
           ((uint32_t) MMC_SWITCH_WRITE << 24)
               | ((uint32_t) MMC_SWITCH_HIGH_SPEED << 16)
@@ -484,10 +605,8 @@ OSDeviceMemoryCard::initialise(void)
               | ((uint32_t) MMC_SWITCH_CMD_SET));
       if (ret != OSReturn::OS_OK)
         return ret;
-
-      // Wait end of busy
-      waitNotBusy();
     }
+
 #endif
 
   if (SD_CARD_V2 & m_cardType)
@@ -504,36 +623,17 @@ OSDeviceMemoryCard::initialise(void)
 #define SDMMC_SWITCH_FUNC_G5_KEEP     (0xf << 16) /**< Group 5 No influence */
 #define SDMMC_SWITCH_FUNC_G6_KEEP     (0xf << 20) /**< Group 6 No influence */
 
-      m_implementation.configureBlockLengthBytes(512 / 8); // CMD6 512 bits status
-      m_implementation.configureBlockCount(1);
       // -- (CMD6)
       // Check if we can enter into the High Speed mode.
-      ret = m_implementation.sendCommand(SwitchCommandCode::SD_SWITCH_FUNC,
+      ret = executeCommand(SwitchCommandCode::SD_SWITCH_FUNC,
           SDMMC_SWITCH_FUNC_MODE_CHECK | SDMMC_SWITCH_FUNC_HIGH_SPEED);
       if (ret != OSReturn::OS_OK)
         return ret;
 
-      // Wait end of busy
-      waitNotBusy();// read busy state on DAT0
-
       bool b_hs_supported = false;
 
-      uint8_t i;
-      for (i = 0; i < (512 / 8); i += 4)
-        {
-          uint32_t data;
-          while (!(m_implementation.isRxReady()))
-            {
-              ;
-            }
-          data = m_implementation.readData();
-          if (i == 16)
-            {
-              if (((data >> 24) & 0xf) == 1)
-                b_hs_supported = true;
-              //break;
-            }
-        }
+      if (((m_buf[4] >> 24) & 0xf) == 1)
+        b_hs_supported = true;
 
       if (!b_hs_supported)
         {
@@ -543,7 +643,7 @@ OSDeviceMemoryCard::initialise(void)
           goto step3;
         }
 
-      ret = m_implementation.sendCommand(
+      ret = executeCommand(
           SwitchCommandCode::SD_SWITCH_FUNC,
           SDMMC_SWITCH_FUNC_MODE_SWITCH | SDMMC_SWITCH_FUNC_G6_KEEP
               | SDMMC_SWITCH_FUNC_G5_KEEP | SDMMC_SWITCH_FUNC_G4_KEEP
@@ -551,14 +651,6 @@ OSDeviceMemoryCard::initialise(void)
               | SDMMC_SWITCH_FUNC_HIGH_SPEED);
       if (ret != OSReturn::OS_OK)
         return ret;
-
-      for (i = 0; i < (512 / 8); i += 4)
-        {
-          uint32_t data;
-          while (!(m_implementation.isRxReady()))
-            ;
-          data = m_implementation.readData();
-        }
 
       /* A 8 cycle delay is required after switch command
        * @ 200KHz clock this should be 40 uS, but we use
@@ -569,30 +661,13 @@ OSDeviceMemoryCard::initialise(void)
       m_implementation.configureHighSpeedMode();
 
       // deselect card
-      ret = m_implementation.sendCommand(CommandCode::SELECT_DESELECT_CARD, 0);
+      // TODO; do we need to deselct card here?
+      ret = executeCommand(CommandCode::SELECT_DESELECT_CARD, 0);
       if (ret != OSReturn::OS_OK)
         return ret;
 
-      // Wait end of busy
-      waitNotBusy();// read busy state on DAT0
 #endif
 
-#if false
-      // -- (CMD9)
-      // Read & analyse CSD register
-      ret = getCsd();
-      if (ret != OSReturn::OS_OK)
-      return ret;
-
-      // select card
-      ret = m_implementation.sendCommand(CommandCode::SELECT_DESELECT_CARD,
-          m_cardRca);
-      if (ret != OSReturn::OS_OK)
-      return ret;
-
-      // Wait end of busy
-      m_implementation.waitNotBusy();// read busy state on DAT0
-#endif
     }
 
   step3:
@@ -605,31 +680,38 @@ OSDeviceMemoryCard::initialise(void)
 #endif
 
 #if true
-  // -- (CMD13)
-  // Check if card is ready, the card must be in TRAN state
-  ret = sendStatus();
+
+  // Enter Data Transfer Mode (tran)
+
+  // select card
+  // -- (CMD7)-R1b
+  ret = executeCommand(CommandCode::SELECT_DESELECT_CARD, m_cardRca);
   if (ret != OSReturn::OS_OK)
     return ret;
 
-  if ((m_implementation.readResponse() & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
+#endif
+
+#if true
+
+  // Check if card is in TRAN state
+  // -- (CMD13)
+  ret = executeCommand(CommandCode::SEND_STATUS, m_cardRca);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  if ((m_response & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
     return OSReturn::OS_BAD_STATE;
 
-  OSDeviceDebug::putString("tran state");
-  OSDeviceDebug::putNewLine();
+  //OSDeviceDebug::putString("tran state");
+  //OSDeviceDebug::putNewLine();
 
 #endif
 
   // -- (CMD16)
   // Set the card block length to 512B
-  ret = setBlockLength(SD_MMC_SECTOR_SIZE);
+  ret = executeCommand(CommandCode::SET_BLOCKLEN, SD_MMC_SECTOR_SIZE);
   if (ret != OSReturn::OS_OK)
     return ret;
-
-  // USB Test Unit Attention requires a state "busy" between "not present" and "ready" state
-  // otherwise never report card change
-
-  // sd_mmc_mci_init_done[slot] = TRUE;
-  m_isInitialised = true;
 
   OSDeviceDebug::putString("card type=");
   OSDeviceDebug::putHex(m_cardType);
@@ -637,10 +719,99 @@ OSDeviceMemoryCard::initialise(void)
 
   m_isOpened = true;
 
-  //ret = m_implementation.sendCommand(CommandCode::SEND_STATUS, m_cardRca);
-  //m_implementation.readResponse();
-
   return OSReturn::OS_OK;
+}
+
+OSReturn_t
+OSDeviceMemoryCard::executeCommand(CommandCode_t code, CommandArgument_t arg)
+{
+  //if (code != CommandCode::READ_SINGLE_BLOCK)
+  waitNotBusy(); // read busy state on DAT0
+
+  OSReturn_t ret;
+
+  if ((code >> COMMAND_CLASS_SHIFT) == CommandClass::APPLICATION_8)
+    {
+      // If necessary insert the command to switch to application commands
+      // -- (CMD55)
+      ret = m_implementation.sendCommand(CommandCode::APP_CMD, 0);
+      if (ret != OSReturn::OS_OK)
+        return ret;
+    }
+
+  if (code == SwitchCommandCode::SD_SWITCH_FUNC)
+    {
+      m_implementation.configureBlockLengthBytes(512 / 8); // CMD6 512 bits status
+      m_implementation.configureBlockCount(1);
+    }
+
+  if ((code == CommandCode::READ_SINGLE_BLOCK) || (code
+      == CommandCode::WRITE_BLOCK))
+    {
+      m_implementation.configureBlockLengthBytes(512);
+      m_implementation.configureBlockCount(1);
+    }
+
+  // Send the command to the implementation layer
+  ret = m_implementation.sendCommand(code, arg);
+
+#if false
+  if (ret < 0)
+    {
+      OSDeviceDebug::putString("rrr=");
+      OSDeviceDebug::putDec((uint32_t) -ret);
+      OSDeviceDebug::putNewLine();
+    }
+#endif
+
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  // Some commands require have an response
+  if ((code == CommandCode::SEND_OP_COND)
+      || (code == CommandCode::SEND_IF_COND) || (code
+      == ApplicationCommandCode::SD_SEND_OP_COND) || (code
+      == CommandCode::SEND_RELATIVE_ADDR) || (code
+      == CommandCode::SELECT_DESELECT_CARD) || (code
+      == SwitchCommandCode::MMC_SWITCH_FUNC) || (code
+      == SwitchCommandCode::SD_SWITCH_FUNC) || (code
+      == CommandCode::SEND_STATUS) || (code == CommandCode::SET_BLOCKLEN)
+      || (code == CommandCode::WRITE_BLOCK) || (code
+      == CommandCode::READ_SINGLE_BLOCK) || (code
+      == CommandCode::ERASE_WR_BLK_START) || (code
+      == CommandCode::ERASE_WR_BLK_END) || (code == CommandCode::ERASE))
+    {
+      m_response = m_implementation.readResponse();
+    }
+
+  if ((code == CommandCode::SELECT_DESELECT_CARD) || (code
+      == SwitchCommandCode::MMC_SWITCH_FUNC) || (code
+      == SwitchCommandCode::SD_SWITCH_FUNC) || (code == CommandCode::ERASE))
+    {
+      waitNotBusy(); // read busy state on DAT0
+    }
+
+  if (code == SwitchCommandCode::SD_SWITCH_FUNC)
+    {
+      uint8_t i;
+      for (i = 0; i < (512 / 8 / sizeof(m_buf[0])); i++)
+        {
+          while (!(m_implementation.isRxReady()))
+            ;
+          m_buf[i] = m_implementation.readData();
+        }
+    }
+
+  if (code == CommandCode::SET_BLOCKLEN)
+    {
+      // check response, card must be in TRAN state
+      if ((m_response & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
+        return OSReturn::OS_BAD_STATE;
+
+      m_implementation.configureBlockLengthBytes(arg);
+      m_implementation.configureBlockCount(1);
+    }
+  return ret;
 }
 
 OSReturn_t
@@ -656,9 +827,6 @@ OSDeviceMemoryCard::getCsd(void)
     { 10, 100, 1000, 10000 };
   const uint8_t mult_fact[16] =
     { 0, 10, 12, 13, 15, 20, 26, 30, 35, 40, 45, 52, 55, 60, 70, 80 }; // MMC tabs...
-
-  // Select Slot card before any other command.
-  m_implementation.selectCard();
 
   //-- (CMD9)
   if (m_implementation.sendCommand(CommandCode::SEND_CSD, m_cardRca)
@@ -742,6 +910,7 @@ OSDeviceMemoryCard::getCsd(void)
 OSReturn_t
 OSDeviceMemoryCard::getExtendedCsd(void)
 {
+#if false
   uint8_t i;
   uint32_t val;
 
@@ -755,16 +924,16 @@ OSDeviceMemoryCard::getExtendedCsd(void)
   // read the extended CSD
   if (m_implementation.sendCommand(ApplicationCommandCode::SEND_EXT_CSD, 0)
       != OSReturn::OS_OK)
-    return OSReturn::OS_ERROR;
+  return OSReturn::OS_ERROR;
 
   // READ_EXT_CSD   // discard bytes not used
   for (i = (512L / 8); i != 0; i--)
     {
       while (!(m_implementation.isRxReady()))
-        ;
+      ;
       m_implementation.readData();
       while (!(m_implementation.isRxReady()))
-        ;
+      ;
       if (((64 - 26) == i) && (m_cardType & MMC_CARD_HC))
         {
           // If MMC HC then read Sector Count
@@ -776,69 +945,61 @@ OSDeviceMemoryCard::getExtendedCsd(void)
           if ((64 - 24) == i)
             { // Read byte at offset 196
               if (MSB0(val) & 0x02)
-                m_cardFrequencyKHz = 52 * 1000;
+              m_cardFrequencyKHz = 52 * 1000;
               else
-                m_cardFrequencyKHz = 26 * 1000;
+              m_cardFrequencyKHz = 26 * 1000;
             }
         }
     }
-
-  return TRUE;
-
+#endif
   return OSReturn::OS_OK;
 }
 
+#if false
 OSReturn_t
 OSDeviceMemoryCard::sendStatus()
-{
-  // Select Slot card before any other command.
-  m_implementation.selectCard();
+  {
+    // Select Slot card before any other command.
+    m_implementation.selectCard();
 
-  OSReturn_t ret;
-  // -- (CMD13)
-  ret = m_implementation.sendCommand(CommandCode::SEND_STATUS, m_cardRca);
-  if (ret != OSReturn::OS_OK)
+    OSReturn_t ret;
+    // -- (CMD13)
+    ret = m_implementation.sendCommand(CommandCode::SEND_STATUS, m_cardRca);
+    if (ret != OSReturn::OS_OK)
     return ret;
 
-  return OSReturn::OS_OK;
-}
+    return OSReturn::OS_OK;
+  }
+#endif
 
+#if false
 OSReturn_t
 OSDeviceMemoryCard::setBlockLength(uint16_t length)
-{
-  // Select Slot card before any other command.
-  m_implementation.selectCard();
+  {
+    // Select Slot card before any other command.
+    m_implementation.selectCard();
 
-  OSReturn_t ret;
-  // -- (CMD16)
-  ret = m_implementation.sendCommand(CommandCode::SET_BLOCKLEN, length);
-  if (ret != OSReturn::OS_OK)
+    OSReturn_t ret;
+    // -- (CMD16)
+    ret = m_implementation.sendCommand(CommandCode::SET_BLOCKLEN, length);
+    if (ret != OSReturn::OS_OK)
     return ret;
 
-  // check response, card must be in TRAN state
-  if ((m_implementation.readResponse() & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
+    // check response, card must be in TRAN state
+    if ((m_implementation.readResponse() & MMC_TRAN_STATE_MSK) != MMC_TRAN_STATE)
     return OSReturn::OS_BAD_STATE;
 
-  m_implementation.configureBlockLengthBytes(length);
-  m_implementation.configureBlockCount(1);
+    m_implementation.configureBlockLengthBytes(length);
+    m_implementation.configureBlockCount(1);
 
-  return OSReturn::OS_OK;
-}
+    return OSReturn::OS_OK;
+  }
+#endif
 
 OSReturn_t
 OSDeviceMemoryCard::prepareReadBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
     OSDeviceBlock::BlockCount_t count)
 {
-  //OSDeviceDebug::putString("1 ");
-
-  // Select Slot card before any other command.
-  m_implementation.selectCard();
-  //OSDeviceDebug::putString("2 ");
-
-  // wait for MMC not busy
-  waitNotBusy();
-  //OSDeviceDebug::putString("3 ");
-
   uint32_t addr;
   addr = blockNumber;
   // send command
@@ -878,15 +1039,17 @@ OSDeviceMemoryCard::prepareReadBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
 OSReturn_t
 OSDeviceMemoryCard::prepareReadBlock(OSDeviceBlock::BlockNumber_t blockNumber)
 {
-  //OSDeviceDebug::putString("1 ");
+  OSReturn_t ret;
 
-  // Select Slot card before any other command.
-  m_implementation.selectCard();
-  //OSDeviceDebug::putString("2 ");
+  ret = prepareAccess();
+  if (ret != OSReturn::OS_OK)
+    return ret;
 
-  // wait for MMC not busy
-  waitNotBusy();
-  //OSDeviceDebug::putString("3 ");
+  // Necessary to clear flag error "ADDRESS_OUT_OF_RANGE" (ID LABO = MMC15)
+  // -- (CMD13)
+  ret = executeCommand(CommandCode::SEND_STATUS, m_cardRca);
+  if (ret != OSReturn::OS_OK)
+    return ret;
 
   uint32_t addr;
   addr = blockNumber;
@@ -897,22 +1060,17 @@ OSDeviceMemoryCard::prepareReadBlock(OSDeviceBlock::BlockNumber_t blockNumber)
       addr <<= 9;
     }
 
-  OSReturn_t ret;
-
-  m_implementation.configureBlockLengthBytes(SD_MMC_SECTOR_SIZE);
-  m_implementation.configureBlockCount(1); // might not be needed
-
   // -- (CMD17)
-  ret = m_implementation.sendCommand(CommandCode::READ_SINGLE_BLOCK, addr);
+  ret = executeCommand(CommandCode::READ_SINGLE_BLOCK, addr);
   if (ret != OSReturn::OS_OK)
     return ret;
 
   // check response
-  if ((m_implementation.readResponse() & CardStatus::FLAGERROR_RD_WR) != 0)
+  if ((m_response & CardStatus::FLAGERROR_RD_WR) != 0)
     return OSReturn::OS_ERROR;
 
   //OSDeviceDebug::putString("read prepare ok");
-  OSDeviceDebug::putNewLine();
+  //OSDeviceDebug::putNewLine();
 
   return OSReturn::OS_OK;
 }
@@ -962,17 +1120,14 @@ OSDeviceMemoryCard::finaliseReadBlock(void)
 }
 
 OSReturn_t
-OSDeviceMemoryCard::prepareWriteBlock(OSDeviceBlock::BlockNumber_t blockNumber __attribute__((unused)))
+OSDeviceMemoryCard::prepareWriteBlock(OSDeviceBlock::BlockNumber_t blockNumber)
 {
-  //OSDeviceDebug::putString("1 ");
+  OSReturn_t ret;
 
-  // Select Slot card before any other command.
-  m_implementation.selectCard();
-  //OSDeviceDebug::putString("2 ");
-
-  // wait for MMC not busy
-  waitNotBusy();
-  //OSDeviceDebug::putString("3 ");
+  // Select Slot card and prepare access
+  ret = prepareAccess();
+  if (ret != OSReturn::OS_OK)
+    return ret;
 
   uint32_t addr;
   addr = blockNumber;
@@ -983,18 +1138,13 @@ OSDeviceMemoryCard::prepareWriteBlock(OSDeviceBlock::BlockNumber_t blockNumber _
       addr <<= 9;
     }
 
-  OSReturn_t ret;
-
-  m_implementation.configureBlockLengthBytes(SD_MMC_SECTOR_SIZE);
-  m_implementation.configureBlockCount(1); // might not be needed
-
   // -- (CMD24)
-  ret = m_implementation.sendCommand(CommandCode::WRITE_BLOCK, addr);
+  ret = executeCommand(CommandCode::WRITE_BLOCK, addr);
   if (ret != OSReturn::OS_OK)
     return ret;
 
   // check response
-  if ((m_implementation.readResponse() & CardStatus::FLAGERROR_RD_WR) != 0)
+  if ((m_response & CardStatus::FLAGERROR_RD_WR) != 0)
     return OSReturn::OS_ERROR;
 
   //OSDeviceDebug::putString("write prepare ok");
@@ -1019,6 +1169,13 @@ OSDeviceMemoryCard::finaliseWriteBlock(void)
     {
       return OSReturn::OS_BAD_CHECKSUM; // An CRC error has been seen
     }
+#if false
+  while (!m_implementation.isTransferDone())
+    {
+      OSDeviceDebug::putChar('f');
+      OSScheduler::yield();
+    }
+#endif
 
   return OSReturn::OS_OK;
 }

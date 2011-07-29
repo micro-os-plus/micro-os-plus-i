@@ -571,6 +571,9 @@ public:
     virtual bool
     isBusy(void) = 0;
 
+    virtual bool
+    isTransferDone(void) = 0;
+
     virtual OSReturn_t
     configureBusWidth(BusWidth_t busWidth) = 0;
 
@@ -664,6 +667,9 @@ private:
   OSReturn_t
   initialise(void);
 
+  OSReturn_t
+  executeCommand(CommandCode_t code, CommandArgument_t arg);
+
   void
   waitNotBusy(void);
 
@@ -673,11 +679,16 @@ private:
   OSReturn_t
   getExtendedCsd(void);
 
+#if false
   OSReturn_t
   setBlockLength(uint16_t length);
 
   OSReturn_t
   sendStatus(void);
+#endif
+
+  OSReturn_t
+  prepareAccess(void);
 
   OSReturn_t
   prepareReadBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
@@ -714,6 +725,8 @@ private:
 
   Implementation_t& m_implementation;
 
+  uint32_t m_response;
+
   bool m_isOpened;
 
   uint8_t m_cardType;
@@ -722,7 +735,7 @@ private:
   uint16_t m_cardFrequencyKHz;
   uint32_t m_cardSizeBlocks;
 
-  bool m_isInitialised;
+  uint32_t m_buf[64 / sizeof(uint32_t)];
 
   // --------------------------------------------------------------------------
 };

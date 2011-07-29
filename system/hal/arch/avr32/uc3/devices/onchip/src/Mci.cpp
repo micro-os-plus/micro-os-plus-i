@@ -162,8 +162,8 @@ namespace avr32
         mci::CardSlot_t cardSlot)
     {
       moduleRegisters.writeSdCard(
-          ((busWidth & 0x3) >> AVR32_MCI_SDCR_SDCBUS_OFFSET)
-              | ((cardSlot & 0x3) >> AVR32_MCI_SDCR_SDCSEL_OFFSET));
+          ((busWidth & 0x3) << AVR32_MCI_SDCR_SDCBUS_OFFSET)
+              | ((cardSlot & 0x3) << AVR32_MCI_SDCR_SDCSEL_OFFSET));
     }
 
     void
@@ -203,6 +203,13 @@ namespace avr32
     {
       return ((getStatusRegister() & AVR32_MCI_SR_NOTBUSY_MASK) == 0);
     }
+
+    bool
+    Mci::isTransferDone(void)
+    {
+      return ((getStatusRegister() & AVR32_MCI_SR_XFRDONE_MASK) != 0);
+    }
+
 
     bool
     Mci::isCommandReady(void)
@@ -253,16 +260,16 @@ namespace avr32
         {
           // if the command is SEND_OP_COND the CRC error flag
           // is always present (cf : R3 response)
-          if ((cmdWord != mci::CommandWord::SD_MMC_SDCARD_APP_OP_COND_CMD)
-              && (cmdWord != mci::CommandWord::SD_MMC_MMC_SEND_OP_COND_CMD))
+          if ((cmdWord == mci::CommandWord::SD_MMC_SDCARD_APP_OP_COND_CMD)
+              || (cmdWord == mci::CommandWord::SD_MMC_MMC_SEND_OP_COND_CMD))
             {
-              if (status != AVR32_MCI_SR_RTOE_MASK)
-                // filter RTOE error which happens when using the HS mode
-                ret = status;
+              if ((status & AVR32_MCI_SR_RCRCE_MASK) == 0)
+                ret = status; // return only if not CRC
             }
           else
             {
-              if (status != AVR32_MCI_SR_RCRCE_MASK)
+              if ((status & AVR32_MCI_SR_RTOE_MASK) == 0)
+                // filter RTOE error which happens when using the HS mode
                 ret = status;
             }
         }
@@ -270,6 +277,8 @@ namespace avr32
 #if defined(OS_DEBUG_AVR32_UC3_MCI_SENDCOMMAND)
       OSDeviceDebug::putString("Mci ret=");
       OSDeviceDebug::putHex(ret);
+      OSDeviceDebug::putString(", stat=");
+      OSDeviceDebug::putHex(status);
       OSDeviceDebug::putNewLine();
 #endif /* defined(OS_DEBUG_AVR32_UC3_MCI_SENDCOMMAND) */
 
@@ -306,7 +315,7 @@ namespace avr32
       bool isRxReady;
       isRxReady = (getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK) != 0;
       if (!isRxReady)
-        OSDeviceDebug::putChar('W');
+        OSDeviceDebug::putChar('R');
 
       return isRxReady;
     }
@@ -332,7 +341,7 @@ namespace avr32
       bool isTxReady;
       isTxReady = (getStatusRegister() & AVR32_MCI_SR_TXRDY_MASK) != 0;
       if (!isTxReady)
-        OSDeviceDebug::putChar('W');
+        OSDeviceDebug::putChar('T');
 
       return isTxReady;
     }

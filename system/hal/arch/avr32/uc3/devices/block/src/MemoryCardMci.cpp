@@ -29,7 +29,7 @@ namespace avr32
 
     // ===== Implementation ===================================================
 
-    MemoryCardMci::Implementation::Implementation(mci::CardSlot_t cardSlot)
+    MemoryCardMci::Implementation::Implementation(mci::CardSlot_t cardSlot) : m_dat0(19)
     {
       OSDeviceDebug::putConstructor(
           "avr32::uc3::MemoryCardMci::Implementation", this);
@@ -135,6 +135,18 @@ namespace avr32
         commandWord = mci::CommandWord::SD_MMC_WRITE_BLOCK_CMD;
         break;
 
+      case CommandCode::ERASE_WR_BLK_START:
+        commandWord = mci::CommandWord::SD_MMC_TAG_SECTOR_START_CMD;
+        break;
+
+      case CommandCode::ERASE_WR_BLK_END:
+        commandWord = mci::CommandWord::SD_MMC_TAG_SECTOR_END_CMD;
+        break;
+
+      case CommandCode::ERASE:
+        commandWord = mci::CommandWord::SD_MMC_ERASE_CMD;
+        break;
+
         // ----- Application commands -----------------------------------------
       case ApplicationCommandCode::SD_SEND_OP_COND:
         commandWord = mci::CommandWord::SD_MMC_SDCARD_APP_OP_COND_CMD;
@@ -191,10 +203,26 @@ namespace avr32
       OSDeviceDebug::putNewLine();
 #endif /* defined(OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_SENDCOMMAND) */
 
-      if (m_mci.sendCommand(commandWord, commnadArg) != MCI_SUCCESS)
-        return OSReturn::OS_BAD_COMMAND;
-      else
+      mci::StatusRegister_t status;
+      status = m_mci.sendCommand(commandWord, commnadArg);
+
+#if false && defined(OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_SENDCOMMAND)
+      OSDeviceDebug::putString("MC stat=");
+      OSDeviceDebug::putHex(status);
+      OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_SENDCOMMAND) */
+
+      if (status == MCI_SUCCESS)
         return OSReturn::OS_OK;
+
+      if ((status & (AVR32_MCI_SR_CSTOE_MASK | AVR32_MCI_SR_RTOE_MASK)) != 0)
+        return OSReturn::OS_TIMEOUT;
+
+      // TODO: maybe other return codes are also interesting
+      if ((status & MCI_SR_ERROR) != 0)
+        return OSReturn::OS_BAD_COMMAND;
+
+      return OSReturn::OS_ERROR;
     }
 
     OSDeviceMemoryCard::Response_t
@@ -230,6 +258,22 @@ namespace avr32
     MemoryCardMci::Implementation::isBusy(void)
     {
       return m_mci.isBusy();
+    }
+
+    bool
+    MemoryCardMci::Implementation::isTransferDone(void)
+    {
+#if false
+      return m_mci.isTransferDone();
+#else
+      bool isPinHigh;
+      m_dat0.setModeGpio();
+      m_dat0.setDirectionInput();
+      isPinHigh = m_dat0.isPinHigh();
+      m_dat0.configPeripheralFunction(avr32::uc3::gpio::PeripheralFunction::A);
+
+      return isPinHigh;
+#endif
     }
 
     OSReturn_t
