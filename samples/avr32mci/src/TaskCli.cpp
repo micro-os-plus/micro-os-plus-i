@@ -155,7 +155,7 @@ TaskCli::threadMain(void)
     }
 }
 
-static const char str_help[] = "mo|mc|mi|mr n|mw n|st";
+static const char str_help[] = "mo | mc | mi | mr n | mw n | me n c | st";
 static const char str_unknown[] = "Cmd?";
 
 /*
@@ -168,7 +168,7 @@ static const char str_unknown[] = "Cmd?";
  *
  * 	mr blk	 	- memory read
  * 	mw blk          - memory write
- *      me blk          - memory erase
+ *      me blk cnt      - memory erase
  * 
  *      mi              - memory info
  *
@@ -264,6 +264,45 @@ TaskCli::lineProcess()
             goto err;
 
           cmdMW(l);
+        }
+      else if (c == 'x')
+        {
+          if ((p = cli.parseNext()) == 0)
+            goto err;
+
+          if (cli.parseUnsigned(p, &l) < 0)
+            goto err;
+
+          cmdMX(l);
+        }
+      else if (c == 'y')
+        {
+          if ((p = cli.parseNext()) == 0)
+            goto err;
+
+          if (cli.parseUnsigned(p, &l) < 0)
+            goto err;
+
+          cmdMY(l);
+        }
+      else if (c == 'e')
+        {
+          if ((p = cli.parseNext()) == 0)
+            goto err;
+
+          if (cli.parseUnsigned(p, &l) < 0)
+            goto err;
+
+          unsigned long c;
+          c = 1;
+
+          if ((p = cli.parseNext()) != 0)
+            {
+              if (cli.parseUnsigned(p, &c) < 0)
+                goto err;
+            }
+
+          cmdME(l, c);
         }
       else
         goto err;
@@ -747,8 +786,6 @@ TaskCli::cmdMR(unsigned long l)
   int r;
   std::ostream& cout = m_cout;
 
-  //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
-
   r = m_card.readBlocks(l, (uint8_t*) m_buf, 1);
   if (r != 0)
     {
@@ -756,21 +793,15 @@ TaskCli::cmdMR(unsigned long l)
       cout << 'R' << std::dec << r;
       return;
     }
-  //OS_CONFIG_USBINT_LED_PORT |= _BV(PORTD0);
 
   cout << std::endl;
 
   dumpHex((uint8_t*) m_buf, 512);
-  //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
-
 }
 
 void
-TaskCli::cmdMW(unsigned long l)
+TaskCli::genBlock(unsigned long l)
 {
-  int r;
-  std::ostream& cout = m_cout;
-
   uint8_t* p;
   p = (uint8_t*) &m_buf[0];
 
@@ -779,7 +810,11 @@ TaskCli::cmdMW(unsigned long l)
     {
       uint8_t b;
 
-      if ((i % 16) == 0)
+      if (i == 0)
+        b = 0x55;
+      else if (i == 511)
+        b = 0xAA;
+      else if ((i % 16) == 0)
         b = i / 16;
       else if ((i % 16) == 1)
         b = (l >> 24);
@@ -794,12 +829,19 @@ TaskCli::cmdMW(unsigned long l)
 
       *p = b;
     }
+}
+
+void
+TaskCli::cmdMW(unsigned long l)
+{
+  int r;
+  std::ostream& cout = m_cout;
+
+  genBlock(l);
 
 #if false
   dumpHex((uint8_t*) m_buf, 512);
 #endif
-
-  //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
 
   r = m_card.writeBlocks(l, (uint8_t*) m_buf, 1);
   if (r != 0)
@@ -808,12 +850,68 @@ TaskCli::cmdMW(unsigned long l)
       cout << 'R' << std::dec << r;
       return;
     }
-  //OS_CONFIG_USBINT_LED_PORT |= _BV(PORTD0);
 
   cout << std::endl;
+}
 
-  //OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
+void
+TaskCli::cmdMX(unsigned long l)
+{
+  int r;
+  std::ostream& cout = m_cout;
 
+  unsigned long i;
+  for (i = 0; i < l; ++i)
+    {
+      genBlock(i);
+      r = m_card.writeBlocks(i, (uint8_t*) m_buf, 1);
+      if (r != 0)
+        {
+          cout << std::endl;
+          cout << 'R' << std::dec << r;
+          return;
+        }
+    }
+
+  cout << std::endl;
+}
+
+void
+TaskCli::cmdMY(unsigned long l)
+{
+  int r;
+  std::ostream& cout = m_cout;
+
+  unsigned long i;
+  for (i = 0; i < l; ++i)
+    {
+      r = m_card.readBlocks(i, (uint8_t*) m_buf, 1);
+      if (r != 0)
+        {
+          cout << std::endl;
+          cout << 'R' << std::dec << r;
+          return;
+        }
+    }
+
+  cout << std::endl;
+}
+
+void
+TaskCli::cmdME(unsigned long l, unsigned long c)
+{
+  int r;
+  std::ostream& cout = m_cout;
+
+  r = m_card.eraseBlocks(l, c);
+  if (r != 0)
+    {
+      cout << std::endl;
+      cout << 'R' << std::dec << r;
+      return;
+    }
+
+  cout << std::endl;
 }
 
 void

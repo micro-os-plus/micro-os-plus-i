@@ -9,11 +9,7 @@
 
 // ----------------------------------------------------------------------------
 
-// override the board definitions, if needed
-//#define OS_CFGLONG_OSCILLATOR_HZ                        (8000000UL)
-
 //#define OS_CFGINT_TICK_RATE_HZ                          (1000)
-//#define OS_CFGINT_TIMER_PRESCALLER                      (64)
 #define OS_CFGINT_THREADS_ARRAY_SIZE                    (3)
 
 //#define OS_EXCLUDE_MULTITASKING                         (1)
@@ -68,7 +64,14 @@
 //#define OS_DEBUG_OSSCHEDULER_DUMPSTACK                  (1)
 //#define OS_DEBUG_CONSTRUCTORS_INIT                      (1)
 
-//#define OS_DEBUG_AVR32_UC3_MCI_READDATA                 (1)
+#if true
+#define OS_DEBUG_AVR32_UC3_MCI_READDATA                 (1)
+#define OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_SENDCOMMAND (1)
+#define OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_READRESPONSE (1)
+#define OS_DEBUG_AVR32_MCI_MEMORYCARDMCI_IMPLEMENTATION_SELECTCARD (1)
+#define OS_DEBUG_AVR32_UC3_MCI_CONFIGURECLOCKFREQUENCYHZ (1)
+#define OS_DEBUG_AVR32_UC3_MCI_SENDCOMMAND              (1)
+#endif
 
 #endif /* DEBUG */
 
