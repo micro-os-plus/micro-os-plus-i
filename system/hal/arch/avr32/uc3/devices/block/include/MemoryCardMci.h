@@ -11,6 +11,7 @@
 
 #include "portable/devices/block/include/OSDeviceMemoryCard.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Mci.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
 
 namespace avr32
 {
@@ -43,6 +44,9 @@ namespace avr32
 
         virtual bool
         isBusy(void);
+
+        virtual bool
+        isTransferDone(void);
 
         virtual OSReturn_t
         configureBusWidth(BusWidth_t busWidth);
@@ -97,6 +101,8 @@ namespace avr32
         Mci::ClockFrequencyHz_t m_speed;
         mci::BusWidth_t m_busWidth;
         mci::CardSlot_t m_cardSlot;
+
+        avr32::uc3::Gpio m_dat0;
 
       };
 
