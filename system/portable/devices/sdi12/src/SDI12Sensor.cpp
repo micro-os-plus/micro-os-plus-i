@@ -65,7 +65,6 @@ volatile unsigned char SDI12Sensor::ms_dDigit;
 unsigned int SDI12Sensor::ms_dSeconds;
 volatile unsigned char SDI12Sensor::ms_dIndex;
 
-
 volatile bool SDI12Sensor::ms_bDAvailable;
 volatile bool SDI12Sensor::ms_bAcquire;
 volatile bool SDI12Sensor::ms_bServiceRequest;
@@ -91,7 +90,6 @@ unsigned char SDI12Sensor::ms_prevValue3;
 
 SDI12Value_t SDI12Sensor::ms_dValues[OS_CFGINT_SDI12SENSOR_DVALUES_SIZE];
 unsigned char SDI12Sensor::ms_dCount;
-
 
 #endif
 
@@ -324,7 +322,8 @@ SDI12Sensor::threadMainSDI12(void)
   OSThread* pThreadIdle;
   pThreadIdle = OSScheduler::getThreadIdle();
 
-  bool bIdleAllowDeepSleep;
+  //bool bIdleAllowSleep;
+  //bool bAllowSleep;
 
   // thread endless loop
   for (;;)
@@ -342,15 +341,15 @@ SDI12Sensor::threadMainSDI12(void)
 
         pThread->virtualWatchdogSet(0);
 
-        // permit to enter deep sleep
-        ms_pThread->setAllowSleep(true);
-
         ms_flags.clear(BREAK);
 
         // disable USART reception
         usartRxDisable();
+
+        // permit to enter sleep
+        ms_pThread->setAllowSleep(true);
+
         // enable break detection
-        //interruptPinChangeEnable();
         enableBreakDetect();
 
         // wait for break and clear condition
@@ -374,6 +373,8 @@ SDI12Sensor::threadMainSDI12(void)
       case STATE2:
         // look for 8.33ms marking
 
+        ms_pThread->setAllowSleep(false);
+
         // enable rx early, otherwise we loose address
         clearInputBuff();
         usartRxEnable();
@@ -392,16 +393,18 @@ SDI12Sensor::threadMainSDI12(void)
       case STATE3:
         // look for address, break or 100 ms timeout
 
-        bIdleAllowDeepSleep = pThreadIdle->isDeepSleepAllowed();
-        pThreadIdle->setAllowSleep(false);
-          {
-            ms_flags.clear(ADDRESS | BREAK | TIMEOUT);
-            enableTimeout(TIMEOUT100_TICKS);
-            ms_flags.wait(ADDRESS | BREAK | TIMEOUT);
-            flags = ms_flags.get();
-            disableTimeout();
-          }
-        pThreadIdle->setAllowSleep(bIdleAllowDeepSleep);
+        ms_pThread->setAllowSleep(false);
+
+        //bIdleAllowSleep = pThreadIdle->isSleepAllowed();
+        //pThreadIdle->setAllowSleep(false);
+        //  {
+        ms_flags.clear(ADDRESS | BREAK | TIMEOUT);
+        enableTimeout(TIMEOUT100_TICKS);
+        ms_flags.wait(ADDRESS | BREAK | TIMEOUT);
+        flags = ms_flags.get();
+        disableTimeout();
+        //  }
+        //pThreadIdle->setAllowSleep(bIdleAllowSleep);
 
         if ((flags & BREAK) != 0)
           {
@@ -427,6 +430,8 @@ SDI12Sensor::threadMainSDI12(void)
 
       case STATE4:
         // look for !, or 8.33 ms marking while loading the command
+
+        ms_pThread->setAllowSleep(false);
 
         ms_flags.clear(EXCLAMATION | MARKING);
         enableMarking(MARKING8_TICKS);
@@ -461,6 +466,8 @@ SDI12Sensor::threadMainSDI12(void)
 
       case STATE5:
         // send the response, release the data line
+
+        ms_pThread->setAllowSleep(false);
 
         unsigned int delta;
         delta = OSScheduler::timerTicks.getTicks() - ms_exclamationTicks;
@@ -505,14 +512,18 @@ SDI12Sensor::threadMainSDI12(void)
       case STATE6:
         // look for break while processing non C command
 
+        ms_pThread->setAllowSleep(false);
+
         if (ms_bAcquire)
           {
             ms_bAcquire = false;
 
             //ms_bIsCancelled = false;
 
-            // reenable to detect break
-            //interruptPinChangeEnable();
+            // permit to enter deep sleep
+            //bAllowSleep = ms_pThread->isSleepAllowed();
+            ms_pThread->setAllowSleep(true);
+            //  {
             enableBreakDetect();
 
             ms_flags.notify(ACQUIRE);
@@ -523,8 +534,11 @@ SDI12Sensor::threadMainSDI12(void)
             ms_flags.clear(ACQUIRE_COMPLETED | BREAK);
             ms_flags.wait(ACQUIRE_COMPLETED | BREAK);
             flags = ms_flags.get();
-            //interruptPinChangeDisable();
+
             ms_breakDetectEnable = false;
+            //  }
+            //ms_pThread->setAllowSleep(bAllowSleep);
+            ms_pThread->setAllowSleep(false);
 
             if (flags & BREAK)
               {
@@ -534,8 +548,6 @@ SDI12Sensor::threadMainSDI12(void)
                 ms_flags.wait(ACQUIRE_COMPLETED);
                 flags = ms_flags.get();
 
-                // to stop automatic cancellation notification
-                //ms_bIsCancelled = false;
                 // acknowledge thread interrupted
                 threadAcquire.ackInterruption();
 
@@ -592,13 +604,7 @@ SDI12Sensor::threadMainSDI12(void)
             OSDeviceDebug::putChar(ms_doReset);
             OSDeviceDebug::putNewLine();
 #endif
-
-            if (ms_doReset == '1')
-              {
-                // TODO: portability
-                eeprom_write_byte((uint8_t*) 0, 0xFF);
-              }
-            OSCPU::softReset();
+            processSoftReset(ms_doReset);
           }
 
         ms_state = STATE3;
@@ -612,8 +618,12 @@ SDI12Sensor::threadMainSDI12(void)
         // look for break
         // while processing the C command
 
+        ms_pThread->setAllowSleep(true);
+
+        //bAllowSleep = ms_pThread->isSleepAllowed();
+        //ms_pThread->setAllowSleep(true);
+        //  {
         // re-enable to detect break
-        //interruptPinChangeEnable();
         enableBreakDetect();
 
         ms_flags.notify(ACQUIRE);
@@ -624,6 +634,8 @@ SDI12Sensor::threadMainSDI12(void)
         ms_flags.clear(ACQUIRE_COMPLETED | BREAK);
         ms_flags.wait(ACQUIRE_COMPLETED | BREAK);
         flags = ms_flags.get();
+        //  }
+        //ms_pThread->setAllowSleep(bAllowSleep);
 
         if (flags & BREAK)
           {
@@ -642,20 +654,22 @@ SDI12Sensor::threadMainSDI12(void)
         // look for address, break or 100 ms timeout
         // while processing the C command
 
+        ms_pThread->setAllowSleep(false);
+
         clearInputBuff();
         usartRxEnable();
 
-        bIdleAllowDeepSleep = pThreadIdle->isDeepSleepAllowed();
-        pThreadIdle->setAllowSleep(false);
-          {
-            ms_flags.clear(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
-            enableTimeout(TIMEOUT100_TICKS);
-            ms_flags.wait(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
-            flags = ms_flags.get();
+        //bIdleAllowSleep = pThreadIdle->isSleepAllowed();
+        //pThreadIdle->setAllowSleep(false);
+        //  {
+        ms_flags.clear(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
+        enableTimeout(TIMEOUT100_TICKS);
+        ms_flags.wait(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
+        flags = ms_flags.get();
 
-            disableTimeout();
-          }
-        pThreadIdle->setAllowSleep(bIdleAllowDeepSleep);
+        disableTimeout();
+        //  }
+        //pThreadIdle->setAllowSleep(bIdleAllowSleep);
 
         if ((flags & BREAK) != 0)
           {
@@ -687,6 +701,8 @@ SDI12Sensor::threadMainSDI12(void)
         // look for address, break or 100 ms timeout
         // while processing the C command
 
+        ms_pThread->setAllowSleep(false);
+
         ms_flags.clear(EXCLAMATION | MARKING);
         enableMarking(MARKING8_TICKS);
         ms_flags.wait(EXCLAMATION | MARKING);
@@ -710,7 +726,6 @@ SDI12Sensor::threadMainSDI12(void)
                 cancelAcquisition();
                 ms_flags.wait(ACQUIRE_COMPLETED);
                 flags = ms_flags.get();
-
 
                 // to stop automatic cancellation notification
                 //ms_bIsCancelled = false;
@@ -1258,7 +1273,10 @@ SDI12Sensor::parseString(unsigned char* pStr, unsigned short len)
       if (c == '\0' || c == ',')
         break;
 
-      *p++ = c;
+      // Store only if printable or not space
+      if (isgraph(c))
+        *p++ = c;
+
       ms_pParse++;
     }
   *p = '\0';
@@ -1823,9 +1841,11 @@ SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
     {
       if (pinChangedIsHigh(crt))
         {
+          // break off
+
           OSTimerTicks_t now;
           now = OSScheduler::timerTicks.getTicks();
-          // break off
+
           OSDebugLed2::off();
 #if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_INTERRUPTPINCHANGESERVICEROUTINE)
           OSDeviceDebug::putDec(now - ms_ticksBRK);
@@ -1837,20 +1857,12 @@ SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
               // break recognized only if pulse longer
               // than MIN_BREAK_TICKS
 
-//#if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_INTERRUPTPINCHANGESERVICEROUTINE)
+              //#if defined(DEBUG) && defined(OS_DEBUG_SDI12SENSOR_INTERRUPTPINCHANGESERVICEROUTINE)
               OSDeviceDebug::putChar('#');
-//#endif
+              //#endif
 
-              //if (ms_cancelOnBreak)
-              //{
-              //ms_bIsCancelled = true;
-              //}
-              //else
-              //{
               ms_flags.notify(BREAK);
-              //}
 
-              //interruptPinChangeDisable();
               ms_breakDetectEnable = false;
             }
           else
@@ -1858,8 +1870,8 @@ SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
 #if defined(DEBUG)
               OSDeviceDebug::putChar('?');
 #endif
-              ms_pThread->setAllowSleep(true);
             }
+          ms_pThread->setAllowSleep(true);
         }
       else
         {
