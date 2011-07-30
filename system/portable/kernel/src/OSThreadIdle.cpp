@@ -56,7 +56,7 @@ OSThreadIdle::enterSleep(void)
   for (int i = 0; i < OSScheduler::getThreadsCount(); ++i)
     {
       // if any thread requests to prevent deep sleep, return
-      if (!OSScheduler::getThread(i)->isDeepSleepAllowed())
+      if (!OSScheduler::getThread(i)->isSleepAllowed())
         return false;
     }
 

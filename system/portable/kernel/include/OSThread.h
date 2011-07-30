@@ -60,7 +60,7 @@ public:
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   // Return TRUE if the thread can go to sleep, FALSE otherwise.
-  bool isDeepSleepAllowed() const;
+  bool isSleepAllowed() const;
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
@@ -391,7 +391,7 @@ OSThread::isWaiting(void) const
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
 
 inline bool
-OSThread::isDeepSleepAllowed(void) const
+OSThread::isSleepAllowed(void) const
   {
     return m_allowSleep;
   }
