@@ -109,6 +109,9 @@ public:
   virtual void
   processPeriodicMeasurements(void);
 
+  virtual void
+  processSoftReset(unsigned char param) = 0;
+
   static void
   interruptPinChangeServiceRoutine(unsigned char crt, unsigned char prev);
   static void
