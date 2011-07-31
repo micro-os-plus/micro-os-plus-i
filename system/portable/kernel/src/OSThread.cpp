@@ -79,8 +79,12 @@ OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint,
   m_isWaiting = false;
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+  getCpuSleepCriticalSection().clear();
+#else
   // by default, threads will enter deep sleep
   m_allowSleep = true;
+#endif
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)

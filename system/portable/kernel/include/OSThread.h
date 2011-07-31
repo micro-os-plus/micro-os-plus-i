@@ -16,6 +16,36 @@ typedef unsigned char OSThreadPriority_t;
 typedef void
 (*OSThreadMainPtr_t)(void*);
 
+#if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+
+class OSCpuSleepCriticalSection
+{
+public:
+  uint8_t
+  clear(void) __attribute__((always_inline));
+
+  uint8_t
+  set(bool flag = true) __attribute__((always_inline));
+
+  void
+  enter(void) __attribute__((always_inline));
+
+  void
+  exit(void) __attribute__((always_inline));
+
+  bool
+  isSleepAllowed(void) __attribute__((always_inline));
+
+private:
+  uint8_t m_count;
+};
+
+#endif /* defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION) */
+
+#endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
+
 class OSThread
 {
 public:
@@ -59,16 +89,24 @@ public:
   isWaiting(void) const;
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+  OSCpuSleepCriticalSection&
+  getCpuSleepCriticalSection(void);
+#else
   // Return TRUE if the thread can go to sleep, FALSE otherwise.
-  bool isSleepAllowed() const;
+  bool
+  isSleepAllowed() const;
+#endif
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   // Set the virtual watchdog expire interval (in seconds).
-  void virtualWatchdogSet(uint16_t seconds);
+  void
+  virtualWatchdogSet(uint16_t seconds);
   // If the virtual watchdog interval expires, the MCU is reset using
   // the hardware module watchdog.
-  void virtualWatchdogCheck(void);
+  void
+  virtualWatchdogCheck(void);
 #endif
 
   // Return the thread name.
@@ -78,13 +116,13 @@ public:
   // Return the address of the stack bottom.
   // Stack grows from high address to low address,
   // so this is the maximum address the stack can grow.
-  unsigned char* 
+  unsigned char*
   getStackBottom(void) const;
 
   // Return the current stack pointer of the thread.
   // This value is stored only during context switch,
   // so the running thread will not get the actual value.
-  OSStack_t* 
+  OSStack_t*
   getStack(void) const;
 
   // Return the stack size given at thread creation.
@@ -127,15 +165,22 @@ public:
   getStackUsed(void) const;
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+#if !defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
   // Allow thread to be put to sleep.
-  void setAllowSleep(bool status);
+  void
+  setAllowSleep(bool status);
+#endif
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
-  bool isInterrupted(void) const;
-  void setInterruption(bool flag);
-  void requestInterruption(void);
-  void ackInterruption(void);
+  bool
+  isInterrupted(void) const;
+  void
+  setInterruption(bool flag);
+  void
+  requestInterruption(void);
+  void
+  ackInterruption(void);
 #endif
 
 #if defined(DEBUG)
@@ -240,7 +285,7 @@ private:
   // The bottom of the thread's stack (lowest address).
   unsigned char* m_pStackBottom;
 
-//public:
+  //public:
   // The size of the thread's stack, in bytes.
   OSStackSize_t m_stackSize;
 
@@ -250,10 +295,15 @@ private:
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+  OSCpuSleepCriticalSection m_cpuSleepCriticalSection;
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+#else
   // True if the thread can be put to sleep.
   bool m_allowSleep;
 #endif
+#endif
 
+private:
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   unsigned short m_WDseconds;
 #endif
@@ -261,10 +311,11 @@ private:
 
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
-inline void OSThread::ackInterruption(void)
-  {
-    setInterruption(false);
-  }
+inline void
+OSThread::ackInterruption(void)
+{
+  setInterruption(false);
+}
 
 #endif
 
@@ -310,13 +361,13 @@ OSThread::getName(void) const
   return m_pName;
 }
 
-inline unsigned char* 
+inline unsigned char*
 OSThread::getStackBottom(void) const
 {
   return m_pStackBottom;
 }
 
-inline OSStack_t* 
+inline OSStack_t*
 OSThread::getStack(void) const
 {
   return m_pStack;
@@ -329,8 +380,8 @@ OSThread::getStackSize(void) const
 }
 
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
-  inline OSStack_t*
-  OSThread::getCriticalSectionNestingStack(void)
+inline OSStack_t*
+OSThread::getCriticalSectionNestingStack(void)
   {
     return &m_criticalSectionNestingStack[0];
   }
@@ -390,6 +441,56 @@ OSThread::isWaiting(void) const
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
 
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+
+inline OSCpuSleepCriticalSection&
+OSThread::getCpuSleepCriticalSection(void)
+{
+  return m_cpuSleepCriticalSection;
+}
+
+inline uint8_t
+OSCpuSleepCriticalSection::clear(void)
+{
+  uint8_t ret;
+  ret = m_count;
+  m_count = 0;
+  return ret;
+}
+
+inline uint8_t
+OSCpuSleepCriticalSection::set(bool flag)
+{
+  uint8_t ret;
+  ret = isSleepAllowed();
+
+  m_count = flag ? 1 : 0;
+
+  return ret;
+}
+
+inline void
+OSCpuSleepCriticalSection::enter(void)
+{
+  if (m_count < 0xFF)
+    ++m_count;
+}
+
+inline void
+OSCpuSleepCriticalSection::exit(void)
+{
+  if (m_count > 0)
+    --m_count;
+}
+
+inline bool
+OSCpuSleepCriticalSection::isSleepAllowed(void)
+{
+  return (m_count == 0);
+}
+
+#else /* !defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION) */
+
 inline bool
 OSThread::isSleepAllowed(void) const
   {
@@ -402,21 +503,23 @@ OSThread::setAllowSleep(bool b)
     m_allowSleep = b;
   }
 
+#endif /* defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION) */
+
 #endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
 
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
 inline bool
 OSThread::isInterrupted(void) const
-  {
-    return m_isInterrupted;
-  }
+{
+  return m_isInterrupted;
+}
 
 inline void
 OSThread::setInterruption(bool flag)
-  {
-    m_isInterrupted = flag;
-  }
+{
+  m_isInterrupted = flag;
+}
 
 #endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
 

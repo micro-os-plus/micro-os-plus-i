@@ -56,8 +56,13 @@ OSThreadIdle::enterSleep(void)
   for (int i = 0; i < OSScheduler::getThreadsCount(); ++i)
     {
       // if any thread requests to prevent deep sleep, return
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+      if (!OSScheduler::getThread(i)->getCpuSleepCriticalSection().isSleepAllowed())
+        return false;
+#else
       if (!OSScheduler::getThread(i)->isSleepAllowed())
         return false;
+#endif
     }
 
   // if there are threads scheduled on the ticks timer, return
