@@ -62,7 +62,7 @@ public:
   ~SDI12Sensor();
 
   virtual void
-  customInit(void);
+  customInit(void) = 0;
 
   virtual void
   prepareResponseSendIdentification(void) = 0;
@@ -281,6 +281,12 @@ private:
   enableBreakDetect(void);
 
   static void
+  disableBreakDetect(void);
+
+  static bool
+  isBreakDetectEnabled(void);
+
+  static void
   interruptPinChangeEnable(void);
   static void
   interruptPinChangeDisable(void);
@@ -458,6 +464,18 @@ inline unsigned short
 SDI12Sensor::getOutputBufferSize(void)
 {
   return OS_CFGINT_SDI12SENSOR_BUFFER_SIZE;
+}
+
+inline void
+SDI12Sensor::disableBreakDetect(void)
+{
+ ms_breakDetectEnable = false;
+}
+
+inline bool
+SDI12Sensor::isBreakDetectEnabled(void)
+{
+  return ms_breakDetectEnable;
 }
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
