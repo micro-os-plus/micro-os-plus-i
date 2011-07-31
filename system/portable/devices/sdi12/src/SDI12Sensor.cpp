@@ -654,7 +654,17 @@ SDI12Sensor::threadMainSDI12(void)
 
             if (ms_delayedMode == DELAYED_MODE_PROTO)
               {
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+                ms_pThread->getCpuSleepCriticalSection().enter();
+#else
+                ms_pThread->setAllowSleep(false);
+#endif
                 processDelayedActions();
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+                ms_pThread->getCpuSleepCriticalSection().exit();
+#else
+                ms_pThread->setAllowSleep(true);
+#endif
               }
 
             if (ms_doReset != 0)
