@@ -79,21 +79,33 @@ OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint,
   m_isWaiting = false;
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+
 #if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+
   getCpuSleepCriticalSection().clear();
-#else
+
+#if defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION)
+
+  getCpuDeepSleepCriticalSection().clear();
+
+#endif /* defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
+
+#else /* !defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
+
   // by default, threads will enter deep sleep
   m_allowSleep = true;
-#endif
-#endif
+
+#endif /* defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
+
+#endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   m_WDseconds = 0;
-#endif
+#endif /* defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG) */
 
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
   m_isInterrupted = false;
-#endif
+#endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
 
   // Register this thread to the scheduler.
   // The scheduler is already initialised at earlyInit() for this to work.

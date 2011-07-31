@@ -92,6 +92,10 @@ public:
 #if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
   OSCpuSleepCriticalSection&
   getCpuSleepCriticalSection(void);
+#if defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION)
+  OSCpuSleepCriticalSection&
+  getCpuDeepSleepCriticalSection(void);
+#endif /* defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
 #else
   // Return TRUE if the thread can go to sleep, FALSE otherwise.
   bool
@@ -296,6 +300,9 @@ private:
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
   OSCpuSleepCriticalSection m_cpuSleepCriticalSection;
+#if defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION)
+  OSCpuSleepCriticalSection m_cpuDeepSleepCriticalSection;
+#endif /*  */
 #if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
 #else
   // True if the thread can be put to sleep.
@@ -449,6 +456,15 @@ OSThread::getCpuSleepCriticalSection(void)
   return m_cpuSleepCriticalSection;
 }
 
+#if defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION)
+
+inline OSCpuSleepCriticalSection&
+OSThread::getCpuDeepSleepCriticalSection(void)
+  {
+    return m_cpuDeepSleepCriticalSection;
+  }
+
+#endif /* defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
 
 inline bool
 OSCpuSleepCriticalSection::isSleepAllowed(void)

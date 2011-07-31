@@ -106,13 +106,19 @@ public:
   getThread(int i);
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
+
+#if !defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION)
+
   // Return true if the deep sleep flag was set to true
   static bool
   isAllowDeepSleep(void);
   // Set the value of the deep sleep flag
   static void
   setAllowDeepSleep(bool flag);
-#endif
+
+#endif /* !defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
+
+#endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
 
   // sleep until event occurs
   static OSEventWaitReturn_t
@@ -532,6 +538,8 @@ OSScheduler::setEventWaitReturn(OSEventWaitReturn_t ret)
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
 
+#if !defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION)
+
 inline bool OSScheduler::isAllowDeepSleep(void)
   {
     return ms_allowDeepSleep;
@@ -541,6 +549,8 @@ inline void OSScheduler::setAllowDeepSleep(bool flag)
   {
     ms_allowDeepSleep = flag;
   }
+
+#endif /* !defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
 
 #endif /* OS_INCLUDE_OSTHREAD_SLEEP */
 

@@ -53,24 +53,49 @@ OSThreadIdle::threadMain(void)
 bool
 OSThreadIdle::enterSleep(void)
 {
+  bool bIsDeepSleepAllowed;
+
+#if defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION)
+
+  bIsDeepSleepAllowed = true;
+
+#else /* !defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
+
+  bIsDeepSleepAllowed = OSScheduler::isAllowDeepSleep();
+
+#endif /* defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
+
   for (int i = 0; i < OSScheduler::getThreadsCount(); ++i)
     {
-      // if any thread requests to prevent deep sleep, return
+      OSThread* pThread;
+      pThread = OSScheduler::getThread(i);
+      if (pThread == NULL)
+        continue;
+
+      // If any thread requests to prevent deep sleep, return
 #if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
-      if (!OSScheduler::getThread(i)->getCpuSleepCriticalSection().isSleepAllowed())
+      if (!pThread->getCpuSleepCriticalSection().isSleepAllowed())
         return false;
+
+#if defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION)
+
+      if (bIsDeepSleepAllowed && !pThread->getCpuDeepSleepCriticalSection().isSleepAllowed())
+        bIsDeepSleepAllowed = false;
+
+#endif /* defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
+
 #else
-      if (!OSScheduler::getThread(i)->isSleepAllowed())
+      if (!pThread->isSleepAllowed())
         return false;
 #endif
     }
 
-  // if there are threads scheduled on the ticks timer, return
+  // If there are threads scheduled on the ticks timer, return
   if (OSScheduler::timerTicks.getCount() > 0)
     return false;
 
-  // finally enter (deep) sleep
-  if (OSScheduler::isAllowDeepSleep())
+  // Finally enter (deep) sleep
+  if (bIsDeepSleepAllowed)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTHREADIDLE_ENTERSLEEP)
       OSDeviceDebug::putChar('S');
