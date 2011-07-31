@@ -449,39 +449,6 @@ OSThread::getCpuSleepCriticalSection(void)
   return m_cpuSleepCriticalSection;
 }
 
-inline uint8_t
-OSCpuSleepCriticalSection::clear(void)
-{
-  uint8_t ret;
-  ret = m_count;
-  m_count = 0;
-  return ret;
-}
-
-inline uint8_t
-OSCpuSleepCriticalSection::set(bool flag)
-{
-  uint8_t ret;
-  ret = isSleepAllowed();
-
-  m_count = flag ? 1 : 0;
-
-  return ret;
-}
-
-inline void
-OSCpuSleepCriticalSection::enter(void)
-{
-  if (m_count < 0xFF)
-    ++m_count;
-}
-
-inline void
-OSCpuSleepCriticalSection::exit(void)
-{
-  if (m_count > 0)
-    --m_count;
-}
 
 inline bool
 OSCpuSleepCriticalSection::isSleepAllowed(void)

@@ -114,7 +114,7 @@ OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint,
       (void*) pNesting,
       STACK_FILL_BYTE,
       OS_CFGINT_OSTHREAD_CRITICALSECTIONNESTINGSTACK_ARRAY_SIZE
-          * sizeof(OSStack_t));
+      * sizeof(OSStack_t));
 
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
@@ -231,48 +231,50 @@ OSProgramPtr_t OSThread::getProgramCounter(void)
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
 
-void OSThread::virtualWatchdogSet(uint16_t seconds)
-  {
+void
+OSThread::virtualWatchdogSet(uint16_t seconds)
+{
 #if defined(DEBUG) && defined(OS_DEBUG_OSTHREAD_VIRTUALWATCHDOGSET)
-    OSDeviceDebug::putString_P(PSTR("vWD("));
-    OSDeviceDebug::putDec(getID());
-    OSDeviceDebug::putString(",");
-    OSDeviceDebug::putDec(seconds);
-    OSDeviceDebug::putString_P(PSTR(") "));
+  OSDeviceDebug::putString_P(PSTR("vWD("));
+  OSDeviceDebug::putDec(getID());
+  OSDeviceDebug::putString(",");
+  OSDeviceDebug::putDec(seconds);
+  OSDeviceDebug::putString_P(PSTR(") "));
 #endif
-    m_WDseconds = seconds;
-  }
+  m_WDseconds = seconds;
+}
 
-void OSThread::virtualWatchdogCheck(void)
-  {
-    if (m_WDseconds != 0)
-      {
-        if (--m_WDseconds == 0)
-          {
+void
+OSThread::virtualWatchdogCheck(void)
+{
+  if (m_WDseconds != 0)
+    {
+      if (--m_WDseconds == 0)
+        {
 #if defined(DEBUG)
-            OSDeviceDebug::putString_P(PSTR("virtual WD '"));
-            OSDeviceDebug::putString(m_pName);
-            OSDeviceDebug::putChar('\'');
+          OSDeviceDebug::putString_P(PSTR("virtual WD '"));
+          OSDeviceDebug::putString(m_pName);
+          OSDeviceDebug::putChar('\'');
 #if defined(OS_INCLUDE_OSTHREAD_GETSTACKUSED)
-            OSDeviceDebug::putChar(' ');
-            OSDeviceDebug::putDec(getStackUsed());
-            OSDeviceDebug::putChar('/');
-            OSDeviceDebug::putDec(getStackSize());
+          OSDeviceDebug::putChar(' ');
+          OSDeviceDebug::putDec(getStackUsed());
+          OSDeviceDebug::putChar('/');
+          OSDeviceDebug::putDec(getStackSize());
 #endif /* defined(OS_INCLUDE_OSTHREAD_GETSTACKUSED) */
-            OSDeviceDebug::putNewLine();
+          OSDeviceDebug::putNewLine();
 #endif
 
-            OSCPU::softReset();
-          }
-        else
-          {
+          OSCPU::softReset();
+        }
+      else
+        {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTHREAD_VIRTUALWATCHDOGCHECK)
-            OSDeviceDebug::putDec(getID());
-            OSDeviceDebug::putChar('=');
+          OSDeviceDebug::putDec(getID());
+          OSDeviceDebug::putChar('=');
 #endif
-          }
-      }
-  }
+        }
+    }
+}
 
 #endif
 
@@ -288,20 +290,21 @@ OSThread::schedulerTick(void)
 
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
 
-void OSThread::requestInterruption(void)
-  {
-    setInterruption(true);
+void
+OSThread::requestInterruption(void)
+{
+  setInterruption(true);
 
-    OSCriticalSection::enter();
-      {
-        OSScheduler::ISRcancelThread(this);
-      }
-    OSCriticalSection::exit();
+  OSCriticalSection::enter();
+    {
+      OSScheduler::ISRcancelThread(this);
+    }
+  OSCriticalSection::exit();
 
 #if defined(DEBUG)
-    OSDeviceDebug::putChar('>');
+  OSDeviceDebug::putChar('>');
 #endif
-  }
+}
 
 #endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
 
@@ -399,5 +402,60 @@ OSThread::eventWaitPrepare(OSEvent_t event)
   // Later this response will allow yield()
   return true;
 }
+
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+
+uint8_t
+OSCpuSleepCriticalSection::clear(void)
+{
+
+  uint8_t ret;
+  OSCriticalSection::enter();
+    {
+      ret = m_count;
+      m_count = 0;
+    }
+  OSCriticalSection::exit();
+  return ret;
+}
+
+uint8_t
+OSCpuSleepCriticalSection::set(bool flag)
+{
+  uint8_t ret;
+  OSCriticalSection::enter();
+    {
+      ret = isSleepAllowed();
+
+      m_count = flag ? 1 : 0;
+    }
+  OSCriticalSection::exit();
+
+  return ret;
+}
+
+void
+OSCpuSleepCriticalSection::enter(void)
+{
+  OSCriticalSection::enter();
+    {
+      if (m_count < 0xFF)
+        ++m_count;
+    }
+  OSCriticalSection::exit();
+}
+
+void
+OSCpuSleepCriticalSection::exit(void)
+{
+  OSCriticalSection::enter();
+    {
+      if (m_count > 0)
+        --m_count;
+    }
+  OSCriticalSection::exit();
+}
+
+#endif /* defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
