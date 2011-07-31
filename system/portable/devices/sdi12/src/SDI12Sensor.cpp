@@ -126,19 +126,12 @@ SDI12Sensor::SDI12Sensor(const char* pNameAcquire,
   ms_timerTimeout = 0;
   ms_timerMarking = 0;
 
-  ms_breakDetectEnable = false;
-
+  disableBreakDetect();
 }
 
 SDI12Sensor::~SDI12Sensor()
 {
   OSDeviceDebug::putDestructor_P(PSTR("SDI12Sensor"), this);
-}
-
-void
-SDI12Sensor::customInit(void)
-{
-  ; // virtual
 }
 
 void
@@ -347,7 +340,11 @@ SDI12Sensor::threadMainSDI12(void)
         usartRxDisable();
 
         // permit to enter sleep
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().clear();
+#else
         ms_pThread->setAllowSleep(true);
+#endif
 
         // enable break detection
         enableBreakDetect();
@@ -355,6 +352,14 @@ SDI12Sensor::threadMainSDI12(void)
         // wait for break and clear condition
         ms_flags.wait(BREAK);
         flags = ms_flags.get();
+
+        // For just in case, the sleep critical section status
+        // should be already cleared by the interrupt
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().clear();
+#else
+        ms_pThread->setAllowSleep(true);
+#endif
 
         pThread->virtualWatchdogSet(OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
@@ -373,19 +378,29 @@ SDI12Sensor::threadMainSDI12(void)
       case STATE2:
         // look for 8.33ms marking
 
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().enter();
+#else
         ms_pThread->setAllowSleep(false);
+#endif
+          {
+            // enable rx early, otherwise we loose address
+            clearInputBuff();
+            usartRxEnable();
 
-        // enable rx early, otherwise we loose address
-        clearInputBuff();
-        usartRxEnable();
-
-        OSDeviceDebug::putChar('(');
-        ms_flags.clear(MARKING);
-        enableMarking(MARKING8_TICKS);
-        ms_flags.wait(MARKING);
-        flags = ms_flags.get();
-        disableMarking();
-        OSDeviceDebug::putChar(')');
+            OSDeviceDebug::putChar('(');
+            ms_flags.clear(MARKING);
+            enableMarking(MARKING8_TICKS);
+            ms_flags.wait(MARKING);
+            flags = ms_flags.get();
+            disableMarking();
+            OSDeviceDebug::putChar(')');
+          }
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().exit();
+#else
+        ms_pThread->setAllowSleep(true);
+#endif
 
         ms_state = STATE3;
         break;
@@ -393,18 +408,28 @@ SDI12Sensor::threadMainSDI12(void)
       case STATE3:
         // look for address, break or 100 ms timeout
 
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().enter();
+#else
         ms_pThread->setAllowSleep(false);
+#endif
 
         //bIdleAllowSleep = pThreadIdle->isSleepAllowed();
         //pThreadIdle->setAllowSleep(false);
-        //  {
-        ms_flags.clear(ADDRESS | BREAK | TIMEOUT);
-        enableTimeout(TIMEOUT100_TICKS);
-        ms_flags.wait(ADDRESS | BREAK | TIMEOUT);
-        flags = ms_flags.get();
-        disableTimeout();
-        //  }
+          {
+            ms_flags.clear(ADDRESS | BREAK | TIMEOUT);
+            enableTimeout(TIMEOUT100_TICKS);
+            ms_flags.wait(ADDRESS | BREAK | TIMEOUT);
+            flags = ms_flags.get();
+            disableTimeout();
+          }
         //pThreadIdle->setAllowSleep(bIdleAllowSleep);
+
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().exit();
+#else
+        ms_pThread->setAllowSleep(false);
+#endif
 
         if ((flags & BREAK) != 0)
           {
@@ -431,88 +456,110 @@ SDI12Sensor::threadMainSDI12(void)
       case STATE4:
         // look for !, or 8.33 ms marking while loading the command
 
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().enter();
+#else
         ms_pThread->setAllowSleep(false);
-
-        ms_flags.clear(EXCLAMATION | MARKING);
-        enableMarking(MARKING8_TICKS);
-        ms_flags.wait(EXCLAMATION | MARKING);
-        flags = ms_flags.get();
-        disableMarking();
-
-        if ((flags & EXCLAMATION) != 0)
+#endif
           {
-            ms_exclamationTicks = ms_ticksRX;
+            ms_flags.clear(EXCLAMATION | MARKING);
+            enableMarking(MARKING8_TICKS);
+            ms_flags.wait(EXCLAMATION | MARKING);
+            flags = ms_flags.get();
+            disableMarking();
 
-            usartRxDisable();
-
-            prevAddress = ms_ownAddress;
-            bIsCcmd = (ms_buf[1] == 'C');
-            // process request, result is in the same buffer
-            // if invalid command, false
-            if (processCommand())
+            if ((flags & EXCLAMATION) != 0)
               {
-                ms_state = STATE5;
+                ms_exclamationTicks = ms_ticksRX;
+
+                usartRxDisable();
+
+                prevAddress = ms_ownAddress;
+                bIsCcmd = (ms_buf[1] == 'C');
+                // process request, result is in the same buffer
+                // if invalid command, false
+                if (processCommand())
+                  {
+                    ms_state = STATE5;
+                  }
+                else
+                  {
+                    ms_state = STATE2;
+                  }
               }
-            else
+            else if ((flags & MARKING) != 0)
               {
-                ms_state = STATE2;
+                ms_state = STATE3;
               }
           }
-        else if ((flags & MARKING) != 0)
-          {
-            ms_state = STATE3;
-          }
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().exit();
+#else
+        ms_pThread->setAllowSleep(true);
+#endif
         break;
 
       case STATE5:
         // send the response, release the data line
 
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().enter();
+#else
         ms_pThread->setAllowSleep(false);
-
-        unsigned int delta;
-        delta = OSScheduler::timerTicks.getTicks() - ms_exclamationTicks;
-
-        if (delta < OSTimerTicks::microsToTicks(8330))
+#endif
           {
-            // be sure the mandatory marking is respected
-            OSScheduler::timerTicks.sleep(
-                OSTimerTicks::microsToTicks(8330) - delta + 1);
-          }
-        else if (delta > OSTimerTicks::microsToTicks(15000))
-          {
-            // NOTICE: not in the specs,
-            // if response not ready in required time,
-            // do not transmit response
-            ms_state = STATE2;
+            unsigned int delta;
+            delta = OSScheduler::timerTicks.getTicks() - ms_exclamationTicks;
+
+            if (delta < OSTimerTicks::microsToTicks(8330))
+              {
+                // be sure the mandatory marking is respected
+                OSScheduler::timerTicks.sleep(
+                    OSTimerTicks::microsToTicks(8330) - delta + 1);
+              }
+            else if (delta > OSTimerTicks::microsToTicks(15000))
+              {
+                // NOTICE: not in the specs,
+                // if response not ready in required time,
+                // do not transmit response
+                ms_state = STATE2;
 
 #if defined(DEBUG)
-            OSDeviceDebug::putString(" ign ");
+                OSDeviceDebug::putString(" ign ");
 #endif
-            break;
-          }
+                //break;
+              }
 
-        transmitResponse();
+            if (ms_state == STATE5)
+              {
+                transmitResponse();
 
-        if (!ms_moreProcessing)
-          {
-            ms_state = STATE3;
+                if (!ms_moreProcessing)
+                  {
+                    ms_state = STATE3;
+                  }
+                else if (bIsCcmd)
+                  {
+                    // C command processing
+                    ms_state = STATE7;
+                  }
+                else
+                  {
+                    // normal (non-C) processing
+                    ms_state = STATE6;
+                  }
+              }
           }
-        else if (bIsCcmd)
-          {
-            // C command processing
-            ms_state = STATE7;
-          }
-        else
-          {
-            // normal (non-C) processing
-            ms_state = STATE6;
-          }
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().exit();
+#else
+        ms_pThread->setAllowSleep(true);
+#endif
+
         break;
 
       case STATE6:
         // look for break while processing non C command
-
-        ms_pThread->setAllowSleep(false);
 
         if (ms_bAcquire)
           {
@@ -522,7 +569,11 @@ SDI12Sensor::threadMainSDI12(void)
 
             // permit to enter deep sleep
             //bAllowSleep = ms_pThread->isSleepAllowed();
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+            ms_pThread->getCpuSleepCriticalSection().clear();
+#else
             ms_pThread->setAllowSleep(true);
+#endif
             //  {
             enableBreakDetect();
 
@@ -535,10 +586,16 @@ SDI12Sensor::threadMainSDI12(void)
             ms_flags.wait(ACQUIRE_COMPLETED | BREAK);
             flags = ms_flags.get();
 
-            ms_breakDetectEnable = false;
+            disableBreakDetect();
             //  }
             //ms_pThread->setAllowSleep(bAllowSleep);
-            ms_pThread->setAllowSleep(false);
+
+            // For just in case the interrupts left the status disabled
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+            ms_pThread->getCpuSleepCriticalSection().clear();
+#else
+            ms_pThread->setAllowSleep(true);
+#endif
 
             if (flags & BREAK)
               {
@@ -561,52 +618,55 @@ SDI12Sensor::threadMainSDI12(void)
                 OSDeviceDebug::putChar('y');
 #endif
                 ms_state = STATE2;
-                break;
               }
-
-            // mark D values are available
-            ms_bDAvailable = true;
-
-            if (ms_bServiceRequest)
+            else
               {
-                ms_bServiceRequest = false;
+                // mark D values are available
+                ms_bDAvailable = true;
+
+                if (ms_bServiceRequest)
+                  {
+                    ms_bServiceRequest = false;
 
 #if defined(DEBUG)
-                OSDeviceDebug::putString(" srv ");
+                    OSDeviceDebug::putString(" srv ");
 #endif
-                unsigned char* pBuf;
-                pBuf = &ms_buf[0];
-                *pBuf++ = ms_ownAddress;
-                *pBuf++ = '\r';
-                *pBuf++ = '\n';
-                ms_bufCount = pBuf - &ms_buf[0];
+                    unsigned char* pBuf;
+                    pBuf = &ms_buf[0];
+                    *pBuf++ = ms_ownAddress;
+                    *pBuf++ = '\r';
+                    *pBuf++ = '\n';
+                    ms_bufCount = pBuf - &ms_buf[0];
 
-                transmitResponse(); // transmit service request
+                    transmitResponse(); // transmit service request
+                  }
               }
           }
 
-        // when transmission is known to be completed,
-        // update address, the standard gives us maximum 1 second
-        if (prevAddress != ms_ownAddress)
+        if (ms_state == STATE6)
           {
-            storeAddressToNonVolatileMemory(ms_ownAddress);
-          }
+            // when transmission is known to be completed,
+            // update address, the standard gives us maximum 1 second
+            if (prevAddress != ms_ownAddress)
+              {
+                storeAddressToNonVolatileMemory(ms_ownAddress);
+              }
 
-        if (ms_delayedMode == DELAYED_MODE_PROTO)
-          {
-            processDelayedActions();
-          }
+            if (ms_delayedMode == DELAYED_MODE_PROTO)
+              {
+                processDelayedActions();
+              }
 
-        if (ms_doReset != 0)
-          {
+            if (ms_doReset != 0)
+              {
 #if defined(DEBUG)
-            OSDeviceDebug::putString(" soft reset ");
-            OSDeviceDebug::putChar(ms_doReset);
-            OSDeviceDebug::putNewLine();
+                OSDeviceDebug::putString(" soft reset ");
+                OSDeviceDebug::putChar(ms_doReset);
+                OSDeviceDebug::putNewLine();
 #endif
-            processSoftReset(ms_doReset);
+                processSoftReset(ms_doReset);
+              }
           }
-
         ms_state = STATE3;
         break;
 
@@ -618,7 +678,11 @@ SDI12Sensor::threadMainSDI12(void)
         // look for break
         // while processing the C command
 
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().clear();
+#else
         ms_pThread->setAllowSleep(true);
+#endif
 
         //bAllowSleep = ms_pThread->isSleepAllowed();
         //ms_pThread->setAllowSleep(true);
@@ -637,116 +701,146 @@ SDI12Sensor::threadMainSDI12(void)
         //  }
         //ms_pThread->setAllowSleep(bAllowSleep);
 
+        // Just to compensate for unmatched break detect interrupts
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().clear();
+#else
+        ms_pThread->setAllowSleep(true);
+#endif
+
         if (flags & BREAK)
           {
             ms_state = STATE8;
-            break;
           }
+        else
+          {
+            // mark D values are available
+            ms_bDAvailable = true;
 
-        // mark D values are available
-        ms_bDAvailable = true;
-
-        // acquisition completed normally
-        ms_state = STATE0;
+            // acquisition completed normally
+            ms_state = STATE0;
+          }
         break;
 
       case STATE8:
         // look for address, break or 100 ms timeout
         // while processing the C command
 
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().enter();
+#else
         ms_pThread->setAllowSleep(false);
-
-        clearInputBuff();
-        usartRxEnable();
-
-        //bIdleAllowSleep = pThreadIdle->isSleepAllowed();
-        //pThreadIdle->setAllowSleep(false);
-        //  {
-        ms_flags.clear(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
-        enableTimeout(TIMEOUT100_TICKS);
-        ms_flags.wait(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
-        flags = ms_flags.get();
-
-        disableTimeout();
-        //  }
-        //pThreadIdle->setAllowSleep(bIdleAllowSleep);
-
-        if ((flags & BREAK) != 0)
+#endif
           {
-            ms_state = STATE8;
-          }
-        else if ((flags & TIMEOUT) != 0)
-          {
-            ms_state = STATE7;
-          }
-        else if ((flags & ADDRESS) != 0)
-          {
-            if (isAddressValid(ms_buf[0]))
+            clearInputBuff();
+            usartRxEnable();
+
+            //bIdleAllowSleep = pThreadIdle->isSleepAllowed();
+            //pThreadIdle->setAllowSleep(false);
+            //  {
+            ms_flags.clear(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
+            enableTimeout(TIMEOUT100_TICKS);
+            ms_flags.wait(ACQUIRE_COMPLETED | ADDRESS | BREAK | TIMEOUT);
+            flags = ms_flags.get();
+
+            disableTimeout();
+            //  }
+            //pThreadIdle->setAllowSleep(bIdleAllowSleep);
+
+            if ((flags & BREAK) != 0)
               {
-                // address valid
-                ms_state = STATE9;
+                ms_state = STATE8;
               }
-            else
+            else if ((flags & TIMEOUT) != 0)
               {
                 ms_state = STATE7;
               }
+            else if ((flags & ADDRESS) != 0)
+              {
+                if (isAddressValid(ms_buf[0]))
+                  {
+                    // address valid
+                    ms_state = STATE9;
+                  }
+                else
+                  {
+                    ms_state = STATE7;
+                  }
+              }
+            else if ((flags & ACQUIRE_COMPLETED) != 0)
+              {
+                ms_state = STATE0;
+              }
           }
-        else if ((flags & ACQUIRE_COMPLETED) != 0)
-          {
-            ms_state = STATE0;
-          }
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().exit();
+#else
+        ms_pThread->setAllowSleep(true);
+#endif
+
         break;
 
       case STATE9:
         // look for address, break or 100 ms timeout
         // while processing the C command
 
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().enter();
+#else
         ms_pThread->setAllowSleep(false);
-
-        ms_flags.clear(EXCLAMATION | MARKING);
-        enableMarking(MARKING8_TICKS);
-        ms_flags.wait(EXCLAMATION | MARKING);
-        flags = ms_flags.get();
-
-        disableMarking();
-
-        if ((flags & EXCLAMATION) != 0)
+#endif
           {
-            ms_exclamationTicks = ms_ticksRX;
+            ms_flags.clear(EXCLAMATION | MARKING);
+            enableMarking(MARKING8_TICKS);
+            ms_flags.wait(EXCLAMATION | MARKING);
+            flags = ms_flags.get();
 
-            usartRxDisable();
+            disableMarking();
 
-            prevAddress = ms_ownAddress;
-
-            // process request, result is in the same buffer
-            // if bad address, false
-            if (processCommand())
+            if ((flags & EXCLAMATION) != 0)
               {
-                // cancel C acquisition
-                cancelAcquisition();
-                ms_flags.wait(ACQUIRE_COMPLETED);
-                flags = ms_flags.get();
+                ms_exclamationTicks = ms_ticksRX;
 
-                // to stop automatic cancellation notification
-                //ms_bIsCancelled = false;
-                // acknowledge thread interrupted
-                threadAcquire.ackInterruption();
+                usartRxDisable();
 
-                ms_state = STATE5;
+                prevAddress = ms_ownAddress;
 
-                // disable for now, may be set again if new command
-                // does a new acquisition
-                ms_bDAvailable = false;
+                // process request, result is in the same buffer
+                // if bad address, false
+                if (processCommand())
+                  {
+                    // cancel C acquisition
+                    cancelAcquisition();
+                    ms_flags.wait(ACQUIRE_COMPLETED);
+                    flags = ms_flags.get();
+
+                    // to stop automatic cancellation notification
+                    //ms_bIsCancelled = false;
+                    // acknowledge thread interrupted
+                    threadAcquire.ackInterruption();
+
+                    ms_state = STATE5;
+
+                    // disable for now, may be set again if new command
+                    // does a new acquisition
+                    ms_bDAvailable = false;
+                  }
+                else
+                  {
+                    ms_state = STATE7;
+                  }
               }
-            else
+            else if ((flags & MARKING) != 0)
               {
                 ms_state = STATE7;
               }
           }
-        else if ((flags & MARKING) != 0)
-          {
-            ms_state = STATE7;
-          }
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+        ms_pThread->getCpuSleepCriticalSection().exit();
+#else
+        ms_pThread->setAllowSleep(true);
+#endif
+
         break;
 
       default:
@@ -1834,7 +1928,7 @@ void
 SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
     unsigned char prev)
 {
-  if (!ms_breakDetectEnable)
+  if (!isBreakDetectEnabled())
     return;
 
   if (pinChanged(crt, prev))
@@ -1863,7 +1957,7 @@ SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
 
               ms_flags.notify(BREAK);
 
-              ms_breakDetectEnable = false;
+              disableBreakDetect();
             }
           else
             {
@@ -1871,7 +1965,11 @@ SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
               OSDeviceDebug::putChar('?');
 #endif
             }
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+          ms_pThread->getCpuSleepCriticalSection().exit();
+#else
           ms_pThread->setAllowSleep(true);
+#endif
         }
       else
         {
@@ -1881,7 +1979,11 @@ SDI12Sensor::interruptPinChangeServiceRoutine(unsigned char crt,
 #endif
 
           // must be here, otherwise we cannot measure pulse duration
+#if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+          ms_pThread->getCpuSleepCriticalSection().enter();
+#else
           ms_pThread->setAllowSleep(false);
+#endif
           OSDebugLed2::on();
         }
       ms_ticksBRK = OSScheduler::timerTicks.getTicks();
