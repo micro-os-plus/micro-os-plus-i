@@ -312,12 +312,13 @@ namespace avr32
     bool
     Mci::isRxReady(void)
     {
-      bool isRxReady;
-      isRxReady = (getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK) != 0;
-      if (!isRxReady)
-        OSDeviceDebug::putChar('R');
+      return (getStatusRegister() & AVR32_MCI_SR_RXRDY_MASK) != 0;
+    }
 
-      return isRxReady;
+    bool
+    Mci::isTxReady(void)
+    {
+      return (getStatusRegister() & AVR32_MCI_SR_TXRDY_MASK) != 0;
     }
 
     uint32_t
@@ -333,17 +334,6 @@ namespace avr32
 #endif /* defined(OS_DEBUG_AVR32_UC3_MCI_READDATA) */
 
       return ret;
-    }
-
-    bool
-    Mci::isTxReady(void)
-    {
-      bool isTxReady;
-      isTxReady = (getStatusRegister() & AVR32_MCI_SR_TXRDY_MASK) != 0;
-      if (!isTxReady)
-        OSDeviceDebug::putChar('T');
-
-      return isTxReady;
     }
 
     void
