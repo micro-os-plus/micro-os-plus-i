@@ -23,7 +23,7 @@
 #if defined(APP_INCLUDE_MEMORYCARDSPI)
 avr32::uc3::MemoryCardSpi card(avr32::uc3::spi::MODULE_1, 41);
 #else
-avr32::uc3::MemoryCardMci card(avr32::uc3::mci::CardSlot::B);
+avr32::uc3::MemoryCardMci card(avr32::uc3::mci::CardSlot::B, 19);
 #endif /* defined(APP_INCLUDE_MEMORYCARDSPI) */
 
 // USB device
