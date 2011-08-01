@@ -589,11 +589,19 @@ public:
     virtual OSReturn_t
     selectCard(void) = 0;
 
+#if false
     virtual bool
     isRxReady(void) = 0;
 
     virtual uint32_t
     readData(void) = 0;
+
+    virtual bool
+    isTxReady(void) = 0;
+
+    virtual void
+    writeData(uint32_t value) = 0;
+#endif
 
     virtual void
     configureHighSpeedMode(void) = 0;
@@ -601,17 +609,17 @@ public:
     virtual bool
     isCrcError(void) = 0;
 
-    virtual bool
-    isTxReady(void) = 0;
-
-    virtual void
-    writeData(uint32_t value) = 0;
-
     virtual void
     transferIncommingBytes(void *pBuf, size_t bytes) = 0;
 
     virtual void
     transferOutgoingBytes(void *pBuf, size_t bytes) = 0;
+
+    virtual void
+    transferIncommingBytesWithoutDma(void *pBuf, size_t bytes) = 0;
+
+    virtual bool
+    isDataLineBusy(void) = 0;
 
   };
 
