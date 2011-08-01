@@ -49,7 +49,7 @@ namespace avr32
         isTransferDone(void);
 
         virtual bool
-        isData0Busy(void);
+        isDataLineBusy(void);
 
         virtual OSReturn_t
         configureBusWidth(BusWidth_t busWidth);
@@ -114,7 +114,7 @@ namespace avr32
         mci::BusWidth_t m_busWidth;
         mci::CardSlot_t m_cardSlot;
 
-        avr32::uc3::Gpio m_dat0;
+        avr32::uc3::Gpio m_dataLine;
 
       };
 

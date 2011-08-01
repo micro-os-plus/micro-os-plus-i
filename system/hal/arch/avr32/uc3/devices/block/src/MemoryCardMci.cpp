@@ -32,7 +32,7 @@ namespace avr32
 
     MemoryCardMci::Implementation::Implementation(mci::CardSlot_t cardSlot,
         gpio::PinNumber_t data0) :
-      m_dat0(data0)
+      m_dataLine(data0)
     {
       OSDeviceDebug::putConstructor(
           "avr32::uc3::MemoryCardMci::Implementation", this);
@@ -270,13 +270,13 @@ namespace avr32
     }
 
     bool
-    MemoryCardMci::Implementation::isData0Busy(void)
+    MemoryCardMci::Implementation::isDataLineBusy(void)
     {
       bool isPinHigh;
-      m_dat0.setModeGpio();
-      m_dat0.setDirectionInput();
-      isPinHigh = m_dat0.isPinHigh();
-      m_dat0.configPeripheralFunction(avr32::uc3::gpio::PeripheralFunction::A);
+      m_dataLine.setModeGpio();
+      m_dataLine.setDirectionInput();
+      isPinHigh = m_dataLine.isPinHigh();
+      m_dataLine.configPeripheralFunction(avr32::uc3::gpio::PeripheralFunction::A);
 
       return !isPinHigh;
     }
