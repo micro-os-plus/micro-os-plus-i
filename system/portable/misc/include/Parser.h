@@ -71,6 +71,9 @@ public:
   int
   tokenCompare(const unsigned char* pStr);
 
+  bool
+  doesStringStartWithToken(const unsigned char* pStr);
+
   // Warning: does not work on AVR32
   int
   tokenCompareIgnoreCase(const unsigned char* pStr);

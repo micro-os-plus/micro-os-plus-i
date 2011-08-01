@@ -353,6 +353,22 @@ Parser::parseFixedPrec(unsigned char* pStr, signed long* pLong,
   return OSReturn::OS_OK;
 }
 
+#if false
+bool
+Parser::doesTokenStartWith(const unsigned char* pStr)
+{
+  return (strncmp((const char*) m_pToken, (const char*) pStr,
+      strlen((const char*) pStr)) == 0);
+}
+#endif
+
+bool
+Parser::doesStringStartWithToken(const unsigned char* pStr)
+{
+  return (strncmp((const char*) pStr, (const char*) m_pToken,
+      strlen((const char*) m_pToken)) == 0);
+}
+
 int
 Parser::tokenCompare(const unsigned char* pStr)
 {
