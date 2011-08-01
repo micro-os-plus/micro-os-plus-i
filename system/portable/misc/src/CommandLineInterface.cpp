@@ -13,8 +13,8 @@
 #include "portable/misc/include/CommandLineInterface.h"
 #include "portable/misc/include/ASCII.h"
 
-CommandLineInterface::CommandLineInterface(std::istream& cin, std::ostream& cout,
-    unsigned char* pLine, unsigned short iSize) :
+CommandLineInterface::CommandLineInterface(std::istream& cin,
+    std::ostream& cout, unsigned char* pLine, unsigned short iSize) :
   m_cin(cin), m_cout(cout)
 {
   OSDeviceDebug::putConstructor_P(PSTR("CommandLineInterface"), this);
@@ -82,7 +82,7 @@ CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
 int
 CommandLineInterface::readLine()
 {
-  unsigned char*  pc;
+  unsigned char* pc;
   int c;
 
   std::istream& cin = m_cin;
@@ -160,7 +160,7 @@ CommandLineInterface::processLine()
 }
 
 OSReturn_t
-CommandLineInterface::recurse(cliToken_t* p)
+CommandLineInterface::recurse(cliToken_t* pIn)
 {
   Parser& parser = m_parser;
 
@@ -169,6 +169,9 @@ CommandLineInterface::recurse(cliToken_t* p)
   if (parser.getTokenLength() == 0)
     return OSReturn::OS_BAD_COMMAND; // no token
 
+  cliToken_t* p;
+
+  p = pIn;
   while (p->pToken != 0)
     {
       if (parser.tokenCompare((const unsigned char*) p->pToken) == 0)
@@ -180,6 +183,35 @@ CommandLineInterface::recurse(cliToken_t* p)
         }
       ++p;
     }
+
+  // If an exact match is not possible, retry as substring
+  if (parser.getTokenLength() >= 2)
+    {
+      cliToken_t* pMatch;
+      pMatch = NULL;
+
+      uint_t cnt;
+
+      p = pIn;
+      for (cnt = 0; p->pToken != 0; ++p)
+        {
+          // Check if the parameter starts with the parsed token
+          if (parser.doesStringStartWithToken((const unsigned char*) p->pToken))
+            {
+              pMatch = p;
+              ++cnt;
+            }
+        }
+
+      if (cnt == 1)
+        {
+          if (pMatch->pDown != 0)
+            return recurse(pMatch->pDown);
+          else if (pMatch->pMethod != 0)
+            return ((pCliClass_t) m_pClass->*(pMatch->pMethod))();
+        }
+    }
+
   return OSReturn::OS_BAD_COMMAND;
 }
 
