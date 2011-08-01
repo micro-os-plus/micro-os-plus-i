@@ -16,8 +16,9 @@ namespace avr32
 {
   namespace uc3
   {
-    MemoryCardMci::MemoryCardMci(mci::CardSlot_t cardSlot) :
-      OSDeviceMemoryCard(implementation), implementation(cardSlot)
+    MemoryCardMci::MemoryCardMci(mci::CardSlot_t cardSlot,
+        gpio::PinNumber_t data0gpio) :
+      OSDeviceMemoryCard(implementation), implementation(cardSlot, data0gpio)
     {
       OSDeviceDebug::putConstructor("avr32::uc3::MemoryCardMci", this);
     }
@@ -29,7 +30,9 @@ namespace avr32
 
     // ===== Implementation ===================================================
 
-    MemoryCardMci::Implementation::Implementation(mci::CardSlot_t cardSlot) : m_dat0(19)
+    MemoryCardMci::Implementation::Implementation(mci::CardSlot_t cardSlot,
+        gpio::PinNumber_t data0) :
+      m_dat0(data0)
     {
       OSDeviceDebug::putConstructor(
           "avr32::uc3::MemoryCardMci::Implementation", this);
@@ -263,17 +266,19 @@ namespace avr32
     bool
     MemoryCardMci::Implementation::isTransferDone(void)
     {
-#if false
       return m_mci.isTransferDone();
-#else
+    }
+
+    bool
+    MemoryCardMci::Implementation::isData0Busy(void)
+    {
       bool isPinHigh;
       m_dat0.setModeGpio();
       m_dat0.setDirectionInput();
       isPinHigh = m_dat0.isPinHigh();
       m_dat0.configPeripheralFunction(avr32::uc3::gpio::PeripheralFunction::A);
 
-      return isPinHigh;
-#endif
+      return !isPinHigh;
     }
 
     OSReturn_t
@@ -311,6 +316,26 @@ namespace avr32
     MemoryCardMci::Implementation::isRxReady(void)
     {
       return m_mci.isRxReady();
+    }
+
+    void
+    MemoryCardMci::Implementation::waitRxReady(void)
+    {
+      while (!isRxReady())
+        {
+          OSDeviceDebug::putChar('R');
+          OSScheduler::yield();
+        }
+    }
+
+    void
+    MemoryCardMci::Implementation::waitTxReady(void)
+    {
+      while (!isTxReady())
+        {
+          OSDeviceDebug::putChar('T');
+          OSScheduler::yield();
+        }
     }
 
     uint32_t
@@ -365,42 +390,54 @@ namespace avr32
 
       while (wordsToRead > 0)
         {
-          while (!(isRxReady()))
-            ;
+          waitRxReady();
           *pLong++ = readData();
 
-          while (!(isRxReady()))
-            ;
+          waitRxReady();
           *pLong++ = readData();
 
-          while (!(isRxReady()))
-            ;
+          waitRxReady();
           *pLong++ = readData();
 
-          while (!(isRxReady()))
-            ;
+          waitRxReady();
           *pLong++ = readData();
 
-          while (!(isRxReady()))
-            ;
+          waitRxReady();
           *pLong++ = readData();
 
-          while (!(isRxReady()))
-            ;
+          waitRxReady();
           *pLong++ = readData();
 
-          while (!(isRxReady()))
-            ;
+          waitRxReady();
           *pLong++ = readData();
 
-          while (!(isRxReady()))
-            ;
+          waitRxReady();
           *pLong++ = readData();
 
           wordsToRead -= 8;
         }
       //OSDeviceDebug::putString("done");
       //OSDeviceDebug::putNewLine();
+    }
+
+    void
+    MemoryCardMci::Implementation::transferIncommingBytesWithoutDma(void *pBuf,
+        size_t bytes)
+    {
+      uint32_t wordsToRead;
+
+      // Warning: buffer must be word aligned
+      uint32_t* pLong = (uint32_t*) pBuf;
+
+      wordsToRead = (bytes / sizeof(*pLong));
+
+      while (wordsToRead > 0)
+        {
+          waitRxReady();
+          *pLong++ = readData();
+
+          wordsToRead--;
+        }
     }
 
     void
@@ -414,36 +451,28 @@ namespace avr32
 
       while (wordsToWrite > 0)
         {
-          while (!isTxReady())
-            ;
+          waitTxReady();
           writeData(*pLong++);
 
-          while (!isTxReady())
-            ;
+          waitTxReady();
           writeData(*pLong++);
 
-          while (!isTxReady())
-            ;
+          waitTxReady();
           writeData(*pLong++);
 
-          while (!isTxReady())
-            ;
+          waitTxReady();
           writeData(*pLong++);
 
-          while (!isTxReady())
-            ;
+          waitTxReady();
           writeData(*pLong++);
 
-          while (!isTxReady())
-            ;
+          waitTxReady();
           writeData(*pLong++);
 
-          while (!isTxReady())
-            ;
+          waitTxReady();
           writeData(*pLong++);
 
-          while (!isTxReady())
-            ;
+          waitTxReady();
           writeData(*pLong++);
 
           wordsToWrite -= 8;

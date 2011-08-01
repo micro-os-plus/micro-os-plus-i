@@ -26,7 +26,7 @@ namespace avr32
       class Implementation : public OSDeviceMemoryCard::Implementation
       {
       public:
-        Implementation(mci::CardSlot_t cardSlot);
+        Implementation(mci::CardSlot_t cardSlot, gpio::PinNumber_t data0gpio);
         virtual
         ~Implementation();
 
@@ -48,6 +48,9 @@ namespace avr32
         virtual bool
         isTransferDone(void);
 
+        virtual bool
+        isData0Busy(void);
+
         virtual OSReturn_t
         configureBusWidth(BusWidth_t busWidth);
 
@@ -63,23 +66,11 @@ namespace avr32
         virtual OSReturn_t
         selectCard(void);
 
-        virtual bool
-        isRxReady(void);
-
-        virtual uint32_t
-        readData(void);
-
         virtual void
         configureHighSpeedMode(void);
 
         virtual bool
         isCrcError(void);
-
-        virtual bool
-        isTxReady(void);
-
-        virtual void
-        writeData(uint32_t data);
 
         void
         transferIncommingBytes(void *pBuf, size_t bytes);
@@ -87,12 +78,33 @@ namespace avr32
         virtual void
         transferOutgoingBytes(void *pBuf, size_t bytes);
 
+        virtual void
+        transferIncommingBytesWithoutDma(void *pBuf, size_t bytes);
+
       private:
 
         // ---- Local methods -------------------------------------------------
 
+        bool
+        isRxReady(void);
+
+        uint32_t
+        readData(void);
+
+        bool
+        isTxReady(void);
+
+        void
+        writeData(uint32_t data);
+
         avr32::uc3::mci::BusWidth_t
         convertBusWidth(BusWidth_t busWidth);
+
+        void
+        waitRxReady(void);
+
+        void
+        waitTxReady(void);
 
       public:
 
@@ -110,7 +122,7 @@ namespace avr32
 
       // ----- Constructors & Destructors -------------------------------------
 
-      MemoryCardMci(mci::CardSlot_t cardSlot);
+      MemoryCardMci(mci::CardSlot_t cardSlot, gpio::PinNumber_t data0gpio);
 
       virtual
       ~MemoryCardMci();
