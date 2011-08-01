@@ -155,7 +155,8 @@ TaskCli::threadMain(void)
     }
 }
 
-static const char str_help[] = "mo | mc | mi | mr n | mw n | me n c | st";
+static const char str_help[] =
+    "mo | mc | mi | mr n | mw n | me n c | mx n c | my n c | st";
 static const char str_unknown[] = "Cmd?";
 
 /*
@@ -273,7 +274,16 @@ TaskCli::lineProcess()
           if (cli.parseUnsigned(p, &l) < 0)
             goto err;
 
-          cmdMX(l);
+          unsigned long c;
+          c = 1;
+
+          if ((p = cli.parseNext()) != 0)
+            {
+              if (cli.parseUnsigned(p, &c) < 0)
+                goto err;
+            }
+
+          cmdMX(l, c);
         }
       else if (c == 'y')
         {
@@ -283,7 +293,16 @@ TaskCli::lineProcess()
           if (cli.parseUnsigned(p, &l) < 0)
             goto err;
 
-          cmdMY(l);
+          unsigned long c;
+          c = 1;
+
+          if ((p = cli.parseNext()) != 0)
+            {
+              if (cli.parseUnsigned(p, &c) < 0)
+                goto err;
+            }
+
+          cmdMY(l, c);
         }
       else if (c == 'e')
         {
@@ -799,6 +818,24 @@ TaskCli::cmdMR(unsigned long l)
   dumpHex((uint8_t*) m_buf, 512);
 }
 
+uint8_t
+TaskCli::computeChecksum(void)
+{
+  uint8_t x;
+  x = 0;
+
+  uint8_t* p;
+  p = (uint8_t*) &m_buf[0];
+
+  int i;
+  for (i = 0; i < 512 - 2; ++i, ++p)
+    {
+      x += *p;
+    }
+
+  return x;
+}
+
 void
 TaskCli::genBlock(unsigned long l)
 {
@@ -812,7 +849,7 @@ TaskCli::genBlock(unsigned long l)
 
       if (i == 0)
         b = 0x55;
-      else if (i == 511)
+      else if (i == (512 - 1))
         b = 0xAA;
       else if ((i % 16) == 0)
         b = i / 16;
@@ -829,6 +866,9 @@ TaskCli::genBlock(unsigned long l)
 
       *p = b;
     }
+
+  p = (uint8_t*) &m_buf[0];
+  p[512 - 2] = computeChecksum();
 }
 
 void
@@ -855,16 +895,17 @@ TaskCli::cmdMW(unsigned long l)
 }
 
 void
-TaskCli::cmdMX(unsigned long l)
+TaskCli::cmdMX(unsigned long l, unsigned long cnt)
 {
   int r;
   std::ostream& cout = m_cout;
 
   unsigned long i;
-  for (i = 0; i < l; ++i)
+  for (i = 0; i < cnt; ++i)
     {
-      genBlock(i);
-      r = m_card.writeBlocks(i, (uint8_t*) m_buf, 1);
+      genBlock(l + i);
+
+      r = m_card.writeBlocks(l + i, (uint8_t*) m_buf, 1);
       if (r != 0)
         {
           cout << std::endl;
@@ -877,20 +918,59 @@ TaskCli::cmdMX(unsigned long l)
 }
 
 void
-TaskCli::cmdMY(unsigned long l)
+TaskCli::cmdMY(unsigned long l, unsigned long cnt)
 {
   int r;
   std::ostream& cout = m_cout;
 
   unsigned long i;
-  for (i = 0; i < l; ++i)
+  for (i = 0; i < cnt; ++i)
     {
-      r = m_card.readBlocks(i, (uint8_t*) m_buf, 1);
+      memset(m_buf, 0, 512);
+
+      r = m_card.readBlocks(l + i, (uint8_t*) m_buf, 1);
       if (r != 0)
         {
           cout << std::endl;
           cout << 'R' << std::dec << r;
           return;
+        }
+
+      uint8_t* p;
+      p = (uint8_t*) m_buf;
+      if (p[0] != 0x55)
+        {
+          cout << std::endl;
+          cout << "BL " << std::dec << (l + i) << " [0] 55->" << std::hex;
+          cout.width(2);
+          cout << (uint16_t) p[0];
+          return;
+        }
+
+      if (p[511] != 0xAA)
+        {
+          cout << std::endl;
+          cout << "BL " << std::dec << (l + i) << " [511] AA->" << std::hex;
+          cout.width(2);
+          cout << (uint16_t) p[511];
+          return;
+        }
+
+      uint32_t lv;
+      lv = (p[1] << 24) | (p[2] << 16) | (p[3] << 8) | p[4];
+      if (lv != (l + i))
+        {
+          cout << std::endl;
+          cout << "BL " << std::dec << (l + i) << " W " << std::hex << (l + i)
+              << "->" << lv;
+          return;
+        }
+
+      if (p[512 - 2] != computeChecksum())
+        {
+          cout << std::endl;
+          cout << "BL " << std::dec << (l + i) << "XOR" << std::dec << (l + i)
+              << " ";
         }
     }
 

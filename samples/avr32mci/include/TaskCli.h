@@ -32,8 +32,8 @@ private:
   void cmdMW(unsigned long l);
   void cmdME(unsigned long l, unsigned long cnt);
 
-  void cmdMX(unsigned long l);
-  void cmdMY(unsigned long l);
+  void cmdMX(unsigned long l, unsigned long cnt);
+  void cmdMY(unsigned long l, unsigned long cnt);
 
   void dumpHex(uint8_t* p, int len);
   void genBlock(unsigned long l);
