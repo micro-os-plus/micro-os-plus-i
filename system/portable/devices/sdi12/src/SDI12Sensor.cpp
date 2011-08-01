@@ -997,15 +997,16 @@ SDI12Sensor::processCommand(void)
                     //OSDeviceDebug::putNewLine();
 
                     //Led1::toggle();
-
+#if defined(OS_CFGINT_SDI12SENSOR_MAX_DCMD_DURATION_MICROS)
                     unsigned int u;
                     u = OSScheduler::timerTicks.getTicks() - ms_ticksBRK;
 
                     // time almost out
-                    if (u >= OSTimerTicks::microsToTicks(13000))
+                    if (u >= OSTimerTicks::microsToTicks(OS_CFGINT_SDI12SENSOR_MAX_DCMD_DURATION_MICROS))
                       {
                         break;
                       }
+#endif /* defined(OS_CFGINT_SDI12SENSOR_MAX_DCMD_DURATION_MICROS) */
 
                     if (!storeFloatResponse(pv->value, pv->precision, true))
                       {
