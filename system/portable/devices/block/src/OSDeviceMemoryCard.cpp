@@ -133,7 +133,7 @@ OSReturn_t
 OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
     uint8_t* pBuf, OSDeviceBlock::BlockCount_t count)
 {
-#if true
+#if false
   OSDeviceDebug::putString("OSDeviceMemoryCard::writeBlocks() ");
   OSDeviceDebug::putDec(blockNumber);
   OSDeviceDebug::putChar(' ');
@@ -216,6 +216,8 @@ OSDeviceMemoryCard::prepareAccess(void)
 
   m_implementation.selectCard();
 
+  waitNotBusy();
+
 #if true
 
   // Enter Data Transfer Mode (tran)
@@ -233,6 +235,9 @@ OSDeviceMemoryCard::prepareAccess(void)
     return ret;
 
 #endif
+
+  m_implementation.configureBlockLengthBytes(SD_MMC_SECTOR_SIZE);
+  m_implementation.configureBlockCount(1);
 
   return ret;
 }
@@ -793,13 +798,7 @@ OSDeviceMemoryCard::executeCommand(CommandCode_t code, CommandArgument_t arg)
 
   if (code == SwitchCommandCode::SD_SWITCH_FUNC)
     {
-      uint8_t i;
-      for (i = 0; i < (512 / 8 / sizeof(m_buf[0])); i++)
-        {
-          while (!(m_implementation.isRxReady()))
-            ;
-          m_buf[i] = m_implementation.readData();
-        }
+      m_implementation.transferIncommingBytesWithoutDma(m_buf, 512 / 8);
     }
 
   if (code == CommandCode::SET_BLOCKLEN)
@@ -1116,6 +1115,8 @@ OSDeviceMemoryCard::finaliseReadBlock(void)
       return OSReturn::OS_BAD_CHECKSUM; // An CRC error has been seen
     }
 
+  waitNotBusy();
+
   return OSReturn::OS_OK;
 }
 
@@ -1169,10 +1170,19 @@ OSDeviceMemoryCard::finaliseWriteBlock(void)
     {
       return OSReturn::OS_BAD_CHECKSUM; // An CRC error has been seen
     }
-#if false
+
+#if true
   while (!m_implementation.isTransferDone())
     {
       OSDeviceDebug::putChar('f');
+      OSScheduler::yield();
+    }
+#endif
+
+#if false
+  while (m_implementation.isDataLineBusy())
+    {
+      OSDeviceDebug::putChar('g');
       OSScheduler::yield();
     }
 #endif
