@@ -37,6 +37,7 @@ private:
 
   void dumpHex(uint8_t* p, int len);
   void genBlock(unsigned long l);
+  uint8_t computeChecksum(void);
 
   void cmdST(void);
 
