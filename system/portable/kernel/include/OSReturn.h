@@ -41,6 +41,8 @@ public:
   static const OSReturn_t OS_BAD_STATE = -24;
   static const OSReturn_t OS_TOO_SHORT = -25;
   static const OSReturn_t OS_SIZE_EXCEEDED = -26;
+  static const OSReturn_t OS_CANCELLED = -27;
+  static const OSReturn_t OS_IGNORED = -28;
 };
 
 // ----------------------------------------------------------------------------
