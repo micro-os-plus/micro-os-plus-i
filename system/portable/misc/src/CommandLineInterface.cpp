@@ -152,7 +152,7 @@ CommandLineInterface::processLine()
   parser.setSeparators((unsigned char*) " ");
   parser.setToken(m_token, sizeof(m_token));
 
-  if (recurse((cliToken_t*) m_pToken) == OSReturn::OS_OK)
+  if (recurse((Token_t*) m_pToken) == OSReturn::OS_OK)
     return;
 
   cout << std::endl << str_unknown;
@@ -160,7 +160,7 @@ CommandLineInterface::processLine()
 }
 
 OSReturn_t
-CommandLineInterface::recurse(cliToken_t* pIn)
+CommandLineInterface::recurse(Token_t* pIn)
 {
   Parser& parser = m_parser;
 
@@ -169,17 +169,17 @@ CommandLineInterface::recurse(cliToken_t* pIn)
   if (parser.getTokenLength() == 0)
     return OSReturn::OS_BAD_COMMAND; // no token
 
-  cliToken_t* p;
+  Token_t* p;
 
   p = pIn;
-  while (p->pToken != 0)
+  while (p->pString != 0)
     {
-      if (parser.tokenCompare((const unsigned char*) p->pToken) == 0)
+      if (parser.tokenCompare((const unsigned char*) p->pString) == 0)
         {
           if (p->pDown != 0)
             return recurse(p->pDown);
           else if (p->pMethod != 0)
-            return ((pCliClass_t) m_pClass->*(p->pMethod))();
+            return ((pClass_t) m_pClass->*(p->pMethod))();
         }
       ++p;
     }
@@ -187,16 +187,16 @@ CommandLineInterface::recurse(cliToken_t* pIn)
   // If an exact match is not possible, retry as substring
   if (parser.getTokenLength() >= 2)
     {
-      cliToken_t* pMatch;
+      Token_t* pMatch;
       pMatch = NULL;
 
       uint_t cnt;
 
       p = pIn;
-      for (cnt = 0; p->pToken != 0; ++p)
+      for (cnt = 0; p->pString != 0; ++p)
         {
           // Check if the parameter starts with the parsed token
-          if (parser.doesStringStartWithToken((const unsigned char*) p->pToken))
+          if (parser.doesStringStartWithToken((const unsigned char*) p->pString))
             {
               pMatch = p;
               ++cnt;
@@ -208,7 +208,7 @@ CommandLineInterface::recurse(cliToken_t* pIn)
           if (pMatch->pDown != 0)
             return recurse(pMatch->pDown);
           else if (pMatch->pMethod != 0)
-            return ((pCliClass_t) m_pClass->*(pMatch->pMethod))();
+            return ((pClass_t) m_pClass->*(pMatch->pMethod))();
         }
     }
 

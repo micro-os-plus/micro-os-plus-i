@@ -17,31 +17,37 @@
 #include "portable/stdlib/include/ostream"
 
 class CommandLineInterface;
-class CliToken;
-
-typedef OSReturn_t
-(CommandLineInterface::*pCliMethod_t)(void);
-typedef CommandLineInterface* pCliClass_t;
-typedef class CliToken cliToken_t;
-
-class CliToken
-{
-public:
-  const char* pToken;
-  cliToken_t* pDown;
-
-  pCliMethod_t pMethod;
-};
 
 class CommandLineInterface
 {
 public:
-  CommandLineInterface(std::istream& cin, std::ostream& cout, unsigned char* pLine,
-      unsigned short iSize);
+  typedef OSReturn_t
+  (CommandLineInterface::*pCommandMethod_t)(void);
+  typedef CommandLineInterface* pClass_t;
+
+  class Token;
+  typedef class Token Token_t;
+
+  typedef int CommandParameter_t;
+
+  class Token
+  {
+  public:
+    const char* pString;
+    Token_t* pDown;
+
+    pCommandMethod_t pMethod;
+
+    CommandParameter_t parameter;
+  };
+
+public:
+  CommandLineInterface(std::istream& cin, std::ostream& cout,
+      unsigned char* pLine, unsigned short iSize);
   ~CommandLineInterface();
 
   void
-  setCommands(cliToken_t* pToken, pCliClass_t* pClass);
+  setCommands(Token_t* pToken, pClass_t* pClass);
 
   OSReturn_t
   loop(OSDeviceCharacter& dev, unsigned char* greeting = 0);
@@ -62,7 +68,7 @@ public:
 
 private:
   OSReturn_t
-  recurse(cliToken_t* p);
+  recurse(Token_t* p);
 
   std::istream m_cin;
   std::ostream m_cout;
@@ -75,12 +81,12 @@ private:
   Parser m_parser;
   unsigned char m_token[20]; // parsed token
 
-  cliToken_t* m_pToken;
-  pCliClass_t* m_pClass;
+  Token_t* m_pToken;
+  pClass_t* m_pClass;
 };
 
 inline void
-CommandLineInterface::setCommands(cliToken_t* pToken, pCliClass_t* pClass)
+CommandLineInterface::setCommands(Token_t* pToken, pClass_t* pClass)
 {
   m_pToken = pToken;
   m_pClass = pClass;
