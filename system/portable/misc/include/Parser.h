@@ -63,6 +63,9 @@ public:
   OSReturn_t
   parseUnsigned(unsigned short* pShort);
   OSReturn_t
+  parseUnsigned(uint32_t* pLong);
+
+  OSReturn_t
   parseSigned(signed long* pLong);
 
   OSReturn_t

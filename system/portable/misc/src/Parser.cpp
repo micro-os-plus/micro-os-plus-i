@@ -190,6 +190,13 @@ Parser::parseUnsigned(unsigned short* pShort)
 {
   return parseUnsigned(m_pToken, pShort);
 }
+
+OSReturn_t
+Parser::parseUnsigned(uint32_t* pLong)
+{
+  return parseUnsigned(m_pToken, pLong);
+}
+
 OSReturn_t
 Parser::parseSigned(signed long* pLong)
 {
