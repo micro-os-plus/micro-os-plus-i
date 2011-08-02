@@ -73,6 +73,7 @@ CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
           return c;
         }
 
+      cout << std::endl;
       processLine();
     }
 
@@ -152,11 +153,19 @@ CommandLineInterface::processLine()
   parser.setSeparators((unsigned char*) " ");
   parser.setToken(m_token, sizeof(m_token));
 
-  if (recurse((Token_t*) m_pToken) == OSReturn::OS_OK)
+  OSReturn_t ret;
+  ret = recurse((Token_t*) m_pToken);
+
+  if ((ret == OSReturn::OS_OK) || (ret == OSReturn::OS_ERROR))
     return;
 
-  cout << std::endl << str_unknown;
-  //cout << endl << str_help;
+  if (ret == OSReturn::OS_BAD_COMMAND)
+    {
+      cout << str_unknown;
+      return;
+    }
+
+  cout << "Error " << std::dec << ret;
 }
 
 OSReturn_t
@@ -179,7 +188,8 @@ CommandLineInterface::recurse(Token_t* pIn)
           if (p->pDown != 0)
             return recurse(p->pDown);
           else if (p->pMethod != 0)
-            return ((pClass_t) m_pClass->*(p->pMethod))();
+            return (*p->pMethod)(m_cin, m_cout, m_parser, *this,
+                (void*) m_pObject, p->parameter);
         }
       ++p;
     }
@@ -187,8 +197,8 @@ CommandLineInterface::recurse(Token_t* pIn)
   // If an exact match is not possible, retry as substring
   if (parser.getTokenLength() >= 2)
     {
-      Token_t* pMatch;
-      pMatch = NULL;
+      Token_t* pp;
+      pp = NULL;
 
       uint_t cnt;
 
@@ -198,21 +208,56 @@ CommandLineInterface::recurse(Token_t* pIn)
           // Check if the parameter starts with the parsed token
           if (parser.doesStringStartWithToken((const unsigned char*) p->pString))
             {
-              pMatch = p;
+              pp = p;
               ++cnt;
             }
         }
 
       if (cnt == 1)
         {
-          if (pMatch->pDown != 0)
-            return recurse(pMatch->pDown);
-          else if (pMatch->pMethod != 0)
-            return ((pClass_t) m_pClass->*(pMatch->pMethod))();
+          if (pp->pDown != 0)
+            return recurse(pp->pDown);
+          else if (pp->pMethod != 0)
+            return (*pp->pMethod)(m_cin, m_cout, m_parser, *this,
+                (void*) m_pObject, p->parameter);
         }
     }
 
   return OSReturn::OS_BAD_COMMAND;
+}
+
+void
+CommandLineInterface::recurseHelp(Token_t* pToken, uchar_t* pBuf,
+    size_t bufSize, uint_t index)
+{
+  std::ostream& cout = m_cout;
+  Token_t* p;
+
+  int i;
+  for (i = 0, p = pToken; p->pString != 0; ++p, ++i)
+    {
+      size_t len;
+      len = strlen(p->pString);
+      if (index + len + 1 < bufSize)
+        {
+          strcpy((char*) (pBuf + index), (const char*) (p->pString));
+          pBuf[index + len] = ' ';
+          pBuf[index + len + 1] = '\0';
+
+          if (p->pDown != 0)
+            recurseHelp(p->pDown, pBuf, bufSize, index + len + 1);
+          else
+            {
+              if (!(i == 0 && index == 0))
+                {
+                  cout << std::endl;
+                }
+              cout << pBuf;
+              if (p->pHelp != 0)
+                cout << p->pHelp;
+            }
+        }
+    }
 }
 
 #endif /* defined(OS_INCLUDE_COMMANDLINEINTERFACE) */
