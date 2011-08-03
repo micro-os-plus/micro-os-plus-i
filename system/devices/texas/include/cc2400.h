@@ -257,7 +257,7 @@ namespace device
       writeRegUseCs(device::texas::cc2400::RegisterId_t reg, uint16_t value);
 
       // the offset of RSSI register
-      static const int16_t m_rssiOffset = -54;
+      static const int16_t RSSI_OFFSET = -54;
 
       ChipSelectActiveLow& m_cs;
       // Radio Interface (Modem) pins
@@ -280,13 +280,13 @@ namespace device
     inline void
     Cc2400::switchToTxMode(void)
     {
-      m_mdmTxStrb.setPinLow();
+      m_mdmRxStrb.setPinLow();
     }
 
     inline void
     Cc2400::switchToRxMode(void)
     {
-      m_mdmRxStrb.setPinLow();
+      m_mdmTxStrb.setPinLow();
     }
 
     inline void

@@ -508,29 +508,39 @@ namespace device
     int16_t
     Cc2400::readRssiValue(void)
     {
-      int16_t rssiValue;
-      uint16_t aux;
-      uint8_t aux8;
-      int8_t *p;
-
       device::texas::cc2400::Status_t status;
+      uint16_t aux;
 
       m_cs.assert();
         {
+
           status = registers.readWord(device::texas::cc2400::Register::RSSI,
               &aux);
         }
       m_cs.deassert();
-      aux8 = aux >> 8;
-      p = (int8_t*) (&aux8);
-      rssiValue = m_rssiOffset + (*p);
 
-      //  OSDeviceDebug::putString("rssi:");
-      //  OSDeviceDebug::putHex((uint16_t) rssiValue);
-      //  OSDeviceDebug::putNewLine();
-      //  OSDeviceDebug::putString("status:");
-      //  OSDeviceDebug::putHex((uint8_t) status);
-      //  OSDeviceDebug::putNewLine();
+      int8_t aux8;
+      aux8 = (int8_t) (aux >> 8);
+
+      int16_t rssiValue;
+      rssiValue = aux8;
+
+#if false
+      OSDeviceDebug::putString("reg:");
+      OSDeviceDebug::putHex((uint16_t) aux);
+      OSDeviceDebug::putString(" 1:");
+      OSDeviceDebug::putHex((uint16_t) aux8);
+      OSDeviceDebug::putString(" 2:");
+      OSDeviceDebug::putHex((uint16_t) rssiValue);
+#endif
+
+      rssiValue += RSSI_OFFSET;
+
+#if false
+      OSDeviceDebug::putString(" 3:");
+      OSDeviceDebug::putHex((uint16_t) rssiValue);
+      OSDeviceDebug::putNewLine();
+#endif
       return rssiValue;
     }
 
