@@ -13,41 +13,56 @@ inline void
 OSDebugLed2::init(void)
 {
   // init led port as output
-  OS_GPIO_PIN_CONFIG(OS_CONFIG_DEBUG_LED2_PORT_INIT, OS_CONFIG_DEBUG_LED2_BIT,
-      1);
+  OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_DEBUG_LED2_PORT_CONFIG, OS_CONFIG_DEBUG_LED2_BIT);
+#if OS_CONFIG_DEBUG_LED2_ISACTIVE_LOW
+  OS_GPIO_PIN_HIGH(OS_CONFIG_DEBUG_LED2_PORT_WRITE, OS_CONFIG_DEBUG_LED2_BIT);
+#else
+  OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_LED2_PORT_WRITE, OS_CONFIG_DEBUG_LED2_BIT);
+#endif
+  OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_DEBUG_LED2_PORT_CONFIG, OS_CONFIG_DEBUG_LED2_BIT);
 }
 
 inline void
 OSDebugLed2::toggle(void)
 {
-  OSCriticalSection::enter();
+  //OSCriticalSection::enter();
     {
       // toggle led
-      OS_GPIO_PIN_TOGGLE(OS_CONFIG_DEBUG_LED2_PORT, OS_CONFIG_DEBUG_LED2_BIT);
+      OS_GPIO_PIN_TOGGLE(OS_CONFIG_DEBUG_LED2_PORT_WRITE, OS_CONFIG_DEBUG_LED2_BIT);
     }
-  OSCriticalSection::exit();
+  //OSCriticalSection::exit();
 }
 
-inline void
+inline
+void
 OSDebugLed2::on(void)
 {
-  OSCriticalSection::enter();
+  //OSCriticalSection::enter();
     {
-      // toggle led
-      OS_GPIO_PIN_HIGH(OS_CONFIG_DEBUG_LED2_PORT, OS_CONFIG_DEBUG_LED2_BIT);
+      // turn led on
+#if OS_CONFIG_DEBUG_LED2_ISACTIVE_LOW
+      OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_LED2_PORT_WRITE, OS_CONFIG_DEBUG_LED2_BIT);
+#else
+      OS_GPIO_PIN_HIGH(OS_CONFIG_DEBUG_LED2_PORT_WRITE, OS_CONFIG_DEBUG_LED2_BIT);
+#endif
     }
-  OSCriticalSection::exit();
+  //OSCriticalSection::exit();
 }
 
-inline void
+inline
+void
 OSDebugLed2::off(void)
 {
-  OSCriticalSection::enter();
+  //OSCriticalSection::enter();
     {
-      // toggle led
-      OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_LED2_PORT, OS_CONFIG_DEBUG_LED2_BIT);
+      // turn led off
+#if OS_CONFIG_DEBUG_LED2_ISACTIVE_LOW
+      OS_GPIO_PIN_HIGH(OS_CONFIG_DEBUG_LED2_PORT_WRITE, OS_CONFIG_DEBUG_LED2_BIT);
+#else
+      OS_GPIO_PIN_LOW(OS_CONFIG_DEBUG_LED2_PORT_WRITE, OS_CONFIG_DEBUG_LED2_BIT);
+#endif
     }
-  OSCriticalSection::exit();
+  //OSCriticalSection::exit();
 }
 
 inline unsigned char
