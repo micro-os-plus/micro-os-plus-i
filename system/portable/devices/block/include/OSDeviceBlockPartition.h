@@ -50,6 +50,12 @@ public:
   setPartitioneOffsetAndSize(OSDeviceBlock::BlockNumber_t offset,
       OSDeviceBlock::BlockNumber_t size);
 
+  OSDeviceBlock::BlockNumber_t
+  getPartitionOffset(void);
+
+  OSDeviceBlock::BlockNumber_t
+  getPartitionSize(void);
+
 private:
 
   // ----- Members ------------------------------------------------------------
@@ -61,5 +67,17 @@ private:
   // --------------------------------------------------------------------------
 
 };
+
+inline OSDeviceBlock::BlockNumber_t
+OSDeviceBlockPartition::getPartitionOffset(void)
+{
+  return m_partitionOffset;
+}
+
+inline OSDeviceBlock::BlockNumber_t
+OSDeviceBlockPartition::getPartitionSize(void)
+{
+  return m_partitionSize;
+}
 
 #endif /* OSDEVICEADDRESSABLEPARTITION_H_ */
