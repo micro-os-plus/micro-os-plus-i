@@ -57,7 +57,7 @@ OSDeviceBlockPartition::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
 }
 
 OSDeviceBlock::BlockNumber_t
-OSDeviceBlockPartition::getDeviceSize(void)
+OSDeviceBlockPartition::getDeviceSizeBlocks(void)
 {
   return m_partitionSize;
 }

@@ -40,7 +40,7 @@ public:
 
   // Return the full size, in blocks, of the device.
   virtual OSDeviceBlock::BlockNumber_t
-  getDeviceSize(void);
+  getDeviceSizeBlocks(void);
 
   // ----- Public local methods -----------------------------------------------
 

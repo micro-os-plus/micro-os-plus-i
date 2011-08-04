@@ -76,16 +76,16 @@ OSDeviceBlockExtension::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber __a
 }
 
 OSDeviceBlock::BlockNumber_t
-OSDeviceBlockExtension::getDeviceSize(void)
+OSDeviceBlockExtension::getDeviceSizeBlocks(void)
 {
-  return m_parent.getDeviceSize();
+  return m_parent.getDeviceSizeBlocks();
 }
 
 // Return the device block size, in bytes.
 OSDeviceBlock::BlockSize_t
-OSDeviceBlockExtension::getBlockSize(void)
+OSDeviceBlockExtension::getBlockSizeBytes(void)
 {
-  return m_parent.getBlockSize();
+  return m_parent.getBlockSizeBytes();
 }
 
 // ----------------------------------------------------------------------------
