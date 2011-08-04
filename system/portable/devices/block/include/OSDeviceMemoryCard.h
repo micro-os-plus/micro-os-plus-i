@@ -740,8 +740,6 @@ private:
 
   int m_openCounter;
 
-  uint8_t m_openCounter;
-
   uint8_t m_cardType;
 
   uint32_t m_cardRca;
