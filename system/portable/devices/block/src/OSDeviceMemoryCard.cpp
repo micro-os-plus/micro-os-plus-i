@@ -23,6 +23,8 @@ OSDeviceMemoryCard::OSDeviceMemoryCard(Implementation& impl) :
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceMemoryCard"), this);
 
   m_isOpened = false;
+
+  m_openCounter = 0;
 }
 
 OSDeviceMemoryCard::~OSDeviceMemoryCard()
@@ -51,6 +53,8 @@ OSDeviceMemoryCard::open(void)
 {
   OSDeviceDebug::putString("OSDeviceMemoryCard::open()");
   OSDeviceDebug::putNewLine();
+
+  m_openCounter++;
 
   if (m_isOpened)
     return OSReturn::OS_ALREADY_OPENED;
@@ -202,6 +206,10 @@ OSDeviceMemoryCard::close(void)
   OSDeviceDebug::putString("OSDeviceMemoryCard::close()");
   OSDeviceDebug::putNewLine();
 #endif
+
+  m_openCounter--;
+  if(m_openCounter > 0)
+    OSReturn::OS_OK;
 
   m_isOpened = false;
 

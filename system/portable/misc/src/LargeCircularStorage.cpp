@@ -42,9 +42,7 @@ LargeCircularStorageWriter::createSession(SessionUniqueId_t sessionUniqueId)
 
   m_blockUniqueId = 0x12345678;
 
-  m_device.open();
-
-  return OSReturn::OS_OK;
+  return m_device.open();
 }
 
 OSReturn_t
@@ -52,9 +50,7 @@ LargeCircularStorageWriter::closeSession(void)
 {
   m_sessionUniqueId = 0;
 
-  // m_device.close(); // TODO: Fix this.
-
-  return OSReturn::OS_OK;
+  return m_device.close();
 }
 
 OSReturn_t
