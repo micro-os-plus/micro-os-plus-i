@@ -661,11 +661,11 @@ public:
 
   // Return the full size, in blocks, of the device.
   virtual OSDeviceBlock::BlockNumber_t
-  getDeviceSize(void);
+  getDeviceSizeBlocks(void);
 
   // Return the device block size, in bytes.
   virtual OSDeviceBlock::BlockSize_t
-  getBlockSize(void);
+  getBlockSizeBytes(void);
 
   Implementation_t&
   getImplementation(void);
@@ -727,6 +727,9 @@ private:
   OSReturn_t
   finaliseWriteBlock(void);
 
+  bool
+  isOpened(void);
+
 private:
 
   // ----- Private members ----------------------------------------------------
@@ -735,7 +738,7 @@ private:
 
   uint32_t m_response;
 
-  bool m_isOpened;
+  int m_openCounter;
 
   uint8_t m_openCounter;
 
@@ -754,6 +757,12 @@ inline OSDeviceMemoryCard::Implementation_t&
 OSDeviceMemoryCard::getImplementation(void)
 {
   return m_implementation;
+}
+
+inline bool
+OSDeviceMemoryCard::isOpened(void)
+{
+  return (m_openCounter > 0);
 }
 
 #endif /* OSDEVICEMEMORYCARD_H_ */

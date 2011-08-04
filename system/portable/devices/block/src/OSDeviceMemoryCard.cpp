@@ -22,8 +22,6 @@ OSDeviceMemoryCard::OSDeviceMemoryCard(Implementation& impl) :
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceMemoryCard"), this);
 
-  m_isOpened = false;
-
   m_openCounter = 0;
 }
 
@@ -54,16 +52,20 @@ OSDeviceMemoryCard::open(void)
   OSDeviceDebug::putString("OSDeviceMemoryCard::open()");
   OSDeviceDebug::putNewLine();
 
-  m_openCounter++;
+  if (isOpened())
+    {
+      m_openCounter++;
 
-  if (m_isOpened)
-    return OSReturn::OS_ALREADY_OPENED;
+      return OSReturn::OS_ALREADY_OPENED;
+    }
 
   OSReturn_t ret;
   ret = initialise();
 
   if (ret == OSReturn::OS_OK)
-    m_isOpened = true;
+    {
+      m_openCounter++;
+    }
 
   return ret;
 }
@@ -80,7 +82,7 @@ OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
   OSDeviceDebug::putNewLine();
 #endif
 
-  if (!m_isOpened)
+  if (!isOpened())
     return OSReturn::OS_NOT_OPENED;
 
   OSReturn_t ret;
@@ -145,7 +147,7 @@ OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
   OSDeviceDebug::putNewLine();
 #endif
 
-  if (!m_isOpened)
+  if (!isOpened())
     return OSReturn::OS_NOT_OPENED;
 
   OSReturn_t ret;
@@ -207,13 +209,21 @@ OSDeviceMemoryCard::close(void)
   OSDeviceDebug::putNewLine();
 #endif
 
-  m_openCounter--;
-  if(m_openCounter > 0)
-    OSReturn::OS_OK;
+  if (!isOpened())
+    return OSReturn::OS_NOT_OPENED;
 
-  m_isOpened = false;
+  OSReturn_t ret;
+  ret = OSReturn::OS_OK;
 
-  return OSReturn::OS_NOT_IMPLEMENTED;
+  --m_openCounter;
+  if (m_openCounter == 0)
+    {
+      // TODO: close the device
+      // Power down everything, like for going to sleep
+      ret = OSReturn::OS_NOT_IMPLEMENTED;
+    }
+
+  return ret;
 }
 
 OSReturn_t
@@ -263,7 +273,7 @@ OSDeviceMemoryCard::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attri
   OSDeviceDebug::putNewLine();
 #endif
 
-  if (!m_isOpened)
+  if (!isOpened())
     return OSReturn::OS_NOT_OPENED;
 
   OSReturn_t ret;
@@ -323,14 +333,14 @@ OSDeviceMemoryCard::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attri
 }
 
 OSDeviceBlock::BlockNumber_t
-OSDeviceMemoryCard::getDeviceSize(void)
+OSDeviceMemoryCard::getDeviceSizeBlocks(void)
 {
   return m_cardSizeBlocks;
 }
 
 // Return the device block size, in bytes.
 OSDeviceBlock::BlockSize_t
-OSDeviceMemoryCard::getBlockSize(void)
+OSDeviceMemoryCard::getBlockSizeBytes(void)
 {
   return 512;
 }
@@ -729,8 +739,6 @@ OSDeviceMemoryCard::initialise(void)
   OSDeviceDebug::putString("card type=");
   OSDeviceDebug::putHex(m_cardType);
   OSDeviceDebug::putNewLine();
-
-  m_isOpened = true;
 
   return OSReturn::OS_OK;
 }
