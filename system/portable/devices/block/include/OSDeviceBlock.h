@@ -60,11 +60,11 @@ public:
 
   // Return the full size, in blocks, of the device.
   virtual OSDeviceBlock::BlockNumber_t
-  getDeviceSize(void) = 0;
+  getDeviceSizeBlocks(void) = 0;
 
   // Return the device block size, in bytes.
   virtual OSDeviceBlock::BlockSize_t
-  getBlockSize(void) = 0;
+  getBlockSizeBytes(void) = 0;
 
   // --------------------------------------------------------------------------
 };

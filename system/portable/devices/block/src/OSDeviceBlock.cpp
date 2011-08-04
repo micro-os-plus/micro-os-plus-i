@@ -32,7 +32,7 @@ OSDeviceBlock::open(void)
 }
 
 OSDeviceBlock::BlockNumber_t
-OSDeviceBlock::getDeviceSize(void)
+OSDeviceBlock::getDeviceSizeBlocks(void)
 {
   return 0; // No device
 }
