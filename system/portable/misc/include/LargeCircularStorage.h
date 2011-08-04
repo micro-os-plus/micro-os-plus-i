@@ -22,7 +22,7 @@ public:
 
   typedef uint32_t BlockUniqueId_t;
 
-  LargeCircularStorageWriter(OSDeviceBlock& device);
+  LargeCircularStorageWriter(OSDeviceBlock& storage);
   ~LargeCircularStorageWriter();
 
   OSReturn_t
@@ -30,7 +30,7 @@ public:
 
   // Fill in the
   OSReturn_t
-  writeBlock(uint8_t* pBuf);
+  writeSessionBlock(uint8_t* pBuf);
 
   // Return the amount of space the application should reserve
   // at the beginning of each written block
@@ -40,8 +40,20 @@ public:
   OSReturn_t
   closeSession(void);
 
+  OSDeviceBlock&
+  getStorage(void);
+
+  // set/get the number of physical blocks per logical block
+  void
+  setSessionBlockSizeBlocks(OSDeviceBlock::BlockSize_t blockSizeBlocks);
+
+  OSDeviceBlock::BlockSize_t
+  getSessionlBlockSizeBlocks(void);
+
 private:
-  OSDeviceBlock& m_device;
+  OSDeviceBlock& m_storage;
+
+  OSDeviceBlock::BlockSize_t m_blockSizeBlocks;
 
   // An application supplied unique id for identifying sessions
   SessionUniqueId_t m_sessionUniqueId;
@@ -57,6 +69,25 @@ LargeCircularStorageWriter::getReservedHeaderSize(void)
 {
   return sizeof(SessionUniqueId_t) + sizeof(OSDeviceBlock::BlockNumber_t)
       + sizeof(BlockUniqueId_t);
+}
+
+inline OSDeviceBlock&
+LargeCircularStorageWriter::getStorage(void)
+{
+  return m_storage;
+}
+
+inline void
+LargeCircularStorageWriter::setSessionBlockSizeBlocks(
+    OSDeviceBlock::BlockSize_t blockSizeBlocks)
+{
+  m_blockSizeBlocks = blockSizeBlocks;
+}
+
+inline OSDeviceBlock::BlockSize_t
+LargeCircularStorageWriter::getSessionlBlockSizeBlocks(void)
+{
+  return m_blockSizeBlocks;
 }
 
 // ----------------------------------------------------------------------------

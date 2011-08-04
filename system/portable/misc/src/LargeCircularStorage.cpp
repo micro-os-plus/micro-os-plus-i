@@ -13,9 +13,11 @@
 // ----------------------------------------------------------------------------
 
 LargeCircularStorageWriter::LargeCircularStorageWriter(OSDeviceBlock& device) :
-  m_device(device)
+  m_storage(device)
 {
   debug.putConstructor_P(PSTR("LargeCircularStorage"), this);
+
+  m_blockSizeBlocks = 1;
 }
 
 LargeCircularStorageWriter::~LargeCircularStorageWriter()
@@ -42,7 +44,7 @@ LargeCircularStorageWriter::createSession(SessionUniqueId_t sessionUniqueId)
 
   m_blockUniqueId = 0x12345678;
 
-  return m_device.open();
+  return m_storage.open();
 }
 
 OSReturn_t
@@ -50,11 +52,11 @@ LargeCircularStorageWriter::closeSession(void)
 {
   m_sessionUniqueId = 0;
 
-  return m_device.close();
+  return m_storage.close();
 }
 
 OSReturn_t
-LargeCircularStorageWriter::writeBlock(uint8_t* pBuf)
+LargeCircularStorageWriter::writeSessionBlock(uint8_t* pBuf)
 {
   if (m_sessionUniqueId == 0)
     {
@@ -106,13 +108,23 @@ LargeCircularStorageWriter::writeBlock(uint8_t* pBuf)
     }
 
   OSReturn_t ret;
-  // Write one block the output device
-  ret = m_device.writeBlocks(m_currentBlockNumber, pBuf, 1);
 
-  // Increment block number; if reaching device size, roll over
-  ++m_currentBlockNumber;
-  if (m_currentBlockNumber >= m_device.getDeviceSize())
-    m_currentBlockNumber = 0;
+  if (m_currentBlockNumber + m_blockSizeBlocks
+      > m_storage.getDeviceSizeBlocks())
+    {
+      // If there are not enough blocks to the end of the storage, roll over
+      m_currentBlockNumber = 0;
+    }
+
+  // Write several blocks to the output device
+  ret = m_storage.writeBlocks(m_currentBlockNumber, pBuf, m_blockSizeBlocks);
+
+  // Increment the block number; when reaching device size, roll over
+  m_currentBlockNumber += m_blockSizeBlocks;
+  if (m_currentBlockNumber >= m_storage.getDeviceSizeBlocks())
+    {
+      m_currentBlockNumber = 0;
+    }
 
   // Increase the monotone increasing unique block number
   ++m_blockUniqueId;
