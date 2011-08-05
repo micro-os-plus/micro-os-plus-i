@@ -30,7 +30,7 @@ inline BlinkLed::BlinkLed()
 
 inline void BlinkLed::init(void)
   {
-    // init led port as output
+    // initialise led port as output
     OS_CONFIG_BLINK_LED_PORT_INIT |= _BV(OS_CONFIG_BLINK_LED_BIT);
   }
 

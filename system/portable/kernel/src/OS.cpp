@@ -44,7 +44,7 @@ uint32_t g_constantMarker = OS_CFGLONG_CONSTANT_MARKER;
 
 #if !defined(OS_EXCLUDE_RESET_HANDLER)
 
-// init value for the stack pointer. defined in linker script
+// initialise value for the stack pointer. defined in linker script
 extern unsigned long __stack_end;
 
 // start/end addresses for the .text section.
@@ -84,7 +84,7 @@ OS::resetHandler(void)
   // Be sure we start with interrupts disabled
   OSCPU::interruptsDisable();
 
-  // earlyInit() should also init GPIO, so that leds will be available
+  // earlyInit() should also initialise GPIO, so that leds will be available
   // WARNING: NO DEBUG YET!
   OSCPU::earlyInit();
 
@@ -147,7 +147,7 @@ OS::resetHandler(void)
 #endif
 
 
-  // will call OSScheduler::earlyInit() to init registered threads count
+  // will call OSScheduler::earlyInit() to initialise registered threads count
   OS::earlyInit();
 
   OS::staticConstructorsInit();

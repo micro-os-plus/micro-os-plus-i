@@ -42,6 +42,10 @@ namespace avr32
       static const uint32_t ADC = 0xFFFF3C00;
       static const uint32_t TC1 = 0xFFFF4400;
     };
+
+    /*
+     * For clocks see Table 7-7, page 58.
+     */
   }
 }
 

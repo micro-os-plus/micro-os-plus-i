@@ -36,7 +36,7 @@ public:
   // static OSTimerTicks_t ms_secondTicks;
 
 protected:
-  // OSScheduler calls OSTimerTicks::init() from OSScheduler::start()
+  // OSScheduler calls OSTimerTicks::initialise() from OSScheduler::start()
   friend class OSScheduler;
 
   // initialise and it is called from OSScheduler::start()

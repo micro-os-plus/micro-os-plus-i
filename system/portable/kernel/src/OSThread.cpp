@@ -16,7 +16,7 @@
 OSThread::OSThread(const char* pName, const OSStack_t* pStack,
     OSStackSize_t stackSize, OSThreadPriority_t priority)
 {
-  OSThread::init(pName, (OSThreadMainPtr_t) &OSThread::staticMain, this,
+  OSThread::initialise(pName, (OSThreadMainPtr_t) &OSThread::staticMain, this,
       pStack, stackSize, priority);
 }
 
@@ -25,12 +25,12 @@ OSThread::OSThread(const char* pName, OSThreadMainPtr_t entryPoint,
     void* pParameters, const OSStack_t* pStack, OSStackSize_t stackSize,
     OSThreadPriority_t priority)
 {
-  OSThread::init(pName, entryPoint, pParameters, pStack, stackSize, priority);
+  OSThread::initialise(pName, entryPoint, pParameters, pStack, stackSize, priority);
 }
 
 // The stack size is in multiples of OSStack_t
 void
-OSThread::init(const char* pName, OSThreadMainPtr_t entryPoint,
+OSThread::initialise(const char* pName, OSThreadMainPtr_t entryPoint,
     void* pParameters, const OSStack_t* pStack, OSStackSize_t stackSize,
     OSThreadPriority_t priority)
 {

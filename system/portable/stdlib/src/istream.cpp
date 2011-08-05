@@ -32,7 +32,7 @@ namespace std
       OSDeviceDebug::putConstructor_P(PSTR("istream"), this);
 
       count_last_ufmt_input = 0;
-      init(0 /*, dev, 0 */);
+      initialise(0 /*, dev, 0 */);
     }
 #endif
 

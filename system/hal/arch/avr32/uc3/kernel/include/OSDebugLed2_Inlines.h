@@ -12,7 +12,7 @@
 inline void
 OSDebugLed2::init(void)
 {
-  // init led port as output
+  // initialise led port as output
   OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_DEBUG_LED2_PORT_INIT, OS_CONFIG_DEBUG_LED2_BIT);
   OS_GPIO_PIN_CONFIG_OUTPUT(OS_CONFIG_DEBUG_LED2_PORT_INIT, OS_CONFIG_DEBUG_LED2_BIT);
 }

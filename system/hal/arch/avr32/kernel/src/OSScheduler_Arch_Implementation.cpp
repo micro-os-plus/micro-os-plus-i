@@ -10,7 +10,7 @@
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-// Called from OSThread::init(), usually in thread constructors
+// Called from OSThread::initialise(), usually in thread constructors
 
 OSStack_t*
 OSSchedulerImpl::stackInitialise(OSStack_t* pStack, void

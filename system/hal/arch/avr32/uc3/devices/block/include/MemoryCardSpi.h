@@ -28,7 +28,7 @@ namespace avr32
       class Implementation : public OSDeviceMemoryCard::Implementation
       {
       public:
-        Implementation(avr32::uc3::spi::ModuleId_t spiModuleId,
+        Implementation(avr32::uc3::spi::Module_t spiModuleId,
             avr32::uc3::gpio::PinNumber_t selectGpioNumber);
         virtual
         ~Implementation();
@@ -92,7 +92,7 @@ namespace avr32
         initGpio(void);
 
       public:
-        avr32::uc3::Spim m_spi;
+        avr32::uc3::SpiMaster m_spi;
         avr32::uc3::Gpio m_gpio;
         ChipSelectActiveLow m_cs;
 
@@ -106,7 +106,7 @@ namespace avr32
 
       // ----- Constructors & Destructors -------------------------------------
 
-      MemoryCardSpi(avr32::uc3::spi::ModuleId_t spiModuleId,
+      MemoryCardSpi(avr32::uc3::spi::Module_t spiModuleId,
           avr32::uc3::gpio::PinNumber_t selectGpioNumber);
 
       virtual

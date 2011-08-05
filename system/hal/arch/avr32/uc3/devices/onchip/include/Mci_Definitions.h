@@ -405,7 +405,7 @@ namespace avr32
         StatusRegister_t
         readStatus(void);
 
-        // Writing 1 to a bit will se IMRt; writing 0 will be ignored
+        // Writing 1 to a bit will set IMR; writing 0 will be ignored
         void
         writeInterruptEnable(uint32_t value);
 
@@ -622,7 +622,7 @@ namespace avr32
 
     }
 
-  // ------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   }
 }
 

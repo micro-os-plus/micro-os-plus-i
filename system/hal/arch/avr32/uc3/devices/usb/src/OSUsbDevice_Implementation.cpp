@@ -368,7 +368,7 @@ OSUsbDeviceImpl::usb_init_device(void)
 
 // @brief This function initialises the USB device controller
 //
-// This function enables the USB controller and init the USB interrupts.
+// This function enables the USB controller and initialise the USB interrupts.
 // The aim is to allow the USB connection detection in order to send
 // the appropriate USB event to the operating mode manager.
 // Start device function is executed once VBUS connection has been detected
@@ -915,7 +915,7 @@ OSUsbDeviceImpl::specificProcessReadRequest(unsigned char type,
 }
 
 /*
- * Redirector to specific endpoint init
+ * Redirector to specific endpoint initialise
  */
 void
 OSUsbDeviceImpl::specificEndpointInit(unsigned char conf_nb)

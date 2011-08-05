@@ -49,7 +49,7 @@ namespace avr32
       m_regionsArraySize = regionsArraySize;
       m_isCircular = isCircular;
 
-      // init status of each region
+      // initialise status of each region
       for (uint_t i = 0; i < regionsArraySize; i++)
         {
           pRegionsArray[i].status = avr32::uc3::pdca::IS_EMPTY_MASK;

@@ -117,11 +117,11 @@
 #  error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
-#if false && !defined(assert)
+#if !defined(DEBUG_ASSERT)
 #  if !defined(DEBUG)
-#    define assert(e)   ((void)0)
+#    define DEBUG_ASSERT(e)   ((void)0)
 #  else /* DEBUG */
-#    define assert(e) ((e) ? (void)0 : OSDeviceDebug::__assert(__func__, __FILE__, __LINE__, #e))
+#    define DEBUG_ASSERT(e) ((e) ? (void)0 : OSDeviceDebug::assert(__func__, __FILE__, __LINE__, #e))
 #  endif
 #endif
 

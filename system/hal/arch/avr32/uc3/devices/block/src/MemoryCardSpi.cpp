@@ -81,10 +81,10 @@ namespace avr32
           != MCI_SUCCESS)
       return OSReturn::OS_NOT_INITIALIZED;
 #else
-      m_cs.init();
+      m_cs.initialise();
 
-      m_spi.init();
-      m_spi.configBaudRate(400000L);
+      m_spi.initialise();
+      m_spi.configureBaudRate(400000L);
 
       m_cs.assert();
 #endif

@@ -237,7 +237,7 @@ private:
 
   // Initialise thread's environment.
   void
-  init(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameters,
+  initialise(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameters,
       const OSStack_t* pStackBottom, OSStackSize_t stackSize,
       OSThreadPriority_t priority);
 

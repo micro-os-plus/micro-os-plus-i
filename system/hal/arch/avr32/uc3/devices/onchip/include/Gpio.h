@@ -51,7 +51,7 @@ namespace avr32
 
         const static uint32_t MEMORY_ADDRESS =
             avr32::uc3::PeripheralAddressMap::GPIO;
-        const static uint32_t MEMORY_OFFSET = 0x100;
+        const static uint32_t MEMORY_OFFSET = 0x0100;
 
         // ----- Memory map ---------------------------------------------------
 
@@ -207,7 +207,7 @@ namespace avr32
       void
       registerInterruptHandler(avr32::uc3::intc::InterruptHandler_t handler);
 
-      // Static method to be used at system init to enable local bus
+      // Static method to be used at system initialise to enable local bus
       // (mandatory, otherwise all local bus peripheral calls will fail).
       static void
       configLocalBus(void);

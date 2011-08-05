@@ -16,7 +16,10 @@ namespace avr32
 {
   namespace uc3
   {
-    Spim::Spim(spi::ModuleId_t module) :
+
+    // ----- Constructors & Destructors ---------------------------------------
+
+    SpiMaster::SpiMaster(spi::Module_t module) :
           registers(
               *reinterpret_cast<spi::Registers*> (spi::Registers::MEMORY_ADDRESS
                   + ((module % 2) * spi::Registers::MEMORY_OFFSET)))
@@ -24,13 +27,15 @@ namespace avr32
       OSDeviceDebug::putConstructorWithIndex("avr32::uc3::Spim", module, this);
     }
 
-    Spim::~Spim()
+    SpiMaster::~SpiMaster()
     {
       OSDeviceDebug::putDestructor("avr32::uc3::Spim", this);
     }
 
+    // ----- Public Methods ---------------------------------------------------
+
     void
-    Spim::init(void)
+    SpiMaster::powerUp(void)
     {
       // software reset SPI module
       registers.writeControl(AVR32_SPI_CR_SWRST_MASK);
@@ -39,8 +44,9 @@ namespace avr32
       registers.writeInterruptsDisable(0xFFFFFFFF);
 
       // Set master mode, enable RX FIFO and Disable Mode Fault
-      registers.writeMode(AVR32_SPI_MSTR_MASK | AVR32_SPI_MR_MODFDIS_MASK |
-          AVR32_SPI_MR_RXFIFOEN_MASK);
+      registers.writeMode(
+          AVR32_SPI_MSTR_MASK | AVR32_SPI_MR_MODFDIS_MASK
+              | AVR32_SPI_MR_RXFIFOEN_MASK);
 
       // initialize CSR0
       registers.writeChipSelect0(0);
@@ -48,37 +54,46 @@ namespace avr32
       // set fixed peripheral mode for CS0
       uint32_t chipSelectValue = 0;
 
-      registers.writeMode( registers.readMode() |
-          ((~(1 << (chipSelectValue + AVR32_SPI_MR_PCS_OFFSET)))
-              & AVR32_SPI_MR_PCS_MASK));
+      registers.writeMode(
+          registers.readMode() | ((~(1 << (chipSelectValue
+              + AVR32_SPI_MR_PCS_OFFSET))) & AVR32_SPI_MR_PCS_MASK));
     }
+
+    // ----- Public Methods ---------------------------------------------------
 
     // Busy wait version of a full Spi byte access
     uint8_t
-    Spim::writeWaitReadByte(uint8_t value)
+    SpiMaster::writeWaitReadByte(uint8_t value)
     {
       transmitByte(value);
       //OSDeviceDebug::putHex(value);
 
       while (!isTransmittedAndReceived())
-        ;
-      //uint8_t b;
-      //b = receiveByte();
+        ; // TODO: Watchdog?
+
+      uint8_t b;
+      b = receiveByte();
+
       //OSDeviceDebug::putHex(b);
       //OSDeviceDebug::putChar(' ');
-      return receiveByte();
-      //return b;
+
+      return b;
     }
 
     // Busy wait version of a full Spi word access
     uint16_t
-    Spim::writeWaitReadWord(uint16_t value)
+    SpiMaster::writeWaitReadWord(uint16_t value)
     {
       transmitWord(value);
+
       while (!isTransmittedAndReceived())
-        ;
+        ; // TODO: Watchdog?
+
       return receiveWord();
     }
+
+  // --------------------------------------------------------------------------
+
   }
 }
 

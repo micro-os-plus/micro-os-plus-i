@@ -35,7 +35,7 @@ private:
 inline
 OSUsbLed::OSUsbLed()
 {
-  // nothing to do, init() will do the magic
+  // nothing to do, initialise() will do the magic
 }
 
 inline void
@@ -45,7 +45,7 @@ OSUsbLed::init(void)
 
   // enable port
   OS_GPIO_PIN_CONFIG_ENABLE(OS_CFGREG_OSUSBLED_LED_PORT_CONFIG, OS_CFGPIN_OSUSBLED_LED_PIN);
-  // init led port as output
+  // initialise led port as output
   OS_GPIO_PIN_CONFIG_OUTPUT(OS_CFGREG_OSUSBLED_LED_PORT_CONFIG, OS_CFGPIN_OSUSBLED_LED_PIN);
   // turn led off
 #if defined(OS_CFGBOOL_OSUSBLED_LED_ISACTIVE_LOW)

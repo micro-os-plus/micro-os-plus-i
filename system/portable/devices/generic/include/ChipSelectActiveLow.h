@@ -21,26 +21,52 @@ typedef avr32::uc3::Gpio Gpio_t;
 
 class ChipSelectActiveLow
 {
+  // --------------------------------------------------------------------------
+
 public:
+
+  // ----- Constructors & Destructors -----------------------------------------
+
   ChipSelectActiveLow(Gpio_t& gpio);
 
+  // ----- Public methods -----------------------------------------------------
+
   void
-  init(void);
+  powerUp(void);
+
+  void
+  powerDown(void);
+
   void
   assert(void);
   void
   deassert(void);
 
 private:
+
+  // ----- Private members ----------------------------------------------------
+
   Gpio_t& m_gpio;
+
+  // --------------------------------------------------------------------------
+
 };
 
+// ----- Inline methods -------------------------------------------------------
+
 inline void
-ChipSelectActiveLow::init(void)
+ChipSelectActiveLow::powerUp(void)
 {
   m_gpio.setModeGpio();
   m_gpio.setPinHigh();
   m_gpio.setDirectionOutput();
+}
+
+inline void
+ChipSelectActiveLow::powerDown(void)
+{
+  m_gpio.setPinHigh();
+  m_gpio.setDirectionInput();
 }
 
 inline void
@@ -54,5 +80,7 @@ ChipSelectActiveLow::deassert(void)
 {
   m_gpio.setPinHigh();
 }
+
+// ----------------------------------------------------------------------------
 
 #endif /* CHIPSELECTACTIVELOW_H_ */
