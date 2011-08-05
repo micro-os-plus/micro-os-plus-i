@@ -6,21 +6,21 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_DEVICE_TEXAS_CC2400)
+#if defined(OS_INCLUDE_DEVICE_TI_CC2400)
 
-#include "devices/texas/include/cc2400.h"
+#include "devices/ti/include/cc2400.h"
 
 namespace device
 {
-  namespace texas
+  namespace ti
   {
     namespace cc2400
     {
       Registers::Registers(spim_t& spi) :
         m_spi(spi)
       {
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
-        OSDeviceDebug::putConstructor("device::texas::cc2400::Registers", this);
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
+        OSDeviceDebug::putConstructor("device::ti::cc2400::Registers", this);
 #endif
       }
 
@@ -174,8 +174,8 @@ namespace device
           m_mdmPktRdy(mdmPktRdy), m_mdmFifoRdy(mdmFifoRdy), m_mdmPwrEnIo(
               mdmPwrEnIo), m_mdmPwrEnCore(mdmPwrEnCore)
     {
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
-      OSDeviceDebug::putConstructor("device::texas::Cc2400", this);
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
+      OSDeviceDebug::putConstructor("device::ti::Cc2400", this);
 #endif
     }
 
@@ -198,7 +198,7 @@ namespace device
       mainValue = 0x8003;
 
       registers.setSpiHighSpeed();
-      device::texas::cc2400::Status_t status;
+      device::ti::cc2400::Status_t status;
 
 #if false
 
@@ -206,8 +206,8 @@ namespace device
 
       uint16_t rssi;
 
-      //device::texas::cc2400::RegisterId_t reg = device::texas::cc2400::Register::RSSI;
-      device::texas::cc2400::RegisterId_t reg = device::texas::cc2400::Register::GRMDM;
+      //device::ti::cc2400::RegisterId_t reg = device::ti::cc2400::Register::RSSI;
+      device::ti::cc2400::RegisterId_t reg = device::ti::cc2400::Register::GRMDM;
 
       m_cs.assert();
       status = registers.readWord(reg, &rssi);
@@ -237,15 +237,15 @@ namespace device
       OSDeviceDebug::putNewLine();
 #endif
 
-      status = writeRegUseCs(device::texas::cc2400::Register::MAIN, 0x0000);
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+      status = writeRegUseCs(device::ti::cc2400::Register::MAIN, 0x0000);
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString("status reset: ");
       OSDeviceDebug::putDec((uint16_t) status);
       OSDeviceDebug::putNewLine();
 #endif
 
-      status = writeRegUseCs(device::texas::cc2400::Register::MAIN, 0x8000);
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+      status = writeRegUseCs(device::ti::cc2400::Register::MAIN, 0x8000);
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString("status reset: ");
       OSDeviceDebug::putDec((uint16_t) status);
       OSDeviceDebug::putNewLine();
@@ -256,7 +256,7 @@ namespace device
     void
     Cc2400::powerOff(void)
     {
-      device::texas::cc2400::Status_t status;
+      device::ti::cc2400::Status_t status;
 
       // make sure RX and TX pins are low
       m_mdmTxStrb.setPinLow();
@@ -266,17 +266,17 @@ namespace device
 
       // send SRFOFF, just to make sure
       readFsmState(status);
-      if ((status & device::texas::cc2400::Status::FS_LOCK) != 0)
+      if ((status & device::ti::cc2400::Status::FS_LOCK) != 0)
         {
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
           OSDeviceDebug::putString("SRFOFF");
 #endif
           m_cs.assert();
             {
-              registers.strobe(device::texas::cc2400::Register::SRFOFF);
+              registers.strobe(device::ti::cc2400::Register::SRFOFF);
             }
           m_cs.deassert();
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
           OSDeviceDebug::putString("wait...");
 #endif
           do
@@ -287,18 +287,18 @@ namespace device
                 }
               m_cs.deassert();
             }
-          while ((status & device::texas::cc2400::Status::FS_LOCK) != 0);
+          while ((status & device::ti::cc2400::Status::FS_LOCK) != 0);
         }
 
 #if false
       // can not stop XOSC;
       readFsmState(status);
-      if ((status & device::texas::cc2400::Status::XOSC16M_STABLE) != 0)
+      if ((status & device::ti::cc2400::Status::XOSC16M_STABLE) != 0)
         {
           OSDeviceDebug::putString("SXOSCOFF");
           m_cs.assert();
             {
-              registers.strobe(device::texas::cc2400::Register::SXOSCOFF);
+              registers.strobe(device::ti::cc2400::Register::SXOSCOFF);
             }
           m_cs.deassert();
           OSDeviceDebug::putString("wait...");
@@ -310,11 +310,11 @@ namespace device
                 }
               m_cs.deassert();
             }
-          while ((status & device::texas::cc2400::Status::XOSC16M_STABLE) != 0);
+          while ((status & device::ti::cc2400::Status::XOSC16M_STABLE) != 0);
         }
 #endif
 
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString(" done");
 #endif
       // Turn off power supplies, by setting MDM_PWR_EN_IO, MDM_PWR_EN_CORE and PA_PWR_EN
@@ -325,8 +325,8 @@ namespace device
     void
     Cc2400::configureRegisters(void)
     {
-      device::texas::cc2400::Status_t status;
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+      device::ti::cc2400::Status_t status;
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString("configure Registers");
       OSDeviceDebug::putNewLine();
 #endif
@@ -335,66 +335,66 @@ namespace device
 
       //      Set the following configuration registers:
       //      MAIN = 0x001, XOSC16M_EN
-      //status = writeRegUseCs(device::texas::cc2400::Register::MAIN,
+      //status = writeRegUseCs(device::ti::cc2400::Register::MAIN,
       //    (uint16_t) 0x0001);
       //      FSCTRL = 0x0010, default value
-      status = writeRegUseCs(device::texas::cc2400::Register::FSCTRL,
+      status = writeRegUseCs(device::ti::cc2400::Register::FSCTRL,
           (uint16_t) 0x0010);
       //      FSDIV = 2401, set on first channel 2401Mhz
-      status = writeRegUseCs(device::texas::cc2400::Register::FSDIV,
+      status = writeRegUseCs(device::ti::cc2400::Register::FSDIV,
           (uint16_t) 2401);
       //      MDMCTRL = 0x0040, frequency deviation of 250kHz
-      status = writeRegUseCs(device::texas::cc2400::Register::MDMCTRL,
+      status = writeRegUseCs(device::ti::cc2400::Register::MDMCTRL,
           (uint16_t) 0x0040);
       //      AGCCTRL unchanged
       //      FREND = 0x000F, max output power
-      status = writeRegUseCs(device::texas::cc2400::Register::FREND,
+      status = writeRegUseCs(device::ti::cc2400::Register::FREND,
           (uint16_t) 0x000F);
       //      RSSI = 0x7FF2, set to 4 bits that are used to calculate the average RSSI
-      status = writeRegUseCs(device::texas::cc2400::Register::RSSI,
+      status = writeRegUseCs(device::ti::cc2400::Register::RSSI,
           (uint16_t) 0x7FF3);
       //      FREQEST read only
       //      IOCFG = 0x17E0, configure GIO1 pin with LOCK_STATUS function,
       // and GIO6 with CRC_OK function
       //      IOCFG = 0x7858, configure GIO6 pin with LOCK_STATUS function,
       // and GIO1 with CRC_OK function
-      status = writeRegUseCs(device::texas::cc2400::Register::IOCFG,
+      status = writeRegUseCs(device::ti::cc2400::Register::IOCFG,
           (uint16_t) 0x17E0);
       //      FSMTC = 0x7A94 (default value)
-      status = writeRegUseCs(device::texas::cc2400::Register::FSMTC,
+      status = writeRegUseCs(device::ti::cc2400::Register::FSMTC,
           (uint16_t) 0x7A94);
       //      MANAND = 0x7FFF (default value, except first bit,
       // which must be set 0 during initialization)
-      status = writeRegUseCs(device::texas::cc2400::Register::MANAND,
+      status = writeRegUseCs(device::ti::cc2400::Register::MANAND,
           (uint16_t) 0x7FFF);
       //      FSMSTATE unchanged
       //      ADCTST read only
       //      RXBPFTST unchanged; set to 0x5335, by ???
       //      PAMTST = 0x0803, as in TI's example
-      status = writeRegUseCs(device::texas::cc2400::Register::PAMTST,
+      status = writeRegUseCs(device::ti::cc2400::Register::PAMTST,
           (uint16_t) 0x0803);
       //      LMTST = 0x2B22, default value, also as in TI's example
       // set to 0x2BA3 by ???
-      status = writeRegUseCs(device::texas::cc2400::Register::LMTST,
+      status = writeRegUseCs(device::ti::cc2400::Register::LMTST,
           (uint16_t) 0x2B22);
       //      MANOR unchanged
       //      MDMTST0 = 0x134B, as in TI's example
-      status = writeRegUseCs(device::texas::cc2400::Register::MDMTST0,
+      status = writeRegUseCs(device::ti::cc2400::Register::MDMTST0,
           (uint16_t) 0x134B);
       //      MDMTST1 = 0x004B, as in TI's example
-      status = writeRegUseCs(device::texas::cc2400::Register::MDMTST1,
+      status = writeRegUseCs(device::ti::cc2400::Register::MDMTST1,
           (uint16_t) 0x004B);
       //      DACTST = 0, default value as in TI's example
-      status = writeRegUseCs(device::texas::cc2400::Register::DACTST,
+      status = writeRegUseCs(device::ti::cc2400::Register::DACTST,
           (uint16_t) 0x0000);
       //      AGCTST0 unchanged
       //      AGCTST1 unchanged
       //      AGCTST2 unchanged
       //      FSTST0 = 0xA210, as in TI's example, default value is 0xA210
-      status = writeRegUseCs(device::texas::cc2400::Register::FSTST0,
+      status = writeRegUseCs(device::ti::cc2400::Register::FSTST0,
           (uint16_t) 0xA210);
       //      FSTST1 = 0x1002, default value as in TI's example
-      status = writeRegUseCs(device::texas::cc2400::Register::FSTST1,
+      status = writeRegUseCs(device::ti::cc2400::Register::FSTST1,
           (uint16_t) 0x1002);
       //      FSTST2 = 0x0600, default value
       //      FSTST3 = 0x02CC, default value
@@ -403,12 +403,12 @@ namespace device
       //      GRMDM = 0x0F70, set buffered mode, 32 preamble bytes, 4 SYNC bytes,
       // CRC generation and checking ok,
       // NRZ line-coding format, GFSK modulation, no Gaussian filtered
-      status = writeRegUseCs(device::texas::cc2400::Register::GRMDM,
+      status = writeRegUseCs(device::ti::cc2400::Register::GRMDM,
           (uint16_t) 0x0F70);
       //      GRDEC unchanged
       //      PKTSTATUS read only
       //      INT = 30, default value
-      status = writeRegUseCs(device::texas::cc2400::Register::INT,
+      status = writeRegUseCs(device::ti::cc2400::Register::INT,
           (uint16_t) 16);
 
       // Wait until crystal oscillator is stable
@@ -416,18 +416,18 @@ namespace device
       readFsmState(status);
       m_cs.assert();
         {
-          registers.strobe(device::texas::cc2400::Register::SXOSCON);
+          registers.strobe(device::ti::cc2400::Register::SXOSCON);
         }
       m_cs.deassert();
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString("wait osc...");
 #endif
       do
         {
           readFsmState(status);
         }
-      while ((status & device::texas::cc2400::Status::XOSC16M_STABLE) == 0);
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+      while ((status & device::ti::cc2400::Status::XOSC16M_STABLE) == 0);
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString(" conf reg done");
       OSDeviceDebug::putNewLine();
       readFsmState(status);
@@ -453,7 +453,7 @@ namespace device
     bool
     Cc2400::isCalibrationOk(bool isDebug = true)
     {
-      device::texas::cc2400::Status_t status;
+      device::ti::cc2400::Status_t status;
       // Start calibration and PLL lock by setting both micro-controller pins
       // connected to RX and TX Modem pins
       m_mdmTxStrb.setPinLow();
@@ -465,7 +465,7 @@ namespace device
 
       //  m_cs.assert();
       //    {
-      //      status = registers.strobe(device::texas::cc2400::Register::SFSON);
+      //      status = registers.strobe(device::ti::cc2400::Register::SFSON);
       //    }
       //  m_cs.deassert();
 
@@ -491,13 +491,13 @@ namespace device
       // if GIO1 not set return error
       if (m_mdmGio1.isPinHigh())
         {
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
           OSDeviceDebug::putString("calib ok");
           OSDeviceDebug::putNewLine();
 #endif
           return true;
         }
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString("calib failed");
       OSDeviceDebug::putNewLine();
 #endif
@@ -508,13 +508,13 @@ namespace device
     int16_t
     Cc2400::readRssiValue(void)
     {
-      device::texas::cc2400::Status_t status;
+      device::ti::cc2400::Status_t status;
       uint16_t aux;
 
       m_cs.assert();
         {
 
-          status = registers.readWord(device::texas::cc2400::Register::RSSI,
+          status = registers.readWord(device::ti::cc2400::Register::RSSI,
               &aux);
         }
       m_cs.deassert();
@@ -545,20 +545,20 @@ namespace device
     }
 
     uint16_t
-    Cc2400::readFsmState(device::texas::cc2400::Status_t &status)
+    Cc2400::readFsmState(device::ti::cc2400::Status_t &status)
     {
       uint16_t fsm;
-      //device::texas::cc2400::Status_t status;
+      //device::ti::cc2400::Status_t status;
 
       m_cs.assert();
         {
           status = registers.readWord(
-              device::texas::cc2400::Register::FSMSTATE, &fsm);
+              device::ti::cc2400::Register::FSMSTATE, &fsm);
         }
       m_cs.deassert();
 
       fsm = fsm & 0x1F;
-#if defined(OS_DEBUG_DEVICE_TEXAS_CC2400)
+#if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString("fsm:");
       OSDeviceDebug::putHex((uint16_t) fsm);
       OSDeviceDebug::putNewLine();
@@ -571,36 +571,36 @@ namespace device
 
     void
     Cc2400::prepareTx(uint16_t frecv,
-        device::texas::cc2400::TxPowerLevel_t txPowerLevel)
+        device::ti::cc2400::TxPowerLevel_t txPowerLevel)
     {
-      device::texas::cc2400::Status_t status;
+      device::ti::cc2400::Status_t status;
 
       // Set frequency by sending on SPI register FSDIV with frequency value
 
-      status = writeRegUseCs(device::texas::cc2400::Register::FSDIV, frecv);
+      status = writeRegUseCs(device::ti::cc2400::Register::FSDIV, frecv);
 
       // Set output power level by sending on SPI register FREND with txPowerLevel value
-      status = writeRegUseCs(device::texas::cc2400::Register::FREND,
+      status = writeRegUseCs(device::ti::cc2400::Register::FREND,
           (uint16_t) txPowerLevel);
 
       // Set FIFO_THRESHOLD by sending on SPI register INT with the value of 16
-      //status = writeRegUseCs(device::texas::cc2400::Register::INT, (uint16_t) 16);
+      //status = writeRegUseCs(device::ti::cc2400::Register::INT, (uint16_t) 16);
 
     }
 
     void
     Cc2400::prepareRx(uint16_t frecv)
     {
-      device::texas::cc2400::Status_t status;
+      device::ti::cc2400::Status_t status;
       // IOCFG = 0x17E0, configure GIO1 pin with LOCK_STATUS function, and GIO6 with CRC_OK function
       // already configured that in NodeRadio::configureRegisters(void)
 
       // Set frequency by sending on SPI register FSDIV with frequency-1 value
-      status = writeRegUseCs(device::texas::cc2400::Register::FSDIV, frecv - 1);
+      status = writeRegUseCs(device::ti::cc2400::Register::FSDIV, frecv - 1);
 
       // Set FIFO_THRESHOLD by sending on SPI register INT with the value of 16
       // already set in configureRegisters()
-      //status = writeRegUseCs(device::texas::cc2400::Register::INT, (uint16_t) 16);
+      //status = writeRegUseCs(device::ti::cc2400::Register::INT, (uint16_t) 16);
     }
 
     void
@@ -614,11 +614,11 @@ namespace device
     }
 
     //  assert CS, writes a CC2400 register, de-assert CS
-    device::texas::cc2400::Status_t
-    Cc2400::writeRegUseCs(device::texas::cc2400::RegisterId_t reg,
+    device::ti::cc2400::Status_t
+    Cc2400::writeRegUseCs(device::ti::cc2400::RegisterId_t reg,
         uint16_t value)
     {
-      device::texas::cc2400::Status_t status;
+      device::ti::cc2400::Status_t status;
       m_cs.assert();
         {
           status = registers.writeWord(reg, value);
@@ -629,4 +629,4 @@ namespace device
   }
 }
 
-#endif /* defined(OS_INCLUDE_DEVICE_TEXAS_CC2400) */
+#endif /* defined(OS_INCLUDE_DEVICE_TI_CC2400) */

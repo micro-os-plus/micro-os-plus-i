@@ -4,8 +4,8 @@
  *      This file is part of the uOS++ distribution.
  */
 
-#ifndef DEVICE_TEXAS_CC2400_H_
-#define DEVICE_TEXAS_CC2400_H_
+#ifndef DEVICE_TI_CC2400_H_
+#define DEVICE_TI_CC2400_H_
 
 #include "portable/kernel/include/OS.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
@@ -21,13 +21,13 @@
 
 namespace device
 {
-  namespace texas
+  namespace ti
   {
     namespace cc2400
     {
       //
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
-      typedef avr32::uc3::Spim spim_t;
+      typedef avr32::uc3::SpiMaster spim_t;
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
 #endif
@@ -36,6 +36,7 @@ namespace device
       typedef uint8_t RegisterOperation_t;
 
       typedef uint8_t Status_t;
+
       typedef uint8_t TxPowerLevel_t;
 
       class TxPowerLevel
@@ -51,6 +52,7 @@ namespace device
         static const TxPowerLevel_t DBM_0 = 7; // 0 dBm
 
       };
+
       class Status
       {
       public:
@@ -221,11 +223,11 @@ namespace device
 
       // returns current value of FSM
       uint16_t
-      readFsmState(device::texas::cc2400::Status_t &status);
+      readFsmState(device::ti::cc2400::Status_t &status);
 
       void
       prepareTx(uint16_t frecv,
-          device::texas::cc2400::TxPowerLevel_t txPowerLevel);
+          device::ti::cc2400::TxPowerLevel_t txPowerLevel);
 
       void
       prepareRx(uint16_t frecv);
@@ -249,17 +251,18 @@ namespace device
       void
       disableFifoInterrupt(void);
 
-      device::texas::cc2400::Registers registers;
+      device::ti::cc2400::Registers registers;
 
     private:
       //  assert CS, writes a CC2400 register, de-assert CS
-      device::texas::cc2400::Status_t
-      writeRegUseCs(device::texas::cc2400::RegisterId_t reg, uint16_t value);
+      device::ti::cc2400::Status_t
+      writeRegUseCs(device::ti::cc2400::RegisterId_t reg, uint16_t value);
 
       // the offset of RSSI register
       static const int16_t RSSI_OFFSET = -54;
 
       ChipSelectActiveLow& m_cs;
+
       // Radio Interface (Modem) pins
       avr32::uc3::Gpio& m_mdmClkEn;
       avr32::uc3::Gpio& m_mdmGio1;
@@ -338,19 +341,19 @@ namespace device
       inline void
       Registers::setSpiToRadioSpeed(void)
       {
-        m_spi.configChipSelect(16, 0, avr32::uc3::spi::BITS_8);
+        m_spi.configureChipSelect(16, 0, avr32::uc3::spi::BITS_8);
       }
 
       inline void
       Registers::setSpiHighSpeed(void)
       {
-        m_spi.configChipSelect(1, 0, avr32::uc3::spi::BITS_8);
+        m_spi.configureChipSelect(1, 0, avr32::uc3::spi::BITS_8);
       }
 
       inline void
       Registers::initSpi(void)
       {
-        m_spi.init();
+        m_spi.powerUp();
         // set SPI max speed, no delay between bytes, 8-bit word size
         setSpiHighSpeed();
         m_spi.enable();
@@ -359,4 +362,4 @@ namespace device
     }
   }
 }
-#endif /* DEVICE_TEXAS_CC2400_H_ */
+#endif /* DEVICE_TI_CC2400_H_ */
