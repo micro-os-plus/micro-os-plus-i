@@ -197,8 +197,8 @@ CommandLineInterface::recurse(Token_t* pIn)
   // If an exact match is not possible, retry as substring
   if (parser.getTokenLength() >= 2)
     {
-      Token_t* pp;
-      pp = NULL;
+      Token_t* pMatched;
+      pMatched = NULL;
 
       uint_t cnt;
 
@@ -208,18 +208,18 @@ CommandLineInterface::recurse(Token_t* pIn)
           // Check if the parameter starts with the parsed token
           if (parser.doesStringStartWithToken((const unsigned char*) p->pString))
             {
-              pp = p;
+              pMatched = p;
               ++cnt;
             }
         }
 
       if (cnt == 1)
         {
-          if (pp->pDown != 0)
-            return recurse(pp->pDown);
-          else if (pp->pMethod != 0)
-            return (*pp->pMethod)(m_cin, m_cout, m_parser, *this,
-                (void*) m_pObject, p->parameter);
+          if (pMatched->pDown != 0)
+            return recurse(pMatched->pDown);
+          else if (pMatched->pMethod != 0)
+            return (*pMatched->pMethod)(m_cin, m_cout, m_parser, *this,
+                (void*) m_pObject, pMatched->parameter);
         }
     }
 
