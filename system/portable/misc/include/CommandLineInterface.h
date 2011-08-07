@@ -42,7 +42,7 @@ public:
 
 public:
   CommandLineInterface(std::istream& cin, std::ostream& cout,
-      unsigned char* pLine, unsigned short iSize);
+      unsigned char* pHistory, unsigned short iHistorySizeBytes);
   ~CommandLineInterface();
 
   void
@@ -69,14 +69,20 @@ public:
   recurseHelp(Token_t* pToken, uchar_t* pBuf, size_t bufSize, uint_t index);
 
 private:
+
+  size_t
+  updateCurrentFromHistory(uchar_t* pHistory);
+
   OSReturn_t
   recurse(Token_t* p);
 
   std::istream m_cin;
   std::ostream m_cout;
 
-  unsigned char* m_pLine;
-  unsigned short m_iSize;
+  uchar_t* m_pHistory;
+  uint_t m_iHistorySizeBytes;
+  uchar_t* m_pHistoryCurrentPosition;
+  uchar_t* m_pHistoryLineBeginning;
 
   unsigned char* m_pPrompt;
 

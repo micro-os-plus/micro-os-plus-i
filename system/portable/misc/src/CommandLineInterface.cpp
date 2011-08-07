@@ -10,17 +10,23 @@
 
 #include "portable/kernel/include/OS.h"
 
+#include <string.h>
+#include <ctype.h>
+
 #include "portable/misc/include/CommandLineInterface.h"
 #include "portable/misc/include/ASCII.h"
 
 CommandLineInterface::CommandLineInterface(std::istream& cin,
-    std::ostream& cout, unsigned char* pLine, unsigned short iSize) :
+    std::ostream& cout, unsigned char* pHistory,
+    unsigned short iHistorySizeBytes) :
   m_cin(cin), m_cout(cout)
 {
   OSDeviceDebug::putConstructor_P(PSTR("CommandLineInterface"), this);
 
-  m_pLine = pLine;
-  m_iSize = iSize;
+  m_pHistoryCurrentPosition = m_pHistory = pHistory;
+  m_iHistorySizeBytes = iHistorySizeBytes;
+
+  memset(pHistory, '\0', iHistorySizeBytes);
 
   m_pPrompt = (unsigned char*) "> ";
 }
@@ -40,7 +46,6 @@ CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
 
   for (; dev.isConnected();)
     {
-      cout << std::endl << m_pPrompt;
       int c;
 
       c = readLine();
@@ -83,13 +88,52 @@ CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
 int
 CommandLineInterface::readLine()
 {
-  unsigned char* pc;
-  int c;
-
   std::istream& cin = m_cin;
   std::ostream& cout = m_cout;
 
-  for (pc = m_pLine;;)
+  cout << std::endl << m_pPrompt;
+
+  int nFree;
+  nFree = m_pHistory + m_iHistorySizeBytes - m_pHistoryCurrentPosition;
+  if (nFree < 40)
+    {
+      // No enough space left, start line from the beginning
+      memset(m_pHistoryCurrentPosition + 1, 0, nFree - 1);
+
+#if defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY)
+      OSDeviceDebug::putString(" bufbeg ");
+#endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
+
+      // Start from the beginning
+      m_pHistoryCurrentPosition = m_pHistory;
+    }
+  else
+    {
+      // Skip over last line terminator
+      m_pHistoryCurrentPosition++;
+    }
+
+  // Remember the line beginning
+  m_pHistoryLineBeginning = m_pHistoryCurrentPosition;
+
+  uchar_t* pNavigate;
+  pNavigate = m_pHistoryLineBeginning;
+
+  // Mark start of text
+  *m_pHistoryCurrentPosition++ = ASCII::STX;
+
+  // Empty line
+  *m_pHistoryCurrentPosition = '\0';
+
+  int lineLength;
+  lineLength = 1; // account for STX
+
+  bool isInVerticalNavigation;
+  isInVerticalNavigation = false;
+
+  int c;
+
+  for (;;)
     {
       cout.flush();
       c = cin.get();
@@ -101,44 +145,237 @@ CommandLineInterface::readLine()
         {
           // OSDeviceDebug::putHex((unsigned char)c);
 
-          if ((c == '\r') || (c == '\n'))
-            break;
-
-          if (c == '\b')
+          if (c == ASCII::ESC)
             {
-              if (pc > m_pLine)
+              c = cin.get();
+              if (c == '[')
                 {
-                  cout.put(c);
-                  cout.put(' ');
-                  cout.put(c);
-                  --pc;
+                  c = cin.get();
+                  if (c == 'A')
+                    {
+#if defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY)
+                      //OSDeviceDebug::putString(" up ");
+#endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
+
+                      if (pNavigate <= m_pHistory)
+                        {
+                          // Move to the end
+                          pNavigate = m_pHistory + m_iHistorySizeBytes;
+                        }
+
+                      for (; *--pNavigate != ASCII::STX;)
+                        ;
+
+                      goto vNav;
+                    }
+                  else if (c == 'B')
+                    {
+#if defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY)
+                      //OSDeviceDebug::putString(" down ");
+#endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
+
+                      for (; *++pNavigate != ASCII::STX;)
+                        if (pNavigate >= m_pHistory + m_iHistorySizeBytes)
+                          pNavigate = m_pHistory;
+
+                      vNav: if (pNavigate == m_pHistoryLineBeginning)
+                        {
+                          // We reached the same line, i.e. end of buffer
+                          c = ASCII::BELL;
+                          cout.put(c);
+
+                          continue;
+                        }
+
+#if defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY)
+                      // In pNavigate we have the previous line
+                      OSDeviceDebug::putPtr(pNavigate);
+                      OSDeviceDebug::putChar(' ');
+                      OSDeviceDebug::putString((const char*) (pNavigate + 1));
+                      OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
+
+                      cout.put('\r');
+                      cout.put(ASCII::ESC);
+                      cout << "[2K" << m_pPrompt << pNavigate;
+
+                      isInVerticalNavigation = true;
+                    }
+                  else if (c == 'C')
+                    {
+#if defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY)
+                      OSDeviceDebug::putString(" right ");
+#endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
+
+                      isInVerticalNavigation = false;
+                    }
+                  else if (c == 'D')
+                    {
+#if defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY)
+                      OSDeviceDebug::putString(" left ");
+#endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
+
+                      isInVerticalNavigation = false;
+                    }
+                  else
+                    {
+                      c = ASCII::BELL;
+                      cout.put(c);
+                    }
                 }
               else
                 {
                   c = ASCII::BELL;
                   cout.put(c);
                 }
+              c = '\0';
+
+              if (!isInVerticalNavigation)
+                lineLength = updateCurrentFromHistory(pNavigate);
             }
           else
             {
-              if (((unsigned short) (pc - m_pLine)) < (m_iSize - 2))
-                *pc++ = c;
-              else
+              if (isInVerticalNavigation)
                 {
+                  lineLength = updateCurrentFromHistory(pNavigate);
+                  isInVerticalNavigation = false;
+                }
+
+              if ((c == '\r') || (c == '\n'))
+                {
+                  break;
+                }
+
+              // Check Backspace
+              if (c == '\b')
+                {
+                  if (lineLength > 1)
+                    {
+                      cout.put(c);
+                      cout.put(' ');
+                      cout.put(c);
+
+                      *--m_pHistoryCurrentPosition = '\0';
+                      --lineLength;
+                    }
+                  else
+                    {
+                      c = ASCII::BELL;
+                      cout.put(c);
+                    }
+                }
+              else if (c == '\t')
+                {
+                  OSDeviceDebug::putString(" tab ");
+
                   c = ASCII::BELL;
                   cout.put(c);
+
+                  c = '\0';
+                }
+              else
+                {
+                  // If buffer not full, store the character
+                  if (m_pHistoryCurrentPosition < (m_pHistory
+                      + m_iHistorySizeBytes - 2))
+                    {
+                      *m_pHistoryCurrentPosition++ = c;
+                      // -2 is to leave space for the terminator
+
+                      // Update current line length
+                      lineLength++;
+                    }
+                  else
+                    {
+                      // Is the line starting at the beginning of the buffer?
+                      if (m_pHistoryLineBeginning == m_pHistory)
+                        {
+                          // Buffer really full
+                          c = ASCII::BELL;
+                          cout.put(c);
+                        }
+                      else
+                        {
+                          // Move line to the beginning, including the terminator
+                          memmove(m_pHistory, m_pHistoryLineBeginning,
+                              lineLength + 1);
+
+#if defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY)
+                          OSDeviceDebug::putString(" bufbeg2 ");
+#endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
+
+                          // Overlapping?
+                          if (m_pHistory + lineLength + 1
+                              >= m_pHistoryLineBeginning)
+                            {
+                              // yes, clear to the end of the buffer
+                              memset(m_pHistory + lineLength + 1, '\0',
+                                  m_iHistorySizeBytes - (lineLength + 1));
+
+#if defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY)
+                              OSDeviceDebug::putString(" clr ");
+#endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
+                            }
+                          else
+                            {
+                              // non overlapping, clear current marker
+                              // to avoid matching this in history
+                              *m_pHistoryLineBeginning = '\0';
+                            }
+
+                          m_pHistoryLineBeginning = m_pHistory;
+                          m_pHistoryCurrentPosition = m_pHistoryLineBeginning
+                              + lineLength;
+
+                          // Finally store the character
+                          *m_pHistoryCurrentPosition++ = c;
+
+                          // Update current line length
+                          lineLength++;
+                        }
+                    }
+                  // Add the terminator
+                  *m_pHistoryCurrentPosition = '\0';
                 }
             }
-          if ((' ' <= c) && (c < 0x7F))
+          if (isprint(c))
             {
               cout.put(c);
             }
         }
-    }
-  // *pc++ = ' ';
-  *pc = '\0';
 
-  return pc - m_pLine;
+    }
+
+  return lineLength;
+}
+
+size_t
+CommandLineInterface::updateCurrentFromHistory(uchar_t* pCurrent)
+{
+  size_t len;
+
+#if defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY)
+  OSDeviceDebug::putString(" use hist ");
+#endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
+
+  // Compute length of the desired command, excluding terminator
+  len = strlen((const char*)pCurrent);
+
+  // Do we have enough space at the end?
+  if (m_pHistoryLineBeginning + len + 1 < m_pHistory + m_iHistorySizeBytes)
+    {
+      // Yes, copy the desired line to the end
+      memcpy(m_pHistoryLineBeginning, pCurrent, len + 1);
+      m_pHistoryCurrentPosition = m_pHistoryLineBeginning + len;
+    }
+  else
+    {
+      // Copy at the beginning, taking care of overlapping
+      memmove(m_pHistory, pCurrent, len + 1);
+      m_pHistoryLineBeginning = m_pHistory;
+      m_pHistoryCurrentPosition = m_pHistoryLineBeginning + len;
+    }
+  return len;
 }
 
 static const char str_unknown[] = "Cmd?";
@@ -149,7 +386,18 @@ CommandLineInterface::processLine()
   std::ostream& cout = m_cout;
   Parser& parser = m_parser;
 
-  parser.setInput(m_pLine);
+  if (*m_pHistoryLineBeginning != ASCII::STX)
+    {
+      OSDeviceDebug::putString(" no STX ");
+
+      return;
+    }
+
+  OSDeviceDebug::putString("Line at ");
+  OSDeviceDebug::putPtr( m_pHistoryLineBeginning);
+  OSDeviceDebug::putNewLine();
+
+  parser.setInput(m_pHistoryLineBeginning + 1);
   parser.setSeparators((unsigned char*) " ");
   parser.setToken(m_token, sizeof(m_token));
 
