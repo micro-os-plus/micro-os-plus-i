@@ -19,6 +19,8 @@ public:
   static const unsigned char LF = 0x0A;
   static const unsigned char CR = 0x0D;
 
+  const static uchar_t ESC = 0x1B;
+
 };
 
 #endif /* ASCII_H_ */
