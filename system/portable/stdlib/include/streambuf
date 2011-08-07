@@ -51,8 +51,8 @@ namespace std
     sgetn(char* s, streamsize n);
 
     // 27.5.2.2.4 Putback:
-#if 0
     int sputbackc(char c);
+#if 0
     int sungetc();
 #endif
     // 27.5.2.2.5 Put area:
@@ -63,7 +63,7 @@ namespace std
     sputn(const char* s, streamsize n) __attribute__((noinline));
 
   protected:
-#if 0
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
     //Pointers for the "get" buffers
     char* mgbeg;
     char* mgnext;
@@ -81,15 +81,16 @@ namespace std
 
     // 27.5.2.3.1 Get area:
 
-#if 0
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
     char* eback() const;
     char* gptr() const;
     char* egptr() const;
+#endif
     void gbump(int n);
     void setg(char* gbeg, char* gnext, char* gend);
 
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
     // 27.5.2.3.2 Put area:
-
     char* pbase() const;
     char* pptr() const;
     char* epptr() const;
@@ -137,7 +138,7 @@ namespace std
 
   };
 
-#if 0
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
   inline char* streambuf::eback() const
     {
       return mgbeg;

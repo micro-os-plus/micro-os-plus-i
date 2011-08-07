@@ -279,6 +279,7 @@ namespace std
       count_last_ufmt_input = n;
       return n;
     }
+#endif
 
   istream&
   istream::putback(char c)
@@ -300,9 +301,11 @@ namespace std
           setstate(ios_base::badbit);
           return *this;
         }
+
       return *this;
     }
 
+#if 0
   istream&
   istream::unget(void)
     {

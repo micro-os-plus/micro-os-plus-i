@@ -18,7 +18,9 @@ namespace std
   {
     OSDeviceDebug::putConstructor_P(PSTR("streambuf"), this);
 
-    //mgbeg = mgnext = mgend = mpbeg = mpnext = mpend = 0;
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
+    mgbeg = mgnext = mgend = mpbeg = mpnext = mpend = 0;
+#endif
     //openedFor = 0;
   }
 
@@ -27,29 +29,29 @@ namespace std
     ;
   }
 
-#if 0
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
 
   void
   streambuf::setg(char* gbeg, char* gnext, char* gend)
-    {
-      mgbeg = gbeg;
-      mgnext = gnext;
-      mgend = gend;
-    }
+  {
+    mgbeg = gbeg;
+    mgnext = gnext;
+    mgend = gend;
+  }
 
   void
   streambuf::setp(char* pbeg, char* pend)
-    {
-      mpbeg = pbeg;
-      mpnext = pbeg;
-      mpend = pend;
-    }
+  {
+    mpbeg = pbeg;
+    mpnext = pbeg;
+    mpend = pend;
+  }
 #endif
 
   streamsize
   streambuf::in_avail()
   {
-#if 0
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
     if (mgend != 0 && mgnext != 0)
       {
         return mgend - mgnext;
@@ -61,7 +63,7 @@ namespace std
   int
   streambuf::sbumpc()
   {
-#if 0
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
     if (mgbeg == 0)
     return traits::eof();
 
@@ -81,7 +83,7 @@ namespace std
   int
   streambuf::snextc()
   {
-#if 0
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
     if (sbumpc() == traits::eof())
       {
         return traits::eof();
@@ -106,18 +108,38 @@ namespace std
 #endif
   }
 
-#if 0
-
   int
   streambuf::sputbackc(char c)
-    {
-      if (mgbeg == 0 || mgnext == mgbeg || !traits::eq(c, gptr() [-1]))
-        {
-          return pbackfail(traits::to_int(c));
-        }
-      gbump(-1);
-      return traits::to_int(*gptr());
-    }
+  {
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
+    if (mgbeg == 0 || mgnext == mgbeg || !traits::eq(c, gptr()[-1]))
+      {
+        return pbackfail(traits::to_int(c));
+      }
+    gbump(-1);
+    return traits::to_int(*gptr());
+#else
+    c = c;
+    return traits::eof();
+#endif
+  }
+
+#if defined(OS_INCLUDE_STREAMBUF_BUFFERS)
+  void
+  streambuf::gbump(int n)
+  {
+    n = n;
+    // TODO: implement
+  }
+
+  char*
+  streambuf::gptr() const
+  {
+    return NULL;
+  }
+#endif
+
+#if 0
 
   int
   streambuf::sungetc()
