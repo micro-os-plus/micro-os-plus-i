@@ -57,16 +57,16 @@ private:
 inline void
 ChipSelectActiveLow::powerUp(void)
 {
-  m_gpio.setModeGpio();
+  m_gpio.configureModeGpio();
   m_gpio.setPinHigh();
-  m_gpio.setDirectionOutput();
+  m_gpio.configureDirectionOutput();
 }
 
 inline void
 ChipSelectActiveLow::powerDown(void)
 {
   m_gpio.setPinHigh();
-  m_gpio.setDirectionInput();
+  m_gpio.configureDirectionInput();
 }
 
 inline void

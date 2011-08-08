@@ -273,10 +273,10 @@ namespace avr32
     MemoryCardMci::Implementation::isDataLineBusy(void)
     {
       bool isPinHigh;
-      m_dataLine.setModeGpio();
-      m_dataLine.setDirectionInput();
+      m_dataLine.configureModeGpio();
+      m_dataLine.configureDirectionInput();
       isPinHigh = m_dataLine.isPinHigh();
-      m_dataLine.configPeripheralFunction(avr32::uc3::gpio::PeripheralFunction::A);
+      m_dataLine.configurePeripheralFunction(avr32::uc3::gpio::PeripheralFunction::A);
 
       return !isPinHigh;
     }

@@ -609,7 +609,7 @@ namespace device
     {
 
       m_mdmFifoRdy.registerInterruptHandler(handler);
-      m_mdmFifoRdy.configInterruptMode(mode);
+      m_mdmFifoRdy.configureInterruptMode(mode);
       m_mdmFifoRdy.enableInterrupt();
     }
 

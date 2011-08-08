@@ -308,7 +308,7 @@ namespace device
     inline void
     Cc2400::disableFifoInterrupt(void)
     {
-      m_mdmFifoRdy.clearInterruptRequested();
+      m_mdmFifoRdy.clearInterruptRequest();
       m_mdmFifoRdy.disableInterrupt();
     }
 
