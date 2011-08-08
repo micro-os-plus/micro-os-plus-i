@@ -559,6 +559,12 @@ public:
 
     // ----- Abstract methods ------------------------------------------------
 
+    virtual void
+    powerUp(void) = 0;
+
+    virtual void
+    powerDown(void) = 0;
+
     virtual OSReturn_t
     initialise(void) = 0;
 
@@ -635,6 +641,12 @@ public:
   ~OSDeviceMemoryCard();
 
   // ----- Public methods -----------------------------------------------------
+
+  virtual void
+  powerUp(void);
+
+  virtual void
+  powerDown(void);
 
   // Prepare the device for operations.
   virtual OSReturn_t

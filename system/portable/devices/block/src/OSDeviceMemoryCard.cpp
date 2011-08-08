@@ -46,6 +46,18 @@ OSDeviceMemoryCard::Implementation::~Implementation()
 
 // ----- Public virtual methods -----------------------------------------------
 
+void
+OSDeviceMemoryCard::powerUp(void)
+{
+  m_implementation.powerUp();
+}
+
+void
+OSDeviceMemoryCard::powerDown(void)
+{
+  m_implementation.powerDown();
+}
+
 OSReturn_t
 OSDeviceMemoryCard::open(void)
 {

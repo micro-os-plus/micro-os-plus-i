@@ -17,8 +17,10 @@ namespace avr32
   namespace uc3
   {
     MemoryCardMci::MemoryCardMci(mci::CardSlot_t cardSlot,
-        gpio::PinNumber_t data0gpio) :
-      OSDeviceMemoryCard(implementation), implementation(cardSlot, data0gpio)
+        gpio::PinNumber_t data0gpio,
+        avr32::uc3::gpio::PinPeripheralFunction_t* pGpioArray) :
+      OSDeviceMemoryCard(implementation),
+          implementation(cardSlot, data0gpio, pGpioArray)
     {
       OSDeviceDebug::putConstructor("avr32::uc3::MemoryCardMci", this);
     }
@@ -31,13 +33,15 @@ namespace avr32
     // ===== Implementation ===================================================
 
     MemoryCardMci::Implementation::Implementation(mci::CardSlot_t cardSlot,
-        gpio::PinNumber_t data0) :
+        gpio::PinNumber_t data0,
+        avr32::uc3::gpio::PinPeripheralFunction_t* pGpioArray) :
       m_dataLine(data0)
     {
       OSDeviceDebug::putConstructor(
           "avr32::uc3::MemoryCardMci::Implementation", this);
 
       m_cardSlot = cardSlot;
+      m_pGpioArray = pGpioArray;
     }
 
     MemoryCardMci::Implementation::~Implementation()
@@ -47,6 +51,30 @@ namespace avr32
     }
 
     // ---- Private virtuals methods ------------------------------------------
+
+    void
+    MemoryCardMci::Implementation::powerUp(void)
+    {
+      OSDeviceDebug::putString("MemoryCardMci::Implementation::powerUp()");
+      OSDeviceDebug::putNewLine();
+
+      if (m_pGpioArray != NULL)
+        {
+          avr32::uc3::Gpio::configPeripheralModeAndFunction( m_pGpioArray);
+        }
+    }
+
+    void
+    MemoryCardMci::Implementation::powerDown(void)
+    {
+      OSDeviceDebug::putString("MemoryCardMci::Implementation::powerDown()");
+      OSDeviceDebug::putNewLine();
+
+      if (m_pGpioArray != NULL)
+        {
+          avr32::uc3::Gpio::configGpioModeInput( m_pGpioArray);
+        }
+    }
 
     OSReturn_t
     MemoryCardMci::Implementation::initialise(void)
@@ -276,7 +304,10 @@ namespace avr32
       m_dataLine.configureModeGpio();
       m_dataLine.configureDirectionInput();
       isPinHigh = m_dataLine.isPinHigh();
-      m_dataLine.configurePeripheralFunction(avr32::uc3::gpio::PeripheralFunction::A);
+      
+      // TODO: use the pin array (pass an index into this array, not a pin number)
+      m_dataLine.configurePeripheralFunction(
+          avr32::uc3::gpio::PeripheralFunction::A);
 
       return !isPinHigh;
     }

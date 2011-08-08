@@ -26,13 +26,23 @@ namespace avr32
       class Implementation : public OSDeviceMemoryCard::Implementation
       {
       public:
-        Implementation(mci::CardSlot_t cardSlot, gpio::PinNumber_t data0gpio);
+        Implementation(mci::CardSlot_t cardSlot, gpio::PinNumber_t data0gpio,
+            avr32::uc3::gpio::PinPeripheralFunction_t* pGpioArray);
         virtual
         ~Implementation();
 
         friend class OSDeviceMemoryCard;
 
       private:
+
+        // ----- Private methods ----------------------------------------------
+
+        virtual void
+        powerUp(void);
+
+        virtual void
+        powerDown(void);
+
         virtual OSReturn_t
         initialise();
 
@@ -116,13 +126,15 @@ namespace avr32
 
         avr32::uc3::Gpio m_dataLine;
 
+        avr32::uc3::gpio::PinPeripheralFunction_t* m_pGpioArray;
       };
 
     public:
 
       // ----- Constructors & Destructors -------------------------------------
 
-      MemoryCardMci(mci::CardSlot_t cardSlot, gpio::PinNumber_t data0gpio);
+      MemoryCardMci(mci::CardSlot_t cardSlot, gpio::PinNumber_t data0gpio,
+          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioArray);
 
       virtual
       ~MemoryCardMci();
