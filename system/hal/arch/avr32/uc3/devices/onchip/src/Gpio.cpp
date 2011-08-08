@@ -26,8 +26,7 @@ namespace avr32
     {
       OSDeviceDebug::putConstructorWithIndex("avr32::uc3::Gpio", pin, this);
 
-      m_mask = 1 << (pin & 0x1F);
-      m_pin = pin;
+      initialise(pin);
     }
 
     Gpio::~Gpio()
@@ -38,7 +37,14 @@ namespace avr32
     // ----- Public Methods ---------------------------------------------------
 
     void
-    Gpio::configPeripheralFunction(gpio::PeripheralFunction_t func)
+    Gpio::initialise(gpio::PinNumber_t pin)
+    {
+      m_mask = 1 << (pin & 0x1F);
+      m_pin = pin;
+    }
+
+    void
+    Gpio::configurePeripheralFunction(gpio::PeripheralFunction_t func)
     {
       if (func & 0x1)
         portRegisters.pmr0s = m_mask;
@@ -52,7 +58,7 @@ namespace avr32
     }
 
     void
-    Gpio::configInterruptMode(gpio::InterruptMode_t mode)
+    Gpio::configureInterruptMode(gpio::InterruptMode_t mode)
     {
       // Configure the edge detector.
       if (mode & 0x1)
@@ -78,17 +84,51 @@ namespace avr32
           avr32::uc3::intc::GroupPriorities::GROUP_02);
     }
 
-    // Static method
+    // ---- Static methods ----------------------------------------------------
+
     void
     Gpio::configPeripheralModeAndFunction(gpio::PinNumber_t pin,
         gpio::PeripheralFunction_t func)
     {
       // Construct a local object here and use it
-      // It will be deleted when exiting this function
+      // It will be destructed when exiting this function
       Gpio gpio(pin);
 
-      gpio.setModePeripheral();
-      gpio.configPeripheralFunction(func);
+      gpio.configureModePeripheral();
+      gpio.configurePeripheralFunction(func);
+    }
+
+    void
+    Gpio::configPeripheralModeAndFunction(
+        gpio::PinPeripheralFunction_t* pPinFunctionArray)
+    {
+      while (pPinFunctionArray->pin != gpio::ILLEGAL_PIN_NUMBER)
+        {
+          configPeripheralModeAndFunction(pPinFunctionArray->pin,
+              pPinFunctionArray->function);
+          pPinFunctionArray++;
+        }
+    }
+
+    void
+    Gpio::configGpioModeInput(gpio::PinNumber_t pin)
+    {
+      // Construct a local object here and use it
+      // It will be destructed when exiting this function
+      Gpio gpio(pin);
+
+      gpio.configureDirectionInput();
+      gpio.configureModeGpio();
+    }
+
+    void
+    Gpio::configGpioModeInput(gpio::PinPeripheralFunction_t* pPinFunctionArray)
+    {
+      while (pPinFunctionArray->pin != gpio::ILLEGAL_PIN_NUMBER)
+        {
+          configGpioModeInput(pPinFunctionArray->pin);
+          pPinFunctionArray++;
+        }
     }
 
   // --------------------------------------------------------------------------
