@@ -38,6 +38,6 @@ namespace avr32
 
   }
 }
-#endif /* defined(OS_INCLUDE_AVR32_UC3_OS_INCLUDE_AVR32_UC3_template) */
+#endif /* defined(OS_INCLUDE_AVR32_UC3_template) */
 
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
