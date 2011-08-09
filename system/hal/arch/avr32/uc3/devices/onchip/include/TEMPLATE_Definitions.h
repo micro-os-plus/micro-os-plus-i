@@ -17,6 +17,7 @@ namespace avr32
   {
     namespace TEMPLATE
     {
+
       // ----- Type definitions -----------------------------------------------
 
       typedef uint8_t ModuleId_t;
