@@ -116,7 +116,7 @@ namespace avr32
 
       void
       setGpioConfigurationArray(
-          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioArray);
+          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray);
 
     private:
 
