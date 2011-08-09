@@ -15,17 +15,21 @@ namespace avr32
   {
     namespace intc
     {
-      typedef enum Priority_e
-      {
-        PRIORITY_0 = 0, PRIORITY_1, PRIORITY_2, PRIORITY_3 = 3
-      } Priority_t;
+      typedef uint8_t Priority_t;
 
-      typedef uint_t InterruptIndex_t;
+      class Priority
+      {
+      public:
+        const static Priority_t _0 = 0;
+        const static Priority_t _1 = 1;
+        const static Priority_t _2 = 2;
+        const static Priority_t _3 = 3;
+      };
 
       typedef void
       (*InterruptHandler_t)(void);
 
-      class GroupPriorities
+      class GroupPriority
       {
       public:
         // CPU
@@ -93,7 +97,58 @@ namespace avr32
         static const Priority_t GROUP_29 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP29_PRIORITY;
       };
+
+      typedef uint_t InterruptIndex_t;
+
+      class InterruptIndex
+      {
+      public:
+        // Interrupt index is (Group * 32 + Line) in Table 10-2, page 104
+        const static InterruptIndex_t EIC0 = 1 * 32 + 0;
+        const static InterruptIndex_t EIC1 = 1 * 32 + 1;
+        const static InterruptIndex_t EIC2 = 1 * 32 + 2;
+        const static InterruptIndex_t EIC3 = 1 * 32 + 3;
+      };
+
+      typedef uint8_t Group_t;
+
+      class Group
+      {
+      public:
+        const static Group_t CPU = 0;
+        const static Group_t EIC = 1;
+        const static Group_t GPIO = 2;
+        const static Group_t PDCA = 3;
+        const static Group_t FLASHC = 4;
+        const static Group_t USART0 = 5;
+        const static Group_t USART1 = 6;
+        const static Group_t USART2 = 7;
+        const static Group_t USART3 = 8;
+        const static Group_t SPI0 = 9;
+        const static Group_t SPI1 = 10;
+        const static Group_t TWIM0 = 11;
+        const static Group_t TWIM1 = 12;
+        const static Group_t SSC = 13;
+        const static Group_t TC0 = 14;
+        const static Group_t ADC = 15;
+        const static Group_t TC1 = 16;
+        const static Group_t USB = 17;
+        const static Group_t SDRAMC = 18;
+        const static Group_t ABDAC = 19;
+        const static Group_t MCI = 20;
+        const static Group_t AES = 21;
+        const static Group_t DMACA = 22;
+        const static Group_t MSI = 26;
+        const static Group_t TWIS0 = 27;
+        const static Group_t TWIS1 = 28;
+        const static Group_t ECCHRS = 29;
+      };
+
+      typedef uint8_t Line_t;
+
+      const static uint_t LINES_PER_GROUP = 32;
     }
+
     class Intc
     {
     public:
@@ -103,7 +158,15 @@ namespace avr32
       registerInterruptHandler(intc::InterruptHandler_t handler,
           intc::InterruptIndex_t index, intc::Priority_t priority);
 
+      static intc::InterruptIndex_t
+      computeInterruptIndex(intc::Group_t group, intc::Line_t line);
     };
+
+    inline intc::InterruptIndex_t
+    Intc::computeInterruptIndex(intc::Group_t group, intc::Line_t line)
+    {
+      return ((group * intc::LINES_PER_GROUP) + line);
+    }
   }
 }
 
