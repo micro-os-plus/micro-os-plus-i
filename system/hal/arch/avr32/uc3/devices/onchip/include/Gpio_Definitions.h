@@ -18,6 +18,7 @@ namespace avr32
   {
     namespace gpio
     {
+
       // ----- Type definitions -----------------------------------------------
 
       typedef uint8_t PinNumber_t;
