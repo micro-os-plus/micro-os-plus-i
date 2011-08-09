@@ -37,6 +37,31 @@ namespace avr32
     // ----- Public methods ---------------------------------------------------
 
     void
+    Mci::powerUp(void)
+    {
+      OSDeviceDebug::putString("avr32::uc3::Mci::powerUp()");
+      OSDeviceDebug::putNewLine();
+
+      if (m_pGpioConfigurationArray != NULL)
+        {
+          avr32::uc3::Gpio::configPeripheralModeAndFunction
+              ( m_pGpioConfigurationArray);
+        }
+    }
+
+    void
+    Mci::powerDown(void)
+    {
+      OSDeviceDebug::putString("avr32::uc3::Mci::powerDown()");
+      OSDeviceDebug::putNewLine();
+
+      if (m_pGpioConfigurationArray != NULL)
+        {
+          avr32::uc3::Gpio::configGpioModeInput( m_pGpioConfigurationArray);
+        }
+    }
+
+    void
     Mci::initialise(mci::CardSlot_t cardSlot)
     {
       OSDeviceDebug::putString("avr32::uc3::Mci::initialise()");

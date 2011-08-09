@@ -10,6 +10,7 @@
 #include "portable/kernel/include/OS.h"
 
 #include "hal/arch/avr32/uc3/devices/onchip/include/Mci_Definitions.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
 
 namespace avr32
 {
@@ -39,6 +40,12 @@ namespace avr32
 
       uint32_t
       getInputClockFrequencyHz(void);
+
+      void
+      powerUp(void);
+
+      void
+      powerDown(void);
 
       void
       initialise(mci::CardSlot_t cardSlot);
@@ -90,6 +97,10 @@ namespace avr32
       mci::StatusRegister_t
       getStatusRegister(void);
 
+      void
+      setGpioConfigurationArray(
+          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray);
+
     private:
 
       // ----- Private methods ------------------------------------------------
@@ -133,6 +144,8 @@ namespace avr32
       // ----- Private members ------------------------------------------------
 
       mci::StatusRegister_t m_shadowStatusRegister;
+
+      avr32::uc3::gpio::PinPeripheralFunction_t* m_pGpioConfigurationArray;
 
       // ----------------------------------------------------------------------
     };
@@ -195,6 +208,12 @@ namespace avr32
               | ((cycles & 0xF) << AVR32_MCI_DTOR_DTOCYC_OFFSET));
     }
 
+    inline void
+    Mci::setGpioConfigurationArray(
+        avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray)
+    {
+      m_pGpioConfigurationArray = pGpioConfigurationArray;
+    }
 
   // ------------------------------------------------------------------------
   }
