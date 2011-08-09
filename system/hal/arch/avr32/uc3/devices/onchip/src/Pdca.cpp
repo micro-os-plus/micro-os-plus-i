@@ -207,7 +207,7 @@ namespace avr32
     {
       avr32::uc3::Intc::registerInterruptHandler(
           (intc::InterruptHandler_t) handler, pdca::INTERRUPT_BASE
-              + m_channelId, avr32::uc3::intc::GroupPriorities::GROUP_03);
+              + m_channelId, avr32::uc3::intc::GroupPriority::GROUP_03);
     }
 
     // ----- PdcaTransmit -----------------------------------------------------
