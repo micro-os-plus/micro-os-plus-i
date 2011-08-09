@@ -55,7 +55,7 @@ namespace avr32
 
       typedef class PinPeripheralFunction PinPeripheralFunction_t;
 
-      const static uint_t INTERRUPT_BASE = 64;
+      //const static uint_t INTERRUPT_BASE = 64;
 
       // ----- Port memory mapped registers -----------------------------------
 

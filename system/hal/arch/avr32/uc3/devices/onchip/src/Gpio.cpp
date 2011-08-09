@@ -80,8 +80,8 @@ namespace avr32
     {
       avr32::uc3::Intc::registerInterruptHandler(
           (intc::InterruptHandler_t) handler,
-          gpio::INTERRUPT_BASE + (m_pin / 8),
-          avr32::uc3::intc::GroupPriorities::GROUP_02);
+          Intc::computeInterruptIndex(intc::Group::GPIO, (m_pin / 8)),
+          avr32::uc3::intc::GroupPriority::GROUP_02);
     }
 
     // ---- Static methods ----------------------------------------------------
