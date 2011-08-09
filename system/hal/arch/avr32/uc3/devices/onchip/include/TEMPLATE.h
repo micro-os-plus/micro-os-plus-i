@@ -33,11 +33,33 @@ namespace avr32
 
       // ----- Public methods -------------------------------------------------
 
+      void
+      powerUp(void);
+
+      void
+      powerDown(void);
+
+      // May be called several times, if conditions change
+      void
+      initialise();
+
+      void
+      enable(void);
+
+      void
+      disable();
+
+      // Allow to reuse the same instance for another module
+      void
+      setModule(template::ModuleId_t module);
+
+      void
+      setGpioConfigurationArray(
+          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioArray);
+
       uint32_t
       getInputClockFrequencyHz(void);
 
-      void
-      initialise(template::ModuleId_t module);
 
     private:
 
@@ -45,12 +67,6 @@ namespace avr32
 
       void
       softwareReset(void);
-
-      void
-      disableInterface(void);
-
-      void
-      enableInterface(void);
 
       void
       disableAllInterrupts(void);
@@ -87,14 +103,14 @@ namespace avr32
     }
 
     inline void
-    Template::disableInterface(void)
+    Template::disable(void)
     {
       // Disable interface and disableInterface power save mode
       moduleRegisters.writeControl(0);
     }
 
     inline void
-    Template::enableInterface(void)
+    Template::enable(void)
     {
       // Enable interface and enableInterface power save
       moduleRegisters.writeControl(0);
