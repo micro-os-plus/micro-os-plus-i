@@ -57,6 +57,9 @@ namespace avr32
       setGpioConfigurationArray(
           avr32::uc3::gpio::PinPeripheralFunction_t* pGpioArray);
 
+      void
+      registerInterruptHandler(intc::InterruptHandler_t handler);
+
       uint32_t
       getInputClockFrequencyHz(void);
 
