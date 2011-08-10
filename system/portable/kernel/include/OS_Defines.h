@@ -159,6 +159,12 @@
 #define OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL  (1)
 #endif
 
+// ----- OSThreadIdle dependencies --------------------------------------------
+
+#if !defined(OS_INCLUDE_OSTHREAD_SLEEP) && defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+#define OS_INCLUDE_OSTHREAD_SLEEP                       (1)
+#endif
+
 // ----- OSDeviceCharacter dependencies ---------------------------------------
 
 #if !defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSARTBASE) && (defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART0) || defined(OS_INCLUDE_DEVICECHARACTERBUFFEREDUSART1))
