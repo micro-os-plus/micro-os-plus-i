@@ -28,6 +28,7 @@ public:
   // ----- Constructors & Destructors -----------------------------------------
 
   ChipSelectActiveLow(Gpio_t& gpio);
+  ~ChipSelectActiveLow();
 
   // ----- Public methods -----------------------------------------------------
 
@@ -53,21 +54,6 @@ private:
 };
 
 // ----- Inline methods -------------------------------------------------------
-
-inline void
-ChipSelectActiveLow::powerUp(void)
-{
-  m_gpio.configureModeGpio();
-  m_gpio.setPinHigh();
-  m_gpio.configureDirectionOutput();
-}
-
-inline void
-ChipSelectActiveLow::powerDown(void)
-{
-  m_gpio.setPinHigh();
-  m_gpio.configureDirectionInput();
-}
 
 inline void
 ChipSelectActiveLow::assert(void)

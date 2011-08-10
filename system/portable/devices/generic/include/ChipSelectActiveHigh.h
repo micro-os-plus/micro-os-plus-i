@@ -56,21 +56,6 @@ private:
 // ----- Inline methods -------------------------------------------------------
 
 inline void
-ChipSelectActiveHigh::powerUp(void)
-{
-  m_gpio.configureModeGpio();
-  m_gpio.setPinLow();
-  m_gpio.configureDirectionOutput();
-}
-
-inline void
-ChipSelectActiveHigh::powerDown(void)
-{
-  m_gpio.setPinLow();
-  m_gpio.configureDirectionInput();
-}
-
-inline void
 ChipSelectActiveHigh::assert(void)
 {
   m_gpio.setPinHigh();

@@ -18,4 +18,24 @@ ChipSelectActiveLow::ChipSelectActiveLow(Gpio_t& gpio) :
   OSDeviceDebug::putConstructor("ChipSelectActiveLow", this);
 }
 
+ChipSelectActiveLow::~ChipSelectActiveLow()
+{
+  OSDeviceDebug::putDestructor("ChipSelectActiveLow", this);
+}
+
+void
+ChipSelectActiveLow::powerUp(void)
+{
+  m_gpio.configureModeGpio();
+  m_gpio.setPinHigh();
+  m_gpio.configureDirectionOutput();
+}
+
+void
+ChipSelectActiveLow::powerDown(void)
+{
+  m_gpio.setPinHigh();
+  m_gpio.configureDirectionInput();
+}
+
 #endif /* defined(OS_INCLUDE_CHIPSELECTACTIVELOW) */
