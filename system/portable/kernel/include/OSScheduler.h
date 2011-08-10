@@ -111,7 +111,7 @@ public:
 
   // Return true if the deep sleep flag was set to true
   static bool
-  isAllowDeepSleep(void);
+  isDeepSleepAllowed(void);
   // Set the value of the deep sleep flag
   static void
   setAllowDeepSleep(bool flag);
@@ -540,7 +540,7 @@ OSScheduler::setEventWaitReturn(OSEventWaitReturn_t ret)
 
 #if !defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION)
 
-inline bool OSScheduler::isAllowDeepSleep(void)
+inline bool OSScheduler::isDeepSleepAllowed(void)
   {
     return ms_allowDeepSleep;
   }
