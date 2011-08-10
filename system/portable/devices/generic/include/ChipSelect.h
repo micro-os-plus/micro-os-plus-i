@@ -9,7 +9,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-// Interface for Chip Select implementations
+// Interface for Chip Select drivers.
 // Use it as a reference for actual implementations.
 
 class ChipSelect
