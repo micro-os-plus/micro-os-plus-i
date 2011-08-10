@@ -6,27 +6,27 @@
 
 #include "portable/kernel/include/OS_Defines.h"
 
-#if defined(OS_INCLUDE_LARGECIRCULARSTORAGE)
+#if defined(OS_INCLUDE_LARGECIRCULARSESSIONSSTORAGE)
 
-#include "portable/misc/include/LargeCircularStorage.h"
+#include "portable/misc/include/LargeCircularSessionsStorage.h"
 
 // ----------------------------------------------------------------------------
 
-LargeCircularStorageWriter::LargeCircularStorageWriter(OSDeviceBlock& device) :
+LargeCircularSessionsStorageWriter::LargeCircularSessionsStorageWriter(OSDeviceBlock& device) :
   m_storage(device)
 {
-  debug.putConstructor_P(PSTR("LargeCircularStorage"), this);
+  debug.putConstructor_P(PSTR("LargeCircularSessionsStorageWriter"), this);
 
   m_blockSizeBlocks = 1;
 }
 
-LargeCircularStorageWriter::~LargeCircularStorageWriter()
+LargeCircularSessionsStorageWriter::~LargeCircularSessionsStorageWriter()
 {
-  debug.putDestructor_P(PSTR("LargeCircularStorage"), this);
+  debug.putDestructor_P(PSTR("LargeCircularSessionsStorageWriter"), this);
 }
 
 OSReturn_t
-LargeCircularStorageWriter::createSession(SessionUniqueId_t sessionUniqueId)
+LargeCircularSessionsStorageWriter::createSession(SessionUniqueId_t sessionUniqueId)
 {
   if (sessionUniqueId == 0)
     {
@@ -48,7 +48,7 @@ LargeCircularStorageWriter::createSession(SessionUniqueId_t sessionUniqueId)
 }
 
 OSReturn_t
-LargeCircularStorageWriter::closeSession(void)
+LargeCircularSessionsStorageWriter::closeSession(void)
 {
   m_sessionUniqueId = 0;
 
@@ -56,7 +56,7 @@ LargeCircularStorageWriter::closeSession(void)
 }
 
 OSReturn_t
-LargeCircularStorageWriter::writeSessionBlock(uint8_t* pBuf)
+LargeCircularSessionsStorageWriter::writeSessionBlock(uint8_t* pBuf)
 {
   if (m_sessionUniqueId == 0)
     {
@@ -134,4 +134,4 @@ LargeCircularStorageWriter::writeSessionBlock(uint8_t* pBuf)
 
 // ----------------------------------------------------------------------------
 
-#endif /* defined(OS_INCLUDE_LARGECIRCULARSTORAGE) */
+#endif /* defined(OS_INCLUDE_LARGECIRCULARSESSIONSSTORAGE) */

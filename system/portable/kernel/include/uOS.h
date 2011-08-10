@@ -119,9 +119,9 @@
 
 // -----
 
-#if defined(OS_INCLUDE_LARGECIRCULARSTORAGE)
-#include "portable/misc/include/LargeCircularStorage.h"
-#endif
+//#if defined(OS_INCLUDE_LARGECIRCULARSESSIONSSTORAGE)
+//#include "portable/misc/include/LargeCircularStorage.h"
+//#endif
 
 // -----
 

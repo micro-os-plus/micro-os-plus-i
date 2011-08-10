@@ -4,14 +4,14 @@
  *      This file is part of the uOS++ distribution.
  */
 
-#ifndef LARGECIRCULARSTORAGE_H_
-#define LARGECIRCULARSTORAGE_H_
+#ifndef LARGECIRCULARSESSIONSSTORAGE_H_
+#define LARGECIRCULARSESSIONSSTORAGE_H_
 
 #include "portable/kernel/include/uOS.h"
 
 // ----------------------------------------------------------------------------
 
-class LargeCircularStorageWriter
+class LargeCircularSessionsStorageWriter
 {
 public:
 #if defined(OS_INCLUDE_LARGECIRCULARSTORAGE_LARGE_SESSIONID)
@@ -22,8 +22,8 @@ public:
 
   typedef uint32_t BlockUniqueId_t;
 
-  LargeCircularStorageWriter(OSDeviceBlock& storage);
-  ~LargeCircularStorageWriter();
+  LargeCircularSessionsStorageWriter(OSDeviceBlock& storage);
+  ~LargeCircularSessionsStorageWriter();
 
   OSReturn_t
   createSession(SessionUniqueId_t sessionId);
@@ -65,31 +65,31 @@ private:
 };
 
 inline uint_t
-LargeCircularStorageWriter::getReservedHeaderSize(void)
+LargeCircularSessionsStorageWriter::getReservedHeaderSize(void)
 {
   return sizeof(SessionUniqueId_t) + sizeof(OSDeviceBlock::BlockNumber_t)
       + sizeof(BlockUniqueId_t);
 }
 
 inline OSDeviceBlock&
-LargeCircularStorageWriter::getStorage(void)
+LargeCircularSessionsStorageWriter::getStorage(void)
 {
   return m_storage;
 }
 
 inline void
-LargeCircularStorageWriter::setSessionBlockSizeBlocks(
+LargeCircularSessionsStorageWriter::setSessionBlockSizeBlocks(
     OSDeviceBlock::BlockSize_t blockSizeBlocks)
 {
   m_blockSizeBlocks = blockSizeBlocks;
 }
 
 inline OSDeviceBlock::BlockSize_t
-LargeCircularStorageWriter::getSessionlBlockSizeBlocks(void)
+LargeCircularSessionsStorageWriter::getSessionlBlockSizeBlocks(void)
 {
   return m_blockSizeBlocks;
 }
 
 // ----------------------------------------------------------------------------
 
-#endif /* LARGECIRCULARSTORAGE_H_ */
+#endif /* LARGECIRCULARSESSIONSSTORAGE_H_ */
