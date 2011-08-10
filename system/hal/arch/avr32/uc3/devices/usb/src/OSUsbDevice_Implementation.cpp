@@ -296,6 +296,10 @@ OSUsbDeviceImpl::usbDriverInit(void)
       OSUsbDeviceImpl::Usb_unfreeze_clock();
       (void) Is_usb_clock_frozen();
 
+      // Disable SOF interrupt.
+      AVR32_usb_disable_sof_interrupt();
+
+      // Enable VBUS interrupt.
       OSUsbDeviceImpl::Usb_enable_vbus_interrupt();
 
       OSUsbDeviceImpl::Usb_ack_suspend(); // A suspend condition may be detected right after enabling the USB macro

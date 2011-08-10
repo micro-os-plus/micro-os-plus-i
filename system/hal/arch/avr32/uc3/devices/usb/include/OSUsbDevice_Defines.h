@@ -211,6 +211,10 @@
 #define AVR32_usb_attach()                              (Clr_bits(AVR32_USBB_udcon, AVR32_USBB_UDCON_DETACH_MASK))
 //! tests if Start-of-Frame occurs
 #define AVR32_is_usb_sof()                              (Tst_bits(AVR32_USBB_udint, AVR32_USBB_UDINT_SOF_MASK))
+  //! enables Start-of-Frame Interrupt
+#define AVR32_usb_enable_sof_interrupt()                (AVR32_USBB_udinteset = AVR32_USBB_UDINTESET_SOFES_MASK)
+  //! disables Start-of-Frame Interrupt
+#define AVR32_usb_disable_sof_interrupt()               (AVR32_USBB_udinteclr = AVR32_USBB_UDINTECLR_SOFEC_MASK)
 #define AVR32_is_usb_sof_interrupt_enabled()            (Tst_bits(AVR32_USBB_udinte, AVR32_USBB_UDINTE_SOFE_MASK))
 //! acks Start-of-Frame
 #define AVR32_usb_ack_sof()                             (AVR32_USBB_udintclr = AVR32_USBB_UDINTCLR_SOFC_MASK)
