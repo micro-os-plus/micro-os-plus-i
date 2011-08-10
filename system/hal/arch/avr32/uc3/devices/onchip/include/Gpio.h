@@ -48,6 +48,8 @@ namespace avr32
 
       bool
       isPinHigh(void);
+      bool
+      isPinLow(void);
 
       void
       configureDirectionOutput(void);
@@ -179,6 +181,12 @@ namespace avr32
     Gpio::isPinHigh(void)
     {
       return ((portRegisters.pvr & m_mask) != 0);
+    }
+
+    inline bool
+    Gpio::isPinLow(void)
+    {
+      return ((portRegisters.pvr & m_mask) == 0);
     }
 
     inline void
