@@ -61,7 +61,7 @@ OSThreadIdle::enterSleep(void)
 
 #else /* !defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
 
-  bIsDeepSleepAllowed = OSScheduler::isAllowDeepSleep();
+  bIsDeepSleepAllowed = OSScheduler::isDeepSleepAllowed();
 
 #endif /* defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
 
@@ -74,6 +74,7 @@ OSThreadIdle::enterSleep(void)
 
       // If any thread requests to prevent deep sleep, return
 #if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
+
       if (!pThread->getCpuSleepCriticalSection().isSleepAllowed())
         return false;
 
@@ -85,8 +86,10 @@ OSThreadIdle::enterSleep(void)
 #endif /* defined(OS_INCLUDE_OSCPUDEEPSLEEPCRITICALSECTION) */
 
 #else
+
       if (!pThread->isSleepAllowed())
         return false;
+
 #endif
     }
 
