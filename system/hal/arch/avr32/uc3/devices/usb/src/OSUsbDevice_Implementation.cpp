@@ -297,7 +297,7 @@ OSUsbDeviceImpl::usbDriverInit(void)
       (void) Is_usb_clock_frozen();
 
       // Disable SOF interrupt.
-      AVR32_usb_disable_sof_interrupt();
+      //AVR32_usb_disable_sof_interrupt();
 
       // Enable VBUS interrupt.
       OSUsbDeviceImpl::Usb_enable_vbus_interrupt();
@@ -387,8 +387,10 @@ OSUsbDeviceImpl::usb_start_device(void)
 {
   Usb_unfreeze_clock();
   (void) Is_usb_clock_frozen();
+#if true
   // enable Start of Frame Interrupt
   AVR32_usb_enable_sof_interrupt();
+#endif
   // enable End of Reset Interrupt
   Usb_enable_reset_interrupt();
   // enable suspend state interrupt
