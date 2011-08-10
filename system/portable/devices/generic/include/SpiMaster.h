@@ -9,7 +9,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-// Interface for SPI Master implementations
+// Interface for SPI Master drivers.
 // Use it as a reference for actual implementations.
 
 class SpiMaster
@@ -46,6 +46,7 @@ public:
   virtual uint8_t
   writeWaitReadByte(uint8_t value) = 0;
 
+  // This one is optional, by default should call the byte method.
   virtual uint16_t
   writeWaitReadWord(uint16_t value) = 0;
 
