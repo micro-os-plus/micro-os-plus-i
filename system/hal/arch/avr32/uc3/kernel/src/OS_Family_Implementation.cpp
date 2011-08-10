@@ -96,6 +96,8 @@ OSImpl::familyEarlyInit(void)
 
   OSDeviceDebug::putString("DID=");
   OSDeviceDebug::putHex((unsigned long) __builtin_mfdr(0));
+  OSDeviceDebug::putString(" rev. ");
+  OSDeviceDebug::putChar('A'+(unsigned char)(((unsigned long) __builtin_mfdr(0)) >> 28));
   OSDeviceDebug::putNewLine();
 
   OSDeviceDebug::putString("UID=");
