@@ -141,7 +141,7 @@ OSCPUImpl::sleep(void)
 {
   asm volatile
   (
-      " sleep 0 \n" /* TODO: updated it!!! */
+      " sleep 2 \n" // Standby, OSC & PLL still running
 
       :
       :
@@ -154,7 +154,7 @@ OSCPUImpl::deepSleep(void)
 {
   asm volatile
   (
-      " sleep 0 \n" /* TODO: updated it!!! */
+      " sleep 3 \n" // Stop, only OSC32 & BOD
 
       :
       :
