@@ -10,6 +10,18 @@
 #include "portable/kernel/include/uOS.h"
 
 // ----------------------------------------------------------------------------
+//
+// These classes handle the management of sessions on a large block storage,
+// used in a circular manner. Sessions are ordered sets of data, grouped
+// by a common id, usually representing the absolute session start time.
+// Large storage means a device with a very large number of blocks, like
+// a memory card.
+//
+// The intended applications are data loggers.
+//
+// These classes require a generic OSDeviceBlock device for storage.
+//
+// ----------------------------------------------------------------------------
 
 class LargeCircularSessionsStorageWriter
 {
