@@ -36,7 +36,7 @@ public:
   exit(void);
 
   bool
-  isSleepAllowed(void) __attribute__((always_inline));
+  isSleepAllowed(void);
 
 private:
   uint8_t m_count;
