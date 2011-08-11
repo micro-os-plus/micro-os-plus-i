@@ -205,9 +205,10 @@ namespace avr32
     void
     Pdca::registerInterruptHandler(avr32::uc3::intc::InterruptHandler_t handler)
     {
+      // TODO: update automatically compute interrupt index
       avr32::uc3::Intc::registerInterruptHandler(
           (intc::InterruptHandler_t) handler, pdca::INTERRUPT_BASE
-              + m_channelId, avr32::uc3::intc::GroupPriority::GROUP_03);
+              + m_channelId, avr32::uc3::intc::GroupPriority::PDCA);
     }
 
     // ----- PdcaTransmit -----------------------------------------------------
