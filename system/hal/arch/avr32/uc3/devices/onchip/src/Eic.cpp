@@ -52,8 +52,8 @@ namespace avr32
 
       if (m_pGpioConfigurationArray != NULL)
         {
-          avr32::uc3::Gpio::configPeripheralModeAndFunction
-              ( m_pGpioConfigurationArray);
+          avr32::uc3::Gpio::configPeripheralModeAndFunction(
+              m_pGpioConfigurationArray);
         }
     }
 
@@ -65,7 +65,7 @@ namespace avr32
 
       if (m_pGpioConfigurationArray != NULL)
         {
-          avr32::uc3::Gpio::configGpioModeInput( m_pGpioConfigurationArray);
+          avr32::uc3::Gpio::configGpioModeInput(m_pGpioConfigurationArray);
         }
     }
 
@@ -218,10 +218,14 @@ namespace avr32
     {
       if (m_id != eic::InterruptId::NMI)
         {
-          // for this group, the interrupt line is identical to m_id
-          Intc::registerInterruptHandler(handler,
-              Intc::computeInterruptIndex(intc::Group::EIC, m_id),
-              intc::GroupPriority::GROUP_01);
+          OSCriticalSection::enter();
+            {
+              // for this group, the interrupt line is identical to m_id
+              Intc::registerInterruptHandler(handler,
+                  Intc::computeInterruptIndex(intc::Group::EIC, m_id),
+                  intc::GroupPriority::EIC);
+            }
+          OSCriticalSection::exit();
         }
       else
         {
