@@ -26,17 +26,17 @@ public:
   // Read exactly count blocks, in the given buffer.
   virtual OSReturn_t
   readBlocks(OSDeviceBlock::BlockNumber_t blockNumber, uint8_t* pBuf,
-      OSDeviceBlock::BlockCount_t count);
+      OSDeviceBlock::BlockCount_t blockCount);
 
   // Write the count blocks, from the given buffer.
   virtual OSReturn_t
   writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber, uint8_t* pBuf,
-      OSDeviceBlock::BlockCount_t count);
+      OSDeviceBlock::BlockCount_t blockCount);
 
   // Erase part of the device.
   virtual OSReturn_t
   eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
-      OSDeviceBlock::BlockCount_t count);
+      OSDeviceBlock::BlockCount_t blockCount);
 
   // Return the full size, in blocks, of the device.
   virtual OSDeviceBlock::BlockNumber_t
@@ -62,7 +62,7 @@ private:
 
   // Both offset and size are in blocks.
   OSDeviceBlock::BlockNumber_t m_partitionOffset;
-  OSDeviceBlock::BlockNumber_t m_partitionSize;
+  OSDeviceBlock::BlockNumber_t m_partitionSizeBlocks;
 
   // --------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ OSDeviceBlockPartition::getPartitionOffset(void)
 inline OSDeviceBlock::BlockNumber_t
 OSDeviceBlockPartition::getPartitionSize(void)
 {
-  return m_partitionSize;
+  return m_partitionSizeBlocks;
 }
 
 #endif /* OSDEVICEADDRESSABLEPARTITION_H_ */
