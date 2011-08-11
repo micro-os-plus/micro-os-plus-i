@@ -81,7 +81,7 @@ namespace avr32
       avr32::uc3::Intc::registerInterruptHandler(
           (intc::InterruptHandler_t) handler,
           Intc::computeInterruptIndex(intc::Group::GPIO, (m_pin / 8)),
-          avr32::uc3::intc::GroupPriority::GROUP_02);
+          avr32::uc3::intc::GroupPriority::GPIO);
     }
 
     // ---- Static methods ----------------------------------------------------
@@ -102,7 +102,7 @@ namespace avr32
     Gpio::configPeripheralModeAndFunction(
         gpio::PinPeripheralFunction_t* pPinFunctionArray)
     {
-      while (pPinFunctionArray->pin != gpio::ILLEGAL_PIN_NUMBER)
+      while (pPinFunctionArray->pin != gpio::NOT_A_PIN)
         {
           configPeripheralModeAndFunction(pPinFunctionArray->pin,
               pPinFunctionArray->function);
@@ -124,7 +124,7 @@ namespace avr32
     void
     Gpio::configGpioModeInput(gpio::PinPeripheralFunction_t* pPinFunctionArray)
     {
-      while (pPinFunctionArray->pin != gpio::ILLEGAL_PIN_NUMBER)
+      while (pPinFunctionArray->pin != gpio::NOT_A_PIN)
         {
           configGpioModeInput(pPinFunctionArray->pin);
           pPinFunctionArray++;
