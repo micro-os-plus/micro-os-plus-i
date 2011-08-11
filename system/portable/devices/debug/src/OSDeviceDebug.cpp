@@ -224,7 +224,6 @@ OSDeviceDebug::putHex(uint16_t w)
   criticalExit(mask);
 }
 
-#if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG)
 void
 OSDeviceDebug::putHex(uint32_t l)
 {
@@ -269,57 +268,17 @@ OSDeviceDebug::putHex(uint32_t l)
   criticalExit(mask);
 }
 
-#endif
-
-#if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT)
-
 // TODO: maybe differentiate between 2 and 4 bytes int
 
 void
-OSDeviceDebug::putHex(uint_t l)
+OSDeviceDebug::putHex(uint_t i)
 {
-  unsigned char c;
-  unsigned char b;
-  unsigned char buff[8];
-
-  b = (l >> 24);
-  c = ((b >> 4) & 0x0F);
-  buff[0] = c < 10 ? c + '0' : c + 'A' - 10;
-
-  c = (b & 0x0F);
-  buff[1] = c < 10 ? c + '0' : c + 'A' - 10;
-
-  b = (l >> 16);
-  c = ((b >> 4) & 0x0F);
-  buff[2] = c < 10 ? c + '0' : c + 'A' - 10;
-
-  c = (b & 0x0F);
-  buff[3] = c < 10 ? c + '0' : c + 'A' - 10;
-
-  b = (l >> 8);
-  c = ((b >> 4) & 0x0F);
-  buff[4] = c < 10 ? c + '0' : c + 'A' - 10;
-
-  c = (b & 0x0F);
-  buff[5] = c < 10 ? c + '0' : c + 'A' - 10;
-
-  b = (l & 0xFF);
-  c = ((b >> 4) & 0x0F);
-  buff[6] = c < 10 ? c + '0' : c + 'A' - 10;
-
-  c = (b & 0x0F);
-  buff[7] = c < 10 ? c + '0' : c + 'A' - 10;
-
-  register OSStack_t mask;
-
-  mask = criticalEnter();
-    {
-      commonPutBytes((const char*) buff, sizeof(buff));
-    }
-  criticalExit(mask);
-}
-
+#if (__SIZEOF_INT__ == 2)
+  putHex((uint16_t)i);
+#else
+  putHex((uint32_t)i);
 #endif
+}
 
 void
 OSDeviceDebug::putPC(const char* PROGMEM pc)
@@ -440,6 +399,12 @@ OSDeviceDebug::putPtr(const void* p)
 }
 
 void
+OSDeviceDebug::putDec(uint8_t b, uint16_t n)
+{
+  putDec((uint16_t)b, n);
+}
+
+void
 OSDeviceDebug::putDec(uint16_t w, uint16_t n)
 {
   int i;
@@ -470,8 +435,6 @@ OSDeviceDebug::putDec(uint16_t w, uint16_t n)
       criticalExit(mask);
     }
 }
-
-#if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
 
 void
 OSDeviceDebug::putDec(uint32_t w, uint16_t n)
@@ -504,7 +467,16 @@ OSDeviceDebug::putDec(uint32_t w, uint16_t n)
       criticalExit(mask);
     }
 }
-#endif /* OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG */
+
+void
+OSDeviceDebug::putDec(uint_t i, uint16_t n)
+{
+#if (__SIZEOF_INT__ == 2)
+  putDec((uint16_t)i, n);
+#else
+  putDec((uint32_t)i, n);
+#endif
+}
 
 #undef assert
 

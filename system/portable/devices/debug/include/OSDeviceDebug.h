@@ -91,28 +91,36 @@ public:
   static void
   putHex(uint16_t w);
 
-#if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG)
   // Output, on debug interface, the hex value of a long;
   // i.e. 8 hexadecimal characters.
   static void
   putHex(uint32_t l);
-#endif
-#if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT)
+
   // Output, on debug interface, the hex value of an integer;
   // i.e. 8 hexadecimal characters.
   static void
-  putHex(uint_t l);
-#endif
+  putHex(uint_t i);
+
+  // Output, on debug interface, the decimal value of a 1-byte,
+  // <n> last digits will not be output, max 3 decimal digits.
+  static void
+  putDec(uint8_t b, uint16_t n = 0);
+
   // Output, on debug interface, the decimal value of a 2-byte word,
   // <n> last digits will not be output, max 5 decimal digits.
   static void
   putDec(uint16_t w, uint16_t n = 0);
-#if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
+
   // Output, on debug interface, the decimal value of a short
   // <n> last digits will not be output, max 10 decimal digits.
   static void
   putDec(uint32_t l, uint16_t n = 0);
-#endif
+
+  // Output, on debug interface, the decimal value of an int
+  // <n> last digits will not be output, max 10 decimal digits.
+  static void
+  putDec(uint_t i, uint16_t n = 0);
+
   // Output, on debug interface, the address p, in hexadecimal.
   static void
   putPtr(const void* p);
