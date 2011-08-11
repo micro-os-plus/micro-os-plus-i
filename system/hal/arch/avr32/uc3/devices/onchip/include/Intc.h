@@ -33,54 +33,45 @@ namespace avr32
       {
       public:
         // CPU
-        static const Priority_t GROUP_00 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP00_PRIORITY;
+        static const Priority_t CPU = OS_CFGINT_AVR32_UC3_INTC_GROUP00_PRIORITY;
         // EINT, RTC, PWR
-        static const Priority_t GROUP_01 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP01_PRIORITY;
+        static const Priority_t EIC = OS_CFGINT_AVR32_UC3_INTC_GROUP01_PRIORITY;
         // GPIO00-13
-        static const Priority_t GROUP_02 =
+        static const Priority_t GPIO =
             OS_CFGINT_AVR32_UC3_INTC_GROUP02_PRIORITY;
         // PDMA0-7
-        static const Priority_t GROUP_03 =
+        static const Priority_t PDCA =
             OS_CFGINT_AVR32_UC3_INTC_GROUP03_PRIORITY;
-        static const Priority_t GROUP_04 =
+        static const Priority_t FLASHC =
             OS_CFGINT_AVR32_UC3_INTC_GROUP04_PRIORITY;
-        static const Priority_t GROUP_05 =
+        static const Priority_t USART0 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP05_PRIORITY;
-        static const Priority_t GROUP_06 =
+        static const Priority_t USART1 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP06_PRIORITY;
-        static const Priority_t GROUP_07 =
+        static const Priority_t USART2 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP07_PRIORITY;
-        static const Priority_t GROUP_08 =
+        static const Priority_t USART3 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP08_PRIORITY;
-        static const Priority_t GROUP_09 =
+        static const Priority_t SPI0 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP09_PRIORITY;
-        static const Priority_t GROUP_10 =
+        static const Priority_t SPI1 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP10_PRIORITY;
-        static const Priority_t GROUP_11 =
+        static const Priority_t TWIM0 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP11_PRIORITY;
-        static const Priority_t GROUP_12 =
+        static const Priority_t TWIM1 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP12_PRIORITY;
-        static const Priority_t GROUP_13 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP13_PRIORITY;
-        static const Priority_t GROUP_14 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP14_PRIORITY;
-        static const Priority_t GROUP_15 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP15_PRIORITY;
-        static const Priority_t GROUP_16 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP16_PRIORITY;
-        static const Priority_t GROUP_17 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP17_PRIORITY;
-        static const Priority_t GROUP_18 =
+        static const Priority_t SSC = OS_CFGINT_AVR32_UC3_INTC_GROUP13_PRIORITY;
+        static const Priority_t TC0 = OS_CFGINT_AVR32_UC3_INTC_GROUP14_PRIORITY;
+        static const Priority_t ADC = OS_CFGINT_AVR32_UC3_INTC_GROUP15_PRIORITY;
+        static const Priority_t TC1 = OS_CFGINT_AVR32_UC3_INTC_GROUP16_PRIORITY;
+        static const Priority_t USB = OS_CFGINT_AVR32_UC3_INTC_GROUP17_PRIORITY;
+        static const Priority_t SDRAMC =
             OS_CFGINT_AVR32_UC3_INTC_GROUP18_PRIORITY;
-        static const Priority_t GROUP_19 =
+        static const Priority_t ABDAC =
             OS_CFGINT_AVR32_UC3_INTC_GROUP19_PRIORITY;
-        static const Priority_t GROUP_20 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP20_PRIORITY;
-        static const Priority_t GROUP_21 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP21_PRIORITY;
-        static const Priority_t GROUP_22 =
+        static const Priority_t MCI = OS_CFGINT_AVR32_UC3_INTC_GROUP20_PRIORITY;
+        static const Priority_t AES = OS_CFGINT_AVR32_UC3_INTC_GROUP21_PRIORITY;
+        static const Priority_t DMACA =
             OS_CFGINT_AVR32_UC3_INTC_GROUP22_PRIORITY;
         static const Priority_t GROUP_23 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP23_PRIORITY;
@@ -88,27 +79,18 @@ namespace avr32
             OS_CFGINT_AVR32_UC3_INTC_GROUP24_PRIORITY;
         static const Priority_t GROUP_25 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP25_PRIORITY;
-        static const Priority_t GROUP_26 =
-            OS_CFGINT_AVR32_UC3_INTC_GROUP26_PRIORITY;
-        static const Priority_t GROUP_27 =
+        static const Priority_t MSI = OS_CFGINT_AVR32_UC3_INTC_GROUP26_PRIORITY;
+        static const Priority_t TWIS0 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP27_PRIORITY;
-        static const Priority_t GROUP_28 =
+        static const Priority_t TWIS1 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP28_PRIORITY;
-        static const Priority_t GROUP_29 =
+        static const Priority_t ECCHRS =
             OS_CFGINT_AVR32_UC3_INTC_GROUP29_PRIORITY;
       };
 
       typedef uint_t InterruptIndex_t;
 
-      class InterruptIndex
-      {
-      public:
-        // Interrupt index is (Group * 32 + Line) in Table 10-2, page 104
-        const static InterruptIndex_t EIC0 = 1 * 32 + 0;
-        const static InterruptIndex_t EIC1 = 1 * 32 + 1;
-        const static InterruptIndex_t EIC2 = 1 * 32 + 2;
-        const static InterruptIndex_t EIC3 = 1 * 32 + 3;
-      };
+      // Interrupt index is (Group * 32 + Line) in Table 10-2, page 104
 
       typedef uint8_t Group_t;
 
