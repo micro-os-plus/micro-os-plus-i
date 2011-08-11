@@ -23,7 +23,7 @@ namespace avr32
 
       typedef uint8_t PinNumber_t;
 
-      const static PinNumber_t ILLEGAL_PIN_NUMBER = 0xFF;
+      const static PinNumber_t NOT_A_PIN = 0xFF;
 
       typedef uint8_t PeripheralFunction_t;
 
@@ -53,7 +53,7 @@ namespace avr32
         PeripheralFunction_t function;
       };
 
-      typedef class PinPeripheralFunction PinPeripheralFunction_t;
+      typedef const class PinPeripheralFunction PinPeripheralFunction_t;
 
       //const static uint_t INTERRUPT_BASE = 64;
 
