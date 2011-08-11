@@ -49,14 +49,19 @@ namespace avr32
 
         regWriteOnly_t cr; //0x0000
         regReadWrite_t mr; //0x0004
+
+        regReadOnly_t rhr; // 0x0010
+        regWriteOnly_t thr; //0x0008
+        regReadOnly_t sr; // 0x0010
+
         regWriteOnly_t ier; //0x0008
         regWriteOnly_t idr; //0x000C
-
         regReadOnly_t imr; // 0x0010
-
 
         regNotAllocated_t
             dummy38[(0x0040 - 0x0038) / sizeof(regNotAllocated_t)]; //0x0038-0x003C
+
+        regReadOnly_t vr; // 0x0034
 
 
         // ----- Methods ------------------------------------------------------
