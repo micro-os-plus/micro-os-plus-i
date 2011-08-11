@@ -24,16 +24,16 @@ class OSCpuSleepCriticalSection
 {
 public:
   uint8_t
-  clear(void) __attribute__((always_inline));
+  clear(void);
 
   uint8_t
-  set(bool flag = true) __attribute__((always_inline));
+  set(bool flag = true);
 
   void
-  enter(void) __attribute__((always_inline));
+  enter(void);
 
   void
-  exit(void) __attribute__((always_inline));
+  exit(void);
 
   bool
   isSleepAllowed(void) __attribute__((always_inline));
