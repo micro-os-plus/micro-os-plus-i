@@ -10,7 +10,27 @@
 #include "portable/kernel/include/OS.h"
 
 #include "hal/arch/avr32/uc3/devices/onchip/include/Template_Definitions.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Intc.h"
 
+/*
+ * Template for device drivers.
+ *
+ * Usage:
+ *      new Template(moduleId);
+ *      setGpioConfigurationArray(...);
+ *      ...
+ *      powerUp();
+ *      initialise();
+ *      registerInterruptHandler(...);
+ *      [ configureClockFrequencyHz(...) ] - optional
+ *      enable();
+ *      ...
+ *      ...
+ *      disable();
+ *      powerDown();
+ *
+ */
 namespace avr32
 {
   namespace uc3
@@ -18,6 +38,7 @@ namespace avr32
     class Template
     {
     public:
+
       // ----- Type definitions -----------------------------------------------
 
       typedef uint32_t ClockFrequencyHz_t;
@@ -26,7 +47,7 @@ namespace avr32
 
       // ----- Constructors & Destructors -------------------------------------
 
-      Template(template::ModuleId_t module);
+      Template(TEMPLATE::ModuleId_t module);
       ~Template();
 
     public:
@@ -40,8 +61,8 @@ namespace avr32
       powerDown(void);
 
       // May be called several times, if conditions change
-      void
-      initialise();
+      OSReturn_t
+      initialise(void);
 
       void
       enable(void);
@@ -49,13 +70,12 @@ namespace avr32
       void
       disable();
 
-      // Allow to reuse the same instance for another module
-      void
-      setModule(template::ModuleId_t module);
+      OSReturn_t
+       configureClockFrequencyHz(ClockFrequencyHz_t speed);
 
       void
       setGpioConfigurationArray(
-          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioArray);
+          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray);
 
       void
       registerInterruptHandler(intc::InterruptHandler_t handler);
@@ -84,7 +104,7 @@ namespace avr32
 
       // ----- Private members ------------------------------------------------
 
-      //template::StatusRegister_t m_shadowStatusRegister;
+      avr32::uc3::gpio::PinPeripheralFunction_t* m_pGpioConfigurationArray;
 
       // ----------------------------------------------------------------------
     };
@@ -94,6 +114,8 @@ namespace avr32
     inline uint32_t
     Template::getInputClockFrequencyHz(void)
     {
+      // TODO: use the appropriate one
+
       //return OS_CFGLONG_PBA_FREQUENCY_HZ;
       return OS_CFGLONG_PBB_FREQUENCY_HZ;
     }
@@ -102,27 +124,34 @@ namespace avr32
     Template::softwareReset(void)
     {
       // Reset interface
-      moduleRegisters.writeControl(0);
+      moduleRegisters.writeControl(0); // TODO: update
     }
 
     inline void
     Template::disable(void)
     {
-      // Disable interface and disableInterface power save mode
-      moduleRegisters.writeControl(0);
+      // Disable interface
+      moduleRegisters.writeControl(0); // TODO: update
     }
 
     inline void
     Template::enable(void)
     {
-      // Enable interface and enableInterface power save
-      moduleRegisters.writeControl(0);
+      // Enable interface
+      moduleRegisters.writeControl(0); // TODO: update
     }
 
     inline void
     Template::disableAllInterrupts(void)
     {
-      moduleRegisters.writeInterruptDisable(0xFFFFFFFF);
+      moduleRegisters.writeInterruptDisable(~0);
+    }
+
+    inline void
+    Template::setGpioConfigurationArray(
+        avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray)
+    {
+      m_pGpioConfigurationArray = pGpioConfigurationArray;
     }
 
     // ------------------------------------------------------------------------
