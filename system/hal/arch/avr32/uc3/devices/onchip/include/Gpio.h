@@ -121,8 +121,7 @@ namespace avr32
           gpio::PinPeripheralFunction_t* pPinFunctionArray);
 
       static void
-      configGpioModeInput(
-          gpio::PinPeripheralFunction_t* pPinFunctionArray);
+      configGpioModeInput(gpio::PinPeripheralFunction_t* pPinFunctionArray);
 
     public:
       volatile gpio::PortRegisters& portRegisters;
