@@ -26,7 +26,7 @@ public:
   static const OSReturn_t OS_TOO_LONG = -9;
   static const OSReturn_t OS_ILLEGAL_CHARACTER = -10;
   static const OSReturn_t OS_BAD_CHECKSUM = -11;
-  static const OSReturn_t OS_NOT_INITIALIZED = -12;
+  static const OSReturn_t OS_NOT_INITIALISED = -12;
   static const OSReturn_t OS_BAD_PARAMETER = -13;
   static const OSReturn_t OS_BUFFER_FULL = -14;
   static const OSReturn_t OS_IMMEDIATELY = -15;
@@ -43,6 +43,8 @@ public:
   static const OSReturn_t OS_SIZE_EXCEEDED = -26;
   static const OSReturn_t OS_CANCELLED = -27;
   static const OSReturn_t OS_IGNORED = -28;
+  static const OSReturn_t OS_NACK = -29;
+  static const OSReturn_t OS_EMPTY_STRING = -30;
 };
 
 // ----------------------------------------------------------------------------
