@@ -11,16 +11,16 @@ class ASCII
 {
 
 public:
-  static const unsigned char STX = 0x02;
-  static const unsigned char ETX = 0x03;
+  const static uchar_t STX = 0x02;
+  const static uchar_t ETX = 0x03;
 
-  static const unsigned char BELL = 0x07;
+  const static uchar_t BELL = 0x07;
 
-  static const unsigned char LF = 0x0A;
-  static const unsigned char CR = 0x0D;
+  const static uchar_t LF = 0x0A;
+  const static uchar_t CR = 0x0D;
 
   const static uchar_t ESC = 0x1B;
-
+  const static uchar_t DEL = 0x7F;
 };
 
 #endif /* ASCII_H_ */
