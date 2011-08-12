@@ -246,14 +246,15 @@ CommandLineInterface::readLine()
                   break;
                 }
 
-              // Check Backspace
-              if (c == '\b')
+              // Check Backspace or DEL
+              if (c == '\b' || c == ASCII::DEL)
                 {
                   if (lineLength > 1)
                     {
-                      cout.put(c);
+                      // Delete previous character
+                      cout.put('\b');
                       cout.put(' ');
-                      cout.put(c);
+                      cout.put('\b');
 
                       *--m_pHistoryCurrentPosition = '\0';
                       --lineLength;
@@ -359,7 +360,7 @@ CommandLineInterface::updateCurrentFromHistory(uchar_t* pCurrent)
 #endif /* defined(OS_DEBUG_COMMANDLINEINTERFACE_READLINE_HISTORY) */
 
   // Compute length of the desired command, excluding terminator
-  len = strlen((const char*)pCurrent);
+  len = strlen((const char*) pCurrent);
 
   // Do we have enough space at the end?
   if (m_pHistoryLineBeginning + len + 1 < m_pHistory + m_iHistorySizeBytes)
@@ -398,8 +399,9 @@ CommandLineInterface::processLine()
   OSDeviceDebug::putNewLine();
 
   parser.setInput(m_pHistoryLineBeginning + 1);
-  parser.setSeparators((unsigned char*) " ");
-  parser.setToken(m_token, sizeof(m_token));
+  parser.setSeparators(" ");
+  parser.setSpaces(" "); // used to ignore multiple spaces
+  parser.setTokenBuffer(m_token, sizeof(m_token));
 
   OSReturn_t ret;
   ret = recurse((Token_t*) m_pToken);
@@ -421,7 +423,7 @@ CommandLineInterface::recurse(Token_t* pIn)
 {
   Parser& parser = m_parser;
 
-  parser.parseToken();
+  parser.parseNextToken();
 
   if (parser.getTokenLength() == 0)
     return OSReturn::OS_BAD_COMMAND; // no token
@@ -431,7 +433,7 @@ CommandLineInterface::recurse(Token_t* pIn)
   p = pIn;
   while (p->pString != 0)
     {
-      if (parser.tokenCompare((const unsigned char*) p->pString) == 0)
+      if (parser.compareStringWithToken((const char*) p->pString) == 0)
         {
           if (p->pDown != 0)
             return recurse(p->pDown);
@@ -454,7 +456,7 @@ CommandLineInterface::recurse(Token_t* pIn)
       for (cnt = 0; p->pString != 0; ++p)
         {
           // Check if the parameter starts with the parsed token
-          if (parser.doesStringStartWithToken((const unsigned char*) p->pString))
+          if (parser.doesStringStartWithToken((const char*) p->pString))
             {
               pMatched = p;
               ++cnt;
