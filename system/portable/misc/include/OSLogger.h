@@ -20,19 +20,19 @@ typedef int logCode_t;
 class OSLogLevel
 {
 public:
-  static const logLevel_t OS_OFF = 0;
+  const static logLevel_t OS_OFF = 0;
 
-  static const logLevel_t OS_FATAL = 10;
-  static const logLevel_t OS_ERROR = 20;
-  static const logLevel_t OS_WARNING = 30;
-  static const logLevel_t OS_INFO = 40;
+  const static logLevel_t OS_FATAL = 10;
+  const static logLevel_t OS_ERROR = 20;
+  const static logLevel_t OS_WARNING = 30;
+  const static logLevel_t OS_INFO = 40;
 
-  static const logLevel_t OS_CONFIG = 50;
-  static const logLevel_t OS_DEBUG = 60;
-  static const logLevel_t OS_TRACE = 70;
-  static const logLevel_t OS_INSANE = 80;
+  const static logLevel_t OS_CONFIG = 50;
+  const static logLevel_t OS_DEBUG = 60;
+  const static logLevel_t OS_TRACE = 70;
+  const static logLevel_t OS_INSANE = 80;
 
-  static const logLevel_t OS_ALL = 90;
+  const static logLevel_t OS_ALL = 90;
 };
 
 class OSLogger
@@ -74,7 +74,7 @@ public:
   void
   setDebugLevel(logLevel_t level);
 
-  static const char*
+  const static char*
   convertLevelToString(logLevel_t level);
   static logLevel_t
   convertStringToLevel(const char* level);

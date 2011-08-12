@@ -20,8 +20,8 @@ namespace util
     {
     public:
       // ----- Constants ------------------------------------------------------
-      static const uint16_t INITIAL_VALUE = 0x0000;
-      static const uint16_t FINAL_VALUE = 0x0000;
+      const static uint16_t INITIAL_VALUE = 0x0000;
+      const static uint16_t FINAL_VALUE = 0x0000;
 
       // ----- Constructors and destructors -----------------------------------
       Crc16x1021();

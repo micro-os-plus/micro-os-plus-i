@@ -128,7 +128,7 @@ public:
   static void
   setPeriodicSeconds(OSTimerTicks_t seconds);
 
-  static const unsigned char DEFAULT_ADDRESS = '0';
+  const static unsigned char DEFAULT_ADDRESS = '0';
 
   static unsigned char
   getAddress(void);
@@ -186,9 +186,9 @@ public:
   static bool
   isAcquisitionCancelled(void);
 
-  static const unsigned char DELAYED_MODE_NONE = 0;
-  static const unsigned char DELAYED_MODE_PROTO = 1;
-  static const unsigned char DELAYED_MODE_DACQ = 2;
+  const static unsigned char DELAYED_MODE_NONE = 0;
+  const static unsigned char DELAYED_MODE_PROTO = 1;
+  const static unsigned char DELAYED_MODE_DACQ = 2;
 
   static void
   interruptTick(void);
@@ -324,40 +324,40 @@ private:
   // constants
 
   // HW flags
-  static const OSEventFlagsBits_t BREAK = 0x0001;
-  static const OSEventFlagsBits_t EXCLAMATION = 0x0002;
-  static const OSEventFlagsBits_t RX_ERROR = 0x0004;
-  static const OSEventFlagsBits_t TX_COMPLETED = 0x0008;
-  static const OSEventFlagsBits_t ADDRESS = 0x0010;
-  static const OSEventFlagsBits_t MARKING = 0x0020;
-  static const OSEventFlagsBits_t TIMEOUT = 0x0040;
-  //static const OSEventFlagsBits_t TIMEOUT = 0x0080;
+  const static OSEventFlagsBits_t BREAK = 0x0001;
+  const static OSEventFlagsBits_t EXCLAMATION = 0x0002;
+  const static OSEventFlagsBits_t RX_ERROR = 0x0004;
+  const static OSEventFlagsBits_t TX_COMPLETED = 0x0008;
+  const static OSEventFlagsBits_t ADDRESS = 0x0010;
+  const static OSEventFlagsBits_t MARKING = 0x0020;
+  const static OSEventFlagsBits_t TIMEOUT = 0x0040;
+  //const static OSEventFlagsBits_t TIMEOUT = 0x0080;
 
   // proto flags
-  static const OSEventFlagsBits_t INITIALIZED = 0x0100;
-  static const OSEventFlagsBits_t ACQUIRE = 0x0200;
-  static const OSEventFlagsBits_t ACQUIRE_COMPLETED = 0x0400;
-  //static const OSEventFlagsBits_t SERVICE_REQUEST = 0x0800;
+  const static OSEventFlagsBits_t INITIALIZED = 0x0100;
+  const static OSEventFlagsBits_t ACQUIRE = 0x0200;
+  const static OSEventFlagsBits_t ACQUIRE_COMPLETED = 0x0400;
+  //const static OSEventFlagsBits_t SERVICE_REQUEST = 0x0800;
 
   // proto states
-  static const unsigned char STATE0 = 0;
-  static const unsigned char STATE1 = 1;
-  static const unsigned char STATE2 = 2;
-  static const unsigned char STATE3 = 3;
-  static const unsigned char STATE4 = 4;
-  static const unsigned char STATE5 = 5;
-  static const unsigned char STATE6 = 6;
-  static const unsigned char STATE7 = 7;
-  static const unsigned char STATE8 = 8;
-  static const unsigned char STATE9 = 9;
+  const static unsigned char STATE0 = 0;
+  const static unsigned char STATE1 = 1;
+  const static unsigned char STATE2 = 2;
+  const static unsigned char STATE3 = 3;
+  const static unsigned char STATE4 = 4;
+  const static unsigned char STATE5 = 5;
+  const static unsigned char STATE6 = 6;
+  const static unsigned char STATE7 = 7;
+  const static unsigned char STATE8 = 8;
+  const static unsigned char STATE9 = 9;
 
   // other constants
-  static const OSTimerTicks_t MIN_BREAK_TICKS = 7;
-  static const OSTimerTicks_t TIMEOUT100_TICKS = 100;
+  const static OSTimerTicks_t MIN_BREAK_TICKS = 7;
+  const static OSTimerTicks_t TIMEOUT100_TICKS = 100;
 #if !defined(DEBUG)
-  static const OSTimerTicks_t MARKING8_TICKS = 8;
+  const static OSTimerTicks_t MARKING8_TICKS = 8;
 #else
-  static const OSTimerTicks_t MARKING8_TICKS = 5;
+  const static OSTimerTicks_t MARKING8_TICKS = 5;
 #endif
 
   // --------------------------------------------

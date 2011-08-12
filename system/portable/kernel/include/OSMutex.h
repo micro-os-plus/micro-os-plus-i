@@ -47,11 +47,11 @@ public:
 #endif /* defined(OS_INCLUDE_OSMUTEX_WAITING_THREADS) */
 
   // Constants ; all are used as result code for acquire and release methods.
-  static const int OS_OK = 1;
-  static const int OS_NOT_OWNER = -1;
-  static const int OS_NOT_ACQUIRED = -2;
-  static const int OS_OTHER_EVENT = -3;
-  static const int OS_WOULD_BLOCK = -4;
+  const static int OS_OK = 1;
+  const static int OS_NOT_OWNER = -1;
+  const static int OS_NOT_ACQUIRED = -2;
+  const static int OS_OTHER_EVENT = -3;
+  const static int OS_WOULD_BLOCK = -4;
 
   // try to acquire mutex
   // if doNotBlock is false, the thread is blocked until this mutex is released

@@ -57,17 +57,17 @@ private:
   static unsigned char Can_get_dlc(void);
   static void can_get_data(unsigned char*  p_can_message_data);
   
-  static const unsigned char NB_MOB = 15;
-  static const unsigned char NB_DATA_MAX = 8;
-  static const unsigned char LAST_MOB_NB = (NB_MOB-1);
-  static const unsigned char NO_MOB = 0xFF;
+  const static unsigned char NB_MOB = 15;
+  const static unsigned char NB_DATA_MAX = 8;
+  const static unsigned char LAST_MOB_NB = (NB_MOB-1);
+  const static unsigned char NO_MOB = 0xFF;
 
-  static const unsigned char NB_MOB_TX = 0;
-  static const unsigned char NB_MOB_RX = 1;
+  const static unsigned char NB_MOB_TX = 0;
+  const static unsigned char NB_MOB_RX = 1;
 
-  static const unsigned char MOB_Tx_ENA = 1;
-  static const unsigned char MOB_Rx_ENA = 2;
-  static const unsigned char MOB_Rx_BENA = 3;
+  const static unsigned char MOB_Tx_ENA = 1;
+  const static unsigned char MOB_Rx_ENA = 2;
+  const static unsigned char MOB_Rx_BENA = 3;
 
   };
 

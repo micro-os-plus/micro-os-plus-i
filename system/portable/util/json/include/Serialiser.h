@@ -18,11 +18,11 @@ namespace util
     {
     public:
       // ----- Constants ------------------------------------------------------
-      static const uchar_t SEPARATOR = ',';
-      static const uchar_t ARRAY_BEGIN = '[';
-      static const uchar_t ARRAY_END = ']';
-      static const uchar_t OBJECT_BEGIN = '{';
-      static const uchar_t OBJECT_END = '}';
+      const static uchar_t SEPARATOR = ',';
+      const static uchar_t ARRAY_BEGIN = '[';
+      const static uchar_t ARRAY_END = ']';
+      const static uchar_t OBJECT_BEGIN = '{';
+      const static uchar_t OBJECT_END = '}';
 
       // ----- Constructors and destructors -----------------------------------
       Serialiser(std::ostream& out);

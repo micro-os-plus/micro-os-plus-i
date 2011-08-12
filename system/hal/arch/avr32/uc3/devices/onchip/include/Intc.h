@@ -33,58 +33,58 @@ namespace avr32
       {
       public:
         // CPU
-        static const Priority_t CPU = OS_CFGINT_AVR32_UC3_INTC_GROUP00_PRIORITY;
+        const static Priority_t CPU = OS_CFGINT_AVR32_UC3_INTC_GROUP00_PRIORITY;
         // EINT, RTC, PWR
-        static const Priority_t EIC = OS_CFGINT_AVR32_UC3_INTC_GROUP01_PRIORITY;
+        const static Priority_t EIC = OS_CFGINT_AVR32_UC3_INTC_GROUP01_PRIORITY;
         // GPIO00-13
-        static const Priority_t GPIO =
+        const static Priority_t GPIO =
             OS_CFGINT_AVR32_UC3_INTC_GROUP02_PRIORITY;
         // PDMA0-7
-        static const Priority_t PDCA =
+        const static Priority_t PDCA =
             OS_CFGINT_AVR32_UC3_INTC_GROUP03_PRIORITY;
-        static const Priority_t FLASHC =
+        const static Priority_t FLASHC =
             OS_CFGINT_AVR32_UC3_INTC_GROUP04_PRIORITY;
-        static const Priority_t USART0 =
+        const static Priority_t USART0 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP05_PRIORITY;
-        static const Priority_t USART1 =
+        const static Priority_t USART1 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP06_PRIORITY;
-        static const Priority_t USART2 =
+        const static Priority_t USART2 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP07_PRIORITY;
-        static const Priority_t USART3 =
+        const static Priority_t USART3 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP08_PRIORITY;
-        static const Priority_t SPI0 =
+        const static Priority_t SPI0 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP09_PRIORITY;
-        static const Priority_t SPI1 =
+        const static Priority_t SPI1 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP10_PRIORITY;
-        static const Priority_t TWIM0 =
+        const static Priority_t TWIM0 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP11_PRIORITY;
-        static const Priority_t TWIM1 =
+        const static Priority_t TWIM1 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP12_PRIORITY;
-        static const Priority_t SSC = OS_CFGINT_AVR32_UC3_INTC_GROUP13_PRIORITY;
-        static const Priority_t TC0 = OS_CFGINT_AVR32_UC3_INTC_GROUP14_PRIORITY;
-        static const Priority_t ADC = OS_CFGINT_AVR32_UC3_INTC_GROUP15_PRIORITY;
-        static const Priority_t TC1 = OS_CFGINT_AVR32_UC3_INTC_GROUP16_PRIORITY;
-        static const Priority_t USB = OS_CFGINT_AVR32_UC3_INTC_GROUP17_PRIORITY;
-        static const Priority_t SDRAMC =
+        const static Priority_t SSC = OS_CFGINT_AVR32_UC3_INTC_GROUP13_PRIORITY;
+        const static Priority_t TC0 = OS_CFGINT_AVR32_UC3_INTC_GROUP14_PRIORITY;
+        const static Priority_t ADC = OS_CFGINT_AVR32_UC3_INTC_GROUP15_PRIORITY;
+        const static Priority_t TC1 = OS_CFGINT_AVR32_UC3_INTC_GROUP16_PRIORITY;
+        const static Priority_t USB = OS_CFGINT_AVR32_UC3_INTC_GROUP17_PRIORITY;
+        const static Priority_t SDRAMC =
             OS_CFGINT_AVR32_UC3_INTC_GROUP18_PRIORITY;
-        static const Priority_t ABDAC =
+        const static Priority_t ABDAC =
             OS_CFGINT_AVR32_UC3_INTC_GROUP19_PRIORITY;
-        static const Priority_t MCI = OS_CFGINT_AVR32_UC3_INTC_GROUP20_PRIORITY;
-        static const Priority_t AES = OS_CFGINT_AVR32_UC3_INTC_GROUP21_PRIORITY;
-        static const Priority_t DMACA =
+        const static Priority_t MCI = OS_CFGINT_AVR32_UC3_INTC_GROUP20_PRIORITY;
+        const static Priority_t AES = OS_CFGINT_AVR32_UC3_INTC_GROUP21_PRIORITY;
+        const static Priority_t DMACA =
             OS_CFGINT_AVR32_UC3_INTC_GROUP22_PRIORITY;
-        static const Priority_t GROUP_23 =
+        const static Priority_t GROUP_23 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP23_PRIORITY;
-        static const Priority_t GROUP_24 =
+        const static Priority_t GROUP_24 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP24_PRIORITY;
-        static const Priority_t GROUP_25 =
+        const static Priority_t GROUP_25 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP25_PRIORITY;
-        static const Priority_t MSI = OS_CFGINT_AVR32_UC3_INTC_GROUP26_PRIORITY;
-        static const Priority_t TWIS0 =
+        const static Priority_t MSI = OS_CFGINT_AVR32_UC3_INTC_GROUP26_PRIORITY;
+        const static Priority_t TWIS0 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP27_PRIORITY;
-        static const Priority_t TWIS1 =
+        const static Priority_t TWIS1 =
             OS_CFGINT_AVR32_UC3_INTC_GROUP28_PRIORITY;
-        static const Priority_t ECCHRS =
+        const static Priority_t ECCHRS =
             OS_CFGINT_AVR32_UC3_INTC_GROUP29_PRIORITY;
       };
 

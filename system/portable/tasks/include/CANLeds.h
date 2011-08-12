@@ -14,15 +14,15 @@ class CANLed
 public:
   CANLed();
 
-  static const unsigned char STATUS_OFF = 0;
-  static const unsigned char STATUS_FLICKERING = 1;
-  static const unsigned char STATUS_BLINKING = 2;
-  static const unsigned char STATUS_SINGLE_FLASH = 3;
-  static const unsigned char STATUS_DOUBLE_FLASH = 4;
-  static const unsigned char STATUS_TRIPLE_FLASH = 5;
-  static const unsigned char STATUS_ON = 6;
+  const static unsigned char STATUS_OFF = 0;
+  const static unsigned char STATUS_FLICKERING = 1;
+  const static unsigned char STATUS_BLINKING = 2;
+  const static unsigned char STATUS_SINGLE_FLASH = 3;
+  const static unsigned char STATUS_DOUBLE_FLASH = 4;
+  const static unsigned char STATUS_TRIPLE_FLASH = 5;
+  const static unsigned char STATUS_ON = 6;
 
-  static const unsigned char STATUS_UNPOWERED = STATUS_OFF;
+  const static unsigned char STATUS_UNPOWERED = STATUS_OFF;
 
   void on(void);
   void off(void);
@@ -41,10 +41,10 @@ class CANLedGreen : public CANLed
 public:
   CANLedGreen();
 
-  static const unsigned char STATUS_AUTOBAUD = STATUS_FLICKERING;
-  static const unsigned char STATUS_PREOPERATIONAL = STATUS_BLINKING;
-  static const unsigned char STATUS_STOPPED = STATUS_SINGLE_FLASH;
-  static const unsigned char STATUS_OPERATIONAL = STATUS_ON;
+  const static unsigned char STATUS_AUTOBAUD = STATUS_FLICKERING;
+  const static unsigned char STATUS_PREOPERATIONAL = STATUS_BLINKING;
+  const static unsigned char STATUS_STOPPED = STATUS_SINGLE_FLASH;
+  const static unsigned char STATUS_OPERATIONAL = STATUS_ON;
 
   void on(void);
   void off(void);
@@ -61,11 +61,11 @@ class CANLedRed : public CANLed
 public:
   CANLedRed();
 
-  static const unsigned char STATUS_AUTOBAUD = STATUS_FLICKERING;
-  static const unsigned char STATUS_WARNING = STATUS_SINGLE_FLASH;
-  static const unsigned char STATUS_ERROR_EVENT = STATUS_DOUBLE_FLASH;
-  static const unsigned char STATUS_SYNC_ERROR = STATUS_TRIPLE_FLASH;
-  static const unsigned char STATUS_BUS_OFF = STATUS_ON;
+  const static unsigned char STATUS_AUTOBAUD = STATUS_FLICKERING;
+  const static unsigned char STATUS_WARNING = STATUS_SINGLE_FLASH;
+  const static unsigned char STATUS_ERROR_EVENT = STATUS_DOUBLE_FLASH;
+  const static unsigned char STATUS_SYNC_ERROR = STATUS_TRIPLE_FLASH;
+  const static unsigned char STATUS_BUS_OFF = STATUS_ON;
 
   void on(void);
   void off(void);

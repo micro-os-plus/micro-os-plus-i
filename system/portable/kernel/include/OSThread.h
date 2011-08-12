@@ -51,15 +51,15 @@ class OSThread
 public:
 
   // Thread range priorities.
-  static const OSThreadPriority_t IDLE_PRIORITY = 0x00;
-  static const OSThreadPriority_t MIN_PRIORITY = 0x01;
-  static const OSThreadPriority_t MAX_PRIORITY = 0xFF;
-  static const OSThreadPriority_t DEFAULT_PRIORITY = (MAX_PRIORITY / 2 + 1);
+  const static OSThreadPriority_t IDLE_PRIORITY = 0x00;
+  const static OSThreadPriority_t MIN_PRIORITY = 0x01;
+  const static OSThreadPriority_t MAX_PRIORITY = 0xFF;
+  const static OSThreadPriority_t DEFAULT_PRIORITY = (MAX_PRIORITY / 2 + 1);
 
   // Value for the minimal size for a thread.
-  static const OSStackSize_t STACK_MINIMAL_SIZE = OS_CFGINT_STACK_MINIMAL_SIZE;
+  const static OSStackSize_t STACK_MINIMAL_SIZE = OS_CFGINT_STACK_MINIMAL_SIZE;
   // Pattern for initialising the stack.
-  static const OSStack_t STACK_FILL_BYTE = 0x5A;
+  const static OSStack_t STACK_FILL_BYTE = 0x5A;
 
   // Constructor; run static threadMain (C++ style).
   OSThread(const char* pName, const OSStack_t* pStack, OSStackSize_t stackSize,

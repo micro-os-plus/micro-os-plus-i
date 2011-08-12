@@ -37,8 +37,8 @@ public:
 
 private:
 
-  static const int I2C_WRITE = 0x0;
-  static const int I2C_READ = 0x1;
+  const static int I2C_WRITE = 0x0;
+  const static int I2C_READ = 0x1;
 
   // Implement I2C master by bitbanging.
   static void

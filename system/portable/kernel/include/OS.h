@@ -52,8 +52,8 @@ typedef unsigned short OSTimerTicks_t;
 class OSTimeout
   {
   public:
-    static const OSTimerTicks_t OS_IMMEDIATELY = 0;
-    static const OSTimerTicks_t OS_NEVER = (0 - 1);
+    const static OSTimerTicks_t OS_IMMEDIATELY = 0;
+    const static OSTimerTicks_t OS_NEVER = (0 - 1);
   };
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS) */
 
@@ -65,10 +65,10 @@ typedef unsigned int OSEvent_t;
 class OSEvent
 {
 public:
-  static const OSEvent_t OS_NONE = (0-1);
-  static const OSEvent_t OS_ALL = 0;
-  static const OSEvent_t OS_TIMEOUT = 1;
-  static const OSEvent_t OS_CUSTOM_TIMER = 2;
+  const static OSEvent_t OS_NONE = (0-1);
+  const static OSEvent_t OS_ALL = 0;
+  const static OSEvent_t OS_TIMEOUT = 1;
+  const static OSEvent_t OS_CUSTOM_TIMER = 2;
 };
 
 // ----------------------------------------------------------------------------
@@ -79,17 +79,17 @@ typedef unsigned int OSEventWaitReturn_t;
 class OSEventWaitReturn
 {
 public:
-  static const OSEventWaitReturn_t OS_NONE = (0-1);
-  static const OSEventWaitReturn_t OS_VOID = 0;
-  static const OSEventWaitReturn_t OS_LOCKED = 1;
-  static const OSEventWaitReturn_t OS_TIMEOUT = 2;
-  static const OSEventWaitReturn_t OS_CANCELED = 3;
-  static const OSEventWaitReturn_t OS_ALL = 4;
-  static const OSEventWaitReturn_t OS_IMMEDIATELY = 5;
-  static const OSEventWaitReturn_t OS_FAILED = 6;
+  const static OSEventWaitReturn_t OS_NONE = (0-1);
+  const static OSEventWaitReturn_t OS_VOID = 0;
+  const static OSEventWaitReturn_t OS_LOCKED = 1;
+  const static OSEventWaitReturn_t OS_TIMEOUT = 2;
+  const static OSEventWaitReturn_t OS_CANCELED = 3;
+  const static OSEventWaitReturn_t OS_ALL = 4;
+  const static OSEventWaitReturn_t OS_IMMEDIATELY = 5;
+  const static OSEventWaitReturn_t OS_FAILED = 6;
 
   // user values should be relative to this one
-  static const OSEventWaitReturn_t OS_CUSTOM = 10;
+  const static OSEventWaitReturn_t OS_CUSTOM = 10;
 };
 
 // ----------------------------------------------------------------------------

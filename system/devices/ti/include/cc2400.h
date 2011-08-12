@@ -42,24 +42,24 @@ namespace device
       class TxPowerLevel
       {
       public:
-        static const TxPowerLevel_t DBM_25 = 0; // -25 dBm
-        static const TxPowerLevel_t DBM_15 = 1; // -15 dBm
-        static const TxPowerLevel_t DBM_10 = 2; // -10 dBm
-        static const TxPowerLevel_t DBM_7 = 3; // -7 dBm
-        static const TxPowerLevel_t DBM_4_6 = 4; // -4.6 dBm
-        static const TxPowerLevel_t DBM_2_8 = 5; // -2.8 dBm
-        static const TxPowerLevel_t DBM_1_3 = 6; // -1.3 dBm
-        static const TxPowerLevel_t DBM_0 = 7; // 0 dBm
+        const static TxPowerLevel_t DBM_25 = 0; // -25 dBm
+        const static TxPowerLevel_t DBM_15 = 1; // -15 dBm
+        const static TxPowerLevel_t DBM_10 = 2; // -10 dBm
+        const static TxPowerLevel_t DBM_7 = 3; // -7 dBm
+        const static TxPowerLevel_t DBM_4_6 = 4; // -4.6 dBm
+        const static TxPowerLevel_t DBM_2_8 = 5; // -2.8 dBm
+        const static TxPowerLevel_t DBM_1_3 = 6; // -1.3 dBm
+        const static TxPowerLevel_t DBM_0 = 7; // 0 dBm
 
       };
 
       class Status
       {
       public:
-        static const Status_t XOSC16M_STABLE = 0x40; // Oscillator running
-        static const Status_t SYNC_RECEIVED = 0x20; // RX sync word received
-        static const Status_t CRC_OK = 0x08; // Next 2 FIFO bytes make CRC OK
-        static const Status_t FS_LOCK = 0x04; // Freq. Synthesiser is in lock
+        const static Status_t XOSC16M_STABLE = 0x40; // Oscillator running
+        const static Status_t SYNC_RECEIVED = 0x20; // RX sync word received
+        const static Status_t CRC_OK = 0x08; // Next 2 FIFO bytes make CRC OK
+        const static Status_t FS_LOCK = 0x04; // Freq. Synthesiser is in lock
 
         static bool
         isOscStable(Status_t status);
@@ -74,60 +74,60 @@ namespace device
       class Operation
       {
       public:
-        static const RegisterOperation_t WRITE = 0x00;
-        static const RegisterOperation_t READ = 0x80;
+        const static RegisterOperation_t WRITE = 0x00;
+        const static RegisterOperation_t READ = 0x80;
       };
 
       class Register
       {
       public:
-        static const RegisterId_t MAIN = 0x00; // Read/Write
-        static const RegisterId_t FSCTRL = 0x01; // R/W
-        static const RegisterId_t FSDIV = 0x02; // R/W
-        static const RegisterId_t MDMCTRL = 0x03; // R/W
-        static const RegisterId_t AGCCTRL = 0x04; // R/W
-        static const RegisterId_t FREND = 0x05; // R/W
-        static const RegisterId_t RSSI = 0x06; // R/W
-        static const RegisterId_t FREQEST = 0x07; // R/W
-        static const RegisterId_t IOCFG = 0x08; // R/W
+        const static RegisterId_t MAIN = 0x00; // Read/Write
+        const static RegisterId_t FSCTRL = 0x01; // R/W
+        const static RegisterId_t FSDIV = 0x02; // R/W
+        const static RegisterId_t MDMCTRL = 0x03; // R/W
+        const static RegisterId_t AGCCTRL = 0x04; // R/W
+        const static RegisterId_t FREND = 0x05; // R/W
+        const static RegisterId_t RSSI = 0x06; // R/W
+        const static RegisterId_t FREQEST = 0x07; // R/W
+        const static RegisterId_t IOCFG = 0x08; // R/W
         // RESERVED
         // RESERVED
-        static const RegisterId_t FSMTC = 0x0B; // R/W
+        const static RegisterId_t FSMTC = 0x0B; // R/W
         // RESERVED
-        static const RegisterId_t MANAND = 0x0D; // R/W
-        static const RegisterId_t FSMSTATE = 0x0E; // R/W
-        static const RegisterId_t ADCTST = 0x0F; // R/W
-        static const RegisterId_t RXBPFST = 0x10; // R/W
-        static const RegisterId_t PAMTST = 0x11; // R/W
-        static const RegisterId_t LMTST = 0x12; // R/W
-        static const RegisterId_t MANOR = 0x13; // R/W
-        static const RegisterId_t MDMTST0 = 0x14; // R/W
-        static const RegisterId_t MDMTST1 = 0x15; // R/W
-        static const RegisterId_t DACTST = 0x16; // R/W
-        static const RegisterId_t AGCTST0 = 0x17; // R/W
-        static const RegisterId_t AGCTST1 = 0x18; // R/W
-        static const RegisterId_t AGCTST2 = 0x19; // R/W
-        static const RegisterId_t FSTST0 = 0x1A; // R/W
-        static const RegisterId_t FSTST1 = 0x1B; // R/W
-        static const RegisterId_t FSTST2 = 0x1C; // R/W
-        static const RegisterId_t FSTST3 = 0x1D; // R/W
-        static const RegisterId_t MANFIDL = 0x1E; // Read
-        static const RegisterId_t MANFIDH = 0x1F; // Read
-        static const RegisterId_t GRMDM = 0x20; // R/W
-        static const RegisterId_t GRDEC = 0x21; // R/W
-        static const RegisterId_t PKTSTATUS = 0x22; // Read
-        static const RegisterId_t INT = 0x23; // R/W
+        const static RegisterId_t MANAND = 0x0D; // R/W
+        const static RegisterId_t FSMSTATE = 0x0E; // R/W
+        const static RegisterId_t ADCTST = 0x0F; // R/W
+        const static RegisterId_t RXBPFST = 0x10; // R/W
+        const static RegisterId_t PAMTST = 0x11; // R/W
+        const static RegisterId_t LMTST = 0x12; // R/W
+        const static RegisterId_t MANOR = 0x13; // R/W
+        const static RegisterId_t MDMTST0 = 0x14; // R/W
+        const static RegisterId_t MDMTST1 = 0x15; // R/W
+        const static RegisterId_t DACTST = 0x16; // R/W
+        const static RegisterId_t AGCTST0 = 0x17; // R/W
+        const static RegisterId_t AGCTST1 = 0x18; // R/W
+        const static RegisterId_t AGCTST2 = 0x19; // R/W
+        const static RegisterId_t FSTST0 = 0x1A; // R/W
+        const static RegisterId_t FSTST1 = 0x1B; // R/W
+        const static RegisterId_t FSTST2 = 0x1C; // R/W
+        const static RegisterId_t FSTST3 = 0x1D; // R/W
+        const static RegisterId_t MANFIDL = 0x1E; // Read
+        const static RegisterId_t MANFIDH = 0x1F; // Read
+        const static RegisterId_t GRMDM = 0x20; // R/W
+        const static RegisterId_t GRDEC = 0x21; // R/W
+        const static RegisterId_t PKTSTATUS = 0x22; // Read
+        const static RegisterId_t INT = 0x23; // R/W
         // ...RESERVED
-        static const RegisterId_t SYNCL = 0x2C; // R/W
-        static const RegisterId_t SYNCH = 0x2D; // R/W
-        static const RegisterId_t SXOSCON = 0x60; // Strobe
-        static const RegisterId_t SFSON = 0x61; // Strobe
-        static const RegisterId_t SRX_REG = 0x62; // Strobe
-        static const RegisterId_t STX_REG = 0x63; // Strobe
-        static const RegisterId_t SRFOFF = 0x64; // Strobe
-        static const RegisterId_t SXOSCOFF = 0x65; // Strobe
+        const static RegisterId_t SYNCL = 0x2C; // R/W
+        const static RegisterId_t SYNCH = 0x2D; // R/W
+        const static RegisterId_t SXOSCON = 0x60; // Strobe
+        const static RegisterId_t SFSON = 0x61; // Strobe
+        const static RegisterId_t SRX_REG = 0x62; // Strobe
+        const static RegisterId_t STX_REG = 0x63; // Strobe
+        const static RegisterId_t SRFOFF = 0x64; // Strobe
+        const static RegisterId_t SXOSCOFF = 0x65; // Strobe
         // .. RESERVED
-        static const RegisterId_t FIFOREG = 0x70; // Special
+        const static RegisterId_t FIFOREG = 0x70; // Special
       };
 
       class Registers
@@ -259,7 +259,7 @@ namespace device
       writeRegUseCs(device::ti::cc2400::RegisterId_t reg, uint16_t value);
 
       // the offset of RSSI register
-      static const int16_t RSSI_OFFSET = -54;
+      const static int16_t RSSI_OFFSET = -54;
 
       ChipSelectActiveLow& m_cs;
 

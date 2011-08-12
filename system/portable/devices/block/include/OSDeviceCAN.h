@@ -15,9 +15,9 @@
 class OSDeviceCAN
 {
 public:
-  static const unsigned char MODE_ENABLED = 1;
-  static const unsigned char MODE_STANDBY = 2;
-  static const unsigned char MODE_LISTEN = 3;
+  const static unsigned char MODE_ENABLED = 1;
+  const static unsigned char MODE_STANDBY = 2;
+  const static unsigned char MODE_LISTEN = 3;
 
   OSDeviceCAN(CANPacket* pRxBuf, unsigned short rxBufSize,
       unsigned short rxHWM, unsigned short rxLWM, CANPacket *pTxBuf,
