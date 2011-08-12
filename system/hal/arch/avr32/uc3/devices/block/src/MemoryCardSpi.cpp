@@ -79,7 +79,7 @@ namespace avr32
       // Wait for 1ms, then wait for 74 more clock cycles (see MMC norms)
       if (m_mci.sendCommand(mci::CommandWord::SD_MMC_INIT_STATE_CMD, 0xFFFFFFFF)
           != MCI_SUCCESS)
-      return OSReturn::OS_NOT_INITIALIZED;
+      return OSReturn::OS_NOT_INITIALISED;
 #else
       m_cs.initialise();
 
