@@ -14,154 +14,191 @@ class Parser
 public:
   Parser();
 
+  // Set the byte array to be parsed
   void
-  setInput(unsigned char* pLine);
+  setInput(uchar_t* pLine);
+
+  // Separators are characters between tokens
+  void
+  setSeparators(const char* pSeparators);
+
+  // Spaces are characters to be ignored in the parsed string
+  void
+  setSpaces(const char* pSpaces);
 
   void
-  setSeparators(unsigned char* pSeparators);
-  void
-  setSpaces(unsigned char* pSpaces);
-
-  void
-  setTokenBuffer(unsigned char* pToken, unsigned short tokenSize);
+  setTokenBuffer(uchar_t* pToken, size_t tokenSize);
 
   // Deprecated
-  void
-  setToken(unsigned char* pToken, unsigned short tokenSize);
-  unsigned char*
+  //void
+  //setToken(unsigned char* pToken, unsigned short tokenSize);
+
+  uchar_t*
   getToken(void) const;
 
-  unsigned char*
+  uchar_t*
   getCurrentPosition(void) const;
 
+  // Set the parser to an absolute position
   void
-  setCurrent(unsigned short index);
+  setCurrentPosition(uint_t index);
 
+  // Check if the parser reached the end of line
   bool
   isEndOfLine(void) const;
 
   OSReturn_t
-  skipTokens(unsigned short nTokens);
+  skipTokens(uint_t nTokens);
   OSReturn_t
-  skipTokens(unsigned short nTokens, unsigned char* pSeparators);
+  skipTokens(uint_t nTokens, const char* pSeparators);
 
+  // Parse token, using the pre-programmed separators/spaces
   OSReturn_t
-  parseToken(void);
-  OSReturn_t
-  parseToken(unsigned char* pSeparators, unsigned char* pSpaces);
+  parseNextToken(void);
 
+  // Parse token, using the given separators/spaces
   OSReturn_t
-  parseSubstring(unsigned short len);
+  parseNextToken(const char* pSeparators, const char* pSpaces);
 
-  unsigned short
+  // Parse next len bytes
+  OSReturn_t
+  parseNextSubstring(size_t len);
+
+  size_t
   getTokenLength(void) const;
-  unsigned char
+  bool
+  isTokenEmpty(void);
+
+  uchar_t
   getSeparator(void);
 
   OSReturn_t
-  parseHex(unsigned char* pChar);
+  convertHex(uint8_t* pChar);
   OSReturn_t
-  parseUnsigned(unsigned short* pShort);
+  convertHex(uint16_t* pShort);
   OSReturn_t
-  parseUnsigned(uint32_t* pLong);
+  convertHex(uint32_t* pLong);
+  OSReturn_t
+  convertHex(uint_t* pChar);
 
   OSReturn_t
-  parseSigned(signed long* pLong);
+  convertUnsigned(uint16_t* pShort);
+  OSReturn_t
+  convertUnsigned(uint32_t* pLong);
 
   OSReturn_t
-  parseFixedPrec(signed long* pLong, unsigned short prec);
+  convertSigned(int32_t* pLong);
+
+  OSReturn_t
+  convertFixedPrecision(int32_t* pLong, uint_t prec);
 
   int
-  tokenCompare(const unsigned char* pStr);
+  compareStringWithToken(const char* pStr);
 
   bool
-  doesStringStartWithToken(const unsigned char* pStr);
+  doesStringMatchToken(const char* pStr);
+
+  // Check if the token is a substring at the beginning of the given string
+  // Return false if the token is empty.
+  bool
+  doesStringStartWithToken(const char* pStr);
 
   // Warning: does not work on AVR32
   int
-  tokenCompareIgnoreCase(const unsigned char* pStr);
+  compareStringWithTokenIgnoreCase(const char* pStr);
 
   // static methods
   static OSReturn_t
-  parseNibble(unsigned char nibble);
+  convertNibble(uchar_t nibble);
   static OSReturn_t
-  parseHex(unsigned char* pStr, unsigned char* pChar);
-  static OSReturn_t
-  parseUnsigned(unsigned char* pStr, unsigned short* pShort);
-  static OSReturn_t
-  parseSigned(unsigned char* pStr, signed long* pLong);
-  static OSReturn_t
-  parseUnsigned(unsigned char* pStr, unsigned long* pLong);
+  convertHex(uchar_t* pStr, void* p, size_t size);
 
   static OSReturn_t
-  parseFixedPrec(unsigned char* pStr, signed long* pLong, unsigned short prec,
+  convertUnsigned(uchar_t* pStr, uint16_t* pShort);
+  static OSReturn_t
+  convertSigned(uchar_t* pStr, int32_t* pLong);
+  static OSReturn_t
+  convertUnsigned(uchar_t* pStr, uint32_t* pLong);
+
+  static OSReturn_t
+  convertFixedPrecision(uchar_t* pStr, int32_t* pLong, uint_t prec,
       bool hasSign);
 
 protected:
+
+  void
+  clearToken(void);
+
   // members
-  unsigned char* m_pLine;
-  unsigned char* m_pCrt;
+  uchar_t* m_pLine;
+  uchar_t* m_pCrt;
 
-  unsigned char* m_pSeparators;
-  unsigned char* m_pSpaces;
+  uchar_t* m_pSeparators;
+  uchar_t* m_pSpaces;
 
-  unsigned char* m_pToken;
-  unsigned short m_tokenSize;
+  uchar_t* m_pToken;
+  size_t m_tokenSize;
 
-  unsigned char m_sep;
-  unsigned short m_len;
+  uchar_t m_sep;
+  size_t m_tokenLength;
 };
 
 // ----------------------------------------------------------------------------
 
-inline unsigned char* 
+inline uchar_t*
 Parser::getToken(void) const
 {
   return m_pToken;
 }
 
-inline unsigned char*
+inline uchar_t*
 Parser::getCurrentPosition(void) const
 {
   return m_pCrt;
 }
 
-inline unsigned char
+inline uchar_t
 Parser::getSeparator(void)
 {
   return m_sep;
 }
 
 inline void
-Parser::setTokenBuffer(unsigned char* pToken, unsigned short tokenSize)
+Parser::setTokenBuffer(uchar_t* pToken, size_t tokenSize)
 {
   m_pToken = pToken;
   m_tokenSize = tokenSize;
 }
 
+//inline void
+//Parser::setToken(uchar_t* pToken, size_t tokenSize)
+//{
+//  m_pToken = pToken;
+//  m_tokenSize = tokenSize;
+//}
+
 inline void
-Parser::setToken(unsigned char* pToken, unsigned short tokenSize)
+Parser::setSeparators(const char* pSeparators)
 {
-  m_pToken = pToken;
-  m_tokenSize = tokenSize;
+  m_pSeparators = (uchar_t*)pSeparators;
 }
 
 inline void
-Parser::setSeparators(unsigned char* pSeparators)
+Parser::setSpaces(const char* pSpaces)
 {
-  m_pSeparators = pSeparators;
+  m_pSpaces = (uchar_t*)pSpaces;
 }
 
-inline void
-Parser::setSpaces(unsigned char* pSpaces)
-{
-  m_pSpaces = pSpaces;
-}
-
-inline unsigned short
+inline size_t
 Parser::getTokenLength(void) const
 {
-  return m_len;
+  return m_tokenLength;
+}
+
+inline bool
+Parser::isTokenEmpty(void)
+{
+  return (m_tokenLength == 0);
 }
 
 inline bool

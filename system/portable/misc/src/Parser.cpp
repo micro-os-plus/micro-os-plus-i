@@ -12,12 +12,13 @@
 
 #include "portable/misc/include/Parser.h"
 #include <string.h>
+#include <ctype.h>
 
 Parser::Parser()
 {
   OSDeviceDebug::putConstructor_P(PSTR("Parser"), this);
 
-  m_pSeparators = (unsigned char*) "\0";
+  m_pSeparators = (uchar_t*) "\0";
   m_pSpaces = 0;
 
   m_pToken = 0;
@@ -25,36 +26,47 @@ Parser::Parser()
 }
 
 void
-Parser::setInput(unsigned char* pLine)
+Parser::setInput(uchar_t* pLine)
 {
   m_pLine = pLine;
   m_pCrt = pLine;
 
-  m_len = 0;
+  m_tokenLength = 0;
   m_sep = '\0';
 }
 
 void
-Parser::setCurrent(unsigned short index)
+Parser::clearToken(void)
+{
+  if (m_pToken != NULL)
+    *m_pToken = '\0';
+
+  m_tokenLength = 0;
+}
+
+void
+Parser::setCurrentPosition(uint_t index)
 {
   m_pCrt = &m_pLine[index];
 }
 
 OSReturn_t
-Parser::skipTokens(unsigned short nTokens)
+Parser::skipTokens(uint_t nTokens)
 {
-  return skipTokens(nTokens, m_pSeparators);
+  return skipTokens(nTokens, (const char*) m_pSeparators);
 }
 
 OSReturn_t
-Parser::skipTokens(unsigned short nTokens, unsigned char* pSeparators)
+Parser::skipTokens(uint_t nTokens, const char* pSeparators)
 {
+  clearToken();
+
   OSReturn_t ret;
   ret = OSReturn::OS_OK;
 
-  for (int i = 0; i < nTokens; ++i)
+  for (uint_t i = 0; i < nTokens; ++i)
     {
-      ret = parseToken(pSeparators, m_pSpaces);
+      ret = parseNextToken(pSeparators, (const char*) m_pSpaces);
       if (ret == '\0')
         break;
     }
@@ -62,30 +74,59 @@ Parser::skipTokens(unsigned short nTokens, unsigned char* pSeparators)
 }
 
 OSReturn_t
-Parser::parseToken(void)
+Parser::parseNextToken(void)
 {
-  return parseToken(m_pSeparators, m_pSpaces);
+  return parseNextToken((const char*) m_pSeparators, (const char*) m_pSpaces);
 }
 
 // Parse to the next separator, ignoring spaces
 OSReturn_t
-Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
+Parser::parseNextToken(const char* pSeparators, const char* pSpaces)
 {
-  unsigned char* p;
+  clearToken();
+
+  uchar_t* p;
   p = m_pToken;
   if (p == 0)
-    return OSReturn::OS_NOT_INITIALIZED;
-
+    {
+      OSDeviceDebug::putString("Not initialised");
+      return OSReturn::OS_NOT_INITIALISED;
+    }
   *p = '\0';
 
-  unsigned short tlen;
+  size_t tlen;
   tlen = 0;
+
+  uchar_t c;
+  bool bSpaceFound;
+
+  for (;;)
+    {
+      c = *m_pCrt;
+      bSpaceFound = false;
+      for (uchar_t* q = (uchar_t*) pSpaces; q && *q && !bSpaceFound; ++q)
+        {
+          if (*q == c)
+            {
+              bSpaceFound = true;
+              break;
+            }
+        }
+
+      // If not space found, that's great, we can start parsing
+      if (!bSpaceFound)
+        break;
+
+      // If space found, skip it and continue to loop
+      m_pCrt++;
+    }
+
+  // We are now on the first non space character
 
   bool bFound;
   bFound = false;
   while (!bFound)
     {
-      unsigned char c;
       c = *m_pCrt++;
 
       bFound = false;
@@ -95,31 +136,33 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
         {
           bFound = true;
           m_sep = '\0';
-          --m_pCrt; // Remain on terminator
+          --m_pCrt; // Point to the terminator
+          // This make future parseNextToken do not exceed the input
         }
       else
         {
-          // Then check if a separator, like COMMA is encountered
-          for (unsigned char* q = pSeparators; q && *q && !bFound; ++q)
+          // If not end of line, check if a separator, like COMMA is encountered
+          for (uchar_t* q = (uchar_t*) pSeparators; q && *q && !bFound; ++q)
             {
               if (*q == c)
                 {
                   bFound = true;
-                  m_sep = *q;
+                  m_sep = *q; // Remeber the separator that terminated the call
                   break;
                 }
             }
 
           if (!bFound)
             {
+              // Here we have a regular character, to be returned.
+
+              // First check if there is enough free space in the token array
               if (tlen < m_tokenSize - 1)
                 {
-                  // If there is enough free space in the token array
-                  bool bSpaceFound;
                   bSpaceFound = false;
 
                   // Check if a special space character is encountered
-                  for (unsigned char* q = pSpaces; q && *q && !bSpaceFound; ++q)
+                  for (uchar_t* q = (uchar_t*) pSpaces; q && *q && !bSpaceFound; ++q)
                     {
                       if (*q == c)
                         {
@@ -127,6 +170,7 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
                           break;
                         }
                     }
+                  // If space, ignore it, do not store in the output
                   if (!bSpaceFound)
                     {
                       // Store the current character in the token array
@@ -140,7 +184,7 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
         }
     }
 
-  m_len = tlen;
+  m_tokenLength = tlen;
 
 #if defined(DEBUG) && defined(OS_DEBUG_PARSER_PARSETOKEN)
   OSDeviceDebug::putString("Token='");
@@ -154,24 +198,27 @@ Parser::parseToken(unsigned char* pSeparators, unsigned char* pSpaces)
 }
 
 OSReturn_t
-Parser::parseSubstring(unsigned short len)
+Parser::parseNextSubstring(size_t len)
 {
+  clearToken();
+
   if (len == 0)
     return OSReturn::OS_BAD_PARAMETER;
 
-  unsigned char* p;
+  uchar_t* p;
   p = m_pToken;
   *p = '\0';
 
-  unsigned char c;
+  uchar_t c;
 
-  unsigned short i;
+  size_t i;
   for (i = 0; i < len; ++i)
     {
       c = *m_pCrt++;
       if (i < m_tokenSize - 1)
         {
           *p++ = c;
+          m_tokenLength++;
         }
     }
   *p = '\0';
@@ -180,37 +227,55 @@ Parser::parseSubstring(unsigned short len)
 }
 
 OSReturn_t
-Parser::parseHex(unsigned char* pChar)
+Parser::convertHex(uchar_t* pChar)
 {
-  return parseHex(m_pToken, pChar);
+  return convertHex(m_pToken, pChar, 1);
 }
 
 OSReturn_t
-Parser::parseUnsigned(unsigned short* pShort)
+Parser::convertHex(uint16_t* pShort)
 {
-  return parseUnsigned(m_pToken, pShort);
+  return convertHex(m_pToken, pShort, 2);
 }
 
 OSReturn_t
-Parser::parseUnsigned(uint32_t* pLong)
+Parser::convertHex(uint32_t* pLong)
 {
-  return parseUnsigned(m_pToken, pLong);
+  return convertHex(m_pToken, pLong, 4);
 }
 
 OSReturn_t
-Parser::parseSigned(signed long* pLong)
+Parser::convertHex(uint_t* pInt)
 {
-  return parseSigned(m_pToken, pLong);
+  return convertHex(m_pToken, pInt, sizeof(*pInt));
 }
 
 OSReturn_t
-Parser::parseFixedPrec(signed long* pLong, unsigned short prec)
+Parser::convertUnsigned(unsigned short* pShort)
 {
-  return parseFixedPrec(m_pToken, pLong, prec, true);
+  return convertUnsigned(m_pToken, pShort);
 }
 
 OSReturn_t
-Parser::parseNibble(unsigned char nibble)
+Parser::convertUnsigned(uint32_t* pLong)
+{
+  return convertUnsigned(m_pToken, pLong);
+}
+
+OSReturn_t
+Parser::convertSigned(signed long* pLong)
+{
+  return convertSigned(m_pToken, pLong);
+}
+
+OSReturn_t
+Parser::convertFixedPrecision(int32_t* pLong, uint_t prec)
+{
+  return convertFixedPrecision(m_pToken, pLong, prec, true);
+}
+
+OSReturn_t
+Parser::convertNibble(unsigned char nibble)
 {
   unsigned char ch;
 
@@ -228,48 +293,64 @@ Parser::parseNibble(unsigned char nibble)
 }
 
 OSReturn_t
-Parser::parseHex(unsigned char* pStr, unsigned char* pChar)
+Parser::convertHex(unsigned char* pStr, void* p, size_t size)
 {
-  unsigned char ch;
-
-  ch = 0;
-  for (int i = 0; i < 2; ++i)
+  if (p == NULL)
     {
-      ch <<= 4;
+      OSDeviceDebug::putString("Null Pointer");
+      return OSReturn::OS_NULL_POINTER;
+    }
 
-      unsigned char nibble;
-      nibble = *pStr++;
+  uint32_t v;
+  v = 0;
+
+  for (uchar_t nibble; ((nibble = *pStr) != '\0'); pStr++)
+    {
+      v <<= 4;
 
       if ('0' <= nibble && nibble <= '9')
-        ch |= (nibble - '0');
+        v |= (nibble - '0');
       else if ('a' <= nibble && nibble <= 'f')
-        ch |= (nibble - (unsigned char) 'a' + 10);
+        v |= (nibble - (unsigned char) 'a' + 10);
       else if ('A' <= nibble && nibble <= 'F')
-        ch |= (nibble - (unsigned char) 'A' + 10);
+        v |= (nibble - (unsigned char) 'A' + 10);
       else
         return OSReturn::OS_BAD_PARAMETER;
     }
 
-  *pChar = ch;
+  if (size == 1)
+    *((uint8_t*) p) = (uint8_t) v;
+  else if (size == 2)
+    *((uint16_t*) p) = (uint16_t) v;
+  else
+    *((uint32_t*) p) = (uint32_t) v;
+
   return OSReturn::OS_OK;
 }
 
 OSReturn_t
-Parser::parseUnsigned(unsigned char* pStr, unsigned short* pShort)
+Parser::convertUnsigned(uchar_t* pStr, uint16_t* pShort)
 {
-  unsigned short w;
-  unsigned char c;
-
-  w = 0;
-  while ((c = *pStr) != '\0')
+  if (pShort == NULL)
     {
-      if ('0' <= c && c <= '9')
+      OSDeviceDebug::putString("Null Pointer");
+      return OSReturn::OS_NULL_POINTER;
+    }
+
+  uint16_t w;
+  w = 0;
+
+  uchar_t ch;
+
+  while ((ch = *pStr) != '\0')
+    {
+      if ('0' <= ch && ch <= '9')
         {
           w *= 10;
-          w += (c - '0');
+          w += (ch - '0');
         }
       else
-        return c;
+        return ch;
 
       ++pStr;
     }
@@ -278,60 +359,72 @@ Parser::parseUnsigned(unsigned char* pStr, unsigned short* pShort)
 }
 
 OSReturn_t
-Parser::parseSigned(unsigned char* pStr, signed long* pLong)
+Parser::convertSigned(uchar_t* pStr, int32_t* pLong)
 {
-  return parseFixedPrec(pStr, pLong, 0, true);
+  return convertFixedPrecision(pStr, pLong, 0, true);
 }
 
 OSReturn_t
-Parser::parseUnsigned(unsigned char* pStr, unsigned long* pLong)
+Parser::convertUnsigned(uchar_t* pStr, uint32_t* pLong)
 {
-  return parseFixedPrec(pStr, (signed long*) pLong, 0, false);
+  return convertFixedPrecision(pStr, (signed long*) pLong, 0, false);
 }
 
 OSReturn_t
-Parser::parseFixedPrec(unsigned char* pStr, signed long* pLong,
-    unsigned short prec, bool hasSign)
+Parser::convertFixedPrecision(uchar_t* pStr, int32_t* pLong, uint_t prec,
+    bool hasSign)
 {
-  signed long l;
-  unsigned char c;
+  if (pLong == NULL)
+    {
+      OSDeviceDebug::putString("Null Pointer");
+      return OSReturn::OS_NULL_POINTER;
+    }
 
+  int32_t l;
   l = 0;
+
   bool bMinus;
   bMinus = false;
 
-  for (; (c = *pStr) == ' ';)
+  uchar_t ch;
+
+  for (; isspace((ch = *pStr));)
     {
       ++pStr; // ignore leading spaces
     }
 
-  if (hasSign && (c = *pStr) != '\0')
+  if (*pStr == '\0')
     {
-      if (c == '-')
+      return OSReturn::OS_EMPTY_STRING;
+    }
+
+  if (hasSign && (ch = *pStr) != '\0')
+    {
+      if (ch == '-')
         {
           pStr++;
           bMinus = true;
         }
-      else if (c == '+')
+      else if (ch == '+')
         {
           pStr++;
         }
     }
 
-  while ((c = *pStr) != '\0')
+  while ((ch = *pStr) != '\0')
     {
-      if ('0' <= c && c <= '9')
+      if ('0' <= ch && ch <= '9')
         {
           l *= 10;
-          l += (c - '0');
+          l += (ch - '0');
         }
-      else if (c == '.')
+      else if (ch == '.')
         {
           ++pStr; // skip '.'
           break;
         }
       else
-        return c;
+        return ch;
 
       ++pStr;
     }
@@ -339,15 +432,15 @@ Parser::parseFixedPrec(unsigned char* pStr, signed long* pLong,
   for (uint_t i = 0; i < prec; ++i)
     {
       l *= 10;
-      c = *pStr;
-      if (c != '\0')
+      ch = *pStr;
+      if (ch != '\0')
         {
-          if ('0' <= c && c <= '9')
+          if ('0' <= ch && ch <= '9')
             {
-              l += (c - '0');
+              l += (ch - '0');
             }
           else
-            return c;
+            return ch;
 
           ++pStr;
         }
@@ -363,30 +456,42 @@ Parser::parseFixedPrec(unsigned char* pStr, signed long* pLong,
 #if false
 bool
 Parser::doesTokenStartWith(const unsigned char* pStr)
-{
-  return (strncmp((const char*) m_pToken, (const char*) pStr,
-      strlen((const char*) pStr)) == 0);
-}
+  {
+    return (strncmp((const char*) m_pToken, (const char*) pStr,
+            strlen((const char*) pStr)) == 0);
+  }
 #endif
 
 bool
-Parser::doesStringStartWithToken(const unsigned char* pStr)
+Parser::doesStringStartWithToken(const char* pStr)
 {
-  return (strncmp((const char*) pStr, (const char*) m_pToken,
-      strlen((const char*) m_pToken)) == 0);
+  if (m_tokenLength == 0)
+    return false;
+
+  return (strncmp(pStr, (const char*) m_pToken, strlen((const char*) m_pToken))
+      == 0);
 }
 
 int
-Parser::tokenCompare(const unsigned char* pStr)
+Parser::compareStringWithToken(const char* pStr)
 {
-  return strcmp((const char*) m_pToken, (const char*) pStr);
+  return strcmp(pStr, (const char*) m_pToken);
+}
+
+bool
+Parser::doesStringMatchToken(const char* pStr)
+{
+  if (m_tokenLength == 0)
+    return false;
+
+  return (strcmp(pStr, (const char*) m_pToken) == 0);
 }
 
 // Warning: does not work on AVR32
 int
-Parser::tokenCompareIgnoreCase(const unsigned char* pStr)
+Parser::compareStringWithTokenIgnoreCase(const char* pStr)
 {
-  return strcasecmp((const char*) m_pToken, (const char*) pStr);
+  return strcasecmp(pStr, (const char*) m_pToken);
 }
 
 #endif /* defined(OS_INCLUDE_PARSER) */
