@@ -58,6 +58,8 @@ public:
   // Output, on debug interface, a string.
   static void
   putString(const char* pc);
+  static void
+  putString(uchar_t* pc);
 
   static void
   putConstructor(const char* pc, const void* p);
@@ -72,6 +74,8 @@ public:
   // until the first zero byte.
   static void
   putString_P(const char* PROGMEM pc);
+  static void
+  putString_P(uchar_t* PROGMEM pc);
 
   static void
   putConstructor_P(const char* PROGMEM pc, const void* p);
@@ -252,6 +256,11 @@ OSDeviceDebug::putString(const char __attribute__((unused)) * pc)
   }
 
 inline void
+OSDeviceDebug::putString(uchar_t __attribute__((unused)) * pc)
+  {
+  }
+
+inline void
 OSDeviceDebug::putConstructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
   {
   }
@@ -270,6 +279,10 @@ OSDeviceDebug::putDestructor(const char* pc __attribute__((unused)), const void*
 #if defined(OS_INCLUDE_SEPARATE_PROGMEM)
 
 inline void OSDeviceDebug::putString_P(const char* PROGMEM pc __attribute__((unused)))
+  {
+  }
+
+inline void OSDeviceDebug::putString_P(uchar_t* PROGMEM pc __attribute__((unused)))
   {
   }
 
