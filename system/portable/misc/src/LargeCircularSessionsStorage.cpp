@@ -60,7 +60,7 @@ LargeCircularSessionsStorageWriter::writeSessionBlock(uint8_t* pBuf)
 {
   if (m_sessionUniqueId == 0)
     {
-      return OSReturn::OS_NOT_INITIALIZED;
+      return OSReturn::OS_NOT_INITIALISED;
     }
 
   // Fill-in the block header, currently having three fields
