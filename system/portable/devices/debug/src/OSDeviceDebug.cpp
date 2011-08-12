@@ -174,6 +174,12 @@ OSDeviceDebug::putString(const char* pc)
 }
 
 void
+OSDeviceDebug::putString(uchar_t* pc)
+{
+  putString((const char*)pc);
+}
+
+void
 OSDeviceDebug::putHex(uint8_t b)
 {
   unsigned char c;
