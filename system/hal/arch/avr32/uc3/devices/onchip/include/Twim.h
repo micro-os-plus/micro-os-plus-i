@@ -23,8 +23,17 @@ namespace avr32
 
       // ----- Type definitions -----------------------------------------------
 
-      typedef uint32_t ClockFrequencyHz_t;
+      typedef uint32_t BusSpeedKbps_t;
+      typedef uint16_t Address_t;
 
+      class BusSpeed
+      {
+      public:
+        const static BusSpeedKbps_t STANDARD_MODE = 100;
+        const static BusSpeedKbps_t FAST_MODE = 400;
+        const static BusSpeedKbps_t FAST_PLUS_MODE = 1000;
+        const static BusSpeedKbps_t HIGH_MODE = 3400;
+      };
     public:
 
       // ----- Constructors & Destructors -------------------------------------
@@ -56,8 +65,39 @@ namespace avr32
       configureSmbus(uint32_t value);
 
       OSReturn_t
-       configureClockFrequencyHz(ClockFrequencyHz_t speed);
+      configureBusSpeedKbps(BusSpeedKbps_t speed);
 
+      // This is the main transfer method, doing a write followed by a read.
+      OSReturn_t
+      writeByteArrayReadByteArray(Address_t addr, uint8_t* outgoingBytes,
+          size_t outgoingBytesLength, uint8_t* incomingBytes,
+          size_t incomingBytesSize, size_t* pIncomingBytesLength);
+
+      // Sends only the address; if the device is not there, a NACK will
+      // be returned
+      OSReturn_t
+      probeDevice(Address_t addr);
+
+      // Write a single byte
+      OSReturn_t
+      writeByte(Address_t addr, uint8_t b);
+
+      // Write a byte array
+      OSReturn_t
+      writeByteArray(Address_t addr, uint8_t* outgoingBytes,
+          size_t outgoingBytesLength);
+
+      // Write a single byte and read a byte array
+      OSReturn_t
+      writeByteReadByteArray(Address_t addr, uint8_t b, uint8_t* incomingBytes,
+          size_t incomingBytesSize, size_t* pIncomingBytesLength);
+
+      // Read into a byte array
+      OSReturn_t
+      readByteArray(Address_t addr, uint8_t* incomingBytes,
+          size_t incomingBytesSize, size_t* pIncomingBytesLength);
+
+      // ---
       void
       setGpioConfigurationArray(
           avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray);
@@ -96,7 +136,6 @@ namespace avr32
 
       twim::ModuleId_t m_module;
       avr32::uc3::gpio::PinPeripheralFunction_t* m_pGpioConfigurationArray;
-
 
       // ----------------------------------------------------------------------
     };
@@ -137,7 +176,7 @@ namespace avr32
       moduleRegisters.writeInterruptDisable(~0);
     }
 
-    inline       void
+    inline void
     Twim::clearStatus(void)
     {
       moduleRegisters.writeStatusClear(~0);
@@ -148,6 +187,43 @@ namespace avr32
         avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray)
     {
       m_pGpioConfigurationArray = pGpioConfigurationArray;
+    }
+
+    inline OSReturn_t
+    Twim::probeDevice(Address_t addr)
+    {
+      return writeByteArrayReadByteArray(addr, NULL, 0, NULL, 0, NULL);
+    }
+
+    inline OSReturn_t
+    Twim::writeByte(Address_t addr, uint8_t b)
+    {
+      return writeByteArrayReadByteArray(addr, &b, 1, NULL, 0, NULL);
+    }
+
+    inline OSReturn_t
+    Twim::writeByteArray(Address_t addr, uint8_t* outgoingBytes,
+        size_t outgoingBytesLength)
+    {
+      return writeByteArrayReadByteArray(addr, outgoingBytes,
+          outgoingBytesLength, NULL, 0, NULL);
+    }
+
+    inline OSReturn_t
+    Twim::writeByteReadByteArray(Address_t addr, uint8_t b,
+        uint8_t* incomingBytes, size_t incomingBytesSize,
+        size_t* pIncomingBytesLength)
+    {
+      return writeByteArrayReadByteArray(addr, &b, 1, incomingBytes,
+          incomingBytesSize, pIncomingBytesLength);
+    }
+
+    inline OSReturn_t
+    Twim::readByteArray(Address_t addr, uint8_t* incomingBytes,
+        size_t incomingBytesSize, size_t* pIncomingBytesLength)
+    {
+      return writeByteArrayReadByteArray(addr, NULL, 0, incomingBytes,
+          incomingBytesSize, pIncomingBytesLength);
     }
 
   // ------------------------------------------------------------------------
