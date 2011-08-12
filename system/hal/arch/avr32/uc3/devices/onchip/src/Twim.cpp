@@ -89,7 +89,7 @@ namespace avr32
 
       clearStatus();
 
-      return configureClockFrequencyHz(400000);
+      return configureBusSpeedKbps(BusSpeed::STANDARD_MODE);
     }
 
     void
@@ -100,12 +100,12 @@ namespace avr32
     }
 
     OSReturn_t
-    Twim::configureClockFrequencyHz(ClockFrequencyHz_t speed)
+    Twim::configureBusSpeedKbps(BusSpeedKbps_t speed)
     {
       uint32_t prescaler;
       uint8_t exponent = 0;
 
-      prescaler = (getInputClockFrequencyHz() / speed / 2);
+      prescaler = (getInputClockFrequencyHz() / (speed * 1000) / 2);
 
       // prescaler must fit in 8 bits, exponent must fit in 3 bits
 
@@ -142,6 +142,23 @@ namespace avr32
 
       return OSReturn::OS_OK;
     }
+
+    OSReturn_t
+    Twim::writeByteArrayReadByteArray(Address_t addr, uint8_t* outgoingBytes,
+        size_t outgoingBytesLength, uint8_t* incomingBytes,
+        size_t incomingBytesSize, size_t* pIncomingBytesLength)
+    {
+      OSDeviceDebug::putString("I2C addr=");
+      OSDeviceDebug::putHex(addr);
+      OSDeviceDebug::putString(", wl=");
+      OSDeviceDebug::putDec(outgoingBytesLength);
+      OSDeviceDebug::putString(", rl=");
+      OSDeviceDebug::putDec(incomingBytesSize);
+      OSDeviceDebug::putNewLine();
+
+      return OSReturn::OS_OK;
+    }
+
 
   // --------------------------------------------------------------------------
 
