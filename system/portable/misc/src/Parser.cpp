@@ -301,6 +301,17 @@ Parser::convertHex(unsigned char* pStr, void* p, size_t size)
       return OSReturn::OS_NULL_POINTER;
     }
 
+  uchar_t ch;
+  for (; isspace((ch = *pStr));)
+    {
+      ++pStr; // ignore leading spaces
+    }
+
+  if (*pStr == '\0')
+    {
+      return OSReturn::OS_EMPTY_STRING;
+    }
+
   uint32_t v;
   v = 0;
 
@@ -337,10 +348,19 @@ Parser::convertUnsigned(uchar_t* pStr, uint16_t* pShort)
       return OSReturn::OS_NULL_POINTER;
     }
 
+  uchar_t ch;
+  for (; isspace((ch = *pStr));)
+    {
+      ++pStr; // ignore leading spaces
+    }
+
+  if (*pStr == '\0')
+    {
+      return OSReturn::OS_EMPTY_STRING;
+    }
+
   uint16_t w;
   w = 0;
-
-  uchar_t ch;
 
   while ((ch = *pStr) != '\0')
     {
