@@ -29,7 +29,7 @@ namespace avr32
         const static ModuleId_t TWIM1 = 1;
       };
 
-      typedef uint32_t StatusRegister_t;
+      typedef uint32_t Status_t;
 
       // ----- Port memory mapped registers -----------------------------------
 
@@ -98,7 +98,7 @@ namespace avr32
         void
         writeTransmitHolding(uint8_t value);
 
-        uint32_t
+        Status_t
         readStatus(void);
 
         // Writing 1 to a bit will set IMR; writing 0 will be ignored
@@ -191,7 +191,7 @@ namespace avr32
         this->thr = value;
       }
 
-      inline uint32_t
+      inline Status_t
       ModuleRegisters::readStatus(void)
       {
         return this->sr;
