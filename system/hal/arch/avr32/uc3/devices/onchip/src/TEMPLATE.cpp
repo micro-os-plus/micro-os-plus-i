@@ -85,10 +85,16 @@ namespace avr32
     }
 
     OSReturn_t
-    Template:: configureClockFrequencyHz(ClockFrequencyHz_t speed)
+    Template::configureClockFrequencyHz(ClockFrequencyHz_t speed)
     {
-          return OSReturn::OS_OK;
-        }
+      return OSReturn::OS_OK;
+    }
+
+    void
+    Template::interruptServiceRoutine(void)
+    {
+      ;
+    }
 
     // --------------------------------------------------------------------------
 
