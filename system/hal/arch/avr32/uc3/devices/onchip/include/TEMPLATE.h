@@ -12,6 +12,7 @@
 #include "hal/arch/avr32/uc3/devices/onchip/include/Template_Definitions.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Intc.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
 
 /*
  * Template for device drivers.
@@ -42,6 +43,7 @@ namespace avr32
       // ----- Type definitions -----------------------------------------------
 
       typedef uint32_t ClockFrequencyHz_t;
+      typedef uint32_t BusSpeedKbps_t;
 
     public:
 
@@ -70,8 +72,14 @@ namespace avr32
       void
       disable();
 
+      bool
+      isEnabled(void);
+
       OSReturn_t
-       configureClockFrequencyHz(ClockFrequencyHz_t speed);
+      configureClockFrequencyHz(ClockFrequencyHz_t speed);
+
+      OSReturn_t
+      configureBusSpeedKbps(BusSpeedKbps_t speed);
 
       void
       setGpioConfigurationArray(
@@ -83,6 +91,8 @@ namespace avr32
       uint32_t
       getInputClockFrequencyHz(void);
 
+      void
+      interruptServiceRoutine(void);
 
     private:
 
@@ -116,8 +126,8 @@ namespace avr32
     {
       // TODO: use the appropriate one
 
-      //return OS_CFGLONG_PBA_FREQUENCY_HZ;
-      return OS_CFGLONG_PBB_FREQUENCY_HZ;
+      Pm::getPbaClockFrequencyHz();
+      //Pm::getPbaClockFrequencyHz();
     }
 
     inline void
@@ -154,7 +164,7 @@ namespace avr32
       m_pGpioConfigurationArray = pGpioConfigurationArray;
     }
 
-    // ------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
   }
 }
 
