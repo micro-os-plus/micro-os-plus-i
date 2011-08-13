@@ -26,6 +26,17 @@ namespace avr32
     Intc::registerInterruptHandler(intc::InterruptHandler_t handler,
         intc::InterruptIndex_t index, intc::Priority_t priority)
     {
+      OSDeviceDebug::putString("Intc::registerInterruptHandler(");
+      OSDeviceDebug::putPtr((void*)handler);
+      OSDeviceDebug::putChar(',');
+      OSDeviceDebug::putDec(index/32);
+      OSDeviceDebug::putString("*32+");
+      OSDeviceDebug::putDec(index%32);
+      OSDeviceDebug::putChar(',');
+      OSDeviceDebug::putDec(priority);
+      OSDeviceDebug::putChar(')');
+      OSDeviceDebug::putNewLine();
+
       // TODO: implement locally
       // Until then, call the framework
       INTC_register_interrupt(handler, index, priority);
