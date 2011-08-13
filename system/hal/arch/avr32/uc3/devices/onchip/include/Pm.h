@@ -21,6 +21,8 @@ namespace avr32
 
       // ----- Type definitions -----------------------------------------------
 
+      typedef uint32_t ClockFrequencyHz_t;
+
     public:
 
       // ----- Constructors & Destructors -------------------------------------
@@ -31,6 +33,12 @@ namespace avr32
     public:
 
       // ----- Public methods -------------------------------------------------
+
+      static ClockFrequencyHz_t
+      getPbaClockFrequencyHz(void);
+
+      static ClockFrequencyHz_t
+      getPbbClockFrequencyHz(void);
 
     private:
 
@@ -51,6 +59,17 @@ namespace avr32
       // ----------------------------------------------------------------------
     };
 
+    inline Pm::ClockFrequencyHz_t
+    Pm::getPbaClockFrequencyHz(void)
+    {
+      return OS_CFGLONG_PBA_FREQUENCY_HZ;
+    }
+
+    inline Pm::ClockFrequencyHz_t
+    getPbbClockFrequencyHz(void)
+    {
+      return OS_CFGLONG_PBB_FREQUENCY_HZ;
+    }
   }
 
 }
