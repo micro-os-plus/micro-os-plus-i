@@ -31,7 +31,7 @@ namespace avr32
         const static ModuleId_t USART3 = 3;
       };
 
-      typedef uint32_t StatusRegister_t;
+      typedef uint32_t Status_t;
 
       // ----- Port memory mapped registers -----------------------------------
 
@@ -68,6 +68,9 @@ namespace avr32
 
         void
         writeControl(uint32_t mask);
+
+        Status_t
+        readStatus(void);
 
         void
         writeMode(uint32_t value);
