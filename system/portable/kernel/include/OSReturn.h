@@ -45,6 +45,7 @@ public:
   const static OSReturn_t OS_IGNORED = -28;
   const static OSReturn_t OS_NACK = -29;
   const static OSReturn_t OS_EMPTY_STRING = -30;
+  const static OSReturn_t OS_NOT_ENABLED = -31;
 };
 
 // ----------------------------------------------------------------------------
