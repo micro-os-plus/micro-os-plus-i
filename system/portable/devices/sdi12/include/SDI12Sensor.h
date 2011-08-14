@@ -218,6 +218,12 @@ private:
   isAddressValid(unsigned char addr);
 
   static void
+  clearDindex(void);
+
+  static void
+  clearPreviousDdigit(void);
+
+  static void
   rs485Init(void);
   static void
   rs485Receive(void);
@@ -331,7 +337,7 @@ private:
   const static OSEventFlagsBits_t ADDRESS = 0x0010;
   const static OSEventFlagsBits_t MARKING = 0x0020;
   const static OSEventFlagsBits_t TIMEOUT = 0x0040;
-  //const static OSEventFlagsBits_t TIMEOUT = 0x0080;
+  const static OSEventFlagsBits_t MARKING_CANCELLED = 0x0080;
 
   // proto flags
   const static OSEventFlagsBits_t INITIALIZED = 0x0100;
@@ -411,6 +417,7 @@ private:
   static volatile OSTimerTicks_t ms_ticksBRK;
 
   static volatile OSTimerTicks_t ms_ticksRX;
+  static volatile OSTimerTicks_t ms_ticksExclamation;
 
   static unsigned char ms_delayedMode;
 
@@ -418,8 +425,6 @@ private:
 
   static OSThread* ms_pThread;
   static OSThread* ms_pThreadA;
-
-  static volatile OSTimerTicks_t ms_exclamationTicks;
 
   static unsigned char ms_state;
   static bool ms_moreProcessing;
@@ -441,10 +446,17 @@ private:
 
   static volatile bool ms_bAcquire;
 
-  static volatile unsigned char ms_dCmd;
-  static volatile unsigned char ms_dDigit;
+  static volatile unsigned char ms_measureCmd;
+  static volatile unsigned char ms_measureCmdDigit;
+  static volatile unsigned char ms_currentCmd;
+  static volatile unsigned char ms_currentCmdDigit;
   static unsigned int ms_dSeconds;
-  static volatile unsigned char ms_dIndex;
+  static volatile unsigned char ms_nextDindex;
+  static volatile unsigned char ms_currentDindex;
+  static volatile unsigned char ms_previousDindex;
+  static volatile unsigned char ms_previousDdigit;
+
+  static volatile int ms_timeoutCounter;
 
   //static volatile bool ms_bIsCancelled;
   static volatile bool ms_bDAvailable;
