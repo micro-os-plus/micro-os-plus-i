@@ -55,15 +55,24 @@ volatile bool SDI12Sensor::ms_breakDetectEnable;
 volatile OSTimerTicks_t SDI12Sensor::ms_cntMarking;
 
 volatile OSTimerTicks_t SDI12Sensor::ms_ticksBRK;
+volatile OSTimerTicks_t SDI12Sensor::ms_ticksExclamation;
 
 volatile unsigned char SDI12Sensor::ms_outIndex;
 volatile bool SDI12Sensor::ms_useCRC;
 volatile bool SDI12Sensor::ms_cmdCRC;
 
-volatile unsigned char SDI12Sensor::ms_dCmd;
-volatile unsigned char SDI12Sensor::ms_dDigit;
+volatile unsigned char SDI12Sensor::ms_measureCmd;
+volatile unsigned char SDI12Sensor::ms_measureCmdDigit;
+volatile unsigned char SDI12Sensor::ms_currentCmd;
+volatile unsigned char SDI12Sensor::ms_currentCmdDigit;
 unsigned int SDI12Sensor::ms_dSeconds;
-volatile unsigned char SDI12Sensor::ms_dIndex;
+volatile unsigned char SDI12Sensor::ms_nextDindex;
+
+volatile unsigned char SDI12Sensor::ms_currentDindex;
+volatile unsigned char SDI12Sensor::ms_previousDindex;
+volatile unsigned char SDI12Sensor::ms_previousDdigit;
+
+volatile int SDI12Sensor::ms_timeoutCounter;
 
 volatile bool SDI12Sensor::ms_bDAvailable;
 volatile bool SDI12Sensor::ms_bAcquire;
@@ -71,7 +80,7 @@ volatile bool SDI12Sensor::ms_bServiceRequest;
 
 unsigned char SDI12Sensor::ms_delayedMode;
 
-volatile OSTimerTicks_t SDI12Sensor::ms_exclamationTicks;
+//volatile OSTimerTicks_t SDI12Sensor::ms_exclamationTicks;
 
 OSTime_t SDI12Sensor::ms_periodicNextSecond;
 OSEventFlags SDI12Sensor::ms_flags;
@@ -125,6 +134,8 @@ SDI12Sensor::SDI12Sensor(const char* pNameAcquire,
 
   ms_timerTimeout = 0;
   ms_timerMarking = 0;
+
+  ms_timeoutCounter = 0;
 
   disableBreakDetect();
 }
@@ -215,6 +226,8 @@ SDI12Sensor::interruptTick(void)
             {
               // pin is low, automatically reset timer
               ms_timerMarking = ms_cntMarking;
+              // and notify task that this is not a marking condition
+              ms_flags.notify(MARKING_CANCELLED);
             }
           else
             {
@@ -351,7 +364,8 @@ SDI12Sensor::threadMainSDI12(void)
         // should be already cleared by the interrupt
         cpuSleepCritical.clear();
 
-        pThreadSDI12->virtualWatchdogSet(OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
+        pThreadSDI12->virtualWatchdogSet(
+            OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
         ms_state = STATE1;
         break;
@@ -375,16 +389,29 @@ SDI12Sensor::threadMainSDI12(void)
             usartRxEnable();
 
             OSDeviceDebug::putChar('(');
-            ms_flags.clear(MARKING);
+            ms_flags.clear(MARKING | RX_ERROR | MARKING_CANCELLED);
             enableMarking(MARKING8_TICKS);
-            ms_flags.wait(MARKING);
+            ms_flags.wait(MARKING | RX_ERROR | MARKING_CANCELLED);
             flags = ms_flags.get();
             disableMarking();
             OSDeviceDebug::putChar(')');
           }
         cpuSleepCritical.exit();
 
-        ms_state = STATE3;
+        if ((flags & (RX_ERROR | MARKING_CANCELLED)) != 0)
+          {
+            OSDeviceDebug::putString("->0");
+
+            // NOTICE: this is not in the specs, but we use it as an
+            // safety net, in case hunting marking is not fully accurate
+            // (without it the virtual WD will trigger)
+            ms_state = STATE0;
+          }
+        else if ((flags & MARKING) != 0)
+          {
+            ms_state = STATE3;
+          }
+
         break;
 
       case STATE3:
@@ -435,7 +462,7 @@ SDI12Sensor::threadMainSDI12(void)
 
             if ((flags & EXCLAMATION) != 0)
               {
-                ms_exclamationTicks = ms_ticksRX;
+                // ms_ticksExclamation = ms_ticksRX; // Already set in IRQ
 
                 usartRxDisable();
 
@@ -468,7 +495,7 @@ SDI12Sensor::threadMainSDI12(void)
         cpuSleepCritical.enter();
           {
             unsigned int delta;
-            delta = OSScheduler::timerTicks.getTicks() - ms_exclamationTicks;
+            delta = OSScheduler::timerTicks.getTicks() - ms_ticksExclamation;
 
             if (delta < OSTimerTicks::microsToTicks(8330))
               {
@@ -476,11 +503,19 @@ SDI12Sensor::threadMainSDI12(void)
                 OSScheduler::timerTicks.sleep(
                     OSTimerTicks::microsToTicks(8330) - delta + 1);
               }
-            else if (delta > OSTimerTicks::microsToTicks(15000))
+            else if (delta > OSTimerTicks::microsToTicks(14000))
               {
-                // NOTICE: not in the specs,
-                // if response not ready in required time,
-                // do not transmit response
+                // The specs require the response to be ready in 15 millis
+                // What to do if the response is not ready in the required time?
+                //
+                // Our choice is count the timeouts and to not transmit the
+                // response at all (an obvious timeout is better than a
+                // marginal one)
+                // NOTICE: this is not in the specs!
+
+
+                ms_timeoutCounter++;
+
                 ms_state = STATE2;
 
 #if defined(DEBUG)
@@ -492,6 +527,24 @@ SDI12Sensor::threadMainSDI12(void)
             if (ms_state == STATE5)
               {
                 transmitResponse();
+
+                // Was the command a D?
+                if (ms_currentCmd == 'D')
+                  {
+                    // Assume the recorder received this D properly;
+                    // advance the index for the next D
+                    ms_nextDindex = ms_currentDindex;
+
+#if defined(OS_DEBUG_SDI12SENSOR_D_COMMAND)
+                    OSDeviceDebug::putString(" D");
+                    OSDeviceDebug::putDec(ms_previousDdigit);
+                    OSDeviceDebug::putChar('@');
+                    OSDeviceDebug::putDec(ms_previousDindex);
+                    OSDeviceDebug::putChar('-');
+                    OSDeviceDebug::putDec(ms_nextDindex);
+                    OSDeviceDebug::putNewLine();
+#endif
+                  }
 
                 if (!ms_moreProcessing)
                   {
@@ -722,7 +775,7 @@ SDI12Sensor::threadMainSDI12(void)
 
             if ((flags & EXCLAMATION) != 0)
               {
-                ms_exclamationTicks = ms_ticksRX;
+                // ms_ticksExclamation = ms_ticksRX; // already don in IRQ
 
                 usartRxDisable();
 
@@ -773,7 +826,23 @@ SDI12Sensor::threadMainSDI12(void)
     }
 }
 
-// return false if bad address
+void
+SDI12Sensor::clearDindex(void)
+{
+  ms_nextDindex = 0;
+  ms_currentDindex = 0;
+}
+
+void
+SDI12Sensor::clearPreviousDdigit(void)
+{
+  // Here legal values are 0-9, so any other values are equally good
+  ms_previousDdigit = 0xFF;
+}
+
+// if bad command or bad address, return false
+// this will make the stame machine to go to STATE2
+// i.e. the command will timeout
 bool
 SDI12Sensor::processCommand(void)
 {
@@ -784,6 +853,8 @@ SDI12Sensor::processCommand(void)
   ms_delayedMode = DELAYED_MODE_NONE;
   ms_doReset = 0;
   ms_bServiceRequest = false;
+  ms_currentCmdDigit = 0xFF;
+  ms_measureCmdDigit = 0xFF;
 
   unsigned char cnt;
   cnt = ms_bufCount;
@@ -791,8 +862,11 @@ SDI12Sensor::processCommand(void)
   ms_buf[cnt] = '\0';
   unsigned char addr;
   addr = ms_buf[0];
+
   unsigned char cmd;
   cmd = ms_buf[1];
+  ms_currentCmd = cmd;
+
   unsigned char cmdp1;
   cmdp1 = ms_buf[2];
 
@@ -813,6 +887,8 @@ SDI12Sensor::processCommand(void)
     cmdDigit -= '0';
   else
     cmdDigit = 0;
+
+  ms_currentCmdDigit = cmdDigit;
 
   // add string terminating mark
   //unsigned char* ms_pBuf;
@@ -839,6 +915,11 @@ SDI12Sensor::processCommand(void)
     }
   else
     {
+      // For D commands, we need to remember the digit of the previous command.
+      // All other commands must clear this information.
+      if (cmd != 'D')
+        clearPreviousDdigit();
+
       switch (cmd)
         {
       case 'I':
@@ -910,9 +991,9 @@ SDI12Sensor::processCommand(void)
             storeUnsignedResponse((unsigned short) ms_dCount,
                 (unsigned short) ((cmd == 'C') ? 2 : 1));
 
-            ms_dCmd = cmd;
-            ms_dDigit = cmdDigit;
-            ms_dIndex = 0;
+            ms_measureCmd = cmd;
+            ms_measureCmdDigit = cmdDigit;
+            clearDindex();
             ms_bDAvailable = false;
             ms_useCRC = cmdC;
 
@@ -920,7 +1001,8 @@ SDI12Sensor::processCommand(void)
             // expected to be returned
             ms_bAcquire = (ms_dCount != 0);
 
-            if (((ms_dCmd == 'M') || (ms_dCmd == 'V')) && (ms_dSeconds != 0))
+            if (((ms_measureCmd == 'M') || (ms_measureCmd == 'V'))
+                && (ms_dSeconds != 0))
               {
                 ms_bServiceRequest = true;
               }
@@ -948,71 +1030,115 @@ SDI12Sensor::processCommand(void)
                 // ms_dPtr points to ms_dCount values to be returned
                 ms_cmdCRC = ms_useCRC;
 
-                if (cmdDigit == 0)
-                  ms_dIndex = 0;
+                ms_currentCmdDigit = cmdDigit;
 
-                if (ms_dCmd == 'C')
+#if defined(OS_DEBUG_SDI12SENSOR_D_COMMAND)
+                OSDeviceDebug::putChar('K');
+                OSDeviceDebug::putChar('0' + cmdDigit);
+                OSDeviceDebug::putChar('0' + ms_previousDdigit);
+#endif
+
+                if (cmdDigit == 0)
                   {
-                    if (sizeof(ms_buf) > 75
-                        + OS_CFGINT_SDI12SENSOR_BUFFER_EXTRA)
-                      {
-                        ms_pBufMax = &ms_buf[75
-                            + OS_CFGINT_SDI12SENSOR_BUFFER_EXTRA]; // limit to 75
-                      }
-                    else
-                      {
-                        ms_pBufMax = &ms_buf[sizeof(ms_buf)];
-                      }
+                    clearDindex();
+                  }
+                else if (cmdDigit == ms_previousDdigit)
+                  {
+                    // Same D command as before, start from the same index
+                    ms_currentDindex = ms_previousDindex;
+#if defined(OS_DEBUG_SDI12SENSOR_D_COMMAND)
+                    OSDeviceDebug::putChar('P');
+                    OSDeviceDebug::putChar('0' + ms_currentDindex);
+#endif
+                  }
+                else if (cmdDigit == (ms_previousDdigit + 1))
+                  {
+                    // Continue from where we left on the previous D
+                    ms_currentDindex = ms_nextDindex;
+#if defined(OS_DEBUG_SDI12SENSOR_D_COMMAND)
+                    OSDeviceDebug::putChar('0' + ms_currentDindex);
+#endif
                   }
                 else
                   {
-                    if (sizeof(ms_buf) > 35
-                        + OS_CFGINT_SDI12SENSOR_BUFFER_EXTRA)
+                    // Due to memory limitations, we cannot reply with
+                    // the same data to previously replied commands, so
+                    // better return an empty response
+                    ms_currentDindex = 0xFF;
+                  }
+
+                if (ms_currentDindex != 0xFF)
+                  {
+                    // Remember the current command digit and index, for just in case
+                    // the data recorder resends it
+                    ms_previousDdigit = ms_currentCmdDigit;
+                    ms_previousDindex = ms_currentDindex;
+
+                    if (ms_measureCmd == 'C')
                       {
-                        ms_pBufMax = &ms_buf[35
-                            + OS_CFGINT_SDI12SENSOR_BUFFER_EXTRA]; // limit to 35
+                        if (sizeof(ms_buf) > 75
+                            + OS_CFGINT_SDI12SENSOR_BUFFER_EXTRA)
+                          {
+                            ms_pBufMax = &ms_buf[75
+                                + OS_CFGINT_SDI12SENSOR_BUFFER_EXTRA]; // limit to 75
+                          }
+                        else
+                          {
+                            ms_pBufMax = &ms_buf[sizeof(ms_buf)];
+                          }
                       }
                     else
                       {
-                        ms_pBufMax = &ms_buf[sizeof(ms_buf)];
+                        if (sizeof(ms_buf) > 35
+                            + OS_CFGINT_SDI12SENSOR_BUFFER_EXTRA)
+                          {
+                            ms_pBufMax = &ms_buf[35
+                                + OS_CFGINT_SDI12SENSOR_BUFFER_EXTRA]; // limit to 35
+                          }
+                        else
+                          {
+                            ms_pBufMax = &ms_buf[sizeof(ms_buf)];
+                          }
                       }
-                  }
 
-                ms_pBufMax -= 1; // adjust for last usable, not next
-                ms_pBufMax -= 2; // reserve space for <cr><lf>
-                if (ms_cmdCRC)
-                  ms_pBufMax -= 3; // reserve space for crc
+                    ms_pBufMax -= 1; // adjust for last usable, not next
+                    ms_pBufMax -= 2; // reserve space for <cr><lf>
+                    if (ms_cmdCRC)
+                      ms_pBufMax -= 3; // reserve space for crc
 
-                // pack response
-                SDI12Value_t* pv;
-                pv = &ms_dValues[ms_dIndex];
-                //Led1::on();
+                    // pack response
+                    SDI12Value_t* pv;
+                    pv = &ms_dValues[ms_currentDindex];
+                    //Led1::on();
 
-                // iterate while we have values and enough time to convert
-                // or no space in buffer
-                for (unsigned int i = 0; (ms_dIndex < ms_dCount) && (i
-                    < OS_CFGINT_SDI12SENSOR_MAX_DCMD_VALUES); ++i, pv++)
-                  {
-                    //OSDeviceDebug::putDec(pv->precision);
-                    //OSDeviceDebug::putNewLine();
-
-                    //Led1::toggle();
-#if defined(OS_CFGINT_SDI12SENSOR_MAX_DCMD_DURATION_MICROS)
-                    unsigned int u;
-                    u = OSScheduler::timerTicks.getTicks() - ms_ticksBRK;
-
-                    // time almost out
-                    if (u >= OSTimerTicks::microsToTicks(OS_CFGINT_SDI12SENSOR_MAX_DCMD_DURATION_MICROS))
+                    // iterate while we have values and enough time to convert
+                    // or no space in buffer
+                    for (unsigned int i = 0; (ms_currentDindex < ms_dCount)
+                        && (i < OS_CFGINT_SDI12SENSOR_MAX_DCMD_VALUES); ++i, pv++)
                       {
-                        break;
-                      }
+                        //OSDeviceDebug::putDec(pv->precision);
+                        //OSDeviceDebug::putNewLine();
+
+                        //Led1::toggle();
+#if defined(OS_CFGINT_SDI12SENSOR_MAX_DCMD_DURATION_MICROS)
+                        unsigned int u;
+                        u = OSScheduler::timerTicks.getTicks()
+                            - ms_ticksExclamation;
+
+                        // time almost out
+                        if (u >= OSTimerTicks::microsToTicks(
+                            OS_CFGINT_SDI12SENSOR_MAX_DCMD_DURATION_MICROS))
+                          {
+                            break;
+                          }
 #endif /* defined(OS_CFGINT_SDI12SENSOR_MAX_DCMD_DURATION_MICROS) */
 
-                    if (!storeFloatResponse(pv->value, pv->precision, true))
-                      {
-                        break;
+                        if (!storeFloatResponse(pv->value, pv->precision, true))
+                          {
+                            break;
+                          }
+                        ms_currentDindex++;
                       }
-                    ms_dIndex++;
                   }
               }
           }
@@ -1137,6 +1263,7 @@ SDI12Sensor::processSystemXCommand(void)
   // aX$Tn : thread n info
   // aX$U : uptime
   // aX$V : OS version
+  // aX$C : counters (timeouts)
 
   unsigned char syscmd;
   syscmd = ms_buf[3];
@@ -1147,7 +1274,7 @@ SDI12Sensor::processSystemXCommand(void)
   parseInit((const char*) &ms_buf[4]);
   if (syscmd == 'H')
     {
-      storeStringResponse("TN,TS,TP,Tn,U,V,R,B");
+      storeStringResponse("TN,TS,TP,Tn,U,V,R,B,C");
     }
   else if (syscmd == 'T')
     {
@@ -1265,6 +1392,10 @@ SDI12Sensor::processSystemXCommand(void)
           // boot
           ms_doReset = parseNext();
         }
+    }
+  else if (syscmd == 'C')
+    {
+      storeUnsignedResponse((unsigned short) ms_timeoutCounter);
     }
   else
     return false;
@@ -1406,15 +1537,16 @@ SDI12Sensor::threadMainAcquire(void)
 
 #if defined(DEBUG)
       OSDeviceDebug::putString(" [");
-      OSDeviceDebug::putChar(ms_dCmd);
-      OSDeviceDebug::putChar(ms_dDigit + '0');
+      OSDeviceDebug::putChar(ms_measureCmd);
+      OSDeviceDebug::putChar(ms_measureCmdDigit + '0');
       OSDeviceDebug::putChar(' ');
 #endif
 
       pThread->virtualWatchdogSet(
           ms_dSeconds + OS_CFGINT_SDI12SENSOR_VIRTUALWD_SECONDS);
 
-      prepareMeasuredData(ms_dCmd, ms_dDigit, ms_dSeconds, ms_dCount);
+      prepareMeasuredData(ms_measureCmd, ms_measureCmdDigit, ms_dSeconds,
+          ms_dCount);
 
       pThread->virtualWatchdogSet(0);
 
@@ -1990,7 +2122,7 @@ SDI12Sensor::interruptRxServiceRoutine(void)
       if (ch == '!')
         {
           // remember the moment when the '!' was received
-          ms_ticksBRK = now;
+          ms_ticksExclamation = now;
 
           disableMarking();
 
