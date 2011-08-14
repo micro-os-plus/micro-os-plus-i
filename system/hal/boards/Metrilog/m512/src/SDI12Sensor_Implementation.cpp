@@ -81,6 +81,7 @@ void SDI12Sensor::init(void)
 #endif
 
     ms_ticksBRK = 0;
+    ms_ticksExclamation = 0;
     //interruptPinChangeEnable();
     ms_breakDetectEnable = true;
 
