@@ -21,7 +21,24 @@
 
 // This one are probably less standard, but quite useful
 typedef unsigned char uchar_t;
+
+#if !defined(OS_CONFIG_ARCH_AVR8)
+
 typedef unsigned int uint_t;
+
+#else /* defined(OS_CONFIG_ARCH_AVR8) */
+
+// The above does not work on AVR8, overloading triggers error
+#if (__SIZEOF_INT__ == 2)
+#define uint_t uint16_t
+#elif (__SIZEOF_INT__ == 4)
+#define uint_t uint16_t
+#else
+#error "Unsupported size of int"
+#endif
+
+#endif /* !defined(OS_CONFIG_ARCH_AVR8) */
+
 typedef unsigned long ulong_t;
 
 #if defined(OS_INCLUDE_CSTDDEF)
