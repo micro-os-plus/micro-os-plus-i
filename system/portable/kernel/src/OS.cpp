@@ -222,6 +222,7 @@ main(void)
 {
 
 #if defined(DEBUG)
+
   if (g_constantMarker != OS_CFGLONG_CONSTANT_MARKER)
     {
       OSDeviceDebug::putString_P(PSTR("dataInit() failed "));
@@ -229,6 +230,7 @@ main(void)
       OSDeviceDebug::putHex((uint16_t)(g_constantMarker&0xFFFF));
       OSDeviceDebug::putNewLine();
     }
+
 #endif /* defined(DEBUG) */
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
@@ -240,17 +242,21 @@ main(void)
 #else /* defined(OS_EXCLUDE_MULTITASKING)*/
 
 #if defined(DEBUG)
+
   OSDeviceDebug::putNewLine();
   OSDeviceDebug::putString_P(PSTR("OS::main()"));
   OSDeviceDebug::putNewLine();
+
 #endif /* defined(DEBUG) */
 
   OS::main();
 
   // Should never get here.
 #if defined(DEBUG)
+
   OSDeviceDebug::putString_P(PSTR("OS::main() failed, loop"));
   OSDeviceDebug::putNewLine();
+
 #endif /* defined(DEBUG) */
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
@@ -272,58 +278,80 @@ void
 OS::earlyInit(void)
 {
 #if defined(DEBUG)
+
   OSDeviceDebug::putNewLine();
   OSDeviceDebug::putString_P(PSTR("OS::earlyInit()"));
   OSDeviceDebug::putNewLine();
+
 #endif /* defined(DEBUG) */
 
 #if defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING)
+
   OSDeviceDebug::putString_P(PSTR("Multithreading: disabled"));
   OSDeviceDebug::putNewLine();
+
 #endif /* defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING) */
 
 #if defined(DEBUG) && defined(OS_EXCLUDE_PREEMPTION)
+
   OSDeviceDebug::putString_P(PSTR("Preemption: disabled"));
   OSDeviceDebug::putNewLine();
+
 #endif /* defined(DEBUG) && defined(OS_EXCLUDE_PREEMPTION) */
 
 #if defined(DEBUG) && defined(OS_EXCLUDE_OSTIMER)
+
   OSDeviceDebug::putString_P(PSTR("SysTick: disabled"));
   OSDeviceDebug::putNewLine();
+
 #else
+
 #if defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
+
   OSDeviceDebug::putString_P(PSTR("SysTick: not naked"));
   OSDeviceDebug::putNewLine();
+
 #endif /* defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION) */
 
   OSDeviceDebug::putString_P(PSTR("SysTick="));
   OSDeviceDebug::putDec((unsigned short) OS_CFGINT_TICK_RATE_HZ);
   OSDeviceDebug::putString_P(PSTR(" ticks/sec"));
   OSDeviceDebug::putNewLine();
+
 #endif /* defined(DEBUG) && defined(OS_EXCLUDE_OSTIMER) */
 
   OSCPU::saveResetBits();
 
 #if defined(DEBUG)
+
   OSDeviceDebug::putString_P(PSTR("ResetBits="));
   OSDeviceDebug::putHex((unsigned char) OSCPU::getResetBits());
   OSDeviceDebug::putNewLine();
 
   OSDeviceDebug::putString_P(PSTR("Oscillator="));
+
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
+
   OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ);
   OSDeviceDebug::putString_P(PSTR(" Hz"));
+
 #else
+
   OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ/1000);
   OSDeviceDebug::putString_P(PSTR(" KHz"));
+
 #endif /* defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG) */
+
   OSDeviceDebug::putNewLine();
+
 #endif /* defined(DEBUG) */
 
   OS::familyEarlyInit();
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
+
   OSScheduler::earlyInit();
+
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 }
 
