@@ -8,15 +8,15 @@
 #define HAL_BOARD_DEVICEDEBUGI2C_DEFINES_H_
 
 #define OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT             (0)
-#define OS_CFGINT_DEBUG_I2C_EMU_INIT_DELAY_COUNT	(8)
+#define OS_CFGINT_DEBUG_I2C_EMU_INIT_DELAY_COUNT        (8)
 
-#define OS_CONFIG_DEBUG_SCL_PORT_INIT                   DDRD
-#define OS_CONFIG_DEBUG_SCL_PORT                        PORTD
+#define OS_CONFIG_DEBUG_SCL_PORT_CONFIG                 DDRD
+#define OS_CONFIG_DEBUG_SCL_PORT_WRITE                  PORTD
 #define OS_CONFIG_DEBUG_SCL_PORT_READ                   PIND
 #define OS_CONFIG_DEBUG_SCL_BIT                         PIND2
 
-#define OS_CONFIG_DEBUG_SDA_PORT_INIT                   DDRD
-#define OS_CONFIG_DEBUG_SDA_PORT                        PORTD
+#define OS_CONFIG_DEBUG_SDA_PORT_CONFIG                 DDRD
+#define OS_CONFIG_DEBUG_SDA_PORT_WRITE                  PORTD
 #define OS_CONFIG_DEBUG_SDA_PORT_READ                   PIND
 #define OS_CONFIG_DEBUG_SDA_BIT                         PIND3
 
