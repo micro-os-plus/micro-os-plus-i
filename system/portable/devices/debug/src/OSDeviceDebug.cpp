@@ -274,7 +274,7 @@ OSDeviceDebug::putHex(uint32_t l)
   criticalExit(mask);
 }
 
-// TODO: maybe differentiate between 2 and 4 bytes int
+#if !defined(OS_CONFIG_ARCH_AVR8)
 
 void
 OSDeviceDebug::putHex(uint_t i)
@@ -285,6 +285,8 @@ OSDeviceDebug::putHex(uint_t i)
   putHex((uint32_t)i);
 #endif
 }
+
+#endif /* !defined(OS_CONFIG_ARCH_AVR8) */
 
 void
 OSDeviceDebug::putPC(const char* PROGMEM pc)
@@ -474,6 +476,8 @@ OSDeviceDebug::putDec(uint32_t w, uint16_t n)
     }
 }
 
+#if !defined(OS_CONFIG_ARCH_AVR8)
+
 void
 OSDeviceDebug::putDec(uint_t i, uint16_t n)
 {
@@ -483,6 +487,8 @@ OSDeviceDebug::putDec(uint_t i, uint16_t n)
   putDec((uint32_t)i, n);
 #endif
 }
+
+#endif /* !defined(OS_CONFIG_ARCH_AVR8) */
 
 #undef assert
 
