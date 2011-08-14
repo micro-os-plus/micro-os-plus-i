@@ -100,10 +100,12 @@ public:
   static void
   putHex(uint32_t l);
 
+#if !defined(OS_CONFIG_ARCH_AVR8)
   // Output, on debug interface, the hex value of an integer;
   // i.e. 8 hexadecimal characters.
   static void
   putHex(uint_t i);
+#endif
 
   // Output, on debug interface, the decimal value of a 1-byte,
   // <n> last digits will not be output, max 3 decimal digits.
@@ -120,10 +122,12 @@ public:
   static void
   putDec(uint32_t l, uint16_t n = 0);
 
+#if !defined(OS_CONFIG_ARCH_AVR8)
   // Output, on debug interface, the decimal value of an int
   // <n> last digits will not be output, max 10 decimal digits.
   static void
   putDec(uint_t i, uint16_t n = 0);
+#endif
 
   // Output, on debug interface, the address p, in hexadecimal.
   static void
