@@ -42,7 +42,7 @@ public:
 
   // ----- Constructors & Destructors -----------------------------------------
 
-  LargeCircularSessionsStorage(OSDeviceBlock& storage);
+  LargeCircularSessionsStorage(OSDeviceBlock& device);
   ~LargeCircularSessionsStorage();
 
   // ----- Public methods -----------------------------------------------------
@@ -56,7 +56,7 @@ public:
   getReservedHeaderSize(void);
 
   OSDeviceBlock&
-  getStorage(void);
+  getDevice(void);
 
   // set/get the number of physical blocks per logical block
   void
@@ -66,7 +66,7 @@ public:
   getSessionlBlockSizeBlocks(void);
 
 private:
-  OSDeviceBlock& m_storage;
+  OSDeviceBlock& m_device;
 
   OSDeviceBlock::BlockSize_t m_blockSizeBlocks;
 
@@ -78,13 +78,13 @@ public:
 
     // ----- Constructors & Destructors ---------------------------------------
 
-    Writer(LargeCircularSessionsStorage& parent);
+    Writer(LargeCircularSessionsStorage& storage);
     ~Writer();
 
     // ----- Public methods ---------------------------------------------------
 
     LargeCircularSessionsStorage&
-    getParent(void);
+    getStorage(void);
 
     OSReturn_t
     createSession(SessionUniqueId_t sessionId);
@@ -97,7 +97,7 @@ public:
     closeSession(void);
 
   private:
-    LargeCircularSessionsStorage& m_parent;
+    LargeCircularSessionsStorage& m_storage;
 
     // An application supplied unique id for identifying sessions
     SessionUniqueId_t m_sessionUniqueId;
@@ -114,13 +114,13 @@ public:
 
     // ----- Constructors & Destructors ---------------------------------------
 
-    Reader(LargeCircularSessionsStorage& parent);
+    Reader(LargeCircularSessionsStorage& storage);
     ~Reader();
 
     // ----- Public methods ---------------------------------------------------
 
     LargeCircularSessionsStorage&
-    getParent(void);
+    getStorage(void);
 
     // Searches for the given session
     OSReturn_t
@@ -152,7 +152,7 @@ public:
     close(void);
 
   protected:
-    LargeCircularSessionsStorage& m_parent;
+    LargeCircularSessionsStorage& m_storage;
 
   };
 
@@ -168,9 +168,9 @@ LargeCircularSessionsStorage::getReservedHeaderSize(void)
 }
 
 inline OSDeviceBlock&
-LargeCircularSessionsStorage::getStorage(void)
+LargeCircularSessionsStorage::getDevice(void)
 {
-  return m_storage;
+  return m_device;
 }
 
 inline void
@@ -189,17 +189,17 @@ LargeCircularSessionsStorage::getSessionlBlockSizeBlocks(void)
 // ============================================================================
 
 inline LargeCircularSessionsStorage&
-LargeCircularSessionsStorage::Writer::getParent(void)
+LargeCircularSessionsStorage::Writer::getStorage(void)
 {
-  return m_parent;
+  return m_storage;
 }
 
 // ============================================================================
 
 inline LargeCircularSessionsStorage&
-LargeCircularSessionsStorage::Reader::getParent(void)
+LargeCircularSessionsStorage::Reader::getStorage(void)
 {
-  return m_parent;
+  return m_storage;
 }
 
 // ============================================================================

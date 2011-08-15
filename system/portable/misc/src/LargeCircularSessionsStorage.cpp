@@ -14,7 +14,7 @@
 
 LargeCircularSessionsStorage::LargeCircularSessionsStorage(
     OSDeviceBlock& device) :
-  m_storage(device)
+  m_device(device)
 {
   debug.putConstructor_P(PSTR("LargeCircularSessionsStorage"), this);
 
@@ -29,8 +29,8 @@ LargeCircularSessionsStorage::~LargeCircularSessionsStorage()
 // ============================================================================
 
 LargeCircularSessionsStorage::Writer::Writer(
-    LargeCircularSessionsStorage& parent) :
-  m_parent(parent)
+    LargeCircularSessionsStorage& storage) :
+  m_storage(storage)
 {
   debug.putConstructor_P(PSTR("LargeCircularSessionsStorage::Writer"), this);
 }
@@ -60,7 +60,7 @@ LargeCircularSessionsStorage::Writer::createSession(
 
   m_blockUniqueId = 0x12345678;
 
-  return getParent().getStorage().open();
+  return getStorage().getDevice().open();
 }
 
 OSReturn_t
@@ -68,7 +68,7 @@ LargeCircularSessionsStorage::Writer::closeSession(void)
 {
   m_sessionUniqueId = 0;
 
-  return getParent().getStorage().close();
+  return getStorage().getDevice().close();
 }
 
 OSReturn_t
@@ -85,7 +85,7 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBuf)
   //    blockUniqueId
 
   uint8_t* p;
-  p = (uint8_t*) pBuf + getParent().getReservedHeaderSize() - 1;
+  p = (uint8_t*) pBuf + getStorage().getReservedHeaderSize() - 1;
 
   uint8_t b;
   uint_t i;
@@ -125,20 +125,20 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBuf)
 
   OSReturn_t ret;
 
-  if (m_currentBlockNumber + getParent().getSessionlBlockSizeBlocks()
-      > getParent().getStorage().getDeviceSizeBlocks())
+  if (m_currentBlockNumber + getStorage().getSessionlBlockSizeBlocks()
+      > getStorage().getDevice().getDeviceSizeBlocks())
     {
       // If there are not enough blocks to the end of the storage, roll over
       m_currentBlockNumber = 0;
     }
 
   // Write several blocks to the output device
-  ret = getParent().getStorage().writeBlocks(m_currentBlockNumber, pBuf,
-      getParent().getSessionlBlockSizeBlocks());
+  ret = getStorage().getDevice().writeBlocks(m_currentBlockNumber, pBuf,
+      getStorage().getSessionlBlockSizeBlocks());
 
   // Increment the block number; when reaching device size, roll over
-  m_currentBlockNumber += getParent().getSessionlBlockSizeBlocks();
-  if (m_currentBlockNumber >= getParent().getStorage().getDeviceSizeBlocks())
+  m_currentBlockNumber += getStorage().getSessionlBlockSizeBlocks();
+  if (m_currentBlockNumber >= getStorage().getDevice().getDeviceSizeBlocks())
     {
       m_currentBlockNumber = 0;
     }
@@ -152,8 +152,8 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBuf)
 // ============================================================================
 
 LargeCircularSessionsStorage::Reader::Reader(
-    LargeCircularSessionsStorage& parent) :
-  m_parent(parent)
+    LargeCircularSessionsStorage& storage) :
+  m_storage(storage)
 {
   debug.putConstructor_P(PSTR("LargeCircularSessionsStorage::Reader"), this);
 }
