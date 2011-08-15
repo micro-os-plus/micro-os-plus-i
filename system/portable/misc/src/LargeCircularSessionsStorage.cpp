@@ -10,29 +10,45 @@
 
 #include "portable/misc/include/LargeCircularSessionsStorage.h"
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 
-LargeCircularSessionsStorageWriter::LargeCircularSessionsStorageWriter(OSDeviceBlock& device) :
+LargeCircularSessionsStorage::LargeCircularSessionsStorage(
+    OSDeviceBlock& device) :
   m_storage(device)
 {
-  debug.putConstructor_P(PSTR("LargeCircularSessionsStorageWriter"), this);
+  debug.putConstructor_P(PSTR("LargeCircularSessionsStorage"), this);
 
   m_blockSizeBlocks = 1;
 }
 
-LargeCircularSessionsStorageWriter::~LargeCircularSessionsStorageWriter()
+LargeCircularSessionsStorage::~LargeCircularSessionsStorage()
 {
-  debug.putDestructor_P(PSTR("LargeCircularSessionsStorageWriter"), this);
+  debug.putDestructor_P(PSTR("LargeCircularSessionsStorage"), this);
+}
+
+// ============================================================================
+
+LargeCircularSessionsStorage::Writer::Writer(
+    LargeCircularSessionsStorage& parent) :
+  m_parent(parent)
+{
+  debug.putConstructor_P(PSTR("LargeCircularSessionsStorage::Writer"), this);
+}
+
+LargeCircularSessionsStorage::Writer::~Writer()
+{
+  debug.putDestructor_P(PSTR("LargeCircularSessionsStorage::Writer"), this);
 }
 
 OSReturn_t
-LargeCircularSessionsStorageWriter::createSession(SessionUniqueId_t sessionUniqueId)
+LargeCircularSessionsStorage::Writer::createSession(
+    SessionUniqueId_t sessionUniqueId)
 {
   if (sessionUniqueId == 0)
     {
       return OSReturn::OS_BAD_PARAMETER;
-
     }
+
   m_sessionUniqueId = sessionUniqueId;
 
   // TODO: search for the next free block;
@@ -44,19 +60,19 @@ LargeCircularSessionsStorageWriter::createSession(SessionUniqueId_t sessionUniqu
 
   m_blockUniqueId = 0x12345678;
 
-  return m_storage.open();
+  return getParent().getStorage().open();
 }
 
 OSReturn_t
-LargeCircularSessionsStorageWriter::closeSession(void)
+LargeCircularSessionsStorage::Writer::closeSession(void)
 {
   m_sessionUniqueId = 0;
 
-  return m_storage.close();
+  return getParent().getStorage().close();
 }
 
 OSReturn_t
-LargeCircularSessionsStorageWriter::writeSessionBlock(uint8_t* pBuf)
+LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBuf)
 {
   if (m_sessionUniqueId == 0)
     {
@@ -69,7 +85,7 @@ LargeCircularSessionsStorageWriter::writeSessionBlock(uint8_t* pBuf)
   //    blockUniqueId
 
   uint8_t* p;
-  p = (uint8_t*) pBuf + getReservedHeaderSize() - 1;
+  p = (uint8_t*) pBuf + getParent().getReservedHeaderSize() - 1;
 
   uint8_t b;
   uint_t i;
@@ -109,19 +125,20 @@ LargeCircularSessionsStorageWriter::writeSessionBlock(uint8_t* pBuf)
 
   OSReturn_t ret;
 
-  if (m_currentBlockNumber + m_blockSizeBlocks
-      > m_storage.getDeviceSizeBlocks())
+  if (m_currentBlockNumber + getParent().getSessionlBlockSizeBlocks()
+      > getParent().getStorage().getDeviceSizeBlocks())
     {
       // If there are not enough blocks to the end of the storage, roll over
       m_currentBlockNumber = 0;
     }
 
   // Write several blocks to the output device
-  ret = m_storage.writeBlocks(m_currentBlockNumber, pBuf, m_blockSizeBlocks);
+  ret = getParent().getStorage().writeBlocks(m_currentBlockNumber, pBuf,
+      getParent().getSessionlBlockSizeBlocks());
 
   // Increment the block number; when reaching device size, roll over
-  m_currentBlockNumber += m_blockSizeBlocks;
-  if (m_currentBlockNumber >= m_storage.getDeviceSizeBlocks())
+  m_currentBlockNumber += getParent().getSessionlBlockSizeBlocks();
+  if (m_currentBlockNumber >= getParent().getStorage().getDeviceSizeBlocks())
     {
       m_currentBlockNumber = 0;
     }
@@ -132,6 +149,80 @@ LargeCircularSessionsStorageWriter::writeSessionBlock(uint8_t* pBuf)
   return ret;
 }
 
+// ============================================================================
+
+LargeCircularSessionsStorage::Reader::Reader(
+    LargeCircularSessionsStorage& parent) :
+  m_parent(parent)
+{
+  debug.putConstructor_P(PSTR("LargeCircularSessionsStorage::Reader"), this);
+}
+
+LargeCircularSessionsStorage::Reader::~Reader()
+{
+  debug.putDestructor_P(PSTR("LargeCircularSessionsStorage::Reader"), this);
+}
+
 // ----------------------------------------------------------------------------
+
+// Searches for the given session
+OSReturn_t
+LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId)
+{
+  // TODO: implement
+  return OSReturn::OS_OK;
+}
+
+// Without a session id, search for the most recent one
+OSReturn_t
+LargeCircularSessionsStorage::Reader::openMostRecentSession(void)
+{
+  // TODO: implement
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+LargeCircularSessionsStorage::Reader::openPreviousSession(void)
+{
+  // TODO: implement
+  return OSReturn::OS_OK;
+}
+
+// Compute the length of the current session, in session blocks
+LargeCircularSessionsStorage::SessionBlockCount_t
+LargeCircularSessionsStorage::Reader::computeSessionLength(void)
+{
+  // TODO: implement
+  return 0;
+}
+
+// Read the requested session block (minimum one device block)
+// The block number should be between 0 and (sessionLength-1)
+OSReturn_t
+LargeCircularSessionsStorage::Reader::readSessionBlock(
+    SessionBlockNumber_t blockNumber, uint8_t* pBuf,
+    OSDeviceBlock::BlockCount_t deviceBlocksCount)
+{
+  // TODO: implement
+  return OSReturn::OS_OK;
+}
+
+// Read the next session block (minimum one device block)
+OSReturn_t
+LargeCircularSessionsStorage::Reader::readNextSessionBlock(uint8_t* pBuf,
+    OSDeviceBlock::BlockCount_t deviceBlocksCount)
+{
+  // TODO: implement
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+LargeCircularSessionsStorage::Reader::close(void)
+{
+  // TODO: implement
+  return OSReturn::OS_OK;
+}
+
+// ============================================================================
 
 #endif /* defined(OS_INCLUDE_LARGECIRCULARSESSIONSSTORAGE) */

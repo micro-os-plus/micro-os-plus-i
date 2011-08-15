@@ -23,9 +23,12 @@
 //
 // ----------------------------------------------------------------------------
 
-class LargeCircularSessionsStorageWriter
+class LargeCircularSessionsStorage
 {
 public:
+
+  // ----- Public type definitions --------------------------------------------
+
 #if defined(OS_INCLUDE_LARGECIRCULARSTORAGE_LARGE_SESSIONID)
   typedef uint64_t SessionUniqueId_t;
 #else
@@ -34,23 +37,23 @@ public:
 
   typedef uint32_t BlockUniqueId_t;
 
-  LargeCircularSessionsStorageWriter(OSDeviceBlock& storage);
-  ~LargeCircularSessionsStorageWriter();
+  typedef uint32_t SessionBlockNumber_t;
+  typedef uint32_t SessionBlockCount_t;
 
-  OSReturn_t
-  createSession(SessionUniqueId_t sessionId);
+  // ----- Constructors & Destructors -----------------------------------------
 
-  // Fill in the
-  OSReturn_t
-  writeSessionBlock(uint8_t* pBuf);
+  LargeCircularSessionsStorage(OSDeviceBlock& storage);
+  ~LargeCircularSessionsStorage();
+
+  // ----- Public methods -----------------------------------------------------
+
+  // Common (writer & reader) methods
 
   // Return the amount of space the application should reserve
-  // at the beginning of each written block
+  // at the beginning of each written block, or the amount of space the
+  // reader should skip
   uint_t
   getReservedHeaderSize(void);
-
-  OSReturn_t
-  closeSession(void);
 
   OSDeviceBlock&
   getStorage(void);
@@ -67,41 +70,139 @@ private:
 
   OSDeviceBlock::BlockSize_t m_blockSizeBlocks;
 
-  // An application supplied unique id for identifying sessions
-  SessionUniqueId_t m_sessionUniqueId;
-  // A monotone increasing unique Id
-  BlockUniqueId_t m_blockUniqueId;
+public:
+  // Writer
+  class Writer
+  {
+  public:
 
-  OSDeviceBlock::BlockNumber_t m_sessionFirstBlockNumber;
-  OSDeviceBlock::BlockNumber_t m_currentBlockNumber;
+    // ----- Constructors & Destructors ---------------------------------------
+
+    Writer(LargeCircularSessionsStorage& parent);
+    ~Writer();
+
+    // ----- Public methods ---------------------------------------------------
+
+    LargeCircularSessionsStorage&
+    getParent(void);
+
+    OSReturn_t
+    createSession(SessionUniqueId_t sessionId);
+
+    // Fill in the
+    OSReturn_t
+    writeSessionBlock(uint8_t* pBuf);
+
+    OSReturn_t
+    closeSession(void);
+
+  private:
+    LargeCircularSessionsStorage& m_parent;
+
+    // An application supplied unique id for identifying sessions
+    SessionUniqueId_t m_sessionUniqueId;
+    // A monotone increasing unique Id
+    BlockUniqueId_t m_blockUniqueId;
+
+    OSDeviceBlock::BlockNumber_t m_sessionFirstBlockNumber;
+    OSDeviceBlock::BlockNumber_t m_currentBlockNumber;
+  };
+
+  class Reader
+  {
+  public:
+
+    // ----- Constructors & Destructors ---------------------------------------
+
+    Reader(LargeCircularSessionsStorage& parent);
+    ~Reader();
+
+    // ----- Public methods ---------------------------------------------------
+
+    LargeCircularSessionsStorage&
+    getParent(void);
+
+    // Searches for the given session
+    OSReturn_t
+    openSession(SessionUniqueId_t sessionId);
+
+    // Without a session id, search for the most recent one
+    OSReturn_t
+    openMostRecentSession(void);
+
+    OSReturn_t
+    openPreviousSession(void);
+
+    // Compute the length of the current session, in session blocks
+    SessionBlockCount_t
+    computeSessionLength(void);
+
+    // Read the requested session block (minimum one device block)
+    // The block number should be between 0 and (sessionLength-1)
+    OSReturn_t
+    readSessionBlock(SessionBlockNumber_t blockNumber, uint8_t* pBuf,
+        OSDeviceBlock::BlockCount_t deviceBlocksCount);
+
+    // Read the next session block (minimum one device block)
+    OSReturn_t
+    readNextSessionBlock(uint8_t* pBuf,
+        OSDeviceBlock::BlockCount_t deviceBlocksCount);
+
+    OSReturn_t
+    close(void);
+
+  protected:
+    LargeCircularSessionsStorage& m_parent;
+
+  };
+
 };
 
+// ============================================================================
+
 inline uint_t
-LargeCircularSessionsStorageWriter::getReservedHeaderSize(void)
+LargeCircularSessionsStorage::getReservedHeaderSize(void)
 {
   return sizeof(SessionUniqueId_t) + sizeof(OSDeviceBlock::BlockNumber_t)
       + sizeof(BlockUniqueId_t);
 }
 
 inline OSDeviceBlock&
-LargeCircularSessionsStorageWriter::getStorage(void)
+LargeCircularSessionsStorage::getStorage(void)
 {
   return m_storage;
 }
 
 inline void
-LargeCircularSessionsStorageWriter::setSessionBlockSizeBlocks(
+LargeCircularSessionsStorage::setSessionBlockSizeBlocks(
     OSDeviceBlock::BlockSize_t blockSizeBlocks)
 {
   m_blockSizeBlocks = blockSizeBlocks;
 }
 
 inline OSDeviceBlock::BlockSize_t
-LargeCircularSessionsStorageWriter::getSessionlBlockSizeBlocks(void)
+LargeCircularSessionsStorage::getSessionlBlockSizeBlocks(void)
 {
   return m_blockSizeBlocks;
 }
 
-// ----------------------------------------------------------------------------
+// ============================================================================
+
+inline LargeCircularSessionsStorage&
+LargeCircularSessionsStorage::Writer::getParent(void)
+{
+  return m_parent;
+}
+
+// ============================================================================
+
+inline LargeCircularSessionsStorage&
+LargeCircularSessionsStorage::Reader::getParent(void)
+{
+  return m_parent;
+}
+
+// ============================================================================
+
 
 #endif /* LARGECIRCULARSESSIONSSTORAGE_H_ */
