@@ -457,6 +457,7 @@ private:
   static volatile unsigned char ms_previousDdigit;
 
   static volatile int ms_timeoutCounter;
+  static volatile int ms_failedMarkingCounter;
 
   //static volatile bool ms_bIsCancelled;
   static volatile bool ms_bDAvailable;

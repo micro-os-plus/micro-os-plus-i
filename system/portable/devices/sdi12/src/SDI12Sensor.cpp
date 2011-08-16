@@ -73,6 +73,7 @@ volatile unsigned char SDI12Sensor::ms_previousDindex;
 volatile unsigned char SDI12Sensor::ms_previousDdigit;
 
 volatile int SDI12Sensor::ms_timeoutCounter;
+volatile int SDI12Sensor::ms_failedMarkingCounter;
 
 volatile bool SDI12Sensor::ms_bDAvailable;
 volatile bool SDI12Sensor::ms_bAcquire;
@@ -136,6 +137,7 @@ SDI12Sensor::SDI12Sensor(const char* pNameAcquire,
   ms_timerMarking = 0;
 
   ms_timeoutCounter = 0;
+  ms_failedMarkingCounter = 0;
 
   disableBreakDetect();
 }
@@ -401,6 +403,9 @@ SDI12Sensor::threadMainSDI12(void)
         if ((flags & (RX_ERROR | MARKING_CANCELLED)) != 0)
           {
             OSDeviceDebug::putString("->0");
+
+            // count the number of failed attempts to identify a marking
+            ms_failedMarkingCounter++;
 
             // NOTICE: this is not in the specs, but we use it as an
             // safety net, in case hunting marking is not fully accurate
@@ -1396,6 +1401,8 @@ SDI12Sensor::processSystemXCommand(void)
   else if (syscmd == 'C')
     {
       storeUnsignedResponse((unsigned short) ms_timeoutCounter);
+      storeCharResponse(',');
+      storeUnsignedResponse((unsigned short) ms_failedMarkingCounter);
     }
   else
     return false;
