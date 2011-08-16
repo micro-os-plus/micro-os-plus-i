@@ -148,6 +148,11 @@ public:
     readNextSessionBlock(uint8_t* pBuf,
         OSDeviceBlock::BlockCount_t deviceBlocksCount);
 
+    // Read the previous session block (minimum one device block)
+    OSReturn_t
+    readPreviousSessionBlock(uint8_t* pBuf,
+        OSDeviceBlock::BlockCount_t deviceBlocksCount);
+
     OSReturn_t
     close(void);
 

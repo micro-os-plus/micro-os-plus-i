@@ -217,6 +217,14 @@ LargeCircularSessionsStorage::Reader::readNextSessionBlock(uint8_t* pBuf,
 }
 
 OSReturn_t
+LargeCircularSessionsStorage::readPreviousSessionBlock(uint8_t* pBuf,
+    OSDeviceBlock::BlockCount_t deviceBlocksCount)
+{
+  // TODO: implement
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
 LargeCircularSessionsStorage::Reader::close(void)
 {
   // TODO: implement
