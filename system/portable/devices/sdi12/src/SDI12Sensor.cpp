@@ -617,6 +617,8 @@ SDI12Sensor::threadMainSDI12(void)
                     OSScheduler::timerTicks.getTicks() - ms_ticksBRK);
                 OSDeviceDebug::putChar('y');
 #endif
+                transmitOwnAddressResponse();
+
                 ms_state = STATE2;
               }
             else
@@ -631,18 +633,7 @@ SDI12Sensor::threadMainSDI12(void)
 #if defined(DEBUG)
                     OSDeviceDebug::putString(" srv ");
 #endif
-                    unsigned char* pBuf;
-                    pBuf = &ms_buf[0];
-                    *pBuf++ = ms_ownAddress;
-                    *pBuf++ = '\r';
-                    *pBuf++ = '\n';
-                    ms_bufCount = pBuf - &ms_buf[0];
-
-                    cpuSleepCritical.enter();
-                      {
-                        transmitResponse(); // transmit service request
-                      }
-                    cpuSleepCritical.exit();
+                    transmitOwnAddressResponse();
 
                     //OSDeviceDebug::putString(" done ");
                   }
@@ -829,6 +820,26 @@ SDI12Sensor::threadMainSDI12(void)
 
       // go to next state
     }
+}
+
+void
+SDI12Sensor::transmitOwnAddressResponse(void)
+{
+  OSCpuSleepCriticalSection& cpuSleepCritical =
+      ms_pThread->getCpuSleepCriticalSection();
+
+  unsigned char* pBuf;
+  pBuf = &ms_buf[0];
+  *pBuf++ = ms_ownAddress;
+  *pBuf++ = '\r';
+  *pBuf++ = '\n';
+  ms_bufCount = pBuf - &ms_buf[0];
+
+  cpuSleepCritical.enter();
+    {
+      transmitResponse(); // transmit service request
+    }
+  cpuSleepCritical.exit();
 }
 
 void

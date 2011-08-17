@@ -192,6 +192,10 @@ public:
 
   static void
   interruptTick(void);
+
+  static void
+  transmitOwnAddressResponse(void);
+
 #endif
 
 #if defined(OS_INCLUDE_SDI12SENSOR_TINY)
