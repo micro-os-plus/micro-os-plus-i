@@ -136,6 +136,9 @@ public:
     OSReturn_t
     openPreviousSession(void);
 
+    OSReturn_t
+    openNextSession(void);
+
     // Compute the length of the current session, in session blocks
     SessionBlockCount_t
     computeSessionLength(void);

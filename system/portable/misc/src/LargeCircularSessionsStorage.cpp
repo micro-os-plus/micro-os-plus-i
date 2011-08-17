@@ -182,7 +182,7 @@ LargeCircularSessionsStorage::Reader::openMostRecentSession(void)
 }
 
 OSReturn_t
-LargeCircularSessionsStorage::openOldestSession(void)
+LargeCircularSessionsStorage::Reader::openOldestSession(void)
 {
   // TODO: implement
   return OSReturn::OS_OK;
@@ -190,6 +190,13 @@ LargeCircularSessionsStorage::openOldestSession(void)
 
 OSReturn_t
 LargeCircularSessionsStorage::Reader::openPreviousSession(void)
+{
+  // TODO: implement
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+LargeCircularSessionsStorage::Reader::openNextSession(void)
 {
   // TODO: implement
   return OSReturn::OS_OK;
@@ -224,7 +231,7 @@ LargeCircularSessionsStorage::Reader::readNextSessionBlock(uint8_t* pBuf,
 }
 
 OSReturn_t
-LargeCircularSessionsStorage::readPreviousSessionBlock(uint8_t* pBuf,
+LargeCircularSessionsStorage::Reader::readPreviousSessionBlock(uint8_t* pBuf,
     OSDeviceBlock::BlockCount_t deviceBlocksCount)
 {
   // TODO: implement
