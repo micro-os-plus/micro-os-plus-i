@@ -576,6 +576,8 @@ DeviceCharacterUsb::cdcSetControlLineState()
 
   if (connected)
     {
+      m_baudRate = 0;
+
       // TODO: check if it's ok to be here.
       // enable RX interrupt
       OSUsbDevice::endpointSelect(RX_EP);
