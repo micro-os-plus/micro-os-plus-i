@@ -538,6 +538,10 @@ DeviceCharacterUsb::cdcSetControlLineState()
 
   value = OSUsbDevice::readWord();
 
+  OSDeviceDebug::putString("value = ");
+  OSDeviceDebug::putHex(value);
+  OSDeviceDebug::putNewLine();
+
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
   OSDeviceDebug::putString(" val=");
   OSDeviceDebug::putHex(value);
