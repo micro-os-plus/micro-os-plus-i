@@ -617,8 +617,6 @@ SDI12Sensor::threadMainSDI12(void)
                     OSScheduler::timerTicks.getTicks() - ms_ticksBRK);
                 OSDeviceDebug::putChar('y');
 #endif
-                transmitOwnAddressResponse();
-
                 ms_state = STATE2;
               }
             else
