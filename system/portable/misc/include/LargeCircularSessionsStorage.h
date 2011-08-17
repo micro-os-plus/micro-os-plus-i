@@ -131,6 +131,9 @@ public:
     openMostRecentSession(void);
 
     OSReturn_t
+    openOldestSession(void);
+
+    OSReturn_t
     openPreviousSession(void);
 
     // Compute the length of the current session, in session blocks

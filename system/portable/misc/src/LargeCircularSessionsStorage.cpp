@@ -182,6 +182,13 @@ LargeCircularSessionsStorage::Reader::openMostRecentSession(void)
 }
 
 OSReturn_t
+LargeCircularSessionsStorage::openOldestSession(void)
+{
+  // TODO: implement
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
 LargeCircularSessionsStorage::Reader::openPreviousSession(void)
 {
   // TODO: implement
