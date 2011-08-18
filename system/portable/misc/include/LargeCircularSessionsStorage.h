@@ -21,6 +21,14 @@
 //
 // These classes require a generic OSDeviceBlock device for storage.
 //
+// One session block may contain multiple device blocks.
+//
+// There are many nested classes:
+//      LargeCircularSessionsStorage - manages the read/write of session blocks
+//      LargeCircularSessionsStorage::Header
+//      LargeCircularSessionsStorage::Writer
+//      LargeCircularSessionsStorage::Reader
+//
 // ----------------------------------------------------------------------------
 
 class LargeCircularSessionsStorage
@@ -29,6 +37,8 @@ public:
 
   // ----- Public type definitions --------------------------------------------
 
+  typedef uint32_t Magic_t;
+
 #if defined(OS_INCLUDE_LARGECIRCULARSTORAGE_LARGE_SESSIONID)
   typedef uint64_t SessionUniqueId_t;
 #else
@@ -36,11 +46,70 @@ public:
 #endif
 
   typedef uint32_t BlockUniqueId_t;
+  const static BlockUniqueId_t BEGINING_UNIQUE_ID = 0x00000001;
 
   typedef uint32_t SessionBlockNumber_t;
   typedef uint32_t SessionBlockCount_t;
 
-  // ----- Constructors & Destructors -----------------------------------------
+  class Header
+  {
+  public:
+
+    static void
+    setMagic(uint8_t* pHeader, Magic_t magic);
+    static Magic_t
+    getMagic(uint8_t* pHeader);
+
+    static void
+    setSessionUniqueId(uint8_t* pHeader, SessionUniqueId_t sessionUniqueId);
+    static SessionUniqueId_t
+    getSessionUniqueId(uint8_t* pHeader);
+
+    static void
+    setSessionBlockNumber(uint8_t* pHeader,
+        SessionBlockNumber_t sessionBlockNumber);
+    static SessionBlockNumber_t
+    getSessionBlockNumber(uint8_t* pHeader);
+
+    static void
+    setBlockUniqueId(uint8_t* pHeader, BlockUniqueId_t blockUniqueId);
+    static BlockUniqueId_t
+    getBlockUniqueId(uint8_t* pHeader);
+
+    static std::size_t
+    getSize(void);
+
+    // The version byte must be increased it the structure of the header is
+    // changed, to avoid trying to read wrong data.
+    // The effect of changing the version is that the storage will be
+    // rewritten, since the circular buffer will restart from the beginning.
+
+    const static uint8_t VERSION = 0x01;
+    const static Magic_t MAGIC = (0x55AAA500 | VERSION);
+
+  private:
+    const static std::size_t OFFSET_OF_MAGIC = 0;
+    Magic_t magic;
+
+    const static std::size_t OFFSET_OF_SESSIONUNIQEID = OFFSET_OF_MAGIC
+        + sizeof(Magic_t);
+    SessionUniqueId_t sessionUniqueId;
+
+    const static std::size_t OFFSET_OF_SESSIONFIRSTBLOCKNUMBER =
+        OFFSET_OF_SESSIONUNIQEID + sizeof(SessionUniqueId_t);
+    SessionBlockNumber_t sessionFirstBlockNumber;
+
+    const static std::size_t OFFSET_OF_BLOCKUNIQUEID =
+        OFFSET_OF_SESSIONFIRSTBLOCKNUMBER + sizeof(SessionBlockNumber_t);
+    BlockUniqueId_t blockUniqueId;
+
+    const static std::size_t SIZE_OF_HEADER = OFFSET_OF_BLOCKUNIQUEID
+        + sizeof(BlockUniqueId_t);
+
+    // ------------------------------------------------------------------------
+  };
+
+  // ----- Constructors & destructors -----------------------------------------
 
   LargeCircularSessionsStorage(OSDeviceBlock& device);
   ~LargeCircularSessionsStorage();
@@ -50,25 +119,55 @@ public:
   // Common (writer & reader) methods
 
   // Return the amount of space the application should reserve
-  // at the beginning of each written block, or the amount of space the
-  // reader should skip
+  // at the beginning of each written session block, or the amount
+  // of space the reader should skip
   uint_t
-  getReservedHeaderSize(void);
+  getReservedHeaderSizeBytes(void);
 
   OSDeviceBlock&
   getDevice(void);
 
-  // set/get the number of physical blocks per logical block
+  // set/get the number of device blocks per session block
   void
   setSessionBlockSizeBlocks(OSDeviceBlock::BlockSize_t blockSizeBlocks);
-
   OSDeviceBlock::BlockSize_t
-  getSessionlBlockSizeBlocks(void);
+  getSessionBlockSizeBlocks(void);
+
+  // Return the number of session blocks available in the device (partition)
+  // This is done by dividing the physical size by the number of blocks
+  // per session block
+  OSDeviceBlock::BlockNumber_t
+  getStorageSizeSessionBlocks(void);
+
+  // Read a session block from the storage. The block may be incomplete,
+  // the first 'deviceBlocksCount'.
+  OSReturn_t
+  readStorageBlock(SessionBlockNumber_t blockNumber, uint8_t* pSessionBlock,
+      OSDeviceBlock::BlockCount_t deviceBlocksCount);
+
+  // Write a session block from the storage. The block may be incomplete,
+  // the first 'deviceBlocksCount'.
+  OSReturn_t
+  writeStorageBlock(SessionBlockNumber_t blockNumber, uint8_t* pSessionBlock,
+      OSDeviceBlock::BlockCount_t deviceBlocksCount);
+
+private:
+
+  OSReturn_t
+  searchMostRecentWrittenBlock(SessionBlockNumber_t* plast,
+      BlockUniqueId_t* pid);
+
+  OSReturn_t
+  readBlkHdr(uint8_t* pbuf, SessionBlockNumber_t blk, BlockUniqueId_t* pid,
+      SessionBlockNumber_t* pbeg, uint_t rtry = 0);
 
 private:
   OSDeviceBlock& m_device;
 
   OSDeviceBlock::BlockSize_t m_blockSizeBlocks;
+
+  // temporary buffer used for search
+  uint8_t m_ibuf[512] __attribute__((aligned(4)));
 
 public:
   // Writer
@@ -83,20 +182,31 @@ public:
 
     // ----- Public methods ---------------------------------------------------
 
+    // Return the underlying storage device
     LargeCircularSessionsStorage&
     getStorage(void);
 
+    // Search for the most recent written block and prepare write from there
     OSReturn_t
     createSession(SessionUniqueId_t sessionId);
 
-    // Fill in the
+    // Fill in the header and write the entire session block.
+    // pSessionBlock must point to a byte array of multiple device blocks.
+    // The write address is automatically incremented.
     OSReturn_t
-    writeSessionBlock(uint8_t* pBuf);
+    writeSessionBlock(uint8_t* pSessionBlock);
 
     OSReturn_t
     closeSession(void);
 
   private:
+
+    // ----- Private methods --------------------------------------------------
+
+  private:
+
+    // ----- Private members --------------------------------------------------
+
     LargeCircularSessionsStorage& m_storage;
 
     // An application supplied unique id for identifying sessions
@@ -104,15 +214,20 @@ public:
     // A monotone increasing unique Id
     BlockUniqueId_t m_blockUniqueId;
 
+    // The block number is the session block number, not the
+    // device physical block number; one session block contains
+    // setSessionBlockSizeBlocks() physical blocks
     OSDeviceBlock::BlockNumber_t m_sessionFirstBlockNumber;
     OSDeviceBlock::BlockNumber_t m_currentBlockNumber;
+
+    // ------------------------------------------------------------------------
   };
 
   class Reader
   {
   public:
 
-    // ----- Constructors & Destructors ---------------------------------------
+    // ----- Constructors & destructors ---------------------------------------
 
     Reader(LargeCircularSessionsStorage& storage);
     ~Reader();
@@ -160,7 +275,7 @@ public:
         OSDeviceBlock::BlockCount_t deviceBlocksCount);
 
     OSReturn_t
-    close(void);
+    closeSession(void);
 
   protected:
     LargeCircularSessionsStorage& m_storage;
@@ -171,11 +286,16 @@ public:
 
 // ============================================================================
 
-inline uint_t
-LargeCircularSessionsStorage::getReservedHeaderSize(void)
+inline std::size_t
+LargeCircularSessionsStorage::Header::getSize(void)
 {
-  return sizeof(SessionUniqueId_t) + sizeof(OSDeviceBlock::BlockNumber_t)
-      + sizeof(BlockUniqueId_t);
+  return LargeCircularSessionsStorage::Header::SIZE_OF_HEADER;
+}
+
+inline uint_t
+LargeCircularSessionsStorage::getReservedHeaderSizeBytes(void)
+{
+  return LargeCircularSessionsStorage::Header::getSize();
 }
 
 inline OSDeviceBlock&
@@ -192,7 +312,7 @@ LargeCircularSessionsStorage::setSessionBlockSizeBlocks(
 }
 
 inline OSDeviceBlock::BlockSize_t
-LargeCircularSessionsStorage::getSessionlBlockSizeBlocks(void)
+LargeCircularSessionsStorage::getSessionBlockSizeBlocks(void)
 {
   return m_blockSizeBlocks;
 }
