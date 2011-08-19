@@ -251,7 +251,7 @@ Parser::convertHex(uint_t* pInt)
 }
 
 OSReturn_t
-Parser::convertUnsigned(unsigned short* pShort)
+Parser::convertUnsigned(uint16_t* pShort)
 {
   return convertUnsigned(m_pToken, pShort);
 }
@@ -260,6 +260,12 @@ OSReturn_t
 Parser::convertUnsigned(uint32_t* pLong)
 {
   return convertUnsigned(m_pToken, pLong);
+}
+
+OSReturn_t
+Parser::convertUnsigned(uint_t* pInt)
+{
+  return convertUnsigned(m_pToken, pInt);
 }
 
 OSReturn_t
@@ -387,7 +393,18 @@ Parser::convertSigned(uchar_t* pStr, int32_t* pLong)
 OSReturn_t
 Parser::convertUnsigned(uchar_t* pStr, uint32_t* pLong)
 {
-  return convertFixedPrecision(pStr, (signed long*) pLong, 0, false);
+  return convertFixedPrecision(pStr, (int32_t*) pLong, 0, false);
+}
+
+OSReturn_t
+Parser::convertUnsigned(uchar_t* pStr, uint_t* pInt)
+{
+  int32_t l;
+  OSReturn_t ret;
+  ret = convertFixedPrecision(pStr, &l, 0, false);
+
+  *pInt = l;
+  return ret;
 }
 
 OSReturn_t

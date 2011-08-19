@@ -85,6 +85,9 @@ public:
   convertUnsigned(uint16_t* pShort);
   OSReturn_t
   convertUnsigned(uint32_t* pLong);
+  OSReturn_t
+  convertUnsigned(uint_t* pInt);
+
 
   OSReturn_t
   convertSigned(int32_t* pLong);
@@ -119,6 +122,8 @@ public:
   convertSigned(uchar_t* pStr, int32_t* pLong);
   static OSReturn_t
   convertUnsigned(uchar_t* pStr, uint32_t* pLong);
+  static OSReturn_t
+  convertUnsigned(uchar_t* pStr, uint_t* pInt);
 
   static OSReturn_t
   convertFixedPrecision(uchar_t* pStr, int32_t* pLong, uint_t prec,
