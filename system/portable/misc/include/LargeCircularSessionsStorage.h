@@ -55,6 +55,40 @@ public:
   {
   public:
 
+    // ----- Constructors & destructors ---------------------------------------
+
+    Header();
+    ~Header();
+
+    // ----- Public methods ---------------------------------------------------
+
+    void
+    copyFromHeader(uint8_t* pHeader);
+
+    // Regular getters/setters, apply on members
+    void
+    setMagic(Magic_t magic);
+    Magic_t
+    getMagic(void);
+
+    void
+    setSessionUniqueId(SessionUniqueId_t sessionUniqueId);
+    SessionUniqueId_t
+    getSessionUniqueId(void);
+
+    void
+    setSessionFirstBlockNumber(SessionBlockNumber_t sessionFirstBlockNumber);
+    SessionBlockNumber_t
+    getSessionFirstBlockNumber(void);
+
+    void
+    setBlockUniqueId(BlockUniqueId_t blockUniqueId);
+    BlockUniqueId_t
+    getBlockUniqueId(void);
+
+    // ----- Static public methods --------------------------------------------
+
+    // Static methods, apply on a block header
     static void
     setMagic(uint8_t* pHeader, Magic_t magic);
     static Magic_t
@@ -66,10 +100,10 @@ public:
     getSessionUniqueId(uint8_t* pHeader);
 
     static void
-    setSessionBlockNumber(uint8_t* pHeader,
+    setSessionFirstBlockNumber(uint8_t* pHeader,
         SessionBlockNumber_t sessionBlockNumber);
     static SessionBlockNumber_t
-    getSessionBlockNumber(uint8_t* pHeader);
+    getSessionFirstBlockNumber(uint8_t* pHeader);
 
     static void
     setBlockUniqueId(uint8_t* pHeader, BlockUniqueId_t blockUniqueId);
@@ -88,20 +122,23 @@ public:
     const static Magic_t MAGIC = (0x55AAA500 | VERSION);
 
   private:
+
+    // ----- Private members --------------------------------------------------
+
     const static std::size_t OFFSET_OF_MAGIC = 0;
-    Magic_t magic;
+    Magic_t m_magic;
 
     const static std::size_t OFFSET_OF_SESSIONUNIQEID = OFFSET_OF_MAGIC
         + sizeof(Magic_t);
-    SessionUniqueId_t sessionUniqueId;
+    SessionUniqueId_t m_sessionUniqueId;
 
     const static std::size_t OFFSET_OF_SESSIONFIRSTBLOCKNUMBER =
         OFFSET_OF_SESSIONUNIQEID + sizeof(SessionUniqueId_t);
-    SessionBlockNumber_t sessionFirstBlockNumber;
+    SessionBlockNumber_t m_sessionFirstBlockNumber;
 
     const static std::size_t OFFSET_OF_BLOCKUNIQUEID =
         OFFSET_OF_SESSIONFIRSTBLOCKNUMBER + sizeof(SessionBlockNumber_t);
-    BlockUniqueId_t blockUniqueId;
+    BlockUniqueId_t m_blockUniqueId;
 
     const static std::size_t SIZE_OF_HEADER = OFFSET_OF_BLOCKUNIQUEID
         + sizeof(BlockUniqueId_t);
@@ -136,7 +173,7 @@ public:
   // Return the number of session blocks available in the device (partition)
   // This is done by dividing the physical size by the number of blocks
   // per session block
-  OSDeviceBlock::BlockNumber_t
+  SessionBlockNumber_t
   getStorageSizeSessionBlocks(void);
 
   // Read a session block from the storage. The block may be incomplete,
@@ -161,6 +198,9 @@ private:
   readBlkHdr(uint8_t* pbuf, SessionBlockNumber_t blk, BlockUniqueId_t* pid,
       SessionBlockNumber_t* pbeg, uint_t rtry = 0);
 
+  SessionBlockNumber_t
+  computeCircularSessionBlockNumber(SessionBlockNumber_t blockNumber, int adjustment);
+
 private:
   OSDeviceBlock& m_device;
 
@@ -175,7 +215,7 @@ public:
   {
   public:
 
-    // ----- Constructors & Destructors ---------------------------------------
+    // ----- Constructors & destructors ---------------------------------------
 
     Writer(LargeCircularSessionsStorage& storage);
     ~Writer();
@@ -264,27 +304,78 @@ public:
     readSessionBlock(SessionBlockNumber_t blockNumber, uint8_t* pBuf,
         OSDeviceBlock::BlockCount_t deviceBlocksCount);
 
-    // Read the next session block (minimum one device block)
-    OSReturn_t
-    readNextSessionBlock(uint8_t* pBuf,
-        OSDeviceBlock::BlockCount_t deviceBlocksCount);
-
-    // Read the previous session block (minimum one device block)
-    OSReturn_t
-    readPreviousSessionBlock(uint8_t* pBuf,
-        OSDeviceBlock::BlockCount_t deviceBlocksCount);
-
     OSReturn_t
     closeSession(void);
 
   protected:
     LargeCircularSessionsStorage& m_storage;
 
+    // The block number is the session block number, not the
+    // device physical block number; one session block contains
+    // setSessionBlockSizeBlocks() physical blocks
+    SessionBlockNumber_t m_sessionFirstBlockNumber;
+
+    SessionUniqueId_t m_sessionUniqueId;
+
+    // temporary buffer
+    uint8_t m_ibuf[512] __attribute__((aligned(4)));
+
   };
 
 };
 
 // ============================================================================
+
+inline void
+LargeCircularSessionsStorage::Header::setMagic(Magic_t magic)
+{
+  m_magic = magic;
+}
+
+inline LargeCircularSessionsStorage::Magic_t
+LargeCircularSessionsStorage::Header::getMagic(void)
+{
+  return m_magic;
+}
+
+inline void
+LargeCircularSessionsStorage::Header::setSessionUniqueId(
+    SessionUniqueId_t sessionUniqueId)
+{
+  m_sessionUniqueId = sessionUniqueId;
+}
+
+inline LargeCircularSessionsStorage::SessionUniqueId_t
+LargeCircularSessionsStorage::Header::getSessionUniqueId(void)
+{
+  return m_sessionUniqueId;
+}
+
+inline void
+LargeCircularSessionsStorage::Header::setSessionFirstBlockNumber(
+    SessionBlockNumber_t sessionFirstBlockNumber)
+{
+  m_sessionFirstBlockNumber = sessionFirstBlockNumber;
+}
+
+inline LargeCircularSessionsStorage::SessionBlockNumber_t
+LargeCircularSessionsStorage::Header::getSessionFirstBlockNumber(void)
+{
+  return m_sessionFirstBlockNumber;
+}
+
+inline void
+LargeCircularSessionsStorage::Header::setBlockUniqueId(
+    BlockUniqueId_t blockUniqueId)
+{
+  m_blockUniqueId = blockUniqueId;
+}
+
+inline LargeCircularSessionsStorage::BlockUniqueId_t
+LargeCircularSessionsStorage::Header::getBlockUniqueId(void)
+{
+  return m_blockUniqueId;
+}
 
 inline std::size_t
 LargeCircularSessionsStorage::Header::getSize(void)
