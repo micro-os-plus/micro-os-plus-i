@@ -61,6 +61,9 @@ public:
   void
   log(logLevel_t level, logCode_t code, const char* msg);
 
+  void
+  flush(void);
+
   const char*
   getName(void) const;
 
@@ -79,16 +82,30 @@ public:
   static logLevel_t
   convertStringToLevel(const char* level);
 
-  static OSLogger* getLogger(const char *name);
-  static OSLogger* getLogger(int index);
+  static OSLogger*
+  getLogger(const char *name);
+  static OSLogger*
+  getLogger(int index);
 
-  static int getLoggersCount(void);
+  static int
+  getLoggersCount(void);
 
 protected:
-  virtual void
-  implLog(logLevel_t level, logCode_t code, const char* msg);
 
-  static OSLogger* registerLogger(OSLogger *log);
+  // ----- Virtual methods ----------------------------------------------------
+
+  virtual void
+  implLog(logLevel_t level, logCode_t code, const char* msg) = 0;
+
+  virtual void
+  implFlush(void) = 0;
+
+  // ----- Static methods -----------------------------------------------------
+
+  static OSLogger*
+  registerLogger(OSLogger *log);
+
+  // ----- Private members ----------------------------------------------------
 
   // minimum log level for the line to be logged
   logLevel_t m_minLevel;
@@ -97,6 +114,8 @@ protected:
   logLevel_t m_minDebugLevel;
 
   const char* m_name;
+
+  // ----- Static members -----------------------------------------------------
 
   static OSLogger* ms_loggersArray[OS_CFGINT_OSLOGGER_ARRAY_SIZE];
   static int ms_loggersArrayCount;

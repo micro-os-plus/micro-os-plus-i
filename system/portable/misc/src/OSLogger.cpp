@@ -196,10 +196,21 @@ OSLogger::log(logLevel_t level, logCode_t code, const char* msg)
 }
 
 void
-OSLogger::implLog(logLevel_t level __attribute__((unused)), logCode_t code __attribute__((unused)), const char* msg __attribute__((unused)))
+OSLogger::flush(void)
 {
-  ; // Nothing here, implement it in children classes
-
+  implFlush();
 }
+
+#if false
+// ----- Implementation methods -----------------------------------------------
+
+void
+OSLogger::implLog(logLevel_t level __attribute__((unused)), logCode_t code __attribute__((unused)), const char* msg __attribute__((unused)))
+  {
+    ; // Nothing here, implement it in children classes
+
+  }
+
+#endif
 
 #endif /* defined(OS_INCLUDE_OSLOGGER) */
