@@ -72,13 +72,14 @@ namespace avr32
     {
       OSCriticalSection::enter();
         {
-          Intc::registerInterruptHandler(
-              handler,
-              Intc::computeInterruptIndex(
-                  m_module == twim::ModuleId::TWIM0 ? intc::Group::TWIM0
-                      : intc::Group::TWIM1, 0),
-              m_module == twim::ModuleId::TWIM0 ? intc::GroupPriority::TWIM0
-                  : intc::GroupPriority::TWIM1);
+          if (m_module == twim::ModuleId::TWIM0)
+            Intc::registerInterruptHandler(handler,
+                Intc::computeInterruptIndex(intc::Group::TWIM0, 0),
+                intc::GroupPriority::TWIM0);
+          else
+            Intc::registerInterruptHandler(handler,
+                Intc::computeInterruptIndex(intc::Group::TWIM1, 0),
+                intc::GroupPriority::TWIM1);
         }
       OSCriticalSection::exit();
     }
