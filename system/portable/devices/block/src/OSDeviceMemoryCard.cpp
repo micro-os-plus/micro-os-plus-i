@@ -86,13 +86,14 @@ OSReturn_t
 OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
     uint8_t* pBuf, OSDeviceBlock::BlockCount_t count)
 {
-#if false
-  OSDeviceDebug::putString("OSDeviceMemoryCard::readBlocks() ");
+#if defined(OS_DEBUG_OSDEVICEMEMORYCARD_READBLOCKS)
+  OSDeviceDebug::putString("OSDeviceMemoryCard::readBlocks(");
   OSDeviceDebug::putDec(blockNumber);
-  OSDeviceDebug::putChar(' ');
+  OSDeviceDebug::putChar(',');
   OSDeviceDebug::putDec(count);
+  OSDeviceDebug::putChar(')');
   OSDeviceDebug::putNewLine();
-#endif
+#endif /* defined(OS_DEBUG_OSDEVICEMEMORYCARD_READBLOCKS) */
 
   if (!isOpened())
     return OSReturn::OS_NOT_OPENED;
@@ -216,7 +217,7 @@ OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
 OSReturn_t
 OSDeviceMemoryCard::close(void)
 {
-#if false
+#if true
   OSDeviceDebug::putString("OSDeviceMemoryCard::close()");
   OSDeviceDebug::putNewLine();
 #endif
