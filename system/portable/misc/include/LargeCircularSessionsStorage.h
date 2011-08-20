@@ -65,7 +65,7 @@ public:
     // ----- Public methods ---------------------------------------------------
 
     void
-    copyFromHeader(uint8_t* pHeader);
+    readFromHeader(const uint8_t* pHeader);
 
     // Regular getters/setters, apply on members
     void
@@ -92,25 +92,25 @@ public:
 
     // Static methods, apply on a block header
     static void
-    writeMagic(uint8_t* pHeader, Magic_t magic);
+    writeMagic(Magic_t magic, uint8_t* pHeader);
     static Magic_t
-    readMagic(uint8_t* pHeader);
+    readMagic(const uint8_t* pHeader);
 
     static void
-    writeSessionUniqueId(uint8_t* pHeader, SessionUniqueId_t sessionUniqueId);
+    writeSessionUniqueId(SessionUniqueId_t sessionUniqueId, uint8_t* pHeader);
     static SessionUniqueId_t
-    readSessionUniqueId(uint8_t* pHeader);
+    readSessionUniqueId(const uint8_t* pHeader);
 
     static void
-    writeSessionFirstBlockNumber(uint8_t* pHeader,
-        SessionBlockNumber_t sessionBlockNumber);
+    writeSessionFirstBlockNumber(SessionBlockNumber_t sessionBlockNumber,
+        uint8_t* pHeader);
     static SessionBlockNumber_t
-    readSessionFirstBlockNumber(uint8_t* pHeader);
+    readSessionFirstBlockNumber(const uint8_t* pHeader);
 
     static void
-    writeBlockUniqueId(uint8_t* pHeader, BlockUniqueId_t blockUniqueId);
+    writeBlockUniqueId(BlockUniqueId_t blockUniqueId, uint8_t* pHeader);
     static BlockUniqueId_t
-    readBlockUniqueId(uint8_t* pHeader);
+    readBlockUniqueId(const uint8_t* pHeader);
 
     static std::size_t
     getSize(void);
@@ -190,19 +190,15 @@ public:
   writeStorageBlock(SessionBlockNumber_t blockNumber, uint8_t* pSessionBlock,
       OSDeviceBlock::BlockCount_t deviceBlocksCount);
 
-
 private:
 
   OSReturn_t
-  searchMostRecentWrittenBlock(SessionBlockNumber_t* plast,
-      BlockUniqueId_t* pid);
-
-  OSReturn_t
-  readBlkHdr(uint8_t* pbuf, SessionBlockNumber_t blk, BlockUniqueId_t* pid,
-      SessionBlockNumber_t* pbeg, uint_t rtry = 0);
+  searchMostRecentlyWrittenBlock(SessionBlockNumber_t* pMostRecentBlock,
+      LargeCircularSessionsStorage::Header& header);
 
   SessionBlockNumber_t
-  computeCircularSessionBlockNumber(SessionBlockNumber_t blockNumber, int adjustment);
+  computeCircularSessionBlockNumber(SessionBlockNumber_t blockNumber,
+      int adjustment);
 
 private:
   OSDeviceBlock& m_device;
@@ -230,8 +226,9 @@ public:
     getStorage(void);
 
     // Search for the most recent written block and prepare write from there
+    // If the sessionId is 0, just use the next id
     OSReturn_t
-    createSession(SessionUniqueId_t sessionId);
+    createSession(SessionUniqueId_t sessionUniqueId = 0);
 
     // Fill in the header and write the entire session block.
     // pSessionBlock must point to a byte array of multiple device blocks.
@@ -386,59 +383,66 @@ LargeCircularSessionsStorage::Header::getSize(void)
   return LargeCircularSessionsStorage::Header::SIZE_OF_HEADER;
 }
 
+// ---- External read/write methods -------------------------------------------
+
 inline void
-LargeCircularSessionsStorage::Header::writeMagic(uint8_t* pHeader,
-    Magic_t value)
+LargeCircularSessionsStorage::Header::writeMagic(Magic_t value,
+    uint8_t* pHeader)
 {
-  util::endianness::BigEndian::writeUnsigned32(pHeader + OFFSET_OF_MAGIC, value);
+  util::endianness::BigEndian::writeUnsigned32(value, pHeader + OFFSET_OF_MAGIC);
 }
 
 inline LargeCircularSessionsStorage::Magic_t
-LargeCircularSessionsStorage::Header::readMagic(uint8_t* pHeader)
+LargeCircularSessionsStorage::Header::readMagic(const uint8_t* pHeader)
 {
   return util::endianness::BigEndian::readUnsigned32(pHeader + OFFSET_OF_MAGIC);
 }
 
 inline void
-LargeCircularSessionsStorage::Header::writeSessionUniqueId(uint8_t* pHeader,
-    SessionUniqueId_t value)
+LargeCircularSessionsStorage::Header::writeSessionUniqueId(
+    SessionUniqueId_t value, uint8_t* pHeader)
 {
-  util::endianness::BigEndian::writeUnsigned32(pHeader + OFFSET_OF_SESSIONUNIQEID, value);
+  util::endianness::BigEndian::writeUnsigned32(value,
+      pHeader + OFFSET_OF_SESSIONUNIQEID);
 }
 
 inline LargeCircularSessionsStorage::SessionUniqueId_t
-LargeCircularSessionsStorage::Header::readSessionUniqueId(uint8_t* pHeader)
+LargeCircularSessionsStorage::Header::readSessionUniqueId(
+    const uint8_t* pHeader)
 {
-  return util::endianness::BigEndian::readUnsigned32(pHeader + OFFSET_OF_SESSIONUNIQEID);
+  return util::endianness::BigEndian::readUnsigned32(
+      pHeader + OFFSET_OF_SESSIONUNIQEID);
 }
 
 inline void
 LargeCircularSessionsStorage::Header::writeSessionFirstBlockNumber(
-    uint8_t* pHeader, SessionBlockNumber_t value)
+    SessionBlockNumber_t value, uint8_t* pHeader)
 {
-  util::endianness::BigEndian::writeUnsigned32(pHeader + OFFSET_OF_SESSIONFIRSTBLOCKNUMBER,
-      value);
+  util::endianness::BigEndian::writeUnsigned32(value,
+      pHeader + OFFSET_OF_SESSIONFIRSTBLOCKNUMBER);
 }
 
 inline LargeCircularSessionsStorage::SessionBlockNumber_t
 LargeCircularSessionsStorage::Header::readSessionFirstBlockNumber(
-    uint8_t* pHeader)
+    const uint8_t* pHeader)
 {
   return util::endianness::BigEndian::readUnsigned32(
       pHeader + OFFSET_OF_SESSIONFIRSTBLOCKNUMBER);
 }
 
 inline void
-LargeCircularSessionsStorage::Header::writeBlockUniqueId(uint8_t* pHeader,
-    BlockUniqueId_t value)
+LargeCircularSessionsStorage::Header::writeBlockUniqueId(BlockUniqueId_t value,
+    uint8_t* pHeader)
 {
-  util::endianness::BigEndian::writeUnsigned32(pHeader + OFFSET_OF_BLOCKUNIQUEID, value);
+  util::endianness::BigEndian::writeUnsigned32(value,
+      pHeader + OFFSET_OF_BLOCKUNIQUEID);
 }
 
 inline LargeCircularSessionsStorage::BlockUniqueId_t
-LargeCircularSessionsStorage::Header::readBlockUniqueId(uint8_t* pHeader)
+LargeCircularSessionsStorage::Header::readBlockUniqueId(const uint8_t* pHeader)
 {
-  return util::endianness::BigEndian::readUnsigned32(pHeader + OFFSET_OF_BLOCKUNIQUEID);
+  return util::endianness::BigEndian::readUnsigned32(
+      pHeader + OFFSET_OF_BLOCKUNIQUEID);
 }
 
 // ============================================================================
