@@ -48,6 +48,7 @@ public:
   const static OSReturn_t OS_NOT_ENABLED = -31;
   const static OSReturn_t OS_BAD_MAGIC = -32;
   const static OSReturn_t OS_END_OF_COLLECTION = -32;
+  const static OSReturn_t OS_OUT_OF_RANGE = -33;
 
 };
 
