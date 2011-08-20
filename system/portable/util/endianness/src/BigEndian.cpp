@@ -20,7 +20,7 @@ namespace util
         // ----- Static methods ---------------------------------------------------
 
         uint16_t
-        BigEndian::readUnsigned16(uint8_t* pByte)
+        BigEndian::readUnsigned16(const uint8_t* pByte)
           {
             uint16_t value;
             value = 0;
@@ -34,7 +34,7 @@ namespace util
           }
 
         void
-        BigEndian::writeUnsigned16(uint8_t* pByte, uint16_t value)
+        BigEndian::writeUnsigned16(uint16_t value,  uint8_t* pByte)
           {
             // Start from low byte and proceed in reverse order
             pByte += sizeof(value);
@@ -50,7 +50,7 @@ namespace util
           }
 
         uint32_t
-        BigEndian::readUnsigned32(uint8_t* pByte)
+        BigEndian::readUnsigned32(const uint8_t* pByte)
           {
             uint32_t value;
             value = 0;
@@ -68,7 +68,7 @@ namespace util
           }
 
         void
-        BigEndian::writeUnsigned32(uint8_t* pByte, uint32_t value)
+        BigEndian::writeUnsigned32(uint32_t value, uint8_t* pByte)
           {
             // Start from low byte and proceed in reverse order
             pByte += sizeof(value);

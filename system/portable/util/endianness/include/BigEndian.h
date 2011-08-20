@@ -20,16 +20,16 @@ namespace util
       // ---- Static methods --------------------------------------------------
 
       static uint16_t
-      readUnsigned16(uint8_t* pByte);
+      readUnsigned16(const uint8_t* pByte);
 
       static void
-      writeUnsigned16(uint8_t* pByte, uint16_t value);
+      writeUnsigned16(uint16_t value, uint8_t* pByte);
 
       static uint32_t
-      readUnsigned32(uint8_t* pByte);
+      readUnsigned32(const uint8_t* pByte);
 
       static void
-      writeUnsigned32(uint8_t* pByte, uint32_t value);
+      writeUnsigned32(uint32_t value, uint8_t* pByte);
 
     };
   }
