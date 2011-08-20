@@ -90,9 +90,23 @@ LargeCircularSessionsStorage::writeStorageBlock(
 }
 
 OSReturn_t
-LargeCircularSessionsStorage::searchMostRecentWrittenBlock(
-    SessionBlockNumber_t* plast, BlockUniqueId_t* pid)
+LargeCircularSessionsStorage::searchMostRecentlyWrittenBlock(
+    SessionBlockNumber_t* pMostRecentBlock,
+    LargeCircularSessionsStorage::Header& header)
 {
+#if defined(OS_INCLUDE_LARGECIRCULARSESSIONSSTORAGE_SINGLE)
+
+  // For the moment just pretend the most used session ended in the
+  // last storage block, so the next free one will be right at the begining
+  // The unique IDs are dummy, will be incremented by the writer
+
+  *pMostRecentBlock = getStorageSizeSessionBlocks() - 1;
+  header.setSessionFirstBlockNumber(getStorageSizeSessionBlocks() - 1);
+  header.setSessionUniqueId(0x11112222 - 1);
+  header.setBlockUniqueId(0x12345678 - 1);
+
+#else
+
   // max block number, i.e. size -1
   unsigned long max;
   max = getStorageSizeSessionBlocks() - 1;
@@ -145,7 +159,7 @@ LargeCircularSessionsStorage::searchMostRecentWrittenBlock(
         }
       //id_i = Header::readBlockUniqueId(pBuf);
       //begblk_i = Header::readSessionFirstBlockNumber(pBuf);
-      first.copyFromHeader(pBuf);
+      first.readFromHeader(pBuf);
 
       //r = readBlkHdr(pBuf, blk_j, &id_j, &begblk_j);
       r = readStorageBlock(lastBlockNumber, pBuf, 1);
@@ -161,7 +175,7 @@ LargeCircularSessionsStorage::searchMostRecentWrittenBlock(
         }
       //id_j = Header::readBlockUniqueId(pBuf);
       // begblk_j = Header::readSessionFirstBlockNumber(pBuf);
-      last.copyFromHeader(pBuf);
+      last.readFromHeader(pBuf);
 
       // Is this the first pass?
       if (i == 0)
@@ -251,7 +265,7 @@ LargeCircularSessionsStorage::searchMostRecentWrittenBlock(
             }
           //id_k = Header::readBlockUniqueId(pBuf);
           //begblk_k = Header::readSessionFirstBlockNumber(pBuf);
-          middle.copyFromHeader(pBuf);
+          middle.readFromHeader(pBuf);
 
 #if 1
           if (os.isDebug())
@@ -293,7 +307,7 @@ LargeCircularSessionsStorage::searchMostRecentWrittenBlock(
             {
               // Roll over case: use signed comparisons
               if (((signed long) middle.getBlockUniqueId()
-                  < (signed long) first.getBlockUniqueId())
+                      < (signed long) first.getBlockUniqueId())
                   || (middle.getBlockUniqueId() == 0))
                 {
                   lastBlockNumber = middleBlockNumber;
@@ -350,50 +364,14 @@ LargeCircularSessionsStorage::searchMostRecentWrittenBlock(
   blk_crt = blk_beg;
 
   if (pid != 0)
-    *pid = id_beg;
+  *pid = id_beg;
 
   if (plast != 0)
-    *plast = blk_beg;
+  *plast = blk_beg;
 
   return 0;
-}
 
-int
-LargeCircularSessionsStorage::readBlkHdr(uint8_t *pBlock,
-    SessionBlockNumber_t sessionBlockNumber, BlockUniqueId_t* pBlockUniqueId,
-    SessionBlockNumber_t* pSessionBlockNumber, uint_t rtry)
-{
-  OSReturn_t res;
-  res = 0;
-
-  unsigned int j;
-  for (j = rtry + 1; j != 0; --j)
-    {
-      // Read the first device block of the session block
-      res = readStorageBlock(sessionBlockNumber, pBlock, 1);
-      if (res == OSReturn::OS_OK)
-        {
-          if (pBlockUniqueId != 0)
-            {
-              *pBlockUniqueId
-                  = LargeCircularSessionsStorage::Header::readBlockUniqueId(
-                      pBlock);
-            }
-
-          if (pSessionBlockNumber != 0)
-            {
-              *pSessionBlockNumber
-                  = LargeCircularSessionsStorage::Header::readSessionFirstBlockNumber(
-                      pBlock);
-            }
-
-          break;
-
-        }
-      //os.busyWaitMillis(1);
-    }
-
-  return res;
+#endif
 }
 
 // ============================================================================
@@ -413,7 +391,7 @@ LargeCircularSessionsStorage::Header::~Header()
 // ----- Public methods -------------------------------------------------------
 
 void
-LargeCircularSessionsStorage::Header::copyFromHeader(uint8_t* pHeader)
+LargeCircularSessionsStorage::Header::readFromHeader(const uint8_t* pHeader)
 {
   setMagic(readMagic(pHeader));
   setSessionUniqueId(readSessionUniqueId(pHeader));
@@ -446,25 +424,65 @@ OSReturn_t
 LargeCircularSessionsStorage::Writer::createSession(
     SessionUniqueId_t sessionUniqueId)
 {
-  if (sessionUniqueId == 0)
+  if (m_sessionUniqueId == 0)
     {
-      return OSReturn::OS_BAD_PARAMETER;
+      // This is the first call, we need to search the storage for the
+      // most recently written block
+
+      LargeCircularSessionsStorage::Header header;
+      SessionBlockNumber_t mostRecentBlock;
+
+      getStorage().searchMostRecentlyWrittenBlock(&mostRecentBlock, header);
+
+      // Compute the next block
+      m_currentBlockNumber = getStorage().computeCircularSessionBlockNumber(
+          mostRecentBlock, 1);
+
+      // Remember where the session starts
+      m_sessionFirstBlockNumber = m_currentBlockNumber;
+
+      // The new block id is just next to the previous one
+      m_blockUniqueId = header.getBlockUniqueId() + 1;
+
+      if (sessionUniqueId != 0)
+        {
+          // Use the requested session unique id
+          m_sessionUniqueId = sessionUniqueId;
+        }
+      else
+        {
+          // If null, just increment the previous unique id
+          m_sessionUniqueId = header.getSessionUniqueId() + 1;
+        }
+    }
+  else
+    {
+      // Subsequent sessions
+
+      // The m_currentBlockNumber and the m_blockUniqueId were already
+      // incremented by the previous writeSessionBlock()
+
+      m_sessionFirstBlockNumber = m_currentBlockNumber;
+
+      if (sessionUniqueId != 0)
+        {
+          // Use the requested session unique id
+          m_sessionUniqueId = sessionUniqueId;
+        }
+      else
+        {
+          // If null, just increment the previous unique id
+          m_sessionUniqueId++;
+        }
     }
 
-#if true
-  m_sessionUniqueId = sessionUniqueId;
-
-  // TODO: search for the next free block;
-  // For the moment just start from the beginning
-  // and with a dummy block unique id
-
-  m_sessionFirstBlockNumber = 0;
-  m_currentBlockNumber = 0;
-
-  m_blockUniqueId = 0x12345678;
-#else
-  getStorage().searchMostRecentWrittenBlock();
-#endif
+  OSDeviceDebug::putString("createSession id=");
+  OSDeviceDebug::putHex(m_sessionUniqueId);
+  OSDeviceDebug::putString(", blk id=");
+  OSDeviceDebug::putHex(m_blockUniqueId);
+  OSDeviceDebug::putString(", blk no=");
+  OSDeviceDebug::putDec(m_sessionFirstBlockNumber);
+  OSDeviceDebug::putNewLine();
 
   return getStorage().getDevice().open();
 }
@@ -472,8 +490,6 @@ LargeCircularSessionsStorage::Writer::createSession(
 OSReturn_t
 LargeCircularSessionsStorage::Writer::closeSession(void)
 {
-  m_sessionUniqueId = 0;
-
   return getStorage().getDevice().close();
 }
 
@@ -494,14 +510,14 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBlock)
   //    sessionFirstBlockNumber
   //    blockUniqueId
 
-  LargeCircularSessionsStorage::Header::writeMagic(pBlock,
-      LargeCircularSessionsStorage::Header::MAGIC);
-  LargeCircularSessionsStorage::Header::writeSessionUniqueId(pBlock,
-      m_sessionUniqueId);
-  LargeCircularSessionsStorage::Header::writeSessionFirstBlockNumber(pBlock,
-      m_sessionFirstBlockNumber);
-  LargeCircularSessionsStorage::Header::writeBlockUniqueId(pBlock,
-      m_blockUniqueId);
+  LargeCircularSessionsStorage::Header::writeMagic(
+      LargeCircularSessionsStorage::Header::MAGIC, pBlock);
+  LargeCircularSessionsStorage::Header::writeSessionUniqueId(m_sessionUniqueId,
+      pBlock);
+  LargeCircularSessionsStorage::Header::writeSessionFirstBlockNumber(
+      m_sessionFirstBlockNumber, pBlock);
+  LargeCircularSessionsStorage::Header::writeBlockUniqueId(m_blockUniqueId,
+      pBlock);
 
   OSReturn_t ret;
 
@@ -509,7 +525,7 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBlock)
   ret = getStorage().writeStorageBlock(m_currentBlockNumber, pBlock, nBlocks);
 
   // Increment the block number; when reaching storage size, roll over
-  m_currentBlockNumber++;
+  ++m_currentBlockNumber;
   if (m_currentBlockNumber >= getStorage().getStorageSizeSessionBlocks())
     {
       m_currentBlockNumber = 0;
