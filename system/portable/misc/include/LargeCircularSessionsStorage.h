@@ -67,6 +67,9 @@ public:
     void
     readFromHeader(const uint8_t* pHeader);
 
+    Header&
+    operator=(const Header& header);
+
     // Regular getters/setters, apply on members
     void
     setMagic(Magic_t magic);
@@ -156,6 +159,12 @@ public:
   // ----- Public methods -----------------------------------------------------
 
   // Common (writer & reader) methods
+
+  OSReturn_t
+  openStorage(void);
+
+  OSReturn_t
+  closeStorage(void);
 
   // Return the amount of space the application should reserve
   // at the beginning of each written session block, or the amount
@@ -296,12 +305,18 @@ public:
 
     // Compute the length of the current session, in session blocks
     SessionBlockCount_t
-    computeSessionLength(void);
+    getSessionLength(void);
 
     // Read the requested session block (minimum one device block)
     // The block number should be between 0 and (sessionLength-1)
     OSReturn_t
     readSessionBlock(SessionBlockNumber_t blockNumber, uint8_t* pBuf,
+        OSDeviceBlock::BlockCount_t deviceBlocksCount);
+
+    // Read the next session block (minimum one device block)
+    // The block number should be between 0 and (sessionLength-1)
+    OSReturn_t
+    readNextSessionBlock(uint8_t* pBuf,
         OSDeviceBlock::BlockCount_t deviceBlocksCount);
 
     OSReturn_t
@@ -310,12 +325,17 @@ public:
   protected:
     LargeCircularSessionsStorage& m_storage;
 
-    // The block number is the session block number, not the
+    // The block number is the session block Fnumber, not the
     // device physical block number; one session block contains
     // setSessionBlockSizeBlocks() physical blocks
     SessionBlockNumber_t m_sessionFirstBlockNumber;
+    SessionBlockNumber_t m_sessionLastBlockNumber;
+    SessionBlockNumber_t m_sessionLength;
 
     SessionUniqueId_t m_sessionUniqueId;
+
+    OSDeviceBlock::BlockNumber_t m_currentBlockNumber;
+    SessionBlockNumber_t m_mostRecentlyWrittenBlockNumber;
 
     // temporary buffer
     uint8_t m_ibuf[512] __attribute__((aligned(4)));
@@ -447,6 +467,18 @@ LargeCircularSessionsStorage::Header::readBlockUniqueId(const uint8_t* pHeader)
 
 // ============================================================================
 
+inline OSReturn_t
+LargeCircularSessionsStorage::openStorage(void)
+{
+  return getDevice().open();
+}
+
+inline OSReturn_t
+LargeCircularSessionsStorage::closeStorage(void)
+{
+  return getDevice().close();
+}
+
 inline uint_t
 LargeCircularSessionsStorage::getReservedHeaderSizeBytes(void)
 {
@@ -486,6 +518,13 @@ inline LargeCircularSessionsStorage&
 LargeCircularSessionsStorage::Reader::getStorage(void)
 {
   return m_storage;
+}
+
+// Get the length of the current session, in session blocks
+inline LargeCircularSessionsStorage::SessionBlockCount_t
+LargeCircularSessionsStorage::Reader::getSessionLength(void)
+{
+  return m_sessionLength;
 }
 
 // ============================================================================
