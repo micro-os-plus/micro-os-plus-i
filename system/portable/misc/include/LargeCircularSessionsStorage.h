@@ -9,6 +9,8 @@
 
 #include "portable/kernel/include/uOS.h"
 
+#include "portable/util/endianness/include/BigEndian.h"
+
 // ----------------------------------------------------------------------------
 //
 // These classes handle the management of sessions on a large block storage,
@@ -90,25 +92,25 @@ public:
 
     // Static methods, apply on a block header
     static void
-    setMagic(uint8_t* pHeader, Magic_t magic);
+    writeMagic(uint8_t* pHeader, Magic_t magic);
     static Magic_t
-    getMagic(uint8_t* pHeader);
+    readMagic(uint8_t* pHeader);
 
     static void
-    setSessionUniqueId(uint8_t* pHeader, SessionUniqueId_t sessionUniqueId);
+    writeSessionUniqueId(uint8_t* pHeader, SessionUniqueId_t sessionUniqueId);
     static SessionUniqueId_t
-    getSessionUniqueId(uint8_t* pHeader);
+    readSessionUniqueId(uint8_t* pHeader);
 
     static void
-    setSessionFirstBlockNumber(uint8_t* pHeader,
+    writeSessionFirstBlockNumber(uint8_t* pHeader,
         SessionBlockNumber_t sessionBlockNumber);
     static SessionBlockNumber_t
-    getSessionFirstBlockNumber(uint8_t* pHeader);
+    readSessionFirstBlockNumber(uint8_t* pHeader);
 
     static void
-    setBlockUniqueId(uint8_t* pHeader, BlockUniqueId_t blockUniqueId);
+    writeBlockUniqueId(uint8_t* pHeader, BlockUniqueId_t blockUniqueId);
     static BlockUniqueId_t
-    getBlockUniqueId(uint8_t* pHeader);
+    readBlockUniqueId(uint8_t* pHeader);
 
     static std::size_t
     getSize(void);
@@ -187,6 +189,7 @@ public:
   OSReturn_t
   writeStorageBlock(SessionBlockNumber_t blockNumber, uint8_t* pSessionBlock,
       OSDeviceBlock::BlockCount_t deviceBlocksCount);
+
 
 private:
 
@@ -382,6 +385,63 @@ LargeCircularSessionsStorage::Header::getSize(void)
 {
   return LargeCircularSessionsStorage::Header::SIZE_OF_HEADER;
 }
+
+inline void
+LargeCircularSessionsStorage::Header::writeMagic(uint8_t* pHeader,
+    Magic_t value)
+{
+  util::endianness::BigEndian::writeUnsigned32(pHeader + OFFSET_OF_MAGIC, value);
+}
+
+inline LargeCircularSessionsStorage::Magic_t
+LargeCircularSessionsStorage::Header::readMagic(uint8_t* pHeader)
+{
+  return util::endianness::BigEndian::readUnsigned32(pHeader + OFFSET_OF_MAGIC);
+}
+
+inline void
+LargeCircularSessionsStorage::Header::writeSessionUniqueId(uint8_t* pHeader,
+    SessionUniqueId_t value)
+{
+  util::endianness::BigEndian::writeUnsigned32(pHeader + OFFSET_OF_SESSIONUNIQEID, value);
+}
+
+inline LargeCircularSessionsStorage::SessionUniqueId_t
+LargeCircularSessionsStorage::Header::readSessionUniqueId(uint8_t* pHeader)
+{
+  return util::endianness::BigEndian::readUnsigned32(pHeader + OFFSET_OF_SESSIONUNIQEID);
+}
+
+inline void
+LargeCircularSessionsStorage::Header::writeSessionFirstBlockNumber(
+    uint8_t* pHeader, SessionBlockNumber_t value)
+{
+  util::endianness::BigEndian::writeUnsigned32(pHeader + OFFSET_OF_SESSIONFIRSTBLOCKNUMBER,
+      value);
+}
+
+inline LargeCircularSessionsStorage::SessionBlockNumber_t
+LargeCircularSessionsStorage::Header::readSessionFirstBlockNumber(
+    uint8_t* pHeader)
+{
+  return util::endianness::BigEndian::readUnsigned32(
+      pHeader + OFFSET_OF_SESSIONFIRSTBLOCKNUMBER);
+}
+
+inline void
+LargeCircularSessionsStorage::Header::writeBlockUniqueId(uint8_t* pHeader,
+    BlockUniqueId_t value)
+{
+  util::endianness::BigEndian::writeUnsigned32(pHeader + OFFSET_OF_BLOCKUNIQUEID, value);
+}
+
+inline LargeCircularSessionsStorage::BlockUniqueId_t
+LargeCircularSessionsStorage::Header::readBlockUniqueId(uint8_t* pHeader)
+{
+  return util::endianness::BigEndian::readUnsigned32(pHeader + OFFSET_OF_BLOCKUNIQUEID);
+}
+
+// ============================================================================
 
 inline uint_t
 LargeCircularSessionsStorage::getReservedHeaderSizeBytes(void)
