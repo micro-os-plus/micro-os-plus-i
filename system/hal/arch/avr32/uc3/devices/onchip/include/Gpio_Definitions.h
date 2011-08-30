@@ -43,7 +43,7 @@ namespace avr32
       public:
         const static InterruptMode_t PIN_CHANGE = 0;
         const static InterruptMode_t RISING_EDGE = 1;
-        const static InterruptMode_t FAILING_EDGE = 2;
+        const static InterruptMode_t FALLING_EDGE = 2;
       };
 
       class PinPeripheralFunction
