@@ -271,7 +271,7 @@ OSCPUImpl::setInterruptsMask(OSInterruptsMask_t mask)
 #endif /* !defined(OS_CFGINT_AVR32_UC3_INTC_GROUP01_PRIORITY) */
 
 #if !defined(OS_CFGINT_AVR32_UC3_INTC_GROUP02_PRIORITY)
-#define OS_CFGINT_AVR32_UC3_INTC_GROUP02_PRIORITY (avr32::uc3::intc::Priority::_0)
+#define OS_CFGINT_AVR32_UC3_INTC_GROUP02_PRIORITY (avr32::uc3::intc::Priority::_3)
 #endif /* !defined(OS_CFGINT_AVR32_UC3_INTC_GROUP02_PRIORITY) */
 
 #if !defined(OS_CFGINT_AVR32_UC3_INTC_GROUP03_PRIORITY)
