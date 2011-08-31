@@ -83,8 +83,6 @@ namespace device
         m_spi.configureChipSelect(1, 0, avr32::uc3::spi::BITS_8);
 
         m_spi.enable();
-
-//        OS::busyWaitMicros(1000 * 100);
       }
 
       void
@@ -136,12 +134,33 @@ namespace device
       void
       Ads1282::resetRegisters(void)
       {
+#if 0
         m_gpioAds1282Reset.setPinLow();
 
         // wait tSPWH > 2/fclck (0.488us)
         OS::busyWaitMicros(1);
 
         m_gpioAds1282Reset.setPinHigh();
+#else
+        m_gpioAds1282Reset.setPinLow();
+
+        // wait tSPWH > 2/fclck (0.488us)
+        OS::busyWaitMicros(1);
+
+        OSCriticalSection::enter();
+          {
+            m_gpioAds1282Reset.setPinHigh();
+
+            // TODO: check with Liviu.
+            while (m_gpioAds1282Drdy.isPinLow())
+              ;
+          }
+        OSCriticalSection::exit();
+
+        // wait for DRDY to be low
+        while (m_gpioAds1282Drdy.isPinHigh())
+          ;
+#endif
       }
 
       void
