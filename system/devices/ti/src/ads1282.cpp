@@ -80,7 +80,7 @@ namespace device
         m_spi.powerUp();
 
         // set SPI baudrate, no delay between bytes, 8-bit word size
-        m_spi.configureChipSelect(1, 0, avr32::uc3::spi::BITS_8);
+        m_spi.configureChipSelect(baudRateFactor, 0, avr32::uc3::spi::BITS_8);
 
         m_spi.enable();
       }
@@ -193,6 +193,11 @@ namespace device
       void
       Ads1282::calibrateOffset(void)
       {
+        m_gpioAds1282Sync.setPinHigh();
+
+        // wait tDLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(6);
+
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
@@ -230,6 +235,8 @@ namespace device
         // wait for DRDY to be low again (16 Data Periods).
         while (m_gpioAds1282Drdy.isPinHigh())
           ;
+
+        m_gpioAds1282Sync.setPinLow();
       }
 
       void
