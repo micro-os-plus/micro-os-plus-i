@@ -161,6 +161,7 @@ os_exception_handler(unsigned short n, const char* s = NULL)
 #endif
 }
 
+
 extern "C" void
 os_scall_handler(void) __attribute__((naked));
 
@@ -228,7 +229,12 @@ os_ex_nmi(void) __attribute__((naked));
 void
 os_ex_nmi(void)
 {
+#if defined(OS_INCLUDE_OSAPPLICATIONIMPL_NONMASKABLEINTERRUPTHANDLER)
+  OSApplicationImpl::nonMaskableInterruptHandler();
+  OSCPU::returnFromInterrupt();
+#else
   os_exception_handler(7, "NMI");
+#endif
 }
 
 // Instruction Address.

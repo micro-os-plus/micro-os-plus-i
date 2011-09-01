@@ -209,6 +209,11 @@ public:
   interruptTick(void);
 #endif /* OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK */
 
+#if defined(OS_INCLUDE_OSAPPLICATIONIMPL_NONMASKABLEINTERRUPTHANDLER)
+  static void
+  nonMaskableInterruptHandler(void);
+#endif
+
 };
 
 // ----------------------------------------------------------------------------
