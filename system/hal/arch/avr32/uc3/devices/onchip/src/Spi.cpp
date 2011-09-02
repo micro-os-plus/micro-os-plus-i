@@ -43,6 +43,9 @@ namespace avr32
       // disable all interrupts
       registers.writeInterruptsDisable(0xFFFFFFFF);
 
+#if 0 // Not works if optimized level is -Os. It seems that the compiler call
+      // readMode() prior to the first writeMode(). Check the *.lst file.
+
       // Set master mode, enable RX FIFO and Disable Mode Fault
       registers.writeMode(
           AVR32_SPI_MSTR_MASK | AVR32_SPI_MR_MODFDIS_MASK
@@ -57,6 +60,17 @@ namespace avr32
       registers.writeMode(
           registers.readMode() | ((~(1 << (chipSelectValue
               + AVR32_SPI_MR_PCS_OFFSET))) & AVR32_SPI_MR_PCS_MASK));
+#else
+      // set fixed peripheral mode for CS0
+      uint32_t chipSelectValue = 0;
+
+      registers.writeMode((AVR32_SPI_MSTR_MASK | AVR32_SPI_MR_MODFDIS_MASK
+          | AVR32_SPI_MR_RXFIFOEN_MASK) | ((~(1 << (chipSelectValue
+          + AVR32_SPI_MR_PCS_OFFSET))) & AVR32_SPI_MR_PCS_MASK));
+
+      // initialize CSR0
+      registers.writeChipSelect0(0);
+#endif
     }
 
     // ----- Public Methods ---------------------------------------------------
