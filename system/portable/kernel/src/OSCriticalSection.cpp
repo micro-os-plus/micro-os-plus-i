@@ -228,6 +228,8 @@ OSRealTimeCriticalSection::exit(void)
   OSCPUImpl::setInterruptsMask(tmp);
 #endif
 
+  OSCPUImpl::setInterruptsMask(tmp);
+
 #elif defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
 
   if ((OSCriticalSection::ms_nestingLevel > 0) && (--OSCriticalSection::ms_nestingLevel == 0))
