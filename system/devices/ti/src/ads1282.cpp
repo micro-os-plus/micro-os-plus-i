@@ -126,7 +126,7 @@ namespace device
         m_gpioAds1282Sync.setPinHigh();
 
         // wait tSPWH > 2/fclck (0.488us)
-        OS::busyWaitMicros(1);
+        OS::busyWaitMicros(T_SYNC_SPWH);
 
         m_gpioAds1282Sync.setPinLow();
       }
@@ -138,14 +138,14 @@ namespace device
         m_gpioAds1282Reset.setPinLow();
 
         // wait tSPWH > 2/fclck (0.488us)
-        OS::busyWaitMicros(1);
+        OS::busyWaitMicros(T_RST);
 
         m_gpioAds1282Reset.setPinHigh();
 #else
         m_gpioAds1282Reset.setPinLow();
 
-        // wait tSPWH > 2/fclck (0.488us)
-        OS::busyWaitMicros(1);
+        // wait T_RST > 2/fclck (0.488us)
+        OS::busyWaitMicros(T_RST);
 
         OSCriticalSection::enter();
           {
@@ -168,8 +168,8 @@ namespace device
       {
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
       }
 
       void
@@ -177,8 +177,8 @@ namespace device
       {
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
       }
 
       void
@@ -186,8 +186,8 @@ namespace device
       {
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATA);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
       }
 
       void
@@ -195,20 +195,20 @@ namespace device
       {
         m_gpioAds1282Sync.setPinHigh();
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // send SYNC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SYNC);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
@@ -220,14 +220,14 @@ namespace device
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // send OFSCAL
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::OFSCAL);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
@@ -245,14 +245,14 @@ namespace device
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // send SYNC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SYNC);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
@@ -264,20 +264,20 @@ namespace device
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // send OFSCAL
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::GANCAL);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
       }
 
       RegisterValue_t
@@ -287,19 +287,21 @@ namespace device
 
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RREG + reg);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // One register.
         m_spi.writeWaitReadByte(0);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         regValue = m_spi.writeWaitReadByte(0);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
+
+        OSDeviceDebug::putHex(regValue);
 
         return regValue;
       }
@@ -309,19 +311,19 @@ namespace device
       {
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::WREG + reg);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         // One register.
         m_spi.writeWaitReadByte(0);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
 
         m_spi.writeWaitReadByte(value);
 
-        // wait tDLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(6);
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
       }
     }
   }

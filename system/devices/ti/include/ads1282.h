@@ -35,7 +35,10 @@ namespace device
       typedef uint8_t RegisterValue_t;
       typedef uint8_t RegisterOffset_t;
 
-      const uint32_t SCLCK = (4096 * 1000);
+      static const uint32_t SCLCK = (4096 * 1000);
+      static const uint32_t T_DLY = 6; // TDLY > 24/fclck (5.85us)
+      static const uint32_t T_SYNC_SPWH = 1; // SYNC pulse width, high.
+      static const uint32_t T_RST = 1; // RESET low.
 
       class Register
       {
