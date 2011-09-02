@@ -20,9 +20,9 @@ namespace avr32
     // ----- Constructors & Destructors ---------------------------------------
 
     SpiMaster::SpiMaster(spi::Module_t module) :
-          registers(
-              *reinterpret_cast<spi::Registers*> (spi::Registers::MEMORY_ADDRESS
-                  + ((module % 2) * spi::Registers::MEMORY_OFFSET)))
+      registers(
+          *reinterpret_cast<spi::Registers*> (spi::Registers::MEMORY_ADDRESS
+              + ((module % 2) * spi::Registers::MEMORY_OFFSET)))
     {
       OSDeviceDebug::putConstructorWithIndex("avr32::uc3::Spim", module, this);
     }
@@ -37,6 +37,8 @@ namespace avr32
     void
     SpiMaster::powerUp(void)
     {
+      uint32_t regValue;
+
       // software reset SPI module
       registers.writeControl(AVR32_SPI_CR_SWRST_MASK);
 
@@ -49,7 +51,7 @@ namespace avr32
       // Set master mode, enable RX FIFO and Disable Mode Fault
       registers.writeMode(
           AVR32_SPI_MSTR_MASK | AVR32_SPI_MR_MODFDIS_MASK
-              | AVR32_SPI_MR_RXFIFOEN_MASK);
+          | AVR32_SPI_MR_RXFIFOEN_MASK);
 
       // initialize CSR0
       registers.writeChipSelect0(0);
@@ -59,14 +61,20 @@ namespace avr32
 
       registers.writeMode(
           registers.readMode() | ((~(1 << (chipSelectValue
-              + AVR32_SPI_MR_PCS_OFFSET))) & AVR32_SPI_MR_PCS_MASK));
+                          + AVR32_SPI_MR_PCS_OFFSET))) & AVR32_SPI_MR_PCS_MASK));
 #else
       // set fixed peripheral mode for CS0
       uint32_t chipSelectValue = 0;
 
-      registers.writeMode((AVR32_SPI_MSTR_MASK | AVR32_SPI_MR_MODFDIS_MASK
+      regValue = (AVR32_SPI_MSTR_MASK | AVR32_SPI_MR_MODFDIS_MASK
           | AVR32_SPI_MR_RXFIFOEN_MASK) | ((~(1 << (chipSelectValue
-          + AVR32_SPI_MR_PCS_OFFSET))) & AVR32_SPI_MR_PCS_MASK));
+          + AVR32_SPI_MR_PCS_OFFSET))) & AVR32_SPI_MR_PCS_MASK);
+
+      // TODO: check this. It seems if -Os is used the while loop is necessary.
+      while (registers.readMode() != regValue)
+        {
+          registers.writeMode(regValue);
+        }
 
       // initialize CSR0
       registers.writeChipSelect0(0);
