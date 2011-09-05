@@ -86,8 +86,7 @@ namespace avr32
       // set first region to be used in transfer
       registers.writeMemoryAddress(m_pRegionsArray[0].address);
       registers.writeTransferCount(m_pRegionsArray[0].size);
-      m_pRegionsArray[0].externStatus
-                = avr32::uc3::pdca::EXT_STATUS_OK;
+      m_pRegionsArray[0].externStatus = avr32::uc3::pdca::EXT_STATUS_OK;
       m_currentRegionIndex = 0;
       m_candidateNotif = 0;
 
@@ -182,24 +181,29 @@ namespace avr32
     void
     Pdca::abortTransfer(void)
     {
-      // disable all interrupt sources
-      registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK
-          | AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
+      OSCriticalSection::enter();
+        {
+          // disable all interrupt sources
+          registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK
+              | AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
 
-      // disable PDMA channel
-      registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
+          // disable PDMA channel
+          registers.writeControl(AVR32_PDCA_CR_TDIS_MASK);
 
-      // update remaining numbers of words from the current transfer
-      m_wordsRemaining = registers.readTransferCounter();
+          // update remaining numbers of words from the current transfer
+          m_wordsRemaining = registers.readTransferCounter();
 
-      // reset counters
-      registers.writeTransferCount(0);
+          // reset counters
+          registers.writeTransferCount(0);
 
-      // reset reload counters
-      registers.writeTransferCountReload(0);
+          // reset reload counters
+          registers.writeTransferCountReload(0);
 
-      // clear error
-      registers.writeControl(AVR32_PDCA_CR_ECLR_MASK);
+          // clear error
+          registers.writeControl(AVR32_PDCA_CR_ECLR_MASK);
+        }
+      OSCriticalSection::exit();
+
     }
 
     void
@@ -233,7 +237,16 @@ namespace avr32
         return OSReturn::OS_WOULD_BLOCK;
 
       // wait
-      OSScheduler::eventWait(m_event);
+      OSCriticalSection::enter();
+        {
+          OSEventWaitReturn_t ret;
+          do
+            {
+              ret = OSScheduler::eventWait(m_event);
+            }
+          while (ret != m_event);
+        }
+      OSCriticalSection::exit();
       return OSReturn::OS_OK;
     }
 
@@ -347,7 +360,16 @@ namespace avr32
 
       // now wait for the candidate to be ready
       //OSEventWaitReturn_t ret = OSScheduler::eventWait(m_event);
-      OSScheduler::eventWait(m_event);
+      OSCriticalSection::enter();
+        {
+          OSEventWaitReturn_t ret;
+          do
+            {
+              ret = OSScheduler::eventWait(m_event);
+            }
+          while (ret != m_event);
+        }
+      OSCriticalSection::exit();
 
       // should check if m_candidateNotif is transferred
       if (m_pRegionsArray[m_candidateNotif].status
