@@ -360,17 +360,20 @@ OSUsbDeviceImpl::Usb_sof_action(void)
   ; //sof_action();
 }
 
-inline void
-OSUsbDeviceImpl::Usb_wake_up_action(void)
-{
-  ;
-}
 
 inline void
 OSUsbDeviceImpl::Usb_resume_action(void)
 {
   ;
 }
+
+
+inline void
+OSUsbDeviceImpl::Usb_reset_action(void)
+{
+  ;
+}
+
 
 inline void
 OSUsbDeviceImpl::Usb_suspend_action(void)
@@ -393,11 +396,12 @@ OSUsbDeviceImpl::Usb_suspend_action(void)
 }
 
 inline void
-OSUsbDeviceImpl::Usb_reset_action(void)
+OSUsbDeviceImpl::Usb_wake_up_action(void)
 {
   ;
 }
 
+#if !defined(OS_INCLUDE_OSUSBDEVICEIMPL_VBUS_ACTIONS)
 inline void
 OSUsbDeviceImpl::Usb_vbus_on_action(void)
 {
@@ -409,6 +413,8 @@ OSUsbDeviceImpl::Usb_vbus_off_action(void)
 {
   ;
 }
+
+#endif
 
 //-----------------------------------------------------------------------------
 
