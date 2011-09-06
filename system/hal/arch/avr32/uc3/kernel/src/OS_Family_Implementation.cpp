@@ -10,6 +10,8 @@
 
 #include "hal/arch/avr32/uc3/lib/include/conf_isp.h"
 
+#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
+
 // In order to be able to program a project with both BatchISP and JTAGICE mkII
 // without having to take the general-purpose fuses into consideration, add this
 // function to the project and change the program entry point to _trampoline.
@@ -106,7 +108,7 @@ OSImpl::familyEarlyInit(void)
   OSDeviceDebug::putNewLine();
 
   OSDeviceDebug::putString("CPU/HSB=");
-  OSDeviceDebug::putDec(OS_CFGLONG_CPU_FREQUENCY_HZ);
+  OSDeviceDebug::putDec(avr32::uc3::Pm::getCpuClockFrequencyHz());
   OSDeviceDebug::putString(" Hz");
   OSDeviceDebug::putNewLine();
 
