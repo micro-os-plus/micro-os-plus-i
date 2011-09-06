@@ -77,6 +77,13 @@ OSReturn_t
 OSDeviceBlockPartition::setPartitioneOffsetAndSize(
     OSDeviceBlock::BlockNumber_t offset, OSDeviceBlock::BlockNumber_t size)
 {
+  OSDeviceDebug::putString("setPartitioneOffsetAndSize(");
+  OSDeviceDebug::putDec(offset);
+  OSDeviceDebug::putChar(',');
+  OSDeviceDebug::putDec(size);
+  OSDeviceDebug::putChar(')');
+  OSDeviceDebug::putNewLine();
+
   m_partitionOffset = offset;
   m_partitionSizeBlocks = size;
 
