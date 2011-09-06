@@ -648,6 +648,9 @@ public:
   virtual void
   powerDown(void);
 
+  OSReturn_t
+  initialise(void);
+
   // Prepare the device for operations.
   virtual OSReturn_t
   open(void);
@@ -684,8 +687,6 @@ public:
 
 private:
 
-  OSReturn_t
-  initialise(void);
 
   OSReturn_t
   executeCommand(CommandCode_t code, CommandArgument_t arg);
@@ -753,6 +754,7 @@ private:
   int m_openCounter;
 
   uint8_t m_cardType;
+  bool m_isInitialised;
 
   uint32_t m_cardRca;
   uint16_t m_cardFrequencyKHz;
