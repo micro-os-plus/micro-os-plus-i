@@ -19,6 +19,8 @@
 #include "hal/arch/avr32/uc3/lib/include/tc.h"
 #include "hal/arch/avr32/uc3/lib/include/rtc.h"
 
+#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
+
 #define COUNT_IRQ_NUM               0
 
 #if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
@@ -127,7 +129,7 @@ OSTimerTicks::implInit(void)
 
 #else
   Set_system_register(AVR32_COUNT, 0);
-  Set_system_register(AVR32_COMPARE, OS_CFGLONG_CPU_FREQUENCY_HZ
+  Set_system_register(AVR32_COMPARE, avr32::uc3::Pm::getCpuClockFrequencyHz()
       /OS_CFGINT_TICK_RATE_HZ);
   //register the interrupt
   INTC_register_interrupt(SysTick_contextHandler, COUNT_IRQ_NUM,
