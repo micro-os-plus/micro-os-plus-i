@@ -237,16 +237,8 @@ namespace avr32
         return OSReturn::OS_WOULD_BLOCK;
 
       // wait
-      OSCriticalSection::enter();
-        {
-          OSEventWaitReturn_t ret;
-          do
-            {
-              ret = OSScheduler::eventWait(m_event);
-            }
-          while (ret != m_event);
-        }
-      OSCriticalSection::exit();
+      OSScheduler::eventWait( m_event);
+
       return OSReturn::OS_OK;
     }
 
@@ -360,16 +352,7 @@ namespace avr32
 
       // now wait for the candidate to be ready
       //OSEventWaitReturn_t ret = OSScheduler::eventWait(m_event);
-      OSCriticalSection::enter();
-        {
-          OSEventWaitReturn_t ret;
-          do
-            {
-              ret = OSScheduler::eventWait(m_event);
-            }
-          while (ret != m_event);
-        }
-      OSCriticalSection::exit();
+      OSScheduler::eventWait( m_event);
 
       // should check if m_candidateNotif is transferred
       if (m_pRegionsArray[m_candidateNotif].status
