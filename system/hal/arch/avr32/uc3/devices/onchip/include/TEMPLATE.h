@@ -125,9 +125,10 @@ namespace avr32
     Template::getInputClockFrequencyHz(void)
     {
       // TODO: use the appropriate one
+      // For clocks see Table 7-7, page 58.
 
       Pm::getPbaClockFrequencyHz();
-      //Pm::getPbaClockFrequencyHz();
+      //Pm::getPbbClockFrequencyHz();
     }
 
     inline void
