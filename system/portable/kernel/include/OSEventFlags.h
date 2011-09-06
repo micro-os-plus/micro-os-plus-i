@@ -20,6 +20,11 @@ typedef unsigned char OSEventFlagsBits_t;
 class OSEventFlags
   {
 public:
+
+  const static OSEventFlagsBits_t ALL = ~0;
+
+public:
+
   // initialise internal structures
   OSEventFlags();
 
