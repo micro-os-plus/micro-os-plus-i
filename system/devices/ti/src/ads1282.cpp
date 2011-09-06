@@ -34,6 +34,17 @@ namespace device
 #endif
       }
 
+      // ----- interrupt routine --------------------------------
+      void
+      Ads1282::drdyInterruptServiceRoutine(void)
+      {
+        isDrdyHighToLowFlag = true;
+
+        // Ack and disable DRDY interrupt.
+        m_gpioAds1282Drdy.clearInterruptRequest();
+        m_gpioAds1282Drdy.disableInterrupt();
+      }
+
       void
       Ads1282::init(void)
       {
@@ -46,6 +57,7 @@ namespace device
 
         m_gpioAds1282Drdy.configureModeGpio();
         m_gpioAds1282Drdy.configureDirectionInput();
+        //        m_gpioAds1282Drdy.enableGlitchFilter();
 
         m_gpioAds1282Reset.setPinHigh();
         m_gpioAds1282Reset.configureModeGpio();
@@ -70,7 +82,7 @@ namespace device
       }
 
       void
-      Ads1282::startSpi(void)
+      Ads1282::startConfiguration(void)
       {
         avr32::uc3::spi::BaudRateFactor_t baudRateFactor;
 
@@ -86,7 +98,7 @@ namespace device
       }
 
       void
-      Ads1282::stopSpi(void)
+      Ads1282::stopConfiguration(void)
       {
         m_spi.disable();
       }
@@ -96,28 +108,25 @@ namespace device
       {
         OSCriticalSection::enter();
           {
-            m_gpioAds1282Pwdn.setPinHigh();
+            isDrdyHighToLowFlag = false;
+            m_gpioAds1282Drdy.enableInterrupt();
 
-            // TODO: check with Liviu.
-            // It takes 21.75us for DRDY to be high, so we must have this loop
-            // in order to be sure that the next loop is executed.
-            while (m_gpioAds1282Drdy.isPinLow())
-              ;
+            m_gpioAds1282Pwdn.setPinHigh();
           }
         OSCriticalSection::exit();
 
-        // wait for DRDY to be low
-        while (m_gpioAds1282Drdy.isPinHigh())
+        // wait for DRDY to be low again (16 Data Periods).
+        while (!isDrdyHighToLowFlag)
           ;
       }
 
       void
       Ads1282::powerOff(void)
       {
-        m_gpioAds1282Pwdn.setPinHigh();
+        m_gpioAds1282Pwdn.setPinLow();
 
         // Empirically.
-        OS::busyWaitMicros(1000 * 1000);
+        OS::busyWaitMicros(POWER_OFF_TIME);
       }
 
       void
@@ -134,33 +143,19 @@ namespace device
       void
       Ads1282::resetRegisters(void)
       {
-#if 0
-        m_gpioAds1282Reset.setPinLow();
-
-        // wait tSPWH > 2/fclck (0.488us)
-        OS::busyWaitMicros(T_RST);
-
-        m_gpioAds1282Reset.setPinHigh();
-#else
         m_gpioAds1282Reset.setPinLow();
 
         // wait T_RST > 2/fclck (0.488us)
         OS::busyWaitMicros(T_RST);
 
-        OSCriticalSection::enter();
-          {
-            m_gpioAds1282Reset.setPinHigh();
+        isDrdyHighToLowFlag = false;
+        m_gpioAds1282Drdy.enableInterrupt();
 
-            // TODO: check with Liviu.
-            while (m_gpioAds1282Drdy.isPinLow())
-              ;
-          }
-        OSCriticalSection::exit();
+        m_gpioAds1282Reset.setPinHigh();
 
-        // wait for DRDY to be low
-        while (m_gpioAds1282Drdy.isPinHigh())
+        // wait for DRDY to be low again (64 Data Periods).
+        while (!isDrdyHighToLowFlag)
           ;
-#endif
       }
 
       void
@@ -210,13 +205,15 @@ namespace device
         // wait T_DLY > 24/fclck (5.85us)
         OS::busyWaitMicros(T_DLY);
 
+        isDrdyHighToLowFlag = false;
+        m_gpioAds1282Drdy.enableInterrupt();
+
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
         // wait for DRDY to be low again (64 Data Periods).
-        while (m_gpioAds1282Drdy.isPinHigh())
+        while (!isDrdyHighToLowFlag)
           ;
-
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
@@ -229,11 +226,14 @@ namespace device
         // wait T_DLY > 24/fclck (5.85us)
         OS::busyWaitMicros(T_DLY);
 
+        isDrdyHighToLowFlag = false;
+        m_gpioAds1282Drdy.enableInterrupt();
+
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
         // wait for DRDY to be low again (16 Data Periods).
-        while (m_gpioAds1282Drdy.isPinHigh())
+        while (!isDrdyHighToLowFlag)
           ;
 
         m_gpioAds1282Sync.setPinLow();
@@ -242,6 +242,11 @@ namespace device
       void
       Ads1282::calibrateGain(void)
       {
+        m_gpioAds1282Sync.setPinHigh();
+
+        // wait T_DLY > 24/fclck (5.85us)
+        OS::busyWaitMicros(T_DLY);
+
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
@@ -254,11 +259,14 @@ namespace device
         // wait T_DLY > 24/fclck (5.85us)
         OS::busyWaitMicros(T_DLY);
 
+        isDrdyHighToLowFlag = false;
+        m_gpioAds1282Drdy.enableInterrupt();
+
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
-        // wait for DRDY to be low again.
-        while (m_gpioAds1282Drdy.isPinHigh())
+        // wait for DRDY to be low again (64 Data Periods).
+        while (!isDrdyHighToLowFlag)
           ;
 
         // send SDATAC
@@ -267,17 +275,23 @@ namespace device
         // wait T_DLY > 24/fclck (5.85us)
         OS::busyWaitMicros(T_DLY);
 
-        // send OFSCAL
+        // send GANCAL
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::GANCAL);
 
         // wait T_DLY > 24/fclck (5.85us)
         OS::busyWaitMicros(T_DLY);
 
+        isDrdyHighToLowFlag = false;
+        m_gpioAds1282Drdy.enableInterrupt();
+
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
-        // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        // wait for DRDY to be low again (16 Data Periods).
+        while (!isDrdyHighToLowFlag)
+          ;
+
+        m_gpioAds1282Sync.setPinLow();
       }
 
       RegisterValue_t

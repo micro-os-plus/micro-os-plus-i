@@ -39,6 +39,7 @@ namespace device
       static const uint32_t T_DLY = 6; // TDLY > 24/fclck (5.85us)
       static const uint32_t T_SYNC_SPWH = 1; // SYNC pulse width, high.
       static const uint32_t T_RST = 1; // RESET low.
+      static const uint32_t POWER_OFF_TIME = 1000 * 1000;
 
       class Register
       {
@@ -96,10 +97,10 @@ namespace device
         init();
 
         void
-        startSpi();
+        startConfiguration();
 
         void
-        stopSpi();
+        stopConfiguration();
 
         void
         powerOn(void);
@@ -137,6 +138,11 @@ namespace device
         bool
         isDrdyHigh(void);
 
+      public:
+        // Handler for DRDY gpio pin interrupt. It only starts the SPI transfer. It has the highest interrupt priority level.
+        void
+        drdyInterruptServiceRoutine(void);
+
       private:
 
         spim_t& m_spi;
@@ -149,6 +155,8 @@ namespace device
         avr32::uc3::Gpio& m_gpioAds1282Sclk;
         avr32::uc3::Gpio& m_gpioAds1282Miso;
         avr32::uc3::Gpio& m_gpioAds1282Mosi;
+
+        volatile bool isDrdyHighToLowFlag;
       };
 
       // ===== Inline methods ===================================================
