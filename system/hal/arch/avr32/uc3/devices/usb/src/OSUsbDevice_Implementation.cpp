@@ -19,6 +19,8 @@
 #include "hal/arch/avr32/uc3/lib/include/pm.h"
 #include "hal/arch/avr32/uc3/lib/include/intc.h"
 
+#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
+
 #if !defined(OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY)
 #define OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY    (0)
 #endif /* !defined(OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY) */
@@ -108,18 +110,20 @@ OSUsbDeviceImpl::interruptComServiceRoutine(void)
 void
 OSUsbDeviceImpl::interruptGenServiceRoutine(void)
 {
+  //OSDeviceDebug::putChar('$');
+
   //OSUsbLed::toggle();
   // ---------- DEVICE events management -----------------------------------
   //- VBUS state detection
   if (OSUsbDeviceImpl::Is_usb_vbus_transition()
       && OSUsbDeviceImpl::Is_usb_vbus_interrupt_enabled())
     {
-      OSDeviceDebug::putString("uv");
-      OSDeviceDebug::putNewLine();
-
       OSUsbDeviceImpl::Usb_ack_vbus_transition();
       if (OSUsbDeviceImpl::Is_usb_vbus_high())
         {
+          OSDeviceDebug::putString("uvH");
+          OSDeviceDebug::putNewLine();
+
           usb_start_device();
 
           OSUsbDeviceImpl::Usb_vbus_on_action();
@@ -127,6 +131,9 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
         }
       else
         {
+          OSDeviceDebug::putString("uvL");
+          OSDeviceDebug::putNewLine();
+
           Usb_unfreeze_clock();
           Usb_detach();
           usb_connected = false;
@@ -232,44 +239,46 @@ OSUsbDeviceImpl::usbDriverInit(void)
       // Start USB clock.
       ////////////////////
 
-#if OS_CFGLONG_OSCILLATOR_HZ == 16000000L
-      // Use 16MHz from OSC0 and generate 96 MHz
-      pm_pll_setup(&AVR32_PM, 0, // pll.
-          2, // mul.
-          0, // div.
-          0, // osc.
-          16); // lockcount.
+      if (avr32::uc3::Pm::getCpuClockFrequencyHz() == 16000000L)
+        {
+          // Use 16MHz from OSC0 and generate 96 MHz
+          pm_pll_setup(&AVR32_PM, 0, // pll.
+              2, // mul.
+              0, // div.
+              0, // osc.
+              16); // lockcount.
 
-      pm_pll_set_option(&AVR32_PM, 0, // pll.
-          1, // pll_freq: choose the range 80-180MHz.
-          0, // pll_div2.
-          0); // pll_wbwdisable.
+          pm_pll_set_option(&AVR32_PM, 0, // pll.
+              1, // pll_freq: choose the range 80-180MHz.
+              0, // pll_div2.
+              0); // pll_wbwdisable.
 
-      // start PLL1 and wait forl lock
-      pm_pll_enable(&AVR32_PM, 0);
+          // start PLL1 and wait forl lock
+          pm_pll_enable(&AVR32_PM, 0);
 
-      // Wait for PLL1 locked.
-      pm_wait_for_pll0_locked(&AVR32_PM);
+          // Wait for PLL1 locked.
+          pm_wait_for_pll0_locked(&AVR32_PM);
 
-      //setup the USB generic clock
-      pm_gc_setup(&AVR32_PM, AVR32_PM_GCLK_USBB, // gc
-          1, // osc_or_pll: use Osc (if 0) or PLL (if 1)
-          0, // pll_osc: select Osc0/PLL0 or Osc1/PLL1
-          1, // diven
-          3); // div
-      // Enable USB GCLK.
-      pm_gc_enable(&AVR32_PM, AVR32_PM_GCLK_USBB);
-
-#elif OS_CFGLONG_OSCILLATOR_HZ == 12000000L
-      //setup the USB generic clock
-      pm_gc_setup(&AVR32_PM, AVR32_PM_GCLK_USBB, // gc
-          0, // osc_or_pll: use Osc (if 0) or PLL (if 1)
-          0, // pll_osc: select Osc0/PLL0 or Osc1/PLL1
-          0, // diven
-          0); // div
-      // Enable USB GCLK.
-      pm_gc_enable(&AVR32_PM, AVR32_PM_GCLK_USBB);
-#endif
+          //setup the USB generic clock
+          pm_gc_setup(&AVR32_PM, AVR32_PM_GCLK_USBB, // gc
+              1, // osc_or_pll: use Osc (if 0) or PLL (if 1)
+              0, // pll_osc: select Osc0/PLL0 or Osc1/PLL1
+              1, // diven
+              3); // div
+          // Enable USB GCLK.
+          pm_gc_enable(&AVR32_PM, AVR32_PM_GCLK_USBB);
+        }
+      else if (avr32::uc3::Pm::getCpuClockFrequencyHz() == 12000000L)
+        {
+          //setup the USB generic clock
+          pm_gc_setup(&AVR32_PM, AVR32_PM_GCLK_USBB, // gc
+              0, // osc_or_pll: use Osc (if 0) or PLL (if 1)
+              0, // pll_osc: select Osc0/PLL0 or Osc1/PLL1
+              0, // diven
+              0); // div
+          // Enable USB GCLK.
+          pm_gc_enable(&AVR32_PM, AVR32_PM_GCLK_USBB);
+        }
 
       ////////////////////
       // configure USB module.
@@ -279,11 +288,13 @@ OSUsbDeviceImpl::usbDriverInit(void)
       INTC_register_interrupt(USB_contextHandler, AVR32_USBB_IRQ,
           OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY);
 
+      AVR32_USBB_usbcon = 0;
+
       // force USB module into device mode
       OSUsbDeviceImpl::Usb_force_device_mode();
 
       /////////////////////
-      // initializes the USB device controller.
+      // initialises the USB device controller.
       ////////////////////
       usb_connected = FALSE;
       usb_configuration_nb = 0;
@@ -301,6 +312,12 @@ OSUsbDeviceImpl::usbDriverInit(void)
 
       // Enable VBUS interrupt.
       OSUsbDeviceImpl::Usb_enable_vbus_interrupt();
+
+      if (AVR32_is_usb_vbus_high())
+        {
+          OSDeviceDebug::putString(" force ");
+          AVR32_usb_raise_vbus_transition();
+        }
 
       OSUsbDeviceImpl::Usb_ack_suspend(); // A suspend condition may be detected right after enabling the USB macro
       (void) OSUsbDeviceImpl::Is_usb_suspend();
@@ -1916,13 +1933,13 @@ const S_usb_user_configuration_descriptor
                     0x01 // Interface number of first slave or associated interface in the union.
                 },
                 { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR,
-                    EP_NB_3, EP_ATTRIBUTES_3,
+                EP_NB_3, EP_ATTRIBUTES_3,
                     Usb_format_mcu_to_usb_data(16, EP_SIZE_3), EP_INTERVAL_3 },
                 { sizeof(S_usb_interface_descriptor), INTERFACE_DESCRIPTOR,
                     IF1_NB, ALTERNATE1, NB_ENDPOINT1, IF1_CLASS, IF1_SUB_CLASS,
                     IF1_PROTOCOL, STRING_INDEX_IF1 },
                 { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR,
-                    EP_NB_1, EP_ATTRIBUTES_1,
+                EP_NB_1, EP_ATTRIBUTES_1,
                     Usb_format_mcu_to_usb_data(16, EP_SIZE_1_FS), EP_INTERVAL_1 },
                 { sizeof(S_usb_endpoint_descriptor), ENDPOINT_DESCRIPTOR,
                     EP_NB_2, EP_ATTRIBUTES_2,
@@ -2046,17 +2063,16 @@ const S_usb_language_id usb_user_language_id =
 const S_usb_manufacturer_string_descriptor
     usb_user_manufacturer_string_descriptor =
       { sizeof(S_usb_manufacturer_string_descriptor), STRING_DESCRIPTOR,
-      USB_MANUFACTURER_NAME };
+          USB_MANUFACTURER_NAME };
 
 // usb_user_product_string_descriptor
 const S_usb_product_string_descriptor usb_user_product_string_descriptor =
   { sizeof(S_usb_product_string_descriptor), STRING_DESCRIPTOR,
-  USB_PRODUCT_NAME };
+      USB_PRODUCT_NAME };
 
 // usb_user_serial_number
 const S_usb_serial_number usb_user_serial_number =
-  { sizeof(S_usb_serial_number), STRING_DESCRIPTOR,
-  USB_SERIAL_NUMBER };
+  { sizeof(S_usb_serial_number), STRING_DESCRIPTOR, USB_SERIAL_NUMBER };
 
 // ----------------------------------------------------------------------------
 
