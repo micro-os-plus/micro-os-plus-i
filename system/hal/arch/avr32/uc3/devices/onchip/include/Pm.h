@@ -35,6 +35,12 @@ namespace avr32
       // ----- Public methods -------------------------------------------------
 
       static ClockFrequencyHz_t
+      getOscillatorFrequencyHz(void);
+
+      static ClockFrequencyHz_t
+      getCpuClockFrequencyHz(void);
+
+      static ClockFrequencyHz_t
       getPbaClockFrequencyHz(void);
 
       static ClockFrequencyHz_t
@@ -58,6 +64,18 @@ namespace avr32
 
       // ----------------------------------------------------------------------
     };
+
+    inline Pm::ClockFrequencyHz_t
+    getOscillatorFrequencyHz(void)
+    {
+      return OS_CFGLONG_OSCILLATOR_HZ;
+    }
+
+    inline Pm::ClockFrequencyHz_t
+    Pm::getCpuClockFrequencyHz(void)
+    {
+      return OS_CFGLONG_CPU_FREQUENCY_HZ;
+    }
 
     inline Pm::ClockFrequencyHz_t
     Pm::getPbaClockFrequencyHz(void)
