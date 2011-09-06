@@ -289,6 +289,10 @@
   //! un-allocates the configuration x in DPRAM memory
 #define AVR32_usb_unallocate_memory(ep)                 (Clr_bits(AVR32_USBB_uecfgx(ep), AVR32_USBB_UECFGX_ALLOC_MASK))
 
+#define AVR32_USBB_usbstaset                    (AVR32_USBB.usbstaset)
+#define AVR32_usb_raise_vbus_transition()       (AVR32_USBB_usbstaset = AVR32_USBB_USBSTASET_VBUSTIS_MASK)
+
+
 //! configures selected endpoint in one step
 #define AVR32_usb_configure_endpoint(ep, type, dir, size, bank) \
 (\
