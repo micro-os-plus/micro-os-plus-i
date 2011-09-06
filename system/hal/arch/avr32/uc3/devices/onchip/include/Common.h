@@ -19,7 +19,7 @@ namespace avr32
     typedef uint32_t regWriteOnly_t;
     typedef uint32_t regNotAllocated_t;
 
-    // Table 5-2, page 36
+    // Table 5-2, page 36-37
     class PeripheralAddressMap
     {
     public:
