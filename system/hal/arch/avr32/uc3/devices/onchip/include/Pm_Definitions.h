@@ -115,6 +115,12 @@ namespace avr32
         void
         writePbbClockMask(uint32_t mask);
 
+        uint8_t
+        readAsynchronousWakeUpEnable(void);
+
+        void
+        writeAsynchronousWakeUpEnable(uint8_t value);
+
       };
 
       // ----- Inline methods -------------------------------------------------
@@ -168,6 +174,19 @@ namespace avr32
       {
         this->pbbmask = mask;
       }
+
+      inline uint8_t
+      ModuleRegisters::readAsynchronousWakeUpEnable(void)
+      {
+        return this->awen;
+      }
+
+      inline void
+      ModuleRegisters::writeAsynchronousWakeUpEnable(uint8_t value)
+      {
+        this->awen = (value & 1);
+      }
+
 
     }
   }
