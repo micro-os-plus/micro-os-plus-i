@@ -23,6 +23,7 @@ OSDeviceMemoryCard::OSDeviceMemoryCard(Implementation& impl) :
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceMemoryCard"), this);
 
   m_openCounter = 0;
+  m_isInitialised = false;
 }
 
 OSDeviceMemoryCard::~OSDeviceMemoryCard()
@@ -56,6 +57,7 @@ void
 OSDeviceMemoryCard::powerDown(void)
 {
   m_implementation.powerDown();
+  m_isInitialised = false;
 }
 
 OSReturn_t
@@ -72,7 +74,10 @@ OSDeviceMemoryCard::open(void)
     }
 
   OSReturn_t ret;
-  ret = initialise();
+  ret = OSReturn::OS_OK;
+
+  if (!m_isInitialised)
+    ret = initialise();
 
   if (ret == OSReturn::OS_OK)
     {
@@ -231,9 +236,8 @@ OSDeviceMemoryCard::close(void)
   --m_openCounter;
   if (m_openCounter == 0)
     {
-      // TODO: close the device
-      // Power down everything, like for going to sleep
-      ret = OSReturn::OS_NOT_IMPLEMENTED;
+      // If anything else to do, add it here
+      ret = OSReturn::OS_OK;
     }
 
   return ret;
