@@ -137,6 +137,8 @@ namespace device
         m_gpioAds1282Pwdn.setPinLow();
 
         // Empirically.
+        // TODO: change this when time module is implemented, to see
+        // if there is at least 1 sec between stop - start.
         OSScheduler::timerSeconds.sleep(POWER_OFF_TIME_S);
       }
 
