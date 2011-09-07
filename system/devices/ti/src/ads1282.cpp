@@ -103,9 +103,11 @@ namespace device
         m_spi.disable();
       }
 
-      void
+      OSReturn_t
       Ads1282::powerOn(void)
       {
+        uint32_t i;
+
         OSCriticalSection::enter();
           {
             isDrdyHighToLowFlag = false;
@@ -115,9 +117,18 @@ namespace device
           }
         OSCriticalSection::exit();
 
-        // wait for DRDY to be low again (16 Data Periods).
-        while (!isDrdyHighToLowFlag)
-          ;
+        // wait for DRDY to be low again.
+        for (i = 0; i < T_DR_MAX_TICKS && !isDrdyHighToLowFlag; i++)
+          {
+            OSScheduler::timerTicks.sleep(1);
+          }
+
+        if (i == T_DR_MAX_TICKS)
+          {
+            return OSReturn::OS_DISCONNECTED;
+          }
+
+        return OSReturn::OS_OK;
       }
 
       void
@@ -126,7 +137,7 @@ namespace device
         m_gpioAds1282Pwdn.setPinLow();
 
         // Empirically.
-        OS::busyWaitMicros(POWER_OFF_TIME);
+        OSScheduler::timerSeconds.sleep(POWER_OFF_TIME_S);
       }
 
       void
@@ -135,18 +146,19 @@ namespace device
         m_gpioAds1282Sync.setPinHigh();
 
         // wait tSPWH > 2/fclck (0.488us)
-        OS::busyWaitMicros(T_SYNC_SPWH);
+        OS::busyWaitMicros(T_SYNC_SPWH_US);
 
         m_gpioAds1282Sync.setPinLow();
       }
 
-      void
+      OSReturn_t
       Ads1282::resetRegisters(void)
       {
+        uint32_t i;
         m_gpioAds1282Reset.setPinLow();
 
         // wait T_RST > 2/fclck (0.488us)
-        OS::busyWaitMicros(T_RST);
+        OS::busyWaitMicros(T_RST_US);
 
         isDrdyHighToLowFlag = false;
         m_gpioAds1282Drdy.enableInterrupt();
@@ -154,8 +166,17 @@ namespace device
         m_gpioAds1282Reset.setPinHigh();
 
         // wait for DRDY to be low again (64 Data Periods).
-        while (!isDrdyHighToLowFlag)
-          ;
+        for (i = 0; i < T_DR_MAX_TICKS && !isDrdyHighToLowFlag; i++)
+          {
+            OSScheduler::timerTicks.sleep(1);
+          }
+
+        if (i == T_DR_MAX_TICKS)
+          {
+            return OSReturn::OS_DISCONNECTED;
+          }
+
+        return OSReturn::OS_OK;
       }
 
       void
@@ -164,7 +185,7 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
       }
 
       void
@@ -173,7 +194,7 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
       }
 
       void
@@ -182,28 +203,30 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATA);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
       }
 
-      void
+      OSReturn_t
       Ads1282::calibrateOffset(void)
       {
+        uint32_t i;
+
         m_gpioAds1282Sync.setPinHigh();
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         // send SYNC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SYNC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         isDrdyHighToLowFlag = false;
         m_gpioAds1282Drdy.enableInterrupt();
@@ -212,19 +235,27 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
         // wait for DRDY to be low again (64 Data Periods).
-        while (!isDrdyHighToLowFlag)
-          ;
+        for (i = 0; i < T_DR_MAX_TICKS && !isDrdyHighToLowFlag; i++)
+          {
+            OSScheduler::timerTicks.sleep(1);
+          }
+
+        if (i == T_DR_MAX_TICKS)
+          {
+            return OSReturn::OS_DISCONNECTED;
+          }
+
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         // send OFSCAL
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::OFSCAL);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         isDrdyHighToLowFlag = false;
         m_gpioAds1282Drdy.enableInterrupt();
@@ -233,31 +264,42 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
         // wait for DRDY to be low again (16 Data Periods).
-        while (!isDrdyHighToLowFlag)
-          ;
+        for (i = 0; i < T_DR_MAX_TICKS && !isDrdyHighToLowFlag; i++)
+          {
+            OSScheduler::timerTicks.sleep(1);
+          }
+
+        if (i == T_DR_MAX_TICKS)
+          {
+            return OSReturn::OS_DISCONNECTED;
+          }
 
         m_gpioAds1282Sync.setPinLow();
+
+        return OSReturn::OS_OK;
       }
 
-      void
+      OSReturn_t
       Ads1282::calibrateGain(void)
       {
+        uint32_t i;
+
         m_gpioAds1282Sync.setPinHigh();
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         // send SYNC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SYNC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         isDrdyHighToLowFlag = false;
         m_gpioAds1282Drdy.enableInterrupt();
@@ -266,20 +308,27 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
         // wait for DRDY to be low again (64 Data Periods).
-        while (!isDrdyHighToLowFlag)
-          ;
+        for (i = 0; i < T_DR_MAX_TICKS && !isDrdyHighToLowFlag; i++)
+          {
+            OSScheduler::timerTicks.sleep(1);
+          }
+
+        if (i == T_DR_MAX_TICKS)
+          {
+            return OSReturn::OS_DISCONNECTED;
+          }
 
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         // send GANCAL
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::GANCAL);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         isDrdyHighToLowFlag = false;
         m_gpioAds1282Drdy.enableInterrupt();
@@ -288,10 +337,19 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
         // wait for DRDY to be low again (16 Data Periods).
-        while (!isDrdyHighToLowFlag)
-          ;
+        for (i = 0; i < T_DR_MAX_TICKS && !isDrdyHighToLowFlag; i++)
+          {
+            OSScheduler::timerTicks.sleep(1);
+          }
+
+        if (i == T_DR_MAX_TICKS)
+          {
+            return OSReturn::OS_DISCONNECTED;
+          }
 
         m_gpioAds1282Sync.setPinLow();
+
+        return OSReturn::OS_OK;
       }
 
       RegisterValue_t
@@ -302,18 +360,18 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RREG + reg);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         // One register.
         m_spi.writeWaitReadByte(0);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         regValue = m_spi.writeWaitReadByte(0);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         OSDeviceDebug::putHex(regValue);
 
@@ -326,18 +384,18 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::WREG + reg);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         // One register.
         m_spi.writeWaitReadByte(0);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
 
         m_spi.writeWaitReadByte(value);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY);
+        OS::busyWaitMicros(T_DLY_US);
       }
     }
   }

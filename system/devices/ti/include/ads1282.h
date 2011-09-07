@@ -36,10 +36,23 @@ namespace device
       typedef uint8_t RegisterOffset_t;
 
       static const uint32_t SCLCK = (4096 * 1000);
-      static const uint32_t T_DLY = 6; // TDLY > 24/fclck (5.85us)
-      static const uint32_t T_SYNC_SPWH = 1; // SYNC pulse width, high.
-      static const uint32_t T_RST = 1; // RESET low.
-      static const uint32_t POWER_OFF_TIME = 1000 * 1000;
+
+      // TDLY > 24/fclck (5.85us)
+      static const uint32_t T_DLY_US = (24 * 1000 * 1000) / SCLCK + 1;
+
+      // SYNC pulse width, high. Min = 2/fclk.
+      static const uint32_t T_SYNC_SPWH_US = (2 * 1000 * 1000) / SCLCK + 1;
+
+      // RESET low. Min = 2/fclk.
+      static const uint32_t T_RST_US = (2 * 1000 * 1000) / SCLCK + 1;
+
+      // 1 second.
+      static const uint32_t POWER_OFF_TIME_S = 1;
+
+      // 62.98046875/fDATA + 468/fCLK: 70*4 ms
+      static const uint32_t T_DR_MAX_MS = 70 * 4;
+      static const uint32_t T_DR_MAX_TICKS = (T_DR_MAX_MS
+          * OS_CFGINT_TICK_RATE_HZ) / 1000 + 1;
 
       class Register
       {
@@ -102,7 +115,7 @@ namespace device
         void
         stopConfiguration();
 
-        void
+        OSReturn_t
         powerOn(void);
 
         void
@@ -111,7 +124,7 @@ namespace device
         void
         sync();
 
-        void
+        OSReturn_t
         resetRegisters(void);
 
         void
@@ -123,10 +136,10 @@ namespace device
         void
         readDataByCommand(void);
 
-        void
+        OSReturn_t
         calibrateOffset(void);
 
-        void
+        OSReturn_t
         calibrateGain(void);
 
         RegisterValue_t
