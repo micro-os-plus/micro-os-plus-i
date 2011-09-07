@@ -19,8 +19,8 @@
  *
  * Usage:
  *      new Template(moduleId);
- *      setGpioConfigurationArray(...);
  *      ...
+ *      setGpioConfigurationArray(...);
  *      powerUp();
  *      initialise();
  *      registerInterruptHandler(...);
@@ -56,6 +56,14 @@ namespace avr32
 
       // ----- Public methods -------------------------------------------------
 
+      // Store the pointer to the array containing the GPIO pins with
+      // the definitions of functions
+      void
+      setGpioConfigurationArray(
+          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray);
+
+      // Configure the GPIO functions, enable power sources
+      // Called only from threads, not from ISRs
       void
       powerUp(void);
 
@@ -80,10 +88,6 @@ namespace avr32
 
       OSReturn_t
       configureBusSpeedKbps(BusSpeedKbps_t speed);
-
-      void
-      setGpioConfigurationArray(
-          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray);
 
       void
       registerInterruptHandler(intc::InterruptHandler_t handler);
