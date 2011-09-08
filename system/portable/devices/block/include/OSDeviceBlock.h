@@ -20,8 +20,13 @@ public:
 
   // ----- Type definitions ---------------------------------------------------
 
+  // Index identifying the block, between 0 and size-1
   typedef uint32_t BlockNumber_t;
+
+  // Count of block to process in one request, usually very small
   typedef uint16_t BlockCount_t;
+
+  // Size of a block, in bytes or in smaller blocks
   typedef uint32_t BlockSize_t;
 
 public:
