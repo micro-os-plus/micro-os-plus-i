@@ -408,8 +408,7 @@ namespace device
       //      GRDEC unchanged
       //      PKTSTATUS read only
       //      INT = 30, default value
-      status = writeRegUseCs(device::ti::cc2400::Register::INT,
-          (uint16_t) 16);
+      status = writeRegUseCs(device::ti::cc2400::Register::INT, (uint16_t) 16);
 
       // Wait until crystal oscillator is stable
 
@@ -514,8 +513,7 @@ namespace device
       m_cs.assert();
         {
 
-          status = registers.readWord(device::ti::cc2400::Register::RSSI,
-              &aux);
+          status = registers.readWord(device::ti::cc2400::Register::RSSI, &aux);
         }
       m_cs.deassert();
 
@@ -552,8 +550,8 @@ namespace device
 
       m_cs.assert();
         {
-          status = registers.readWord(
-              device::ti::cc2400::Register::FSMSTATE, &fsm);
+          status = registers.readWord(device::ti::cc2400::Register::FSMSTATE,
+              &fsm);
         }
       m_cs.deassert();
 
@@ -613,10 +611,19 @@ namespace device
       m_mdmFifoRdy.enableInterrupt();
     }
 
+    void
+    Cc2400::enablePktInterrupt(avr32::uc3::intc::InterruptHandler_t handler,
+        avr32::uc3::gpio::InterruptMode_t mode)
+    {
+
+      m_mdmPktRdy.registerInterruptHandler(handler);
+      m_mdmPktRdy.configureInterruptMode(mode);
+      m_mdmPktRdy.enableInterrupt();
+    }
+
     //  assert CS, writes a CC2400 register, de-assert CS
     device::ti::cc2400::Status_t
-    Cc2400::writeRegUseCs(device::ti::cc2400::RegisterId_t reg,
-        uint16_t value)
+    Cc2400::writeRegUseCs(device::ti::cc2400::RegisterId_t reg, uint16_t value)
     {
       device::ti::cc2400::Status_t status;
       m_cs.assert();

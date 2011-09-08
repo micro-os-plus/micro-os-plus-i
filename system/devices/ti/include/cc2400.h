@@ -226,8 +226,8 @@ namespace device
       readFsmState(device::ti::cc2400::Status_t &status);
 
       void
-      prepareTx(uint16_t frecv,
-          device::ti::cc2400::TxPowerLevel_t txPowerLevel);
+          prepareTx(uint16_t frecv,
+              device::ti::cc2400::TxPowerLevel_t txPowerLevel);
 
       void
       prepareRx(uint16_t frecv);
@@ -250,6 +250,16 @@ namespace device
 
       void
       disableFifoInterrupt(void);
+
+      void
+      enablePktInterrupt(avr32::uc3::intc::InterruptHandler_t handler,
+          avr32::uc3::gpio::InterruptMode_t mode);
+
+      void
+      disablePktInterrupt(void);
+
+      bool
+      isCrcPinOk(void);
 
       device::ti::cc2400::Registers registers;
 
@@ -310,6 +320,19 @@ namespace device
     {
       m_mdmFifoRdy.clearInterruptRequest();
       m_mdmFifoRdy.disableInterrupt();
+    }
+
+    inline void
+    Cc2400::disablePktInterrupt(void)
+    {
+      m_mdmPktRdy.clearInterruptRequest();
+      m_mdmPktRdy.disableInterrupt();
+    }
+
+    inline bool
+    Cc2400::isCrcPinOk(void)
+    {
+      return m_mdmGio6.isPinHigh();
     }
 
     namespace cc2400
