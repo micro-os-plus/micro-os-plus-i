@@ -22,6 +22,7 @@ class OSEventFlags
 public:
 
   const static OSEventFlagsBits_t ALL = ~0;
+  const static OSEventFlagsBits_t ONE = 1;
 
 public:
 
