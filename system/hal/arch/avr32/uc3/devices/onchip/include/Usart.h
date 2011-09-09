@@ -11,6 +11,8 @@
 
 #include "hal/arch/avr32/uc3/devices/onchip/include/Usart_Definitions.h"
 
+#include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
+
 namespace avr32
 {
   namespace uc3
@@ -40,6 +42,10 @@ namespace avr32
       void
       initialise(usart::ModuleId_t module);
 
+      void
+      setGpioConfigurationArray(
+          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray);
+
     private:
 
       // ----- Private methods ------------------------------------------------
@@ -66,7 +72,7 @@ namespace avr32
 
       // ----- Private members ------------------------------------------------
 
-      //usart::StatusRegister_t m_shadowStatusRegister;
+      avr32::uc3::gpio::PinPeripheralFunction_t* m_pGpioConfigurationArray;
 
       // ----------------------------------------------------------------------
     };
@@ -104,6 +110,13 @@ namespace avr32
     Usart::disableAllInterrupts(void)
     {
       moduleRegisters.writeInterruptDisable(0xFFFFFFFF);
+    }
+
+    inline void
+    Usart::setGpioConfigurationArray(
+        avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray)
+    {
+      m_pGpioConfigurationArray = pGpioConfigurationArray;
     }
 
     // ------------------------------------------------------------------------
@@ -149,11 +162,19 @@ namespace avr32
         void
         clearControl();
 
+        void
+        setGpioConfigurationArray(
+            avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray);
+
       public:
 
         // ----- Public members -----------------------------------------------
 
         usart::ModuleRegisters& moduleRegisters;
+
+      private:
+
+        avr32::uc3::gpio::PinPeripheralFunction_t* m_pGpioConfigurationArray;
 
         // --------------------------------------------------------------------
 
@@ -163,6 +184,13 @@ namespace avr32
       SpiMaster::getInputClockFrequencyHz(void)
       {
         return OS_CFGLONG_PBA_FREQUENCY_HZ;
+      }
+
+      inline void
+      SpiMaster::setGpioConfigurationArray(
+          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray)
+      {
+        m_pGpioConfigurationArray = pGpioConfigurationArray;
       }
 
     }

@@ -61,6 +61,15 @@ namespace avr32
       void
       SpiMaster::powerUp(void)
       {
+        OSDeviceDebug::putString("avr32::uc3::usart::SpiMaster::PowerUp()");
+        OSDeviceDebug::putNewLine();
+
+        if (m_pGpioConfigurationArray != NULL)
+           {
+             avr32::uc3::Gpio::configPeripheralModeAndFunction(
+                 m_pGpioConfigurationArray);
+           }
+
         reset();
 
         // Clear control, disable most things
@@ -123,6 +132,9 @@ namespace avr32
       void
       SpiMaster::powerDown(void)
       {
+        OSDeviceDebug::putString("avr32::uc3::usart::SpiMaster::PowerDown()");
+        OSDeviceDebug::putNewLine();
+
         uint32_t mode;
         mode = moduleRegisters.readMode();
           {
@@ -132,6 +144,11 @@ namespace avr32
         moduleRegisters.writeMode(mode);
 
         clearControl();
+
+        if (m_pGpioConfigurationArray != NULL)
+           {
+             avr32::uc3::Gpio::configGpioModeInput(m_pGpioConfigurationArray);
+           }
       }
 
       void
