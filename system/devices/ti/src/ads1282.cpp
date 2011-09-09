@@ -216,7 +216,7 @@ namespace device
         m_gpioAds1282Sync.setPinHigh();
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+//        OS::busyWaitMicros(T_DLY_US);
 
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
