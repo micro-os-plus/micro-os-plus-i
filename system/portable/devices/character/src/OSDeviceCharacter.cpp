@@ -194,6 +194,8 @@ OSDeviceCharacter::open(void)
   // If everything is ok, mark that the device is opened
   m_isOpened = true;
 
+  m_doCancelRead = false;
+
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
   OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::open() return OK"));
   OSDeviceDebug::putNewLine();
@@ -473,6 +475,15 @@ OSDeviceCharacter::flush(void)
   return r;
 }
 
+void
+OSDeviceCharacter::cancelRead(void)
+{
+  m_doCancelRead = true;
+
+  OSScheduler::eventNotify(getReadEvent(), OSEventWaitReturn::OS_CANCELED);
+}
+
+
 // OSReturn::OS_NOT_OPENED
 // OSReturn::OS_WOULD_BLOCK
 // OSReturn::OS_TIMEOUT
@@ -493,6 +504,15 @@ OSDeviceCharacter::readByte(void)
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
       return OSReturn::OS_NOT_OPENED;
     }
+
+  if(m_doCancelRead)
+    {
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+      m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+      return OSReturn::OS_CANCELLED;
+    }
+
   bool canRead;
   for (;;)
     {
@@ -560,6 +580,16 @@ OSDeviceCharacter::readByte(void)
           m_pReadMatchArray = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
           return OSReturn::OS_TIMEOUT;
+        }
+      else if (ret == OSEventWaitReturn::OS_CANCELED)
+        {
+          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte() cancelled"));
+          OSDeviceDebug::putNewLine();
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+          m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+          return OSReturn::OS_CANCELLED;
         }
       else
         {

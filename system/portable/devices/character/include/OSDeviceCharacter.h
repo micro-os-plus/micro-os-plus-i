@@ -113,6 +113,9 @@ public:
   OSEvent_t
   getOpenEvent(void) const;
 
+  void
+  cancelRead(void);
+
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
   // set the match array
   void
@@ -177,6 +180,8 @@ protected:
 #endif
 
   bool m_isOpened;
+
+  bool m_doCancelRead;
 
   unsigned long volatile m_baudRate;
 
