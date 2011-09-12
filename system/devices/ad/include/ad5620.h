@@ -29,6 +29,7 @@ namespace device
       typedef ChipSelectActiveLow ChipSelectActiveLow_t;
 
       typedef uint16_t Value_t;
+      typedef int16_t SignedValue_t;
 
       class Value
       {
@@ -39,6 +40,10 @@ namespace device
         const static Value_t MIN = 0;
         const static Value_t MAX = VALIDATION_MASK;
         const static Value_t MIDDLE = (MIN + ((MAX - MIN) / 2));
+
+        const static SignedValue_t SIGNED_MIN = MIN-MIDDLE;
+        const static SignedValue_t SIGNED_MAX = MAX-MIDDLE;
+
       };
 
       typedef uint16_t PowerDownMode_t;
@@ -101,6 +106,9 @@ namespace device
 
       void
       writeValue(ad5620::Value_t value);
+
+      OSReturn_t
+      writeSignedValue(ad5620::SignedValue_t signedValue);
 
       ad5620::Value_t
       getPreviouslyWrittenValue(void);

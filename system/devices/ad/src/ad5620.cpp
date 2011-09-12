@@ -82,6 +82,33 @@ namespace device
       m_spi.configureClockFrequencyHz(clockFrequencyHz);
     }
 
+    OSReturn_t
+    Ad5620::writeSignedValue(ad5620::SignedValue_t signedValue)
+    {
+      OSReturn_t ret;
+      ret = OSReturn::OS_OK;
+
+      if (signedValue < ad5620::Value::SIGNED_MIN)
+        {
+          signedValue = ad5620::Value::SIGNED_MIN;
+          ret = OSReturn::OS_OUT_OF_RANGE;
+        }
+      else if (signedValue > ad5620::Value::SIGNED_MAX)
+        {
+          signedValue = ad5620::Value::SIGNED_MAX;
+          ret = OSReturn::OS_OUT_OF_RANGE;
+        }
+
+      ad5620::Value_t value;
+      value = ad5620::Value::MIDDLE;
+
+      value += signedValue;
+
+      writeValue(value);
+
+      return ret;
+    }
+
     void
     Ad5620::writeValue(ad5620::Value_t value)
     {
