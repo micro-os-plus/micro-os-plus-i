@@ -18,7 +18,7 @@ typedef unsigned char OSEventFlagsBits_t;
 // Inter-thread synchronisation mechanism allowing a thread to wait for multiple events,
 // defined as separate flags in a structure.
 class OSEventFlags
-  {
+{
 public:
 
   const static OSEventFlagsBits_t ALL = ~0;
@@ -31,14 +31,17 @@ public:
 
   // Set bits and send an internally identified event.
   // Return the new flags.
-  OSEventFlagsBits_t notify(OSEventFlagsBits_t bits);
+  OSEventFlagsBits_t
+  notify(OSEventFlagsBits_t bits);
 
   // Return the current flags value
-  OSEventFlagsBits_t get(void) const;
+  OSEventFlagsBits_t
+  get(void) const;
 
   // Clear the given flags.
   // Return the new flags.
-  OSEventFlagsBits_t clear(OSEventFlagsBits_t bits);
+  OSEventFlagsBits_t
+  clear(OSEventFlagsBits_t bits);
 
   // Loop until one the requested bits are set.
   // If isStrict is true all the requested bits must be set, in order to return.
@@ -46,24 +49,42 @@ public:
   // If any flag is already set, return immediately.
   // For timeouts please set timers to send events; this function will return
   // the timer event.
-  OSReturn_t wait(OSEventFlagsBits_t bits, bool isStrict = true);
+  OSReturn_t
+  wait(OSEventFlagsBits_t bits, bool isStrict = true);
 
   // Return the event used for notification
-  OSEvent_t getEvent(void) const;
+  OSEvent_t
+  getEvent(void) const;
 
-private:
+  void
+  registerThread(OSThread* pThread);
+
+public:
   // Contain the current value of the flags
   volatile OSEventFlagsBits_t m_flags;
-  };
 
-inline OSEvent_t OSEventFlags::getEvent(void) const
-  {
-    return (OSEvent_t)this;
-  }
+private:
 
-inline OSEventFlagsBits_t OSEventFlags::get(void) const
-  {
-    return m_flags;
-  }
+  OSThread* m_pThread;
+
+};
+
+inline OSEvent_t
+OSEventFlags::getEvent(void) const
+{
+  return (OSEvent_t) this;
+}
+
+inline OSEventFlagsBits_t
+OSEventFlags::get(void) const
+{
+  return m_flags;
+}
+
+inline void
+OSEventFlags::registerThread(OSThread* pThread)
+{
+  m_pThread = pThread;
+}
 
 #endif /* OSEVENTFLAGS_H_ */
