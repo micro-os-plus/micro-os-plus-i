@@ -799,6 +799,7 @@ LargeCircularSessionsStorage::Reader::openMostRecentSession(void)
     }
 
   m_sessionLastBlockNumber = m_mostRecentlyWrittenBlockNumber;
+  m_sessionFirstBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
 
   // TODO: should account for roll
   m_sessionLength = m_sessionLastBlockNumber
@@ -809,7 +810,7 @@ LargeCircularSessionsStorage::Reader::openMostRecentSession(void)
   OSDeviceDebug::putString("openMostRecentSession() id=");
   OSDeviceDebug::putHex(m_currentHeader.getSessionUniqueId());
   OSDeviceDebug::putString(", block=");
-  OSDeviceDebug::putDec(m_currentHeader.getSessionFirstBlockNumber());
+  OSDeviceDebug::putDec(m_sessionFirstBlockNumber);
   OSDeviceDebug::putString("-");
   OSDeviceDebug::putDec(m_sessionLastBlockNumber);
   OSDeviceDebug::putNewLine();
@@ -884,6 +885,7 @@ LargeCircularSessionsStorage::Reader::openOldestSession(void)
     }
 
   m_currentBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
+  m_sessionFirstBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
 
   // TODO: should account for roll
   m_sessionLength = m_sessionLastBlockNumber
@@ -892,7 +894,7 @@ LargeCircularSessionsStorage::Reader::openOldestSession(void)
   OSDeviceDebug::putString("openOldestSession() id=");
   OSDeviceDebug::putHex(m_currentHeader.getSessionUniqueId());
   OSDeviceDebug::putString(", block=");
-  OSDeviceDebug::putDec(m_currentHeader.getSessionFirstBlockNumber());
+  OSDeviceDebug::putDec(m_sessionFirstBlockNumber);
   OSDeviceDebug::putString("-");
   OSDeviceDebug::putDec(m_sessionLastBlockNumber);
   OSDeviceDebug::putNewLine();
@@ -954,11 +956,12 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
       - m_currentHeader.getSessionFirstBlockNumber() + 1;
 
   m_currentBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
+  m_sessionFirstBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
 
   OSDeviceDebug::putString("openPreviousSession() id=");
   OSDeviceDebug::putHex(m_currentHeader.getSessionUniqueId());
   OSDeviceDebug::putString(", block=");
-  OSDeviceDebug::putDec(m_currentHeader.getSessionFirstBlockNumber());
+  OSDeviceDebug::putDec(m_sessionFirstBlockNumber);
   OSDeviceDebug::putString("-");
   OSDeviceDebug::putDec(m_sessionLastBlockNumber);
   OSDeviceDebug::putNewLine();
@@ -1004,11 +1007,14 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
             {
               m_sessionLength = 0;
             }
+
+          m_sessionFirstBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
+
 #if true
           OSDeviceDebug::putString("openNextSession() id=");
           OSDeviceDebug::putHex(m_currentHeader.getSessionUniqueId());
           OSDeviceDebug::putString(", block=");
-          OSDeviceDebug::putDec(m_currentHeader.getSessionFirstBlockNumber());
+          OSDeviceDebug::putDec(m_sessionFirstBlockNumber);
           OSDeviceDebug::putString("-");
           if (m_sessionLength > 0)
             {

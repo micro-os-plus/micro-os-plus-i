@@ -409,6 +409,7 @@ public:
     Header m_currentHeader;
 
     SessionBlockNumber_t m_sessionLastBlockNumber;
+    SessionBlockNumber_t m_sessionFirstBlockNumber;
     SessionBlockNumber_t m_sessionLength;
 
     OSDeviceBlock::BlockNumber_t m_currentBlockNumber;
