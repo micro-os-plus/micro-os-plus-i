@@ -911,7 +911,7 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
 
   SessionBlockNumber_t lastBlockNumber;
   lastBlockNumber = getStorage().computeCircularSessionBlockNumber(
-      m_sessionLastBlockNumber, -1);
+      m_sessionFirstBlockNumber, -1);
 
   ret = getStorage().readStorageBlock(lastBlockNumber, m_block, 1);
   if (ret != OSReturn::OS_OK)
