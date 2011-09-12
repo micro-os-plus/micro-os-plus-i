@@ -93,6 +93,9 @@ public:
   convertSigned(int32_t* pLong);
 
   OSReturn_t
+  convertSigned(int16_t* pShort);
+
+  OSReturn_t
   convertFixedPrecision(int32_t* pLong, uint_t prec);
 
   int

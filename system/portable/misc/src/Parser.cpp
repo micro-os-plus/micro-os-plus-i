@@ -275,6 +275,20 @@ Parser::convertSigned(signed long* pLong)
 }
 
 OSReturn_t
+Parser::convertSigned(int16_t* pShort)
+{
+  int32_t tmp;
+
+  OSReturn_t ret;
+  ret = convertSigned(m_pToken, &tmp);
+
+  if (pShort != NULL)
+    *pShort = (int16_t)tmp;
+
+  return ret;
+}
+
+OSReturn_t
 Parser::convertFixedPrecision(int32_t* pLong, uint_t prec)
 {
   return convertFixedPrecision(m_pToken, pLong, prec, true);
@@ -448,6 +462,9 @@ Parser::convertFixedPrecision(uchar_t* pStr, int32_t* pLong, uint_t prec,
         }
     }
 
+  OSReturn_t ret;
+  ret = OSReturn::OS_OK;
+
   while ((ch = *pStr) != '\0')
     {
       if ('0' <= ch && ch <= '9')
@@ -461,25 +478,34 @@ Parser::convertFixedPrecision(uchar_t* pStr, int32_t* pLong, uint_t prec,
           break;
         }
       else
-        return ch;
+        {
+          ret = ch;
+          break;
+        }
 
       ++pStr;
     }
 
-  for (uint_t i = 0; i < prec; ++i)
+  if (ret == OSReturn::OS_OK)
     {
-      l *= 10;
-      ch = *pStr;
-      if (ch != '\0')
+      for (uint_t i = 0; i < prec; ++i)
         {
-          if ('0' <= ch && ch <= '9')
+          l *= 10;
+          ch = *pStr;
+          if (ch != '\0')
             {
-              l += (ch - '0');
-            }
-          else
-            return ch;
+              if ('0' <= ch && ch <= '9')
+                {
+                  l += (ch - '0');
+                }
+              else
+                {
+                  ret = ch;
+                  break;
+                }
 
-          ++pStr;
+              ++pStr;
+            }
         }
     }
 
@@ -487,7 +513,7 @@ Parser::convertFixedPrecision(uchar_t* pStr, int32_t* pLong, uint_t prec,
     l = -l;
 
   *pLong = l;
-  return OSReturn::OS_OK;
+  return ret;
 }
 
 #if false
