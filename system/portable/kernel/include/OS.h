@@ -214,6 +214,12 @@ public:
   nonMaskableInterruptHandler(void);
 #endif
 
+#if defined(OS_INCLUDE_OSAPPLICATIONIMPL_INITIALISEEXTERNALCLOCK)
+  static void
+  earlyInitialiseExternalClock(void);
+  static void
+  initialiseExternalClock(void);
+#endif
 };
 
 // ----------------------------------------------------------------------------
