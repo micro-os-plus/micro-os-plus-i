@@ -118,6 +118,11 @@ OS::resetHandler(void)
   OSDeviceDebug::earlyInit();
 #endif /* defined(DEBUG) */
 
+#if defined(OS_INCLUDE_OSAPPLICATIONIMPL_INITIALISEEXTERNALCLOCK)
+  // Switch to external Oscillator 0
+  OSApplicationImpl::initialiseExternalClock();
+#endif
+
 #if defined(DEBUG) && defined(OS_DEBUG_INIT_SECTIONS)
 
   OSDeviceDebug::putNewLine();
