@@ -16,8 +16,13 @@ namespace util
     class Parser
     {
     public:
+
+      // ----- Constructors and destructors -----------------------------------
+
       Parser(const uchar_t* pBuf, std::size_t len);
       ~Parser();
+
+      // ---- Public methods --------------------------------------------------
 
       void
       setInput(const uchar_t* pBuf, std::size_t len);
@@ -41,7 +46,11 @@ namespace util
       parseNumber(int32_t& num);
 
       OSReturn_t
-      parseByteArray(uint8_t* pByteArray, std::size_t size,  std::size_t *pLength);
+      parseByteArray(uint8_t* pByteArray, std::size_t size,
+          std::size_t *pLength);
+
+      OSReturn_t
+      parseBoolean(bool& flag);
 
       uchar_t
       skipSpaces(void);
@@ -55,7 +64,10 @@ namespace util
       void
       advanceCurrent(void);
 
+      // ----- Private members ------------------------------------------------
+
     private:
+
       const uchar_t* m_pBuf;
       std::size_t m_len;
 

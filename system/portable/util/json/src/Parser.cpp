@@ -13,6 +13,8 @@
 #include "portable/util/json/include/Parser.h"
 #include "portable/util/json/include/Serialiser.h"
 
+//#include <string.h>
+
 namespace util
 {
   namespace json
@@ -293,11 +295,11 @@ namespace util
       for (i = 0; hasMoreContent(); i++)
         {
           if (i == size)
-              return OSReturn::OS_NOT_ENOUGH_SPACE;
+            return OSReturn::OS_NOT_ENOUGH_SPACE;
 
           r = parseNumber(n_32);
           if (r != OSReturn::OS_OK)
-              return r;
+            return r;
 
           pByteArray[i] = (uint8_t) n_32;
 
@@ -310,9 +312,49 @@ namespace util
       if (r != OSReturn::OS_OK)
         return r;
 
-      *pLength = i+1;
+      *pLength = i + 1;
 
       return OSReturn::OS_OK;
+    }
+
+    OSReturn_t
+    Parser::parseBoolean(bool& flag)
+    {
+      OSReturn_t ret;
+      ret = OSReturn::OS_OK;
+
+      uchar_t ch;
+      ch = skipSpaces();
+
+      uchar_t tmp[6];
+      uint_t i;
+      i = 0;
+
+      for (; hasMoreContent(); advanceCurrent())
+        {
+          uchar_t ch;
+          ch = getCurrentChar();
+
+          if (i < sizeof(tmp))
+            {
+              tmp[i++] = ch;
+              tmp[i] = '\0';
+            }
+        }
+
+      if (strcmp((const char*) tmp, "true") == 0)
+        {
+          flag = true;
+        }
+      else
+        {
+          if (strcmp((const char*) tmp, "false") != 0)
+            ret = OSReturn::OS_BAD_PARAMETER;
+
+          flag = false;
+        }
+
+      return ret;
     }
 
   // --------------------------------------------------------------------------

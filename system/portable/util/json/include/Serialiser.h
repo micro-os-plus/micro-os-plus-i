@@ -17,7 +17,9 @@ namespace util
     class Serialiser
     {
     public:
+
       // ----- Constants ------------------------------------------------------
+
       const static uchar_t SEPARATOR = ',';
       const static uchar_t ARRAY_BEGIN = '[';
       const static uchar_t ARRAY_END = ']';
@@ -25,10 +27,12 @@ namespace util
       const static uchar_t OBJECT_END = '}';
 
       // ----- Constructors and destructors -----------------------------------
+
       Serialiser(std::ostream& out);
       ~Serialiser();
 
-      // ---- Object methods --------------------------------------------------
+      // ---- Public methods --------------------------------------------------
+
       void
       putChar(uchar_t c);
 
@@ -46,8 +50,13 @@ namespace util
       putQuotedString(const char* str);
       void
       putUnhandledString(const char* str);
+      void
+      putBoolean(bool flag);
+      void
+      putNull(void);
 
     private:
+
       std::ostream& m_out;
     };
   }

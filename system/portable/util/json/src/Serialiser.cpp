@@ -68,12 +68,13 @@ namespace util
     {
       m_out.put(ARRAY_BEGIN);
       std::size_t i;
-      for ( i = 0; i < len; ++i, ++pb)
+      for (i = 0; i < len; ++i, ++pb)
         {
-          if (i > 0){
+          if (i > 0)
+            {
               m_out << SEPARATOR;
-          }
-          m_out << std::dec << (uint_t)(*pb);
+            }
+          m_out << std::dec << (uint_t) (*pb);
         }
       m_out.put(ARRAY_END);
     }
@@ -139,6 +140,20 @@ namespace util
       m_out << str;
     }
 
+    void
+    Serialiser::putBoolean(bool flag)
+    {
+      if (flag)
+        m_out << "true";
+      else
+        m_out << "false";
+    }
+
+    void
+    Serialiser::putNull(void)
+    {
+      m_out << "null";
+    }
   }
 }
 
