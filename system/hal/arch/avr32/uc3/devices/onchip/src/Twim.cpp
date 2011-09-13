@@ -70,7 +70,7 @@ namespace avr32
     void
     Twim::registerInterruptHandler(intc::InterruptHandler_t handler)
     {
-      OSCriticalSection::enter();
+      //OSCriticalSection::enter();
         {
           if (m_module == twim::ModuleId::TWIM0)
             Intc::registerInterruptHandler(handler,
@@ -81,7 +81,7 @@ namespace avr32
                 Intc::computeInterruptIndex(intc::Group::TWIM1, 0),
                 intc::GroupPriority::TWIM1);
         }
-      OSCriticalSection::exit();
+      //OSCriticalSection::exit();
     }
 
     OSReturn_t
@@ -190,81 +190,30 @@ namespace avr32
       clearStatus();
 
       OSCriticalSection::enter();
-
-      // point to outgoing buffer
-      twim_tx_data = pOutgoingBytes;
-
-      // set the number of bytes to transmit
-      twim_tx_nb_bytes = outgoingBytesLength;
-
-      // point to incoming buffer
-      twim_rx_data = pIncomingBytes;
-
-      // set the number of bytes to receive
-      twim_rx_nb_bytes = incomingBytesSize;
-
-      // Initialize bus transfer status
-      transfer_status = TWI_SUCCESS;
-
-      twim_rx_ef_bytes = 0;
-
-      if (incomingBytesSize == 0)
         {
-          // Write only call
+          // point to outgoing buffer
+          twim_tx_data = pOutgoingBytes;
 
-          // Set next transfer to false
-          twim_next = false;
+          // set the number of bytes to transmit
+          twim_tx_nb_bytes = outgoingBytesLength;
 
-          // set the command to start the write transfer
-          moduleRegisters.writeCommand(
-              (slaveAddress << AVR32_TWIM_CMDR_SADR_OFFSET)
-                  | ((outgoingBytesLength & 0xFF)
-                      << AVR32_TWIM_CMDR_NBYTES_OFFSET)
-                  | (AVR32_TWIM_CMDR_VALID_MASK) | (AVR32_TWIM_CMDR_START_MASK)
-                  | (AVR32_TWIM_CMDR_STOP_MASK) | ((isTenBit ? 1 : 0)
-                  << AVR32_TWIM_CMDR_TENBIT_OFFSET) | (0
-                  << AVR32_TWIM_CMDR_READ_OFFSET));
+          // point to incoming buffer
+          twim_rx_data = pIncomingBytes;
 
-          moduleRegisters.writeNextCommand(0);
+          // set the number of bytes to receive
+          twim_rx_nb_bytes = incomingBytesSize;
 
-          //OSDeviceDebug::putString(" 3 ");
+          // Initialize bus transfer status
+          transfer_status = TWI_SUCCESS;
 
-          if (outgoingBytesLength != 0)
+          twim_rx_ef_bytes = 0;
+
+          if (incomingBytesSize == 0)
             {
-              // enable TXRDY interrupts
-              twim_it_mask = AVR32_TWIM_IER_TXRDY_MASK;
-            }
-        }
-      else
-        {
-          if (outgoingBytesLength == 0)
-            {
-              // Read only call
+              // Write only call
 
               // Set next transfer to false
               twim_next = false;
-
-              // set the command to start the read transfer
-              moduleRegisters.writeCommand(
-                  (slaveAddress << AVR32_TWIM_CMDR_SADR_OFFSET)
-                      | ((incomingBytesSize & 0xFF)
-                          << AVR32_TWIM_CMDR_NBYTES_OFFSET)
-                      | (AVR32_TWIM_CMDR_VALID_MASK)
-                      | (AVR32_TWIM_CMDR_START_MASK)
-                      | (AVR32_TWIM_CMDR_STOP_MASK) | ((isTenBit ? 1 : 0)
-                      << AVR32_TWIM_CMDR_TENBIT_OFFSET)
-                      | (AVR32_TWIM_CMDR_READ_MASK));
-
-              moduleRegisters.writeNextCommand(0);
-
-              //OSDeviceDebug::putString(" 4 ");
-
-              // mask RXRDY interrupts
-              twim_it_mask = AVR32_TWIM_IER_RXRDY_MASK;
-            }
-          else
-            {
-              // Write followed by read call
 
               // set the command to start the write transfer
               moduleRegisters.writeCommand(
@@ -272,42 +221,94 @@ namespace avr32
                       | ((outgoingBytesLength & 0xFF)
                           << AVR32_TWIM_CMDR_NBYTES_OFFSET)
                       | (AVR32_TWIM_CMDR_VALID_MASK)
-                      | (AVR32_TWIM_CMDR_START_MASK) | (0
-                      << AVR32_TWIM_CMDR_STOP_OFFSET) | ((isTenBit ? 1 : 0)
+                      | (AVR32_TWIM_CMDR_START_MASK)
+                      | (AVR32_TWIM_CMDR_STOP_MASK) | ((isTenBit ? 1 : 0)
                       << AVR32_TWIM_CMDR_TENBIT_OFFSET) | (0
                       << AVR32_TWIM_CMDR_READ_OFFSET));
 
-              // set the command to start the read transfer
-              moduleRegisters.writeNextCommand(
-                  (slaveAddress << AVR32_TWIM_CMDR_SADR_OFFSET)
-                      | ((incomingBytesSize & 0xFF)
-                          << AVR32_TWIM_CMDR_NBYTES_OFFSET)
-                      | (AVR32_TWIM_CMDR_VALID_MASK)
-                      | (AVR32_TWIM_CMDR_START_MASK)
-                      | (AVR32_TWIM_CMDR_STOP_MASK) | ((isTenBit ? 1 : 0)
-                      << AVR32_TWIM_CMDR_TENBIT_OFFSET)
-                      | (AVR32_TWIM_CMDR_READ_MASK));
+              moduleRegisters.writeNextCommand(0);
 
-              // mask NACK and TXRDY and RXRDY interrupts
-              twim_it_mask = AVR32_TWIM_IER_TXRDY_MASK
-                  | AVR32_TWIM_IER_RXRDY_MASK;
+              //OSDeviceDebug::putString(" 3 ");
 
-              //OSDeviceDebug::putString(" 6 ");
-              //OSDeviceDebug::putHex(moduleRegisters.readNextCommand());
-
+              if (outgoingBytesLength != 0)
+                {
+                  // enable TXRDY interrupts
+                  twim_it_mask = AVR32_TWIM_IER_TXRDY_MASK;
+                }
             }
+          else
+            {
+              if (outgoingBytesLength == 0)
+                {
+                  // Read only call
+
+                  // Set next transfer to false
+                  twim_next = false;
+
+                  // set the command to start the read transfer
+                  moduleRegisters.writeCommand(
+                      (slaveAddress << AVR32_TWIM_CMDR_SADR_OFFSET)
+                          | ((incomingBytesSize & 0xFF)
+                              << AVR32_TWIM_CMDR_NBYTES_OFFSET)
+                          | (AVR32_TWIM_CMDR_VALID_MASK)
+                          | (AVR32_TWIM_CMDR_START_MASK)
+                          | (AVR32_TWIM_CMDR_STOP_MASK) | ((isTenBit ? 1 : 0)
+                          << AVR32_TWIM_CMDR_TENBIT_OFFSET)
+                          | (AVR32_TWIM_CMDR_READ_MASK));
+
+                  moduleRegisters.writeNextCommand(0);
+
+                  //OSDeviceDebug::putString(" 4 ");
+
+                  // mask RXRDY interrupts
+                  twim_it_mask = AVR32_TWIM_IER_RXRDY_MASK;
+                }
+              else
+                {
+                  // Write followed by read call
+
+                  // set the command to start the write transfer
+                  moduleRegisters.writeCommand(
+                      (slaveAddress << AVR32_TWIM_CMDR_SADR_OFFSET)
+                          | ((outgoingBytesLength & 0xFF)
+                              << AVR32_TWIM_CMDR_NBYTES_OFFSET)
+                          | (AVR32_TWIM_CMDR_VALID_MASK)
+                          | (AVR32_TWIM_CMDR_START_MASK) | (0
+                          << AVR32_TWIM_CMDR_STOP_OFFSET) | ((isTenBit ? 1 : 0)
+                          << AVR32_TWIM_CMDR_TENBIT_OFFSET) | (0
+                          << AVR32_TWIM_CMDR_READ_OFFSET));
+
+                  // set the command to start the read transfer
+                  moduleRegisters.writeNextCommand(
+                      (slaveAddress << AVR32_TWIM_CMDR_SADR_OFFSET)
+                          | ((incomingBytesSize & 0xFF)
+                              << AVR32_TWIM_CMDR_NBYTES_OFFSET)
+                          | (AVR32_TWIM_CMDR_VALID_MASK)
+                          | (AVR32_TWIM_CMDR_START_MASK)
+                          | (AVR32_TWIM_CMDR_STOP_MASK) | ((isTenBit ? 1 : 0)
+                          << AVR32_TWIM_CMDR_TENBIT_OFFSET)
+                          | (AVR32_TWIM_CMDR_READ_MASK));
+
+                  // mask NACK and TXRDY and RXRDY interrupts
+                  twim_it_mask = AVR32_TWIM_IER_TXRDY_MASK
+                      | AVR32_TWIM_IER_RXRDY_MASK;
+
+                  //OSDeviceDebug::putString(" 6 ");
+                  //OSDeviceDebug::putHex(moduleRegisters.readNextCommand());
+
+                }
+            }
+          //OSDeviceDebug::putString(" 7 ");
+
+          // Enable NACK anc CCOMP too
+          twim_it_mask |= AVR32_TWIM_IER_ANAK_MASK | AVR32_TWIM_IER_DNAK_MASK
+              | AVR32_TWIM_IER_CCOMP_MASK;
+          // update IMR through IER
+          moduleRegisters.writeInterruptEnable(twim_it_mask);
+
+          //OSDeviceDebug::putString(" 8 ");
+          enable();
         }
-      //OSDeviceDebug::putString(" 7 ");
-
-      // Enable NACK anc CCOMP too
-      twim_it_mask |= AVR32_TWIM_IER_ANAK_MASK | AVR32_TWIM_IER_DNAK_MASK
-          | AVR32_TWIM_IER_CCOMP_MASK;
-      // update IMR through IER
-      moduleRegisters.writeInterruptEnable(twim_it_mask);
-
-      //OSDeviceDebug::putString(" 8 ");
-      enable();
-
       OSCriticalSection::exit();
 
 #if true
@@ -317,7 +318,8 @@ namespace avr32
       while ((transfer_status == TWI_SUCCESS) && !isIdle())
         {
           OSDeviceDebug::putChar('w');
-          OSScheduler::yield();
+          // cannot use yield in inits :-(
+          //OSScheduler::yield();
         }
 
       //OSDeviceDebug::putString(" we ");
@@ -362,7 +364,7 @@ namespace avr32
       // Is this a NACK?
       if (((status & (AVR32_TWIM_SR_ANAK_MASK | AVR32_TWIM_SR_DNAK_MASK
           | AVR32_TWIM_SR_ARBLST_MASK)) != 0) && ((imr
-          & (AVR32_TWIM_IER_ANAK_MASK | AVR32_TWIM_IER_DNAK_MASK)) != 0))
+          & (AVR32_TWIM_IMR_ANAK_MASK | AVR32_TWIM_IMR_DNAK_MASK)) != 0))
         {
 #if defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_INTERUPTSERVICEROUTINE)
           OSDeviceDebug::putString(" nak ");
@@ -392,7 +394,7 @@ namespace avr32
         }
       // Is this a RXRDY?
       else if ((status & AVR32_TWIM_SR_RXRDY_MASK) != 0 && ((imr
-          & AVR32_TWIM_IER_RXRDY_MASK) != 0))
+          & AVR32_TWIM_IMR_RXRDY_MASK) != 0))
         {
 #if defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_INTERUPTSERVICEROUTINE)
           OSDeviceDebug::putString(" rx ");
@@ -430,7 +432,7 @@ namespace avr32
 
       // Is this a TXRDY?
       else if ((status & AVR32_TWIM_SR_TXRDY_MASK) != 0 && ((imr
-          & AVR32_TWIM_IER_TXRDY_MASK) != 0))
+          & AVR32_TWIM_IMR_TXRDY_MASK) != 0))
         {
 #if defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_INTERUPTSERVICEROUTINE)
           OSDeviceDebug::putString(" tx ");
@@ -460,6 +462,11 @@ namespace avr32
               // decrease transmited bytes number
               twim_tx_nb_bytes--;
             }
+        }
+      else if ((status & AVR32_TWIM_SR_SMBALERT_MASK) != 0 && ((imr
+          & AVR32_TWIM_IMR_SMBALERT_MASK) != 0))
+        {
+          moduleRegisters.writeStatusClear(AVR32_TWIM_SR_SMBALERT_MASK);
         }
       else
         {
