@@ -657,8 +657,8 @@ LargeCircularSessionsStorage::Writer::createSession(
           else
             {
               // If null, just increment the previous unique id
-              m_currentHeader.setSessionUniqueId(
-                  header.getSessionUniqueId() + 1);
+              m_currentHeader.setSessionUniqueId(header.getSessionUniqueId()
+                  + 1);
             }
         }
       else
@@ -779,10 +779,41 @@ LargeCircularSessionsStorage::Reader::~Reader()
 OSReturn_t
 LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId)
 {
-  // TODO: implement
-  sessionId = sessionId;
+  OSReturn_t ret;
+  SessionUniqueId_t mostRecentSessionUniqueId;
+  SessionUniqueId_t currentSessionUniqueId;
 
-  return OSReturn::OS_OK;
+  ret = openMostRecentSession();
+  if (ret != OSReturn::OS_OK)
+    {
+      return ret;
+    }
+
+  mostRecentSessionUniqueId = m_currentHeader.getSessionUniqueId();
+
+  if (mostRecentSessionUniqueId == sessionId)
+    {
+      return OSReturn::OS_OK;
+    }
+
+  do
+    {
+      ret = openPreviousSession();
+      if (ret != OSReturn::OS_OK)
+        {
+          return ret;
+        }
+
+      currentSessionUniqueId = m_currentHeader.getSessionUniqueId();
+
+      if(currentSessionUniqueId == sessionId)
+        {
+          return OSReturn::OS_OK;
+        }
+    }
+  while (currentSessionUniqueId != mostRecentSessionUniqueId);
+
+  return OSReturn::OS_ITEM_NOT_FOUND;
 }
 
 // Without a session id, search for the most recent one
