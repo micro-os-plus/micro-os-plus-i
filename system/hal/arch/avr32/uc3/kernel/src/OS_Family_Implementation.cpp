@@ -36,7 +36,7 @@ _trampoline(void)
       :
       : [ORG] "i" (PROGRAM_START_OFFSET), [START] "i" (OS::resetHandler)
       :
-);
+  );
   for (;;)
     ; // noreturn
 }
@@ -49,22 +49,35 @@ extern unsigned long _evba;
 void
 OSCPUImpl::earlyInit(void)
 {
-  //Configure peripheral clock's
-  pm_cksel(&AVR32_PM, CFG_INT_PBA_DIV, CFG_INT_PBA_SEL, CFG_INT_PBB_DIV,
-      CFG_INT_PBB_SEL, CFG_INT_HSB_DIV, CFG_INT_HSB_SEL);
-
-  // Switch to external Oscillator 0
-  pm_switch_to_osc0(&AVR32_PM, OS_CFGLONG_OSCILLATOR_HZ,
-      AVR32_PM_OSCCTRL0_STARTUP_2048_RCOSC);
 
   // initialise local bus; without it GPIO does not work
   Set_system_register(AVR32_CPUCR,
       Get_system_register(AVR32_CPUCR) | AVR32_CPUCR_LOCEN_MASK);
 
+  // Configure peripheral clock's
+  pm_cksel(&AVR32_PM, CFG_INT_PBA_DIV, CFG_INT_PBA_SEL, CFG_INT_PBB_DIV,
+      CFG_INT_PBB_SEL, CFG_INT_HSB_DIV, CFG_INT_HSB_SEL);
+
+#if defined(OS_INCLUDE_OSAPPLICATIONIMPL_INITIALISEEXTERNALCLOCK)
+  // Switch to external Oscillator 0
+  OSApplicationImpl::earlyInitialiseExternalClock();
+#else
+  // Switch from RC to crystal
+
+  // Enable the Osc0 in crystal mode
+  pm_enable_osc0_crystal(&AVR32_PM, OS_CFGLONG_OSCILLATOR_HZ);
+
+  // Crystal startup time - This parameter is critical and depends on
+  // the characteristics of the crystal
+  pm_enable_clk0(&AVR32_PM, AVR32_PM_OSCCTRL0_STARTUP_16384_RCOSC);
+
+  // Then switch main clock to Osc0
+  pm_switch_to_clock(&AVR32_PM, AVR32_PM_MCSEL_OSC0);
+#endif
+
   // Set up EVBA so interrupts can be enabled later.
   Set_system_register(AVR32_EVBA, (int)&_evba);
 }
-
 
 void
 OSImpl::familyEarlyInit(void)
@@ -80,31 +93,33 @@ OSImpl::familyEarlyInit(void)
 
 #if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
   OSDeviceDebug::putString("Mask=");
-  OSDeviceDebug::putHex((uint16_t)((OS_CFGINT_OSCRITICALSECTION_MASK) >> 16));
+  OSDeviceDebug::putHex((uint16_t) ((OS_CFGINT_OSCRITICALSECTION_MASK) >> 16));
   OSDeviceDebug::putNewLine();
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS) */
 
 #if defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS)
   OSDeviceDebug::putString("RT Mask=");
-  OSDeviceDebug::putHex((uint16_t)((OS_CFGINT_OSCRITICALSECTION_MASKRT) >> 16));
+  OSDeviceDebug::putHex((uint16_t) ((OS_CFGINT_OSCRITICALSECTION_MASKRT) >> 16));
   OSDeviceDebug::putNewLine();
 #endif /* defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
 
 #if defined(OS_INCLUDE_OSSCHEDULER_YIELD_MASK_INTERRUPTS)
   OSDeviceDebug::putString("YIELD Mask=");
-  OSDeviceDebug::putHex((uint16_t)((OS_CFGINT_OSCRITICALSECTION_MASKYIELD) >> 16));
+  OSDeviceDebug::putHex(
+      (uint16_t) ((OS_CFGINT_OSCRITICALSECTION_MASKYIELD) >> 16));
   OSDeviceDebug::putNewLine();
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_YIELD_MASK_INTERRUPTS) */
 
   OSDeviceDebug::putString("DID=");
   OSDeviceDebug::putHex((unsigned long) __builtin_mfdr(0));
   OSDeviceDebug::putString(" rev. ");
-  OSDeviceDebug::putChar('A'+(unsigned char)(((unsigned long) __builtin_mfdr(0)) >> 28));
+  OSDeviceDebug::putChar(
+      'A' + (unsigned char) (((unsigned long) __builtin_mfdr(0)) >> 28));
   OSDeviceDebug::putNewLine();
 
   OSDeviceDebug::putString("UID=");
   for (int* p = (int*) 0x80800204; p < (int*) 0x80800212; ++p)
-    OSDeviceDebug::putPtr((void*)*p);
+    OSDeviceDebug::putPtr((void*) *p);
   OSDeviceDebug::putNewLine();
 
   OSDeviceDebug::putString("CPU/HSB=");
@@ -162,7 +177,6 @@ os_exception_handler(unsigned short n, const char* s = NULL)
 
 #endif
 }
-
 
 extern "C" void
 os_scall_handler(void) __attribute__((naked));
