@@ -118,11 +118,6 @@ OS::resetHandler(void)
   OSDeviceDebug::earlyInit();
 #endif /* defined(DEBUG) */
 
-#if defined(OS_INCLUDE_OSAPPLICATIONIMPL_INITIALISEEXTERNALCLOCK)
-  // Switch to external Oscillator 0
-  OSApplicationImpl::initialiseExternalClock();
-#endif
-
 #if defined(DEBUG) && defined(OS_DEBUG_INIT_SECTIONS)
 
   OSDeviceDebug::putNewLine();
@@ -151,9 +146,10 @@ OS::resetHandler(void)
 
 #endif
 
-
   // will call OSScheduler::earlyInit() to initialise registered threads count
   OS::earlyInit();
+
+  OSDeviceDebug::putNewLine();
 
   OS::staticConstructorsInit();
 
@@ -290,6 +286,29 @@ OS::earlyInit(void)
 
 #endif /* defined(DEBUG) */
 
+#if defined(OS_INCLUDE_OSAPPLICATIONIMPL_INITIALISEEXTERNALCLOCK)
+  // Switch to external Oscillator 0
+  OSApplicationImpl::initialiseExternalClock();
+#else
+
+  OSDeviceDebug::putString_P(PSTR("Oscillator="));
+
+#if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
+
+  OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ);
+  OSDeviceDebug::putString_P(PSTR(" Hz"));
+
+#else
+
+  OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ/1000);
+  OSDeviceDebug::putString_P(PSTR(" KHz"));
+
+#endif /* defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG) */
+
+  OSDeviceDebug::putNewLine();
+
+#endif
+
 #if defined(DEBUG) && defined(OS_EXCLUDE_MULTITASKING)
 
   OSDeviceDebug::putString_P(PSTR("Multithreading: disabled"));
@@ -331,21 +350,6 @@ OS::earlyInit(void)
 
   OSDeviceDebug::putString_P(PSTR("ResetBits="));
   OSDeviceDebug::putHex((unsigned char) OSCPU::getResetBits());
-  OSDeviceDebug::putNewLine();
-
-  OSDeviceDebug::putString_P(PSTR("Oscillator="));
-
-#if defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
-
-  OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ);
-  OSDeviceDebug::putString_P(PSTR(" Hz"));
-
-#else
-
-  OSDeviceDebug::putDec(OS_CFGLONG_OSCILLATOR_HZ/1000);
-  OSDeviceDebug::putString_P(PSTR(" KHz"));
-
-#endif /* defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG) */
 
   OSDeviceDebug::putNewLine();
 
