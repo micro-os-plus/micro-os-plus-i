@@ -33,7 +33,7 @@ LargeCircularSessionsStorage::~LargeCircularSessionsStorage()
 LargeCircularSessionsStorage::SessionBlockNumber_t
 LargeCircularSessionsStorage::getStorageSizeSessionBlocks(void)
 {
-  // Compute the number of session block
+  // Compute the number of session blocks on the device size and the block size
   return getDevice().getDeviceSizeBlocks() / getSessionBlockSizeBlocks();
 }
 
@@ -50,6 +50,7 @@ LargeCircularSessionsStorage::computeCircularSessionBlockNumber(
   OSDeviceDebug::putNewLine();
 #endif
 
+  // Move the block pointer forward/backward in the circular storage
   if (adjustment > 0)
     {
       return (blockNumber + adjustment) % size;
@@ -82,6 +83,7 @@ LargeCircularSessionsStorage::readStorageBlock(
   OSDeviceDebug::putNewLine();
 #endif /* OS_DEBUG_LARGECIRCULARSESSIONSTORAGE_READSTORAGEBLOCK */
 
+  // Compute the device address and call the device read
   return getDevice().readBlocks(blockNumber * getSessionBlockSizeBlocks(),
       pSessionBlock, deviceBlocksCount);
 }
@@ -95,6 +97,7 @@ LargeCircularSessionsStorage::writeStorageBlock(
   if (deviceBlocksCount > getSessionBlockSizeBlocks())
     return OSReturn::OS_OUT_OF_RANGE;
 
+  // Compute the device address and call the device write
   return getDevice().writeBlocks(blockNumber * getSessionBlockSizeBlocks(),
       pSessionBlock, deviceBlocksCount);
 }
@@ -165,7 +168,7 @@ LargeCircularSessionsStorage::searchMostRecentlyWrittenBlock(uint8_t* pBlock,
 
           if (leftBlockNumber + 1 == rightBlockNumber)
             {
-              // Found, the info in the 'first' header is the one
+              // Found, the 'left' header is the most recent
               break;
             }
 
@@ -181,31 +184,103 @@ LargeCircularSessionsStorage::searchMostRecentlyWrittenBlock(uint8_t* pBlock,
 
           if (middle.getMagic() != Header::MAGIC)
             {
-              // Middle header invalid, consider it as last
+              // Middle header invalid, consider it as last written
               rightBlockNumber = middleBlockNumber;
               right = middle;
             }
           else
             {
-              // Midlle in use, adjust first
+              // Middle in use, adjust first
               leftBlockNumber = middleBlockNumber;
               left = middle;
             }
         }
 
-      // Found, the first block is the most recently used
-      // The last is the first empty block, with invalid magic
+      // Found, the left block is the most recently written
+      // The right is the first empty block, with invalid magic
 
       *pMostRecentBlock = leftBlockNumber;
       header = left;
       return OSReturn::OS_OK;
     }
 
-  OSDeviceDebug::putString("Storage is full, to be implemented shortly");
-  OSDeviceDebug::putNewLine();
+  // Check if the discontinuity is exactly at the circular border
+  if (right.getBlockUniqueId() + 1 != left.getBlockUniqueId())
+    {
+      // Found, the right block (the last in the array) is the most recently
+      // written. The left block (the first in the array) is the oldest
+      // block, with the oldest block unique id, that we'll overwrite
 
-  ret = OSReturn::OS_NOT_FOUND;
-  return ret;
+      *pMostRecentBlock = rightBlockNumber;
+      header = right;
+      return OSReturn::OS_OK;
+    }
+
+  // After checking the border, the circular storage is now simplified to a
+  // linear storage, so a binary search, similar to the above, would do
+  // the job
+
+  for (;;)
+    {
+      OSDeviceDebug::putString(" search ");
+      OSDeviceDebug::putDec(leftBlockNumber);
+      OSDeviceDebug::putChar('-');
+      OSDeviceDebug::putDec(rightBlockNumber);
+      OSDeviceDebug::putNewLine();
+
+      if (leftBlockNumber + 1 == rightBlockNumber)
+        {
+          // Found, the 'left' header is the most recent
+          break;
+        }
+
+      middleBlockNumber = (leftBlockNumber + rightBlockNumber) / 2;
+      ret = readStorageBlock(middleBlockNumber, pBlock, 1);
+      if (ret != OSReturn::OS_OK)
+        {
+          OSDeviceDebug::putChar('X');
+          OSDeviceDebug::putHex((unsigned short) ret);
+          return ret;
+        }
+      middle.readFromBlock(pBlock);
+
+      // There are two tricks below:
+      // - the number of blocks in the storage, and, since the block
+      // unique ID is monotone increasing with step 1, the range of existing
+      // unique IDs in the storage at a given moment, is lower than the
+      // range of the variables used for the block unique ID. In other words,
+      // at a given time we have IDs from N to N+size, while the variables
+      // can range from 0 to 0xFF..FF.
+      // - we count that the unique IDs are unsigned values, so when we
+      // subtract something from a lower value we get a large result,
+      // like 0 - 1 = 0xFFFF
+
+      // If the size is much lower than 0xFF..FF, the unsigned difference
+      // between the unique block IDs in the half where the discontinuity
+      // is present must be higher than the difference where the IDs are
+      // monotone
+
+      if ((middle.getBlockUniqueId() - left.getBlockUniqueId())
+          > (right.getBlockUniqueId() - middle.getBlockUniqueId()))
+        {
+          // The discontinuity is in the left half
+          rightBlockNumber = middleBlockNumber;
+          right = middle;
+        }
+      else
+        {
+          // The discontinuity is in the right half
+          leftBlockNumber = middleBlockNumber;
+          left = middle;
+        }
+    }
+
+  // Found, the left block is the most recently written.
+  // The right is the oldest written block, that we'll overwrite
+
+  *pMostRecentBlock = leftBlockNumber;
+  header = left;
+  return OSReturn::OS_OK;
 
 #else
 
@@ -657,8 +732,8 @@ LargeCircularSessionsStorage::Writer::createSession(
           else
             {
               // If null, just increment the previous unique id
-              m_currentHeader.setSessionUniqueId(header.getSessionUniqueId()
-                  + 1);
+              m_currentHeader.setSessionUniqueId(
+                  header.getSessionUniqueId() + 1);
             }
         }
       else
@@ -806,7 +881,7 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId)
 
       currentSessionUniqueId = m_currentHeader.getSessionUniqueId();
 
-      if(currentSessionUniqueId == sessionId)
+      if (currentSessionUniqueId == sessionId)
         {
           return OSReturn::OS_OK;
         }
@@ -1039,7 +1114,8 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
               m_sessionLength = 0;
             }
 
-          m_sessionFirstBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
+          m_sessionFirstBlockNumber
+              = m_currentHeader.getSessionFirstBlockNumber();
 
 #if true
           OSDeviceDebug::putString("openNextSession() id=");
