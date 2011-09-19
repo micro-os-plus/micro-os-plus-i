@@ -10,6 +10,7 @@
 #include "portable/kernel/include/uOS.h"
 
 #include "portable/util/endianness/include/BigEndian.h"
+#include "portable/kernel/include/OSEventNotifier.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -85,6 +86,9 @@ public:
     Magic_t
     getMagic(void);
 
+    bool
+    isMagicValid(void);
+
     void
     setSessionUniqueId(SessionUniqueId_t sessionUniqueId);
     SessionUniqueId_t
@@ -111,6 +115,12 @@ public:
         SessionBlockNumber_t nextSessionFirstBlockNumber);
     SessionBlockNumber_t
     getNextSessionFirstBlockNumber(void);
+
+    SessionBlockNumber_t
+    getCurrentBlockNumber(void);
+
+    void
+    setCurrentBlockNumber(SessionBlockNumber_t blockNumber);
 
     // ----- Static public methods --------------------------------------------
 
@@ -167,6 +177,8 @@ public:
     SessionBlockNumber_t m_sessionFirstBlockNumber;
     BlockUniqueId_t m_blockUniqueId;
     SessionBlockNumber_t m_nextSessionFirstBlockNumber;
+
+    SessionBlockNumber_t m_currentBlockNumber;
 
     // Offsets when stored in a block header.
     const static std::size_t OFFSET_OF_MAGIC = 0;
@@ -244,6 +256,15 @@ public:
   writeStorageBlock(SessionBlockNumber_t blockNumber, uint8_t* pSessionBlock,
       OSDeviceBlock::BlockCount_t deviceBlocksCount);
 
+  bool
+  isWriting(void);
+
+  void
+  setIsWriting(bool flag);
+
+  Header&
+  getMostRecentlyWrittenBlockHeader(void);
+
 private:
 
   // All new sessions are created just after the most recent existing one.
@@ -264,6 +285,10 @@ private:
   computeCircularSessionBlockNumber(SessionBlockNumber_t blockNumber,
       int adjustment);
 
+  SessionBlockNumber_t
+  computeCircularSessionLength(SessionBlockNumber_t last,
+      SessionBlockNumber_t first);
+
   // Update the header of the current session to point to the next (future)
   // session. This is to help forward navigation, since backward
   // navigation is already possible, all blocks point to the first
@@ -278,6 +303,10 @@ private:
 
   OSDeviceBlock::BlockSize_t m_blockSizeBlocks;
 
+  // Header for the the most recently written
+  Header m_currentHeader;
+  bool m_isWriting;
+
 public:
 
   // This class handles all operations needed to write on the circular storage.
@@ -291,6 +320,8 @@ public:
     // ----- Constructors & destructors ---------------------------------------
 
     Writer(LargeCircularSessionsStorage& storage);
+    Writer(LargeCircularSessionsStorage& storage,
+        OSEventNotifier* pEventNotifier);
     ~Writer();
 
     // ----- Public methods ---------------------------------------------------
@@ -314,9 +345,17 @@ public:
     OSReturn_t
     closeSession(void);
 
+    OSEvent_t
+    getEvent(void);
+
+    void
+    setEvent(OSEvent_t event);
+
   private:
 
     // ----- Private methods --------------------------------------------------
+    void
+    notifyReaders(void);
 
   private:
 
@@ -327,10 +366,11 @@ public:
     // Header for the current block
     Header m_currentHeader;
 
-    SessionBlockNumber_t m_currentBlockNumber;
-
     // temporary buffer used for search and update forward references
     uint8_t m_block[512] __attribute__((aligned(4)));
+
+    OSEventNotifier* m_pEventNotifier;
+    OSEvent_t m_event;
 
     // ------------------------------------------------------------------------
   };
@@ -379,23 +419,8 @@ public:
     // The block number should be between 0 and (sessionLength-1)
     OSReturn_t
     readSessionBlock(SessionBlockNumber_t blockNumber,
-        OSDeviceBlock::BlockCount_t deviceBlocksCount, uint8_t* pBlock);
-
-#if false
-    // These methods might be removed, use readSessionBlock()
-
-    // Read the next session block (minimum one device block)
-    // The block number should be between 0 and (sessionLength-1)
-    OSReturn_t
-    readNextSessionBlock(OSDeviceBlock::BlockCount_t deviceBlocksCount,
-        uint8_t* pBlock);
-
-    // Read the previous session block (minimum one device block)
-    // The block number should be between 0 and (sessionLength-1)
-    OSReturn_t
-    readPreviousSessionBlock(OSDeviceBlock::BlockCount_t deviceBlocksCount,
-        uint8_t* pBlock);
-#endif
+        OSDeviceBlock::BlockCount_t deviceBlocksCount, uint8_t* pBlock,
+        bool doNotBlock = false);
 
     // Mainly for completeness, not much to do.
     OSReturn_t
@@ -433,6 +458,12 @@ inline LargeCircularSessionsStorage::Magic_t
 LargeCircularSessionsStorage::Header::getMagic(void)
 {
   return m_magic;
+}
+
+inline bool
+LargeCircularSessionsStorage::Header::isMagicValid(void)
+{
+  return (m_magic == MAGIC);
 }
 
 inline void
@@ -497,6 +528,19 @@ inline LargeCircularSessionsStorage::SessionBlockNumber_t
 LargeCircularSessionsStorage::Header::getNextSessionFirstBlockNumber(void)
 {
   return m_nextSessionFirstBlockNumber;
+}
+
+inline LargeCircularSessionsStorage::SessionBlockNumber_t
+LargeCircularSessionsStorage::Header::getCurrentBlockNumber(void)
+{
+  return m_currentBlockNumber;
+}
+
+inline void
+LargeCircularSessionsStorage::Header::setCurrentBlockNumber(
+    SessionBlockNumber_t blockNumber)
+{
+  m_currentBlockNumber = blockNumber;
 }
 
 inline std::size_t
@@ -622,12 +666,42 @@ LargeCircularSessionsStorage::getSessionBlockSizeBlocks(void)
   return m_blockSizeBlocks;
 }
 
+inline bool
+LargeCircularSessionsStorage::isWriting(void)
+{
+  return m_isWriting;
+}
+
+inline void
+LargeCircularSessionsStorage::setIsWriting(bool flag)
+{
+  m_isWriting = flag;
+}
+
+inline LargeCircularSessionsStorage::Header&
+LargeCircularSessionsStorage::getMostRecentlyWrittenBlockHeader(void)
+{
+  return m_currentHeader;
+}
+
 // ============================================================================
 
 inline LargeCircularSessionsStorage&
 LargeCircularSessionsStorage::Writer::getStorage(void)
 {
   return m_storage;
+}
+
+inline OSEvent_t
+LargeCircularSessionsStorage::Writer::getEvent(void)
+{
+  return m_event;
+}
+
+inline void
+LargeCircularSessionsStorage::Writer::setEvent(OSEvent_t event)
+{
+  m_event = event;
 }
 
 // ============================================================================
