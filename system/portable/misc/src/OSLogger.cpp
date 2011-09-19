@@ -27,56 +27,56 @@ OSLogger::OSLogger(const char* name)
   OSDeviceDebug::putNewLine();
 #endif
 
-  m_minLevel = OSLogLevel::OS_INFO;
-  m_minDebugLevel = OSLogLevel::OS_INFO;
+  m_minLevel = LogLevel::OS_INFO;
+  m_minDebugLevel = LogLevel::OS_INFO;
   m_name = name;
 
   registerLogger(this);
 }
 
 const char*
-OSLogger::convertLevelToString(logLevel_t level)
+OSLogger::convertLevelToString(LogLevel_t level)
 {
   const char* p;
   switch (level)
     {
-  case OSLogLevel::OS_OFF:
+  case LogLevel::OS_OFF:
     p = "off";
     break;
 
-  case OSLogLevel::OS_FATAL:
+  case LogLevel::OS_FATAL:
     p = "fatal";
     break;
 
-  case OSLogLevel::OS_ERROR:
+  case LogLevel::OS_ERROR:
     p = "error";
     break;
 
-  case OSLogLevel::OS_WARNING:
+  case LogLevel::OS_WARNING:
     p = "warning";
     break;
 
-  case OSLogLevel::OS_INFO:
+  case LogLevel::OS_INFO:
     p = "info";
     break;
 
-  case OSLogLevel::OS_CONFIG:
+  case LogLevel::OS_CONFIG:
     p = "config";
     break;
 
-  case OSLogLevel::OS_DEBUG:
+  case LogLevel::OS_DEBUG:
     p = "debug";
     break;
 
-  case OSLogLevel::OS_TRACE:
+  case LogLevel::OS_TRACE:
     p = "trace";
     break;
 
-  case OSLogLevel::OS_INSANE:
+  case LogLevel::OS_INSANE:
     p = "insane";
     break;
 
-  case OSLogLevel::OS_ALL:
+  case LogLevel::OS_ALL:
     p = "all";
     break;
 
@@ -87,41 +87,41 @@ OSLogger::convertLevelToString(logLevel_t level)
   return p;
 }
 
-logLevel_t
+OSLogger::LogLevel_t
 OSLogger::convertStringToLevel(const char* level)
 {
   if (level == NULL)
     return -1;
 
   if (!strcmp(level, "off"))
-    return OSLogLevel::OS_OFF;
+    return LogLevel::OS_OFF;
 
   if (!strcmp(level, "fatal"))
-    return OSLogLevel::OS_FATAL;
+    return LogLevel::OS_FATAL;
 
   if (!strcmp(level, "error"))
-    return OSLogLevel::OS_ERROR;
+    return LogLevel::OS_ERROR;
 
   if (!strcmp(level, "warning"))
-    return OSLogLevel::OS_WARNING;
+    return LogLevel::OS_WARNING;
 
   if (!strcmp(level, "info"))
-    return OSLogLevel::OS_INFO;
+    return LogLevel::OS_INFO;
 
   if (!strcmp(level, "config"))
-    return OSLogLevel::OS_CONFIG;
+    return LogLevel::OS_CONFIG;
 
   if (!strcmp(level, "debug"))
-    return OSLogLevel::OS_DEBUG;
+    return LogLevel::OS_DEBUG;
 
   if (!strcmp(level, "trace"))
-    return OSLogLevel::OS_TRACE;
+    return LogLevel::OS_TRACE;
 
   if (!strcmp(level, "insane"))
-    return OSLogLevel::OS_INSANE;
+    return LogLevel::OS_INSANE;
 
   if (!strcmp(level, "all"))
-    return OSLogLevel::OS_ALL;
+    return LogLevel::OS_ALL;
 
   return -1;
 }
@@ -171,21 +171,34 @@ OSLogger::getLogger(int index)
 }
 
 void
-OSLogger::log(logLevel_t level, logCode_t code, const char* msg)
+OSLogger::log(LogLevel_t level, LogCode_t code, const char* msg)
 {
 #if defined(DEBUG)
   if (level <= m_minDebugLevel)
     {
-      OSDeviceDebug::putString("DEBUG: log ");
-      OSDeviceDebug::putString(convertLevelToString(level));
-      OSDeviceDebug::putString(" ");
-      OSDeviceDebug::putString(m_name);
-      OSDeviceDebug::putString(" ");
-      OSDeviceDebug::putDec((unsigned long) code);
-      OSDeviceDebug::putString(" '");
-      OSDeviceDebug::putString(msg);
-      OSDeviceDebug::putString("'");
-      OSDeviceDebug::putNewLine();
+      OSSchedulerLock::enter();
+        {
+          OSDeviceDebug::putString("DBGLOG(");
+          OSDeviceDebug::putString(convertLevelToString(level));
+          OSDeviceDebug::putChar(',');
+          OSDeviceDebug::putString(m_name);
+          OSDeviceDebug::putChar(',');
+          OSDeviceDebug::putDec((unsigned long) code);
+          OSDeviceDebug::putChar(',');
+          if (msg != NULL)
+            {
+              OSDeviceDebug::putChar('\'');
+              OSDeviceDebug::putString(msg);
+              OSDeviceDebug::putChar('\'');
+            }
+          else
+            {
+              OSDeviceDebug::putString("null");
+            }
+          OSDeviceDebug::putChar(')');
+          OSDeviceDebug::putNewLine();
+        }
+      OSSchedulerLock::exit();
     }
 #endif /* defined(DEBUG) */
 
@@ -205,7 +218,7 @@ OSLogger::flush(void)
 // ----- Implementation methods -----------------------------------------------
 
 void
-OSLogger::implLog(logLevel_t level __attribute__((unused)), logCode_t code __attribute__((unused)), const char* msg __attribute__((unused)))
+OSLogger::implLog(LogLevel_t level __attribute__((unused)), LogCode_t code __attribute__((unused)), const char* msg __attribute__((unused)))
   {
     ; // Nothing here, implement it in children classes
 
