@@ -228,15 +228,25 @@
 #endif
 
 #if !defined(OS_INCLUDE_OSDEVICEBLOCKEXTENSION) && defined(OS_INCLUDE_OSDEVICEBLOCKPARTITION)
-#define OS_INCLUDE_OSDEVICEBLOCKEXTENSION                        (1)
+#define OS_INCLUDE_OSDEVICEBLOCKEXTENSION               (1)
 #endif
 
 #if !defined(OS_INCLUDE_OSDEVICEBLOCKEXTENSION) && defined(OS_INCLUDE_OSDEVICEBLOCKSYNCHRONISED)
-#define OS_INCLUDE_OSDEVICEBLOCKEXTENSION                        (1)
+#define OS_INCLUDE_OSDEVICEBLOCKEXTENSION               (1)
 #endif
 
 #if !defined(OS_INCLUDE_OSDEVICEBLOCK) && defined(OS_INCLUDE_OSDEVICEBLOCKEXTENSION)
 #define OS_INCLUDE_OSDEVICEBLOCK                        (1)
+#endif
+
+// ----- OSEventNotifier dependencies -------------------------------------------
+
+#if !defined(OS_INCLUDE_OSEVENTNOTIFIERARRAY) && defined(OS_INCLUDE_LARGECIRCULARSESSIONSSTORAGE)
+#define OS_INCLUDE_OSEVENTNOTIFIERARRAY                 (1)
+#endif
+
+#if !defined(OS_INCLUDE_OSEVENTNOTIFIER) && defined(OS_INCLUDE_OSEVENTNOTIFIERARRAY)
+#define OS_INCLUDE_OSEVENTNOTIFIER                      (1)
 #endif
 
 // ----------------------------------------------------------------------------
