@@ -13,7 +13,7 @@
 #include "portable/util/json/include/Parser.h"
 #include "portable/util/json/include/Serialiser.h"
 
-//#include <string.h>
+#include <ctype.h>
 
 namespace util
 {
@@ -334,6 +334,9 @@ namespace util
         {
           uchar_t ch;
           ch = getCurrentChar();
+
+          if (!isalpha(ch))
+            break;
 
           if (i < sizeof(tmp))
             {
