@@ -22,10 +22,10 @@ public:
 
   virtual uint_t
   eventNotify(OSEvent_t event,
-      OSEventWaitReturn_t eventReturn = OSEventWaitReturn::OS_VOID) = 0;
+      OSEventWaitReturn_t eventReturn = OSEventWaitReturn::OS_VOID);
 
   virtual OSReturn_t
-  registerThread(OSThread* pThread) = 0;
+  registerThread(OSThread* pThread);
 
   // ----- Private members ----------------------------------------------------
 
