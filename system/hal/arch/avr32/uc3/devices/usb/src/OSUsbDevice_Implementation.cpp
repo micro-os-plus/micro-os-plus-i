@@ -121,8 +121,8 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
       OSUsbDeviceImpl::Usb_ack_vbus_transition();
       if (OSUsbDeviceImpl::Is_usb_vbus_high())
         {
-          OSDeviceDebug::putString("uvH");
-          OSDeviceDebug::putNewLine();
+          OSDeviceDebug::putString(" uvH ");
+          //OSDeviceDebug::putNewLine();
 
           usb_start_device();
 
@@ -131,8 +131,8 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
         }
       else
         {
-          OSDeviceDebug::putString("uvL");
-          OSDeviceDebug::putNewLine();
+          OSDeviceDebug::putString(" uvL ");
+          //OSDeviceDebug::putNewLine();
 
           Usb_unfreeze_clock();
           Usb_detach();
@@ -150,8 +150,8 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
   if (OSUsbDeviceImpl::Is_usb_suspend()
       && OSUsbDeviceImpl::Is_suspend_interrupt_enabled())
     {
-      OSDeviceDebug::putString("us");
-      OSDeviceDebug::putNewLine();
+      OSDeviceDebug::putString(" us ");
+      //OSDeviceDebug::putNewLine();
 
       OSUsbDeviceImpl::Usb_ack_suspend();
       OSUsbDeviceImpl::Usb_enable_wake_up_interrupt();
@@ -164,8 +164,8 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
   if (OSUsbDeviceImpl::Is_usb_wake_up()
       && OSUsbDeviceImpl::Is_swake_up_interrupt_enabled())
     {
-      OSDeviceDebug::putString("uw");
-      OSDeviceDebug::putNewLine();
+      OSDeviceDebug::putString(" uw ");
+      //OSDeviceDebug::putNewLine();
 
       OSUsbDeviceImpl::Usb_unfreeze_clock();
       (void) Is_usb_clock_frozen();
@@ -178,8 +178,8 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
   if (OSUsbDeviceImpl::Is_usb_resume()
       && OSUsbDeviceImpl::Is_resume_interrupt_enabled())
     {
-      OSDeviceDebug::putString("ue");
-      OSDeviceDebug::putNewLine();
+      OSDeviceDebug::putString(" ue ");
+      //OSDeviceDebug::putNewLine();
 
       OSUsbDeviceImpl::Usb_disable_wake_up_interrupt();
       OSUsbDeviceImpl::Usb_ack_resume();
@@ -191,8 +191,8 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
   if (OSUsbDeviceImpl::Is_usb_reset()
       && OSUsbDeviceImpl::Is_reset_interrupt_enabled())
     {
-      OSDeviceDebug::putString("ur");
-      OSDeviceDebug::putNewLine();
+      OSDeviceDebug::putString(" ur ");
+      //OSDeviceDebug::putNewLine();
 
       OSUsbDeviceImpl::Usb_ack_reset();
       usb_init_device();
