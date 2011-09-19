@@ -11,8 +11,8 @@
 
 // Generic logger facility.
 
-typedef int logLevel_t;
-typedef int logCode_t;
+typedef int LogLevel_t;
+typedef int LogCode_t;
 
 // common log classes
 
@@ -20,19 +20,19 @@ typedef int logCode_t;
 class OSLogLevel
 {
 public:
-  const static logLevel_t OS_OFF = 0;
+  const static LogLevel_t OS_OFF = 0;
 
-  const static logLevel_t OS_FATAL = 10;
-  const static logLevel_t OS_ERROR = 20;
-  const static logLevel_t OS_WARNING = 30;
-  const static logLevel_t OS_INFO = 40;
+  const static LogLevel_t OS_FATAL = 10;
+  const static LogLevel_t OS_ERROR = 20;
+  const static LogLevel_t OS_WARNING = 30;
+  const static LogLevel_t OS_INFO = 40;
 
-  const static logLevel_t OS_CONFIG = 50;
-  const static logLevel_t OS_DEBUG = 60;
-  const static logLevel_t OS_TRACE = 70;
-  const static logLevel_t OS_INSANE = 80;
+  const static LogLevel_t OS_CONFIG = 50;
+  const static LogLevel_t OS_DEBUG = 60;
+  const static LogLevel_t OS_TRACE = 70;
+  const static LogLevel_t OS_INSANE = 80;
 
-  const static logLevel_t OS_ALL = 90;
+  const static LogLevel_t OS_ALL = 90;
 };
 
 class OSLogger
@@ -42,24 +42,24 @@ public:
   OSLogger(const char* name);
 
   void
-  logFatal(logCode_t code, const char* msg);
+  logFatal(LogCode_t code, const char* msg = NULL);
   void
-  logError(logCode_t code, const char* msg);
+  logError(LogCode_t code, const char* msg = NULL);
   void
-  logWarning(logCode_t code, const char* msg);
+  logWarning(LogCode_t code, const char* msg = NULL);
   void
-  logInfo(logCode_t code, const char* msg);
+  logInfo(LogCode_t code, const char* msg = NULL);
   void
-  logConfig(logCode_t code, const char* msg);
+  logConfig(LogCode_t code, const char* msg = NULL);
   void
-  logDebug(logCode_t code, const char* msg);
+  logDebug(LogCode_t code, const char* msg = NULL);
   void
-  logTrace(logCode_t code, const char* msg);
+  logTrace(LogCode_t code, const char* msg = NULL);
   void
-  logInsane(logCode_t code, const char* msg);
+  logInsane(LogCode_t code, const char* msg = NULL);
 
   void
-  log(logLevel_t level, logCode_t code, const char* msg);
+  log(LogLevel_t level, LogCode_t code, const char* msg = NULL);
 
   void
   flush(void);
@@ -67,19 +67,19 @@ public:
   const char*
   getName(void) const;
 
-  logLevel_t
+  LogLevel_t
   getLevel(void) const;
   void
-  setLevel(logLevel_t level);
+  setLevel(LogLevel_t level);
 
-  logLevel_t
+  LogLevel_t
   getDebugLevel(void) const;
   void
-  setDebugLevel(logLevel_t level);
+  setDebugLevel(LogLevel_t level);
 
   const static char*
-  convertLevelToString(logLevel_t level);
-  static logLevel_t
+  convertLevelToString(LogLevel_t level);
+  static LogLevel_t
   convertStringToLevel(const char* level);
 
   static OSLogger*
@@ -95,7 +95,7 @@ protected:
   // ----- Virtual methods ----------------------------------------------------
 
   virtual void
-  implLog(logLevel_t level, logCode_t code, const char* msg) = 0;
+  implLog(LogLevel_t level, LogCode_t code, const char* msg) = 0;
 
   virtual void
   implFlush(void) = 0;
@@ -108,10 +108,10 @@ protected:
   // ----- Private members ----------------------------------------------------
 
   // minimum log level for the line to be logged
-  logLevel_t m_minLevel;
+  LogLevel_t m_minLevel;
 
   // minimum debug log level for the line to be logged
-  logLevel_t m_minDebugLevel;
+  LogLevel_t m_minDebugLevel;
 
   const char* m_name;
 
@@ -122,49 +122,49 @@ protected:
 };
 
 inline void
-OSLogger::logFatal(logCode_t code, const char* msg)
+OSLogger::logFatal(LogCode_t code, const char* msg)
 {
   log(OSLogLevel::OS_FATAL, code, msg);
 }
 
 inline void
-OSLogger::logError(logCode_t code, const char* msg)
+OSLogger::logError(LogCode_t code, const char* msg)
 {
   log(OSLogLevel::OS_FATAL, code, msg);
 }
 
 inline void
-OSLogger::logWarning(logCode_t code, const char* msg)
+OSLogger::logWarning(LogCode_t code, const char* msg)
 {
   log(OSLogLevel::OS_WARNING, code, msg);
 }
 
 inline void
-OSLogger::logInfo(logCode_t code, const char* msg)
+OSLogger::logInfo(LogCode_t code, const char* msg)
 {
   log(OSLogLevel::OS_INFO, code, msg);
 }
 
 inline void
-OSLogger::logConfig(logCode_t code, const char* msg)
+OSLogger::logConfig(LogCode_t code, const char* msg)
 {
   log(OSLogLevel::OS_CONFIG, code, msg);
 }
 
 inline void
-OSLogger::logDebug(logCode_t code, const char* msg)
+OSLogger::logDebug(LogCode_t code, const char* msg)
 {
   log(OSLogLevel::OS_DEBUG, code, msg);
 }
 
 inline void
-OSLogger::logTrace(logCode_t code, const char* msg)
+OSLogger::logTrace(LogCode_t code, const char* msg)
 {
   log(OSLogLevel::OS_TRACE, code, msg);
 }
 
 inline void
-OSLogger::logInsane(logCode_t code, const char* msg)
+OSLogger::logInsane(LogCode_t code, const char* msg)
 {
   log(OSLogLevel::OS_INSANE, code, msg);
 }
@@ -176,24 +176,24 @@ OSLogger::getName(void) const
 }
 
 inline void
-OSLogger::setLevel(logLevel_t level)
+OSLogger::setLevel(LogLevel_t level)
 {
   m_minLevel = level;
 }
 
-inline logLevel_t
+inline LogLevel_t
 OSLogger::getLevel(void) const
 {
   return m_minLevel;
 }
 
 inline void
-OSLogger::setDebugLevel(logLevel_t level)
+OSLogger::setDebugLevel(LogLevel_t level)
 {
   m_minDebugLevel = level;
 }
 
-inline logLevel_t
+inline LogLevel_t
 OSLogger::getDebugLevel(void) const
 {
   return m_minDebugLevel;
