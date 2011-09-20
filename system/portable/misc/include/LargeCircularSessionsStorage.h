@@ -48,6 +48,9 @@ public:
   typedef uint32_t SessionUniqueId_t;
 #endif
 
+  const static SessionUniqueId_t OLDEST_SESSSION_UNIQUE_ID = 0;
+  const static SessionUniqueId_t NEWEST_SESSSION_UNIQUE_ID = ~0;
+
   typedef uint32_t BlockUniqueId_t;
   const static BlockUniqueId_t BEGINING_BLOCK_UNIQUE_ID = 1;
 
@@ -56,7 +59,8 @@ public:
 
   // This inner class handles the session block header fields.
   // In addition to regular getters/setters, it has methods to read/write
-  // hedader fields at proper byte positions.
+  // header fields at proper byte positions.
+
   class Header
   {
   public:
@@ -204,6 +208,100 @@ public:
     // ------------------------------------------------------------------------
   };
 
+  class Session
+  {
+  public:
+
+    // ----- Constructors & destructors ---------------------------------------
+
+    Session();
+    ~Session();
+
+    // ----- Public methods ---------------------------------------------------
+
+    void
+    setSessionUniqueId(SessionUniqueId_t sessionUniqueId);
+    SessionUniqueId_t
+    getSessionUniqueId(void);
+
+    void
+    incrementSessionUniqueId(void);
+
+    void
+    setSessionFirstBlockNumber(SessionBlockNumber_t sessionFirstBlockNumber);
+    SessionBlockNumber_t
+    getSessionFirstBlockNumber(void);
+
+    void
+    setSessionLastBlockNumber(SessionBlockNumber_t sessionLastBlockNumber);
+    SessionBlockNumber_t
+    getSessionLastBlockNumber(void);
+
+    void
+    setSessionLength(SessionBlockNumber_t sessionLength);
+    SessionBlockNumber_t
+    getSessionLength(void);
+
+    void
+    setNextSessionFirstBlockNumber(
+        SessionBlockNumber_t nextSessionFirstBlockNumber);
+    SessionBlockNumber_t
+    getNextSessionFirstBlockNumber(void);
+
+  private:
+
+    // ----- Private members --------------------------------------------------
+
+    // Valid always
+    SessionUniqueId_t m_sessionUniqueId;
+
+    // Valid always
+    SessionBlockNumber_t m_sessionFirstBlockNumber;
+
+    // DEFAULT_NEXTSESSIONFIRSTBLOCKNUMBER if unknown
+    SessionBlockNumber_t m_sessionLastBlockNumber;
+
+    // 0 if unknown
+    SessionBlockNumber_t m_sessionLength;
+
+    // DEFAULT_NEXTSESSIONFIRSTBLOCKNUMBER if unknown
+    SessionBlockNumber_t m_nextSessionFirstBlockNumber;
+  };
+
+  class SessionBlock
+  {
+  public:
+
+    // ----- Constructors & destructors ---------------------------------------
+
+    SessionBlock();
+    ~SessionBlock();
+
+    // ----- Public methods ---------------------------------------------------
+
+    void
+    setUniqueId(BlockUniqueId_t blockUniqueId);
+
+    BlockUniqueId_t
+    getUniqueId(void);
+
+    void
+    incrementUniqueId(void);
+
+    void
+    setBlockNumber(SessionBlockNumber_t sessionBlockNumber);
+
+    SessionBlockNumber_t
+    getBlockNumber(void);
+
+  private:
+
+    // ----- Private members --------------------------------------------------
+
+    BlockUniqueId_t m_blockUniqueId;
+    SessionBlockNumber_t m_blockNumber;
+  };
+
   // ----- Constructors & destructors -----------------------------------------
 
   LargeCircularSessionsStorage(OSDeviceBlock& device);
@@ -265,6 +363,12 @@ public:
   Header&
   getMostRecentlyWrittenBlockHeader(void);
 
+  Session&
+  getMostRecentlyWrittenSession(void);
+
+  SessionBlock&
+  getMostRecentlyWrittenSessionBlock(void);
+
 private:
 
   // All new sessions are created just after the most recent existing one.
@@ -305,7 +409,21 @@ private:
 
   // Header for the the most recently written
   Header m_currentHeader;
+
+  Session m_mostRecentlyWrittenSession;
+  SessionBlock m_mostRecentlyWrittenSessionBlock;
+
   bool m_isWriting;
+
+  OSEvent_t m_event;
+
+public:
+
+  OSEvent_t
+  getEvent(void);
+
+  void
+  setEvent(OSEvent_t event);
 
 public:
 
@@ -345,15 +463,10 @@ public:
     OSReturn_t
     closeSession(void);
 
-    OSEvent_t
-    getEvent(void);
-
-    void
-    setEvent(OSEvent_t event);
-
   private:
 
     // ----- Private methods --------------------------------------------------
+
     void
     notifyReaders(void);
 
@@ -370,7 +483,6 @@ public:
     uint8_t m_block[512] __attribute__((aligned(4)));
 
     OSEventNotifier* m_pEventNotifier;
-    OSEvent_t m_event;
 
     // ------------------------------------------------------------------------
   };
@@ -390,16 +502,21 @@ public:
     getStorage(void);
 
     // Searches for the given session.
+    // Special cases are
+    //  OLDEST_SESSSION_UNIQUE_ID - open the oldest session available
+    //  NEWEST_SESSSION_UNIQUE_ID - open the most recently written session
     OSReturn_t
-    openSession(SessionUniqueId_t sessionId);
+    openSession(SessionUniqueId_t sessionId, bool doNotBlock = false);
 
     // Search for the most recent session.
     OSReturn_t
     openMostRecentSession(void);
 
+#if false
     // Search for the oldest session still available in the storage.
     OSReturn_t
     openOldestSession(void);
+#endif
 
     // Navigate to the previous session.
     OSReturn_t
@@ -428,6 +545,8 @@ public:
 
   protected:
 
+    // ----- Private members --------------------------------------------------
+
     LargeCircularSessionsStorage& m_storage;
 
     // Header for the current block
@@ -437,11 +556,13 @@ public:
     SessionBlockNumber_t m_sessionFirstBlockNumber;
     SessionBlockNumber_t m_sessionLength;
 
-    OSDeviceBlock::BlockNumber_t m_currentBlockNumber;
+    //OSDeviceBlock::BlockNumber_t m_currentBlockNumber;
     SessionBlockNumber_t m_mostRecentlyWrittenBlockNumber;
 
     // temporary buffer
     uint8_t m_block[512] __attribute__((aligned(4)));
+
+    // ------------------------------------------------------------------------
   };
 
 };
@@ -629,6 +750,113 @@ LargeCircularSessionsStorage::Header::readNextSessionFirstBlockNumber(
 
 // ============================================================================
 
+inline void
+LargeCircularSessionsStorage::Session::setSessionUniqueId(
+    SessionUniqueId_t sessionUniqueId)
+{
+  m_sessionUniqueId = sessionUniqueId;
+}
+
+inline LargeCircularSessionsStorage::SessionUniqueId_t
+LargeCircularSessionsStorage::Session::getSessionUniqueId(void)
+{
+  return m_sessionUniqueId;
+}
+
+inline void
+LargeCircularSessionsStorage::Session::incrementSessionUniqueId(void)
+{
+  ++m_sessionUniqueId;
+}
+
+inline void
+LargeCircularSessionsStorage::Session::setSessionFirstBlockNumber(
+    SessionBlockNumber_t sessionFirstBlockNumber)
+{
+  m_sessionFirstBlockNumber = sessionFirstBlockNumber;
+}
+
+inline LargeCircularSessionsStorage::SessionBlockNumber_t
+LargeCircularSessionsStorage::Session::getSessionFirstBlockNumber(void)
+{
+  return m_sessionFirstBlockNumber;
+}
+
+inline void
+LargeCircularSessionsStorage::Session::setSessionLastBlockNumber(
+    SessionBlockNumber_t sessionLastBlockNumber)
+{
+  m_sessionLastBlockNumber = sessionLastBlockNumber;
+}
+
+inline LargeCircularSessionsStorage::SessionBlockNumber_t
+LargeCircularSessionsStorage::Session::getSessionLastBlockNumber(void)
+{
+  return m_sessionLastBlockNumber;
+}
+
+inline void
+LargeCircularSessionsStorage::Session::setSessionLength(
+    SessionBlockNumber_t sessionLength)
+{
+  m_sessionLength = sessionLength;
+}
+
+inline LargeCircularSessionsStorage::SessionBlockNumber_t
+LargeCircularSessionsStorage::Session::getSessionLength(void)
+{
+  return m_sessionLength;
+}
+
+inline void
+LargeCircularSessionsStorage::Session::setNextSessionFirstBlockNumber(
+    SessionBlockNumber_t nextSessionFirstBlockNumber)
+{
+  m_nextSessionFirstBlockNumber = nextSessionFirstBlockNumber;
+}
+
+inline LargeCircularSessionsStorage::SessionBlockNumber_t
+LargeCircularSessionsStorage::Session::getNextSessionFirstBlockNumber(void)
+{
+  return m_nextSessionFirstBlockNumber;
+}
+
+// ============================================================================
+
+inline void
+LargeCircularSessionsStorage::SessionBlock::setUniqueId(
+    BlockUniqueId_t blockUniqueId)
+{
+  m_blockUniqueId = blockUniqueId;
+}
+
+inline LargeCircularSessionsStorage::BlockUniqueId_t
+LargeCircularSessionsStorage::SessionBlock::getUniqueId(void)
+{
+  return m_blockUniqueId;
+}
+
+inline void
+LargeCircularSessionsStorage::SessionBlock::incrementUniqueId(void)
+{
+  ++m_blockUniqueId;
+}
+
+inline void
+LargeCircularSessionsStorage::SessionBlock::setBlockNumber(
+    SessionBlockNumber_t sessionBlockNumber)
+{
+  m_blockNumber = sessionBlockNumber;
+}
+
+inline LargeCircularSessionsStorage::SessionBlockNumber_t
+LargeCircularSessionsStorage::SessionBlock::getBlockNumber(void)
+{
+  return m_blockNumber;
+}
+
+// ============================================================================
+
 inline OSReturn_t
 LargeCircularSessionsStorage::openStorage(void)
 {
@@ -684,24 +912,36 @@ LargeCircularSessionsStorage::getMostRecentlyWrittenBlockHeader(void)
   return m_currentHeader;
 }
 
+inline LargeCircularSessionsStorage::Session&
+LargeCircularSessionsStorage::getMostRecentlyWrittenSession(void)
+{
+  return m_mostRecentlyWrittenSession;
+}
+
+inline LargeCircularSessionsStorage::SessionBlock&
+LargeCircularSessionsStorage::getMostRecentlyWrittenSessionBlock(void)
+{
+  return m_mostRecentlyWrittenSessionBlock;
+}
+
+inline OSEvent_t
+LargeCircularSessionsStorage::getEvent(void)
+{
+  return m_event;
+}
+
+inline void
+LargeCircularSessionsStorage::setEvent(OSEvent_t event)
+{
+  m_event = event;
+}
+
 // ============================================================================
 
 inline LargeCircularSessionsStorage&
 LargeCircularSessionsStorage::Writer::getStorage(void)
 {
   return m_storage;
-}
-
-inline OSEvent_t
-LargeCircularSessionsStorage::Writer::getEvent(void)
-{
-  return m_event;
-}
-
-inline void
-LargeCircularSessionsStorage::Writer::setEvent(OSEvent_t event)
-{
-  m_event = event;
 }
 
 // ============================================================================

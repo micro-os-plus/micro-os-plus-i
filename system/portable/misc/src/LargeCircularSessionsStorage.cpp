@@ -21,6 +21,8 @@ LargeCircularSessionsStorage::LargeCircularSessionsStorage(
   OSDeviceDebug::putConstructor_P(PSTR("LargeCircularSessionsStorage"), this);
 
   m_blockSizeBlocks = 1;
+
+  m_event = (OSEvent_t) (&m_event);
 }
 
 LargeCircularSessionsStorage::~LargeCircularSessionsStorage()
@@ -72,8 +74,20 @@ LargeCircularSessionsStorage::SessionBlockNumber_t
 LargeCircularSessionsStorage::computeCircularSessionLength(
     SessionBlockNumber_t last, SessionBlockNumber_t first)
 {
-  // TODO: should account for roll
-  return last - first + 1;
+  // The usual case is when both numbers are in short succession
+  if (last >= first)
+    return last - first + 1;
+
+  // In case we're just rolling over the circular border,
+  // use storage size.
+
+  // The trick here is that the session length is significantly smaller
+  // than the storage size.
+
+  SessionBlockNumber_t size;
+  size = getStorageSizeSessionBlocks();
+
+  return last + size - first + 1;
 }
 
 OSReturn_t
@@ -650,8 +664,49 @@ LargeCircularSessionsStorage::Header::fillUnusedSpace(uint8_t* pHeader)
     *p++ = UNUSED_SPACE_FILL_BYTE;
 
 }
+
 // ----- Static public methods ------------------------------------------------
 
+// ============================================================================
+
+// ----- Constructors & destructors -------------------------------------------
+
+LargeCircularSessionsStorage::Session::Session()
+{
+  OSDeviceDebug::putConstructor_P(
+      PSTR("LargeCircularSessionsStorage::Session"), this);
+
+  m_sessionUniqueId = 0;
+  m_sessionFirstBlockNumber = 0;
+  m_sessionFirstBlockNumber = Header::DEFAULT_NEXTSESSIONFIRSTBLOCKNUMBER;
+  m_sessionLength = 0;
+  m_nextSessionFirstBlockNumber = Header::DEFAULT_NEXTSESSIONFIRSTBLOCKNUMBER;
+}
+
+LargeCircularSessionsStorage::Session::~Session()
+{
+  OSDeviceDebug::putDestructor_P(PSTR("LargeCircularSessionsStorage::Session"),
+      this);
+}
+
+// ============================================================================
+
+// ----- Constructors & destructors -------------------------------------------
+
+LargeCircularSessionsStorage::SessionBlock::SessionBlock()
+{
+  OSDeviceDebug::putConstructor_P(
+      PSTR("LargeCircularSessionsStorage::SessionBlock"), this);
+
+  m_blockUniqueId = 0;
+  m_blockNumber = 0;
+}
+
+LargeCircularSessionsStorage::SessionBlock::~SessionBlock()
+{
+  OSDeviceDebug::putDestructor_P(
+      PSTR("LargeCircularSessionsStorage::SessionBlock"), this);
+}
 
 // ============================================================================
 
@@ -665,7 +720,6 @@ LargeCircularSessionsStorage::Writer::Writer(
       this);
 
   m_pEventNotifier = NULL;
-  m_event = (OSEvent_t) (&m_event);
 
   // Initialise the writer to search for the most recently written block
   m_currentHeader.setSessionUniqueId(0);
@@ -679,7 +733,6 @@ LargeCircularSessionsStorage::Writer::Writer(
       this);
 
   m_pEventNotifier = pEventNotifier;
-  m_event = (OSEvent_t) (&m_event);
 
   // Initialise the writer to search for the most recently written block
   m_currentHeader.setSessionUniqueId(0);
@@ -889,6 +942,11 @@ LargeCircularSessionsStorage::Writer::closeSession(void)
       currentHeader.getSessionFirstBlockNumber(),
       currentHeader.getCurrentBlockNumber(), m_block);
 
+  // Update pointer to next block to allow the reader to
+  // compute the session length
+  currentHeader.setNextSessionFirstBlockNumber(
+      currentHeader.getCurrentBlockNumber());
+
   // Inform readers that we are no longer in a writing session
   getStorage().setIsWriting(false);
 
@@ -904,7 +962,7 @@ LargeCircularSessionsStorage::Writer::notifyReaders(void)
   if (m_pEventNotifier != NULL)
     {
       OSEvent_t event;
-      event = getEvent();
+      event = getStorage().getEvent();
 
       m_pEventNotifier->eventNotify(event, (OSEventWaitReturn_t) event);
     }
@@ -930,9 +988,14 @@ LargeCircularSessionsStorage::Reader::~Reader()
 
 // ----- Public methods -------------------------------------------------------
 
-// Searches for the given session
+// Searches for the given session.
+// Special cases are:
+//  OLDEST_SESSSION_UNIQUE_ID - open the oldest session available
+//  NEWEST_SESSSION_UNIQUE_ID - open the most recently written session
+
 OSReturn_t
-LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId)
+LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
+    bool doNotBlock)
 {
   OSReturn_t ret;
   SessionUniqueId_t mostRecentSessionUniqueId;
@@ -944,13 +1007,47 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId)
       return ret;
     }
 
+  if (sessionId == NEWEST_SESSSION_UNIQUE_ID)
+    return OSReturn::OS_OK;
+
   mostRecentSessionUniqueId = m_currentHeader.getSessionUniqueId();
 
+  // Did we ask for exactly the most recently written session?
   if (mostRecentSessionUniqueId == sessionId)
     {
+      // Fine, we're done
       return OSReturn::OS_OK;
     }
 
+  // Did we ask for a future session id?
+  if (sessionId > mostRecentSessionUniqueId)
+    {
+      if (doNotBlock)
+        return OSReturn::OS_WOULD_BLOCK;
+
+      for (;;)
+        {
+          // Wait for the requested session to become available
+          // For this we wake-up every time the writer updates the storage
+
+          ret = os.sched.eventWait(getStorage().getEvent());
+          if (ret == OSReturn::OS_CANCELLED)
+            {
+              return ret;
+            }
+
+          // Copy header prepared by writer
+          m_currentHeader = getStorage().getMostRecentlyWrittenBlockHeader();
+
+          if (m_currentHeader.getSessionUniqueId() == sessionId)
+            {
+              // TODO: check if other things are needed
+              return OSReturn::OS_OK;
+            }
+        }
+    }
+
+  // Search for the given session id
   do
     {
       ret = openPreviousSession();
@@ -968,6 +1065,10 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId)
     }
   while (currentSessionUniqueId != mostRecentSessionUniqueId);
 
+  if (sessionId == OLDEST_SESSSION_UNIQUE_ID)
+    return OSReturn::OS_OK;
+
+  // Otherwise inform the caller we could not find the given session id
   return OSReturn::OS_ITEM_NOT_FOUND;
 }
 
@@ -976,20 +1077,39 @@ OSReturn_t
 LargeCircularSessionsStorage::Reader::openMostRecentSession(void)
 {
   OSReturn_t ret;
+  ret = OSReturn::OS_OK;
 
   if (!getStorage().getMostRecentlyWrittenBlockHeader().isMagicValid())
     {
+      // If there was now prior write, we need to search
+      // The result is in m_currentHeader
       ret = getStorage().searchMostRecentlyWrittenBlock(m_block,
           &m_mostRecentlyWrittenBlockNumber, m_currentHeader);
+      // TODO: change to != OS_OK
       if (ret == OSReturn::OS_NOT_FOUND)
         {
           return ret;
         }
+
+      os.sched.lock.enter();
+        {
+          // Minimal protection, in case we are running in parallel with a
+          // writer session.
+          if (!getStorage().getMostRecentlyWrittenBlockHeader().isMagicValid())
+            {
+              // Copy local header to parent class, to be used by writer too
+              getStorage().getMostRecentlyWrittenBlockHeader()
+                  = m_currentHeader;
+            }
+        }
+      os.sched.lock.exit();
     }
   else
     {
       m_currentHeader = getStorage().getMostRecentlyWrittenBlockHeader();
     }
+
+  // Now we know the header of the most recently written block
 
   m_sessionLastBlockNumber = m_mostRecentlyWrittenBlockNumber;
   m_sessionFirstBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
@@ -997,7 +1117,8 @@ LargeCircularSessionsStorage::Reader::openMostRecentSession(void)
   m_sessionLength = getStorage().computeCircularSessionLength(
       m_sessionLastBlockNumber, m_currentHeader.getSessionFirstBlockNumber());
 
-  m_currentBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
+  m_currentHeader.setSessionFirstBlockNumber(
+      m_currentHeader.getSessionFirstBlockNumber());
 
   OSDeviceDebug::putString("openMostRecentSession() id=");
   OSDeviceDebug::putHex(m_currentHeader.getSessionUniqueId());
@@ -1012,88 +1133,91 @@ LargeCircularSessionsStorage::Reader::openMostRecentSession(void)
   return ret;
 }
 
+#if false
+
 OSReturn_t
 LargeCircularSessionsStorage::Reader::openOldestSession(void)
-{
-  OSReturn_t ret;
+  {
+    OSReturn_t ret;
 
-  ret = getStorage().searchMostRecentlyWrittenBlock(m_block,
-      &m_mostRecentlyWrittenBlockNumber, m_currentHeader);
-  if (ret == OSReturn::OS_NOT_FOUND)
-    {
-      // This means that no sessions were found
-      return ret;
-    }
+    ret = getStorage().searchMostRecentlyWrittenBlock(m_block,
+        &m_mostRecentlyWrittenBlockNumber, m_currentHeader);
+    if (ret == OSReturn::OS_NOT_FOUND)
+      {
+        // This means that no sessions were found
+        return ret;
+      }
 
-  // Point to the most recently written block and walk backwords
-  m_sessionLastBlockNumber = m_mostRecentlyWrittenBlockNumber;
+    // Point to the most recently written block and walk backwords
+    m_sessionLastBlockNumber = m_mostRecentlyWrittenBlockNumber;
 
-  for (;;)
-    {
-      SessionBlockNumber_t lastBlockNumber;
-      // Go to the block before this session's first block,
-      // i.e. to the last block of the previous session
-      lastBlockNumber = getStorage().computeCircularSessionBlockNumber(
-          m_currentHeader.getSessionFirstBlockNumber(), -1);
+    for (;;)
+      {
+        SessionBlockNumber_t lastBlockNumber;
+        // Go to the block before this session's first block,
+        // i.e. to the last block of the previous session
+        lastBlockNumber = getStorage().computeCircularSessionBlockNumber(
+            m_currentHeader.getSessionFirstBlockNumber(), -1);
 
-      // Read the last block of the previous session
-      ret = getStorage().readStorageBlock(lastBlockNumber, m_block, 1);
-      if (ret != OSReturn::OS_OK)
+        // Read the last block of the previous session
+        ret = getStorage().readStorageBlock(lastBlockNumber, m_block, 1);
+        if (ret != OSReturn::OS_OK)
         return ret;
 
-      // We are now on the last block of the previous session
+        // We are now on the last block of the previous session
 
-      // If not valid, quit loop, m_currentHeader points to the
-      // oldest session
-      if (Header::readMagic(m_block) != Header::MAGIC)
+        // If not valid, quit loop, m_currentHeader points to the
+        // oldest session
+        if (Header::readMagic(m_block) != Header::MAGIC)
         break;
 
-      SessionUniqueId_t lastBlockSessionUniqueId;
-      lastBlockSessionUniqueId = Header::readSessionUniqueId(m_block);
+        SessionUniqueId_t lastBlockSessionUniqueId;
+        lastBlockSessionUniqueId = Header::readSessionUniqueId(m_block);
 
-      SessionBlockNumber_t firstBlockNumber;
-      firstBlockNumber = Header::readSessionFirstBlockNumber(m_block);
+        SessionBlockNumber_t firstBlockNumber;
+        firstBlockNumber = Header::readSessionFirstBlockNumber(m_block);
 
-      // Read the first block of the previous session
-      ret = getStorage().readStorageBlock(firstBlockNumber, m_block, 1);
-      if (ret != OSReturn::OS_OK)
+        // Read the first block of the previous session
+        ret = getStorage().readStorageBlock(firstBlockNumber, m_block, 1);
+        if (ret != OSReturn::OS_OK)
         return ret;
 
-      // We are now on the first block of the previous session
-      if (Header::readMagic(m_block) != Header::MAGIC)
+        // We are now on the first block of the previous session
+        if (Header::readMagic(m_block) != Header::MAGIC)
         break;
 
-      SessionUniqueId_t firstBlockSessionUniqueId;
-      firstBlockSessionUniqueId = Header::readSessionUniqueId(m_block);
+        SessionUniqueId_t firstBlockSessionUniqueId;
+        firstBlockSessionUniqueId = Header::readSessionUniqueId(m_block);
 
-      // Are we still inside the same session?
-      if (firstBlockSessionUniqueId != lastBlockSessionUniqueId)
+        // Are we still inside the same session?
+        if (firstBlockSessionUniqueId != lastBlockSessionUniqueId)
         break;
 
-      m_sessionLastBlockNumber = lastBlockNumber;
+        m_sessionLastBlockNumber = lastBlockNumber;
 
-      // Read current header from current session first block
-      m_currentHeader.readFromBlock(m_block);
-    }
+        // Read current header from current session first block
+        m_currentHeader.readFromBlock(m_block);
+      }
 
-  m_currentBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
-  m_sessionFirstBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
+    m_currentBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
+    m_sessionFirstBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
 
-  m_sessionLength = getStorage().computeCircularSessionLength(
-      m_sessionLastBlockNumber, m_currentHeader.getSessionFirstBlockNumber());
+    m_sessionLength = getStorage().computeCircularSessionLength(
+        m_sessionLastBlockNumber, m_currentHeader.getSessionFirstBlockNumber());
 
-  OSDeviceDebug::putString("openOldestSession() id=");
-  OSDeviceDebug::putHex(m_currentHeader.getSessionUniqueId());
-  OSDeviceDebug::putString(", block=");
-  OSDeviceDebug::putDec(m_sessionFirstBlockNumber);
-  OSDeviceDebug::putString("-");
-  OSDeviceDebug::putDec(m_sessionLastBlockNumber);
-  OSDeviceDebug::putNewLine();
+    OSDeviceDebug::putString("openOldestSession() id=");
+    OSDeviceDebug::putHex(m_currentHeader.getSessionUniqueId());
+    OSDeviceDebug::putString(", block=");
+    OSDeviceDebug::putDec(m_sessionFirstBlockNumber);
+    OSDeviceDebug::putString("-");
+    OSDeviceDebug::putDec(m_sessionLastBlockNumber);
+    OSDeviceDebug::putNewLine();
 
-  ret = OSReturn::OS_OK;
+    ret = OSReturn::OS_OK;
 
-  return ret;
-}
+    return ret;
+  }
+#endif
 
 OSReturn_t
 LargeCircularSessionsStorage::Reader::openPreviousSession(void)
@@ -1102,17 +1226,20 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
 
   LargeCircularSessionsStorage::Header header;
 
+  // From the first block of the current session, go one block before,
+  // i.e. the last block of the previous session
   SessionBlockNumber_t lastBlockNumber;
   lastBlockNumber = getStorage().computeCircularSessionBlockNumber(
       m_sessionFirstBlockNumber, -1);
 
+  // Read the last block of the previous session
   ret = getStorage().readStorageBlock(lastBlockNumber, m_block, 1);
   if (ret != OSReturn::OS_OK)
     return ret;
 
   // We are now on the last block of the previous session
 
-  // If not valid, quit loop, the previous header points to the
+  // If not valid, return, the previous header points to the
   // oldest session
   if (Header::readMagic(m_block) != Header::MAGIC)
     return OSReturn::OS_END_OF_COLLECTION;
@@ -1120,14 +1247,15 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
   SessionUniqueId_t lastBlockSessionUniqueId;
   lastBlockSessionUniqueId = Header::readSessionUniqueId(m_block);
 
-  SessionBlockNumber_t firstBlockNumber;
-  firstBlockNumber = Header::readSessionFirstBlockNumber(m_block);
+  SessionBlockNumber_t sessionFirstBlockNumber;
+  sessionFirstBlockNumber = Header::readSessionFirstBlockNumber(m_block);
 
   ret = getStorage().readStorageBlock(lastBlockNumber, m_block, 1);
   if (ret != OSReturn::OS_OK)
     return ret;
 
   // We are now on the first block of the previous session
+  // If not valid, return
   if (Header::readMagic(m_block) != Header::MAGIC)
     return OSReturn::OS_END_OF_COLLECTION;
 
@@ -1138,14 +1266,14 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
     return OSReturn::OS_END_OF_COLLECTION;
 
   m_currentHeader.setSessionUniqueId(firstBlockSessionUniqueId);
-  m_currentHeader.setSessionFirstBlockNumber(firstBlockNumber);
+  m_currentHeader.setSessionFirstBlockNumber(sessionFirstBlockNumber);
 
   m_sessionLastBlockNumber = lastBlockNumber;
 
   m_sessionLength = getStorage().computeCircularSessionLength(
       m_sessionLastBlockNumber, m_currentHeader.getSessionFirstBlockNumber());
 
-  m_currentBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
+  //m_currentBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
   m_sessionFirstBlockNumber = m_currentHeader.getSessionFirstBlockNumber();
 
   OSDeviceDebug::putString("openPreviousSession() id=");
@@ -1165,12 +1293,14 @@ OSReturn_t
 LargeCircularSessionsStorage::Reader::openNextSession(void)
 {
   // Add blockNumber to session start
-  m_currentBlockNumber = getStorage().computeCircularSessionBlockNumber(
-      m_currentBlockNumber, 1);
+  m_currentHeader.setSessionFirstBlockNumber(
+      getStorage().computeCircularSessionBlockNumber(
+          m_currentHeader.getCurrentBlockNumber(), 1));
 
   OSReturn_t ret;
 
-  ret = getStorage().readStorageBlock(m_currentBlockNumber, m_block, 1);
+  ret = getStorage().readStorageBlock(m_currentHeader.getCurrentBlockNumber(),
+      m_block, 1);
   if (ret == OSReturn::OS_OK)
     {
       Magic_t magic;
@@ -1249,8 +1379,9 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
     }
 
   // Add blockNumber to session start
-  m_currentBlockNumber = getStorage().computeCircularSessionBlockNumber(
-      m_currentHeader.getSessionFirstBlockNumber(), (int) blockNumber);
+  m_currentHeader.setSessionFirstBlockNumber(
+      getStorage().computeCircularSessionBlockNumber(
+          m_currentHeader.getSessionFirstBlockNumber(), (int) blockNumber));
 
 #if false
   OSDeviceDebug::putString("readSessionBlock() blk=");
@@ -1264,8 +1395,8 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
 
   for (;;)
     {
-      ret = getStorage().readStorageBlock(m_currentBlockNumber, pBlock,
-          deviceBlocksCount);
+      ret = getStorage().readStorageBlock(
+          m_currentHeader.getCurrentBlockNumber(), pBlock, deviceBlocksCount);
 
       if (ret == OSReturn::OS_OK)
         {
