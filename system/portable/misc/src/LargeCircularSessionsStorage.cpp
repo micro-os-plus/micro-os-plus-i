@@ -334,8 +334,7 @@ LargeCircularSessionsStorage::searchMostRecentlyWrittenBlock(
           != Header::INVALID_BLOCKNUMBER)
         {
           session.setLength(
-              computeCircularSessionLength(
-                  session.getFirstBlockNumber(),
+              computeCircularSessionLength(session.getFirstBlockNumber(),
                   session.getLastBlockNumber()));
         }
       else
@@ -558,7 +557,7 @@ LargeCircularSessionsStorage::Writer::createSession(
           m_currentBlock.setUniqueId(1);
 
           // Initialise the session
-          if (sessionUniqueId != 0)
+          if (sessionUniqueId != NEXT_SESSSION_UNIQUE_ID)
             {
               // Use the requested session unique id
               m_currentSession.setUniqueId(sessionUniqueId);
@@ -569,8 +568,7 @@ LargeCircularSessionsStorage::Writer::createSession(
               m_currentSession.setUniqueId(1);
             }
 
-          m_currentSession.setFirstBlockNumber(
-              m_currentBlock.getBlockNumber());
+          m_currentSession.setFirstBlockNumber(m_currentBlock.getBlockNumber());
 
           // last, next and length not initialised
 
@@ -600,18 +598,23 @@ LargeCircularSessionsStorage::Writer::createSession(
           // Initialise the new session
           if (sessionUniqueId != NEXT_SESSSION_UNIQUE_ID)
             {
+              if (sessionUniqueId <= mostRecentSession.getUniqueId())
+                {
+                  OSDeviceDebug::putString("session id not monotone");
+                  OSDeviceDebug::putNewLine();
+
+                  return OSReturn::OS_BAD_PARAMETER;
+                }
               // Use the requested session unique id
               m_currentSession.setUniqueId(sessionUniqueId);
             }
           else
             {
               // If null, just increment the previous unique id
-              m_currentSession.setUniqueId(
-                  mostRecentSession.getUniqueId() + 1);
+              m_currentSession.setUniqueId(mostRecentSession.getUniqueId() + 1);
             }
 
-          m_currentSession.setFirstBlockNumber(
-              m_currentBlock.getBlockNumber());
+          m_currentSession.setFirstBlockNumber(m_currentBlock.getBlockNumber());
 
           // last, next and length not initialised
 
@@ -636,6 +639,13 @@ LargeCircularSessionsStorage::Writer::createSession(
 
       if (sessionUniqueId != NEXT_SESSSION_UNIQUE_ID)
         {
+          if (sessionUniqueId <= mostRecentSession.getUniqueId())
+            {
+              OSDeviceDebug::putString("session id not monotone");
+              OSDeviceDebug::putNewLine();
+
+              return OSReturn::OS_BAD_PARAMETER;
+            }
           // Use the requested session unique id
           m_currentSession.setUniqueId(sessionUniqueId);
         }
@@ -645,8 +655,7 @@ LargeCircularSessionsStorage::Writer::createSession(
           m_currentSession.incrementUniqueId();
         }
 
-      m_currentSession.setFirstBlockNumber(
-          m_currentBlock.getBlockNumber());
+      m_currentSession.setFirstBlockNumber(m_currentBlock.getBlockNumber());
     }
 
   // Initialise defaults for new sessions
@@ -654,7 +663,7 @@ LargeCircularSessionsStorage::Writer::createSession(
   m_currentSession.setLastBlockNumber(Header::INVALID_BLOCKNUMBER);
   m_currentSession.setLength(0);
 
-  OSDeviceDebug::putString("createSession() id=");
+  OSDeviceDebug::putString(" createSession() id=");
   OSDeviceDebug::putHex(m_currentSession.getUniqueId());
   OSDeviceDebug::putString(", blk id=");
   OSDeviceDebug::putHex(m_currentBlock.getUniqueId());
@@ -695,11 +704,10 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBlockBuffer)
   // Prepare the current block header.
   Header::writeMagic(Header::MAGIC, pBlockBuffer);
 
-  Header::writeSessionUniqueId(m_currentSession.getUniqueId(),
-      pBlockBuffer);
+  Header::writeSessionUniqueId(m_currentSession.getUniqueId(), pBlockBuffer);
 
-  Header::writeSessionFirstBlockNumber(
-      m_currentSession.getFirstBlockNumber(), pBlockBuffer);
+  Header::writeSessionFirstBlockNumber(m_currentSession.getFirstBlockNumber(),
+      pBlockBuffer);
 
   // All new blocks have the forward reference set to an illegal value.
   Header::writeNextSessionFirstBlockNumber(Header::INVALID_BLOCKNUMBER,
@@ -707,6 +715,10 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBlockBuffer)
 
   // Block unique id
   Header::writeBlockUniqueId(m_currentBlock.getUniqueId(), pBlockBuffer);
+
+  OSDeviceDebug::putString(" wb=");
+  OSDeviceDebug::putDec(m_currentBlock.getBlockNumber());
+  OSDeviceDebug::putChar(' ');
 
   // Write a full session block to the output device
   OSReturn_t ret;
@@ -751,14 +763,22 @@ LargeCircularSessionsStorage::Writer::closeSession(void)
       return OSReturn::OS_NOT_INITIALISED;
     }
 
+  OSDeviceDebug::putString(" closeSession() id=");
+  OSDeviceDebug::putHex(m_currentSession.getUniqueId());
+  OSDeviceDebug::putString(", nblk id=");
+  OSDeviceDebug::putHex(m_currentBlock.getUniqueId());
+  OSDeviceDebug::putString(", nblk no=");
+  OSDeviceDebug::putDec(m_currentBlock.getBlockNumber());
+  OSDeviceDebug::putNewLine();
+
   // Update the header of the current session to point to the next (future)
   // session. This is to help forward navigation, since backward
   // navigation is already possible, all blocks point to the first
   // session block
   OSReturn_t ret;
   ret = getStorage().updateForwardReference(
-      m_currentSession.getFirstBlockNumber(),
-      m_currentBlock.getBlockNumber(), m_blockBuffer);
+      m_currentSession.getFirstBlockNumber(), m_currentBlock.getBlockNumber(),
+      m_blockBuffer);
 
   // Update pointer to next block to allow forward references
   m_currentSession.setNextSessionFirstBlockNumber(
@@ -1008,8 +1028,8 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
 
   // Read the last block of the previous session
   OSReturn_t ret;
-  ret = getStorage().readStorageBlock(
-      previousSession.getLastBlockNumber(), m_blockBuffer, 1);
+  ret = getStorage().readStorageBlock(previousSession.getLastBlockNumber(),
+      m_blockBuffer, 1);
   if (ret != OSReturn::OS_OK)
     return ret;
 
@@ -1025,8 +1045,8 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
   previousSession.setFirstBlockNumber(
       Header::readSessionFirstBlockNumber(m_blockBuffer));
 
-  ret = getStorage().readStorageBlock(
-      previousSession.getFirstBlockNumber(), m_blockBuffer, 1);
+  ret = getStorage().readStorageBlock(previousSession.getFirstBlockNumber(),
+      m_blockBuffer, 1);
   if (ret != OSReturn::OS_OK)
     return ret;
 
@@ -1119,8 +1139,7 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
   OSDeviceDebug::putString(", block=");
   OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
   OSDeviceDebug::putString("-");
-  if (m_currentSession.getLastBlockNumber()
-      != Header::INVALID_BLOCKNUMBER)
+  if (m_currentSession.getLastBlockNumber() != Header::INVALID_BLOCKNUMBER)
     {
       OSDeviceDebug::putDec(m_currentSession.getLastBlockNumber());
     }
