@@ -26,6 +26,12 @@ namespace util
       writeUnsigned16(uint16_t value, uint8_t* pByte);
 
       static uint32_t
+      readUnsigned24(const uint8_t* pByte);
+
+      static void
+      writeUnsigned24(uint32_t value, uint8_t* pByte);
+
+      static uint32_t
       readUnsigned32(const uint8_t* pByte);
 
       static void

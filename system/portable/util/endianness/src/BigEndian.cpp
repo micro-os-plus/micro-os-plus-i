@@ -50,6 +50,41 @@ namespace util
           }
 
         uint32_t
+        BigEndian::readUnsigned24(const uint8_t* pByte)
+          {
+            uint32_t value;
+            value = 0;
+
+            //value <<= 8;
+            value |= *pByte++;
+            value <<= 8;
+            value |= *pByte++;
+            value <<= 8;
+            value |= *pByte++;
+
+            return value;
+          }
+
+        void
+        BigEndian::writeUnsigned24(uint32_t value, uint8_t* pByte)
+          {
+            // Start from low byte and proceed in reverse order
+            pByte += sizeof(value);
+
+            uint8_t b;
+
+            b = (value & 0xFF);
+            *--pByte = b;
+            value >>= 8;
+            b = (value & 0xFF);
+            *--pByte = b;
+            value >>= 8;
+            b = (value & 0xFF);
+            *--pByte = b;
+            //value >>= 8;
+          }
+
+        uint32_t
         BigEndian::readUnsigned32(const uint8_t* pByte)
           {
             uint32_t value;
