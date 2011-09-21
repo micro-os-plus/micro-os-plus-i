@@ -989,7 +989,7 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
         {
           sessionFound: //
 
-          OSDeviceDebug::putString("openSession() id=");
+          OSDeviceDebug::putString(" openSession() id=");
           OSDeviceDebug::putHex(m_currentSession.getUniqueId());
           OSDeviceDebug::putString(", block=");
           OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
@@ -1069,7 +1069,7 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
   // Make the previous session the current session
   m_currentSession = previousSession;
 
-  OSDeviceDebug::putString("openPreviousSession() id=");
+  OSDeviceDebug::putString(" openPreviousSession() id=");
   OSDeviceDebug::putHex(m_currentSession.getUniqueId());
   OSDeviceDebug::putString(", block=");
   OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
@@ -1134,7 +1134,7 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
   m_currentSession = nextSession;
 
 #if true
-  OSDeviceDebug::putString("openNextSession() id=");
+  OSDeviceDebug::putString(" openNextSession() id=");
   OSDeviceDebug::putHex(m_currentSession.getUniqueId());
   OSDeviceDebug::putString(", block=");
   OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
@@ -1209,7 +1209,7 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
               if (sessionUniqueId != m_currentSession.getUniqueId())
                 {
                   // If the session id changes, return eof
-                  OSDeviceDebug::putString("readSessionBlock() eof");
+                  OSDeviceDebug::putString(" readSessionBlock() eof");
                   OSDeviceDebug::putNewLine();
 
                   ret = OSReturn::OS_END_OF_COLLECTION;
@@ -1224,7 +1224,7 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
             }
           else
             {
-              OSDeviceDebug::putString("readSessionBlock() bad magic");
+              OSDeviceDebug::putString(" readSessionBlock() bad magic");
               OSDeviceDebug::putNewLine();
 
               ret = OSReturn::OS_END_OF_COLLECTION;
