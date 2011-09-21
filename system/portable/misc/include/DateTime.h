@@ -10,6 +10,7 @@
 #include "portable/kernel/include/uOS.h"
 
 #if !defined(OS_CFGINT_DATETIME_EPOCH_YEAR)
+// With 32 bits, this gives us 135 years, i.e. up to 2145
 #define OS_CFGINT_DATETIME_EPOCH_YEAR 2010
 #endif
 
