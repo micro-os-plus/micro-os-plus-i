@@ -188,17 +188,15 @@ namespace device
       m_mdmTxStrb.setPinLow();
 
       // Turn on power supplies, by setting MDM_PWR_EN_IO and MDM_PWR_EN_CORE
-      m_mdmPwrEnCore.setPinHigh();
       m_mdmPwrEnIo.setPinHigh();
+      m_mdmPwrEnCore.setPinHigh();
     }
 
-    // this is called after the power supplies are stable
+    // reset modem by setting MAIN register 0x0000, then 0x8000
     void
     Cc2400::powerOnPhase2(void)
     {
-      // Send MAIN register, having set the flags: RESET and XOSC16M_BYPASS set (value 0x8003)
-      uint16_t mainValue;
-      mainValue = 0x8003;
+      // Send MAIN register, having set the flag RESET
 
       registers.setSpiHighSpeed();
       device::ti::cc2400::Status_t status;
@@ -240,6 +238,7 @@ namespace device
       OSDeviceDebug::putNewLine();
 #endif
 
+      // enter in RESET state
       status = writeRegUseCs(device::ti::cc2400::Register::MAIN, 0x0000);
 #if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString("status reset: ");
@@ -247,7 +246,12 @@ namespace device
       OSDeviceDebug::putNewLine();
 #endif
 
+      // exit from RESET state
+      // MAIN register possible values are:
+      // 0x8000 - crystal oscillator
+      // 0x8003 - external clock
       status = writeRegUseCs(device::ti::cc2400::Register::MAIN, 0x8000);
+
 #if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString("status reset: ");
       OSDeviceDebug::putDec((uint16_t) status);
