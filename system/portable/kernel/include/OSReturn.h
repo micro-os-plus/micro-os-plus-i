@@ -49,6 +49,7 @@ public:
   const static OSReturn_t OS_BAD_MAGIC = -32;
   const static OSReturn_t OS_END_OF_COLLECTION = -32;
   const static OSReturn_t OS_OUT_OF_RANGE = -33;
+  const static OSReturn_t OS_BAD_DATE = -34;
 
 };
 
