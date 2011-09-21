@@ -450,6 +450,9 @@ public:
     OSReturn_t
     createSession(SessionUniqueId_t sessionUniqueId = NEXT_SESSSION_UNIQUE_ID);
 
+    SessionUniqueId_t
+    getSessionUniqueId(void);
+
     // Fill in the header and write the entire session block.
     // pSessionBlock must point to a byte array of multiple device blocks.
     // The write address is automatically incremented.
@@ -923,6 +926,12 @@ inline LargeCircularSessionsStorage&
 LargeCircularSessionsStorage::Writer::getStorage(void)
 {
   return m_storage;
+}
+
+inline LargeCircularSessionsStorage::SessionUniqueId_t
+LargeCircularSessionsStorage::Writer::getSessionUniqueId(void)
+{
+  return m_currentSession.getUniqueId();
 }
 
 // ============================================================================
