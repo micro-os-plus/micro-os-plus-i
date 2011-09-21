@@ -639,7 +639,7 @@ LargeCircularSessionsStorage::Writer::createSession(
 
       if (sessionUniqueId != NEXT_SESSSION_UNIQUE_ID)
         {
-          if (sessionUniqueId <= mostRecentSession.getUniqueId())
+          if (sessionUniqueId <= m_currentSession.getUniqueId())
             {
               OSDeviceDebug::putString("session id not monotone");
               OSDeviceDebug::putNewLine();
