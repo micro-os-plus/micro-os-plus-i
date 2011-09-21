@@ -859,7 +859,7 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
 
   while (!getStorage().getMostRecentlyWrittenSession().isValid())
     {
-      // If there was now prior write, we need to search.
+      // If there was no prior write, we need to search.
       // The result is in mostRecentlyWrittenBlock
       ret = getStorage().searchMostRecentlyWrittenBlock(m_blockBuffer,
           m_currentBlock, m_currentSession);
@@ -1177,8 +1177,8 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
   currentBlockNumber = getStorage().computeCircularSessionBlockNumber(
       m_currentSession.getFirstBlockNumber(), (int) blockNumber);
 
-#if false
-  OSDeviceDebug::putString("readSessionBlock() blk=");
+#if true
+  OSDeviceDebug::putString(" readSessionBlock() blk=");
   OSDeviceDebug::putDec(blockNumber);
   OSDeviceDebug::putString(", storage blk=");
   OSDeviceDebug::putDec(currentBlockNumber);
@@ -1215,12 +1215,8 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
                   ret = OSReturn::OS_END_OF_COLLECTION;
                 }
 
-#if false
-              OSDeviceDebug::putString("readSessionBlock() start block=");
-              OSDeviceDebug::putDec(currentHeader.getFirstBlockNumber());
-              OSDeviceDebug::putString(", crt block=");
-              OSDeviceDebug::putDec(m_currentBlockNumber);
-              OSDeviceDebug::putNewLine();
+#if true
+              OSDeviceDebug::putString(" readSessionBlock() done ");
 #endif
               ret = OSReturn::OS_OK;
 
@@ -1254,6 +1250,9 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
 OSReturn_t
 LargeCircularSessionsStorage::Reader::closeSession(void)
 {
+  OSDeviceDebug::putString(" closeSession()");
+  OSDeviceDebug::putNewLine();
+
   return OSReturn::OS_OK;
 }
 
