@@ -9,9 +9,9 @@
 
 #include "portable/kernel/include/uOS.h"
 
-#if !defined(OS_CFGINT_DATETIME_EPOCH_YEAR)
+#if !defined(OS_CFGINT_DATETIME_DEFAULT_EPOCH_YEAR)
 // With 32 bits, this gives us 135 years, i.e. up to 2145
-#define OS_CFGINT_DATETIME_EPOCH_YEAR 2010
+#define OS_CFGINT_DATETIME_DEFAULT_EPOCH_YEAR 2010
 #endif
 
 // ----------------------------------------------------------------------------
@@ -28,8 +28,6 @@ public:
   typedef uint16_t DayOfYear_t; // 1-366
   typedef uint8_t Month_t; // 1-12
   typedef uint16_t Year_t; // >= EPOCH
-
-  const static uint16_t EPOCH_YEAR = OS_CFGINT_DATETIME_EPOCH_YEAR;
 
   typedef uint32_t DurationSeconds_t;
 
@@ -76,13 +74,36 @@ public:
   bool
   isLeapYear(void);
 
+  Year_t
+  getEpochYear(void);
+
+#if defined(OS_INCLUDE_DATETIME_YEAR_EPOCH)
+
+  void
+  setYearEpoch(Year_t year);
+
+#endif /* defined(OS_INCLUDE_DATETIME_YEAR_EPOCH) */
+
+  Year_t
+  getDefaultEpochYear(void);
+
 private:
+
+  const static Year_t DEFAULT_EPOCH_YEAR =
+      OS_CFGINT_DATETIME_DEFAULT_EPOCH_YEAR;
+
   Second_t m_second; // 0-59
   Minute_t m_minute; // 0-59
   Hour_t m_hour; // 0-23
   Day_t m_day; // 1-31
   Month_t m_month; // 1-12
   Year_t m_year; // >= EPOCH
+
+#if defined(OS_INCLUDE_DATETIME_YEAR_EPOCH)
+
+  Year_t m_yearEpoch;
+
+#endif /* defined(OS_INCLUDE_DATETIME_YEAR_EPOCH) */
 };
 
 inline DateTime::Second_t
@@ -119,6 +140,37 @@ inline DateTime::Year_t
 DateTime::getYear()
 {
   return m_year;
+}
+
+inline DateTime::Year_t
+DateTime::getEpochYear(void)
+{
+#if defined(OS_INCLUDE_DATETIME_YEAR_EPOCH)
+
+  return m_yearEpoch;
+
+#else
+
+  return getDefaultEpochYear();
+
+#endif /* defined(OS_INCLUDE_DATETIME_YEAR_EPOCH) */
+
+}
+
+#if defined(OS_INCLUDE_DATETIME_YEAR_EPOCH)
+
+inline void
+DateTime::setYearEpoch(Year_t year)
+{
+  m_yearEpoch = year;
+}
+
+#endif /* defined(OS_INCLUDE_DATETIME_YEAR_EPOCH) */
+
+inline DateTime::Year_t
+DateTime::getDefaultEpochYear(void)
+{
+  return DEFAULT_EPOCH_YEAR;
 }
 
 // ----------------------------------------------------------------------------

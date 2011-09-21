@@ -24,7 +24,7 @@ DateTime::DateTime()
   m_hour = 0;
   m_day = 0;
   m_month = 0;
-  m_year = EPOCH_YEAR;
+  m_year = DEFAULT_EPOCH_YEAR;
 }
 
 DateTime::~DateTime()
@@ -118,7 +118,7 @@ DateTime::parseIso(const char* pStr)
 
         }
     }
-  if ((m_year < EPOCH_YEAR) || (m_month < 1) || (m_month > 12) || (m_day < 1)
+  if ((m_year < getEpochYear()) || (m_month < 1) || (m_month > 12) || (m_day < 1)
       || (m_day > 31) || (m_hour > 24) || (m_minute > 60) || (m_second > 60))
     {
       OSDeviceDebug::putString(" parseIso() bad fields ");
@@ -164,8 +164,8 @@ DateTime::computeSecondsFromEpoch()
   DurationSeconds_t seconds;
   Year_t fullYears;
 
-  if (m_year > EPOCH_YEAR)
-    fullYears = m_year - EPOCH_YEAR - 1;
+  if (m_year > getEpochYear())
+    fullYears = m_year - getEpochYear() - 1;
   else
     fullYears = 0;
 
@@ -182,7 +182,7 @@ DateTime::computeSecondsFromEpoch()
       count = 0;
 
       Year_t y;
-      y = (EPOCH_YEAR + 3) & ~0x3; // First possible leap year from EPOCH
+      y = (getEpochYear() + 3) & ~0x3; // First possible leap year from EPOCH
 
       // TODO: compute without loop
       for (; y < m_year; y += 4)
