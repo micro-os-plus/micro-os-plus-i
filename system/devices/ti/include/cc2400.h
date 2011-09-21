@@ -225,8 +225,9 @@ namespace device
       uint16_t
       readFsmState(device::ti::cc2400::Status_t &status);
 
+      // set frecv and power level
       void
-          prepareTx(uint16_t frecv,
+      prepareTx(uint16_t frecv,
               device::ti::cc2400::TxPowerLevel_t txPowerLevel);
 
       void
@@ -296,6 +297,7 @@ namespace device
       m_mdmRxStrb.setPinLow();
     }
 
+    // Set Reception mode, by resetting TX pin (leave RX pin set)
     inline void
     Cc2400::switchToRxMode(void)
     {

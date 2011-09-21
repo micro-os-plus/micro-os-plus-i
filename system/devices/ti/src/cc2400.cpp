@@ -179,6 +179,7 @@ namespace device
 #endif
     }
 
+    // turn on power supplies
     void
     Cc2400::powerOnPhase1(void)
     {
@@ -186,10 +187,12 @@ namespace device
       m_mdmRxStrb.setPinLow();
       m_mdmTxStrb.setPinLow();
 
-      // Turn on power supplies, by setting MDM_PWR_EN_IO, MDM_PWR_EN_CORE and PA_PWR_EN
+      // Turn on power supplies, by setting MDM_PWR_EN_IO and MDM_PWR_EN_CORE
       m_mdmPwrEnCore.setPinHigh();
       m_mdmPwrEnIo.setPinHigh();
     }
+
+    // this is called after the power supplies are stable
     void
     Cc2400::powerOnPhase2(void)
     {
@@ -253,6 +256,7 @@ namespace device
 #endif
     }
 
+    // turn off Modem
     void
     Cc2400::powerOff(void)
     {
@@ -290,8 +294,8 @@ namespace device
           while ((status & device::ti::cc2400::Status::FS_LOCK) != 0);
         }
 
+      // ??? cannot stop XOSC;
 #if false
-      // can not stop XOSC;
       readFsmState(status);
       if ((status & device::ti::cc2400::Status::XOSC16M_STABLE) != 0)
         {
@@ -322,6 +326,7 @@ namespace device
       m_mdmPwrEnCore.setPinLow();
     }
 
+    // set all registers to default value
     void
     Cc2400::configureRegisters(void)
     {
@@ -433,6 +438,7 @@ namespace device
 #endif
     }
 
+    // read all FIFO buffer to empty it
     void
     Cc2400::clearFifoBuffer()
     {
@@ -449,12 +455,13 @@ namespace device
       m_cs.deassert();
     }
 
+    // calibrate and return status of calibration
     bool
     Cc2400::isCalibrationOk(bool isDebug = true)
     {
       device::ti::cc2400::Status_t status;
-      // Start calibration and PLL lock by setting both micro-controller pins
-      // connected to RX and TX Modem pins
+
+      // make sure Modem is in IDLE
       m_mdmTxStrb.setPinLow();
       m_mdmRxStrb.setPinLow();
 
@@ -468,6 +475,8 @@ namespace device
       //    }
       //  m_cs.deassert();
 
+      // Start calibration and PLL lock by setting both micro-controller pins
+      // connected to RX and TX Modem pins
       m_mdmTxStrb.setPinHigh();
       m_mdmRxStrb.setPinHigh();
 
@@ -478,7 +487,8 @@ namespace device
           OSDeviceDebug::putNewLine();
 
         }
-      // Wait until GIO1 is set (max 100usec)
+
+      // BUSY WAIT until GIO1 is set (max 100usec); meaning calibration done
       while (!m_mdmGio1.isPinHigh())
         ;
       //  do
@@ -487,6 +497,7 @@ namespace device
       //    }
       //  while (0 == (status & 0x04));;
       //readFsmState();
+
       // if GIO1 not set return error
       if (m_mdmGio1.isPinHigh())
         {
@@ -512,11 +523,11 @@ namespace device
 
       m_cs.assert();
         {
-
           status = registers.readWord(device::ti::cc2400::Register::RSSI, &aux);
         }
       m_cs.deassert();
 
+      // put first byte of aux as "signed int16" value
       int8_t aux8;
       aux8 = (int8_t) (aux >> 8);
 
@@ -532,6 +543,7 @@ namespace device
       OSDeviceDebug::putHex((uint16_t) rssiValue);
 #endif
 
+      // add the offset of the modem (-54dB) as in datasheet
       rssiValue += RSSI_OFFSET;
 
 #if false
@@ -542,6 +554,7 @@ namespace device
       return rssiValue;
     }
 
+    // returns Radio current fsm state (as in datasheet page 35)
     uint16_t
     Cc2400::readFsmState(device::ti::cc2400::Status_t &status)
     {
@@ -567,6 +580,7 @@ namespace device
       return fsm;
     }
 
+    // set frecv and power level
     void
     Cc2400::prepareTx(uint16_t frecv,
         device::ti::cc2400::TxPowerLevel_t txPowerLevel)
@@ -586,6 +600,7 @@ namespace device
 
     }
 
+    // set frecv
     void
     Cc2400::prepareRx(uint16_t frecv)
     {
@@ -601,6 +616,7 @@ namespace device
       //status = writeRegUseCs(device::ti::cc2400::Register::INT, (uint16_t) 16);
     }
 
+    // enable FIFO pin interrupt
     void
     Cc2400::enableFifoInterrupt(avr32::uc3::intc::InterruptHandler_t handler,
         avr32::uc3::gpio::InterruptMode_t mode)
@@ -611,17 +627,17 @@ namespace device
       m_mdmFifoRdy.enableInterrupt();
     }
 
+    // enable PKT pin interrupt
     void
     Cc2400::enablePktInterrupt(avr32::uc3::intc::InterruptHandler_t handler,
         avr32::uc3::gpio::InterruptMode_t mode)
     {
-
       m_mdmPktRdy.registerInterruptHandler(handler);
       m_mdmPktRdy.configureInterruptMode(mode);
       m_mdmPktRdy.enableInterrupt();
     }
 
-    //  assert CS, writes a CC2400 register, de-assert CS
+    // assert CS, then writes a CC2400 register, then de-assert CS
     device::ti::cc2400::Status_t
     Cc2400::writeRegUseCs(device::ti::cc2400::RegisterId_t reg, uint16_t value)
     {
