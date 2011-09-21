@@ -97,7 +97,10 @@ LargeCircularSessionsStorage::readStorageBlock(
 {
   // Validate block count
   if (deviceBlocksCount > getSessionBlockSizeBlocks())
-    return OSReturn::OS_OUT_OF_RANGE;
+    {
+      OSDeviceDebug::putString(" readStorageBlock() out of range ");
+      return OSReturn::OS_OUT_OF_RANGE;
+    }
 
 #if defined(OS_DEBUG_LARGECIRCULARSESSIONSTORAGE_READSTORAGEBLOCK)
   OSDeviceDebug::putString("readStorageBlock() blk=");
@@ -117,7 +120,10 @@ LargeCircularSessionsStorage::writeStorageBlock(
 {
   // Validate block count
   if (deviceBlocksCount > getSessionBlockSizeBlocks())
-    return OSReturn::OS_OUT_OF_RANGE;
+    {
+      OSDeviceDebug::putString(" writeStorageBlock() out of range ");
+      return OSReturn::OS_OUT_OF_RANGE;
+    }
 
   // Compute the device address and call the device write
   return getDevice().writeBlocks(blockNumber * getSessionBlockSizeBlocks(),
@@ -576,7 +582,7 @@ LargeCircularSessionsStorage::Writer::createSession(
         }
       else if (ret == OSReturn::OS_OK)
         {
-          // At least one session found, use it as most recent block
+          // At least one session found, use it as the most recent block
 
           // Compute the next block
           m_currentBlock.setBlockNumber(
@@ -698,7 +704,18 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBlockBuffer)
 {
   if (!m_currentSession.isValid())
     {
+      OSDeviceDebug::putString(" writeSessionBlock() not initialised ");
       return OSReturn::OS_NOT_INITIALISED;
+    }
+
+  SessionBlockNumber_t maxBlockNumber;
+  maxBlockNumber = getStorage().computeCircularSessionBlockNumber(
+      m_currentSession.getFirstBlockNumber(), -1);
+
+  if (m_currentBlock.getBlockNumber() == maxBlockNumber)
+    {
+      OSDeviceDebug::putString(" writeSessionBlock() size exceeded ");
+      return OSReturn::OS_SIZE_EXCEEDED;
     }
 
   // Prepare the current block header.
@@ -716,7 +733,7 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBlockBuffer)
   // Block unique id
   Header::writeBlockUniqueId(m_currentBlock.getUniqueId(), pBlockBuffer);
 
-  OSDeviceDebug::putString(" wb=");
+  OSDeviceDebug::putString(" wsb=");
   OSDeviceDebug::putDec(m_currentBlock.getBlockNumber());
   OSDeviceDebug::putChar(' ');
 
@@ -760,6 +777,7 @@ LargeCircularSessionsStorage::Writer::closeSession(void)
 {
   if (!m_currentSession.isValid())
     {
+      OSDeviceDebug::putString(" closeSession() not initialised ");
       return OSReturn::OS_NOT_INITIALISED;
     }
 
@@ -1011,6 +1029,7 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
 {
   if (!m_currentSession.isValid())
     {
+      OSDeviceDebug::putString(" openPreviousSession() not initialised ");
       return OSReturn::OS_NOT_INITIALISED;
     }
 
@@ -1086,6 +1105,7 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
 {
   if (!m_currentSession.isValid())
     {
+      OSDeviceDebug::putString(" openNextSession() not initialised ");
       return OSReturn::OS_NOT_INITIALISED;
     }
 
@@ -1101,6 +1121,7 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
       m_blockBuffer, 1);
   if (ret != OSReturn::OS_OK)
     {
+      OSDeviceDebug::putString(" openNextSession() read error ");
       return ret;
     }
 
@@ -1177,13 +1198,17 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
   currentBlockNumber = getStorage().computeCircularSessionBlockNumber(
       m_currentSession.getFirstBlockNumber(), (int) blockNumber);
 
-#if true
+#if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
   OSDeviceDebug::putString(" readSessionBlock() blk=");
   OSDeviceDebug::putDec(blockNumber);
   OSDeviceDebug::putString(", storage blk=");
   OSDeviceDebug::putDec(currentBlockNumber);
   OSDeviceDebug::putNewLine();
-#endif
+#else
+  OSDeviceDebug::putString(" rsb=");
+  OSDeviceDebug::putDec(currentBlockNumber);
+  OSDeviceDebug::putChar(' ');
+#endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
 
   OSReturn_t ret;
 
@@ -1215,9 +1240,9 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
                   ret = OSReturn::OS_END_OF_COLLECTION;
                 }
 
-#if true
+#if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
               OSDeviceDebug::putString(" readSessionBlock() done ");
-#endif
+#endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
               ret = OSReturn::OS_OK;
 
               break;
