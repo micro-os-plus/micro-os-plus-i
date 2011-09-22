@@ -218,6 +218,9 @@ public:
     //operator=(const Header& header);
 
     bool
+    isCompletelyWritten(void);
+
+    bool
     isValid(void);
 
     void
@@ -308,7 +311,8 @@ public:
 
   // ----- Constructors & destructors -----------------------------------------
 
-  LargeCircularSessionsStorage(OSDeviceBlock& device);
+  LargeCircularSessionsStorage(OSDeviceBlock& device,
+      OSEventNotifier* pEventNotifier = NULL);
   ~LargeCircularSessionsStorage();
 
   // ----- Public methods -----------------------------------------------------
@@ -370,6 +374,12 @@ public:
   SessionBlock&
   getMostRecentlyWrittenSessionBlock(void);
 
+  void
+  setEventNotifier(OSEventNotifier* pEventNotifier);
+
+  OSEventNotifier*
+  getEventNotifier(void);
+
 private:
 
   // All new sessions are created just after the most recent existing one.
@@ -415,6 +425,8 @@ private:
 
   OSEvent_t m_event;
 
+  OSEventNotifier* m_pEventNotifier;
+
 public:
 
   OSEvent_t
@@ -435,8 +447,7 @@ public:
 
     // ----- Constructors & destructors ---------------------------------------
 
-    Writer(LargeCircularSessionsStorage& storage,
-        OSEventNotifier* pEventNotifier = NULL);
+    Writer(LargeCircularSessionsStorage& storage);
     ~Writer();
 
     // ----- Public methods ---------------------------------------------------
@@ -463,6 +474,7 @@ public:
     OSReturn_t
     closeSession(void);
 
+
   private:
 
     // ----- Private methods --------------------------------------------------
@@ -481,8 +493,6 @@ public:
 
     // temporary buffer used for search and update forward references
     uint8_t m_blockBuffer[512] __attribute__((aligned(4)));
-
-    OSEventNotifier* m_pEventNotifier;
 
     // ------------------------------------------------------------------------
   };
@@ -535,7 +545,7 @@ public:
     // Read the requested session block (minimum one device block)
     // The block number should be between 0 and (sessionLength-1)
     OSReturn_t
-    readSessionBlock(SessionBlockNumber_t blockNumber,
+    readSessionBlock(SessionBlockNumber_t sessionBlockNumber,
         OSDeviceBlock::BlockCount_t deviceBlocksCount, uint8_t* pBlock,
         bool doNotBlock = false);
 
@@ -729,6 +739,12 @@ LargeCircularSessionsStorage::Header::readNextSessionFirstBlockNumber(
 // ============================================================================
 
 inline bool
+LargeCircularSessionsStorage::Session::isCompletelyWritten(void)
+{
+  return (m_sessionLength > 0);
+}
+
+inline bool
 LargeCircularSessionsStorage::Session::isValid(void)
 {
   return (m_sessionFirstBlockNumber != Header::INVALID_BLOCKNUMBER);
@@ -918,6 +934,19 @@ inline void
 LargeCircularSessionsStorage::setEvent(OSEvent_t event)
 {
   m_event = event;
+}
+
+inline void
+LargeCircularSessionsStorage::setEventNotifier(
+    OSEventNotifier* pEventNotifier)
+{
+  m_pEventNotifier = pEventNotifier;
+}
+
+inline OSEventNotifier*
+LargeCircularSessionsStorage::getEventNotifier(void)
+{
+  return m_pEventNotifier;
 }
 
 // ============================================================================
