@@ -459,19 +459,18 @@ namespace device
       m_cs.deassert();
     }
 
-    // calibrate and return status of calibration
-    bool
-    Cc2400::isCalibrationOk(bool isDebug = true)
+    // start calibration
+    void
+    Cc2400::startCalibration(void)
     {
-      device::ti::cc2400::Status_t status;
-
       // make sure Modem is in IDLE
       m_mdmTxStrb.setPinLow();
       m_mdmRxStrb.setPinLow();
 
-      //#ifdef APP_CFGINT_NODERADIO_DEBUG
-      if (isDebug)
-        readFsmState(status);
+#ifdef APP_CFGINT_NODERADIO_DEBUG
+      device::ti::cc2400::Status_t status;
+      readFsmState(status);
+#endif
 
       //  m_cs.assert();
       //    {
@@ -483,39 +482,32 @@ namespace device
       // connected to RX and TX Modem pins
       m_mdmTxStrb.setPinHigh();
       m_mdmRxStrb.setPinHigh();
+    }
 
-      if (isDebug)
-        {
-          OSDeviceDebug::putString("wait calib, st:");
-          OSDeviceDebug::putHex((uint16_t) status);
-          OSDeviceDebug::putNewLine();
+    // wait calibration
+    void
+    Cc2400::waitCalibration(void)
+    {
+      // TODO: should not wait forever
+#ifdef APP_CFGINT_NODERADIO_DEBUG
+      device::ti::cc2400::Status_t status;
+      OSDeviceDebug::putString("wait calib, st:");
+      OSDeviceDebug::putHex((uint16_t) status);
+      OSDeviceDebug::putNewLine();
+#endif
 
-        }
-
+#if true
       // BUSY WAIT until GIO1 is set (max 100usec); meaning calibration done
       while (!m_mdmGio1.isPinHigh())
         ;
-      //  do
-      //    {
-      //      readFsmState(status);
-      //    }
-      //  while (0 == (status & 0x04));;
-      //readFsmState();
-
-      // if GIO1 not set return error
-      if (m_mdmGio1.isPinHigh())
-        {
-#if defined(OS_DEBUG_DEVICE_TI_CC2400)
-          OSDeviceDebug::putString("calib ok");
-          OSDeviceDebug::putNewLine();
+      // wait calibration by reading status
+#else
+        do
+          {
+            readFsmState(status);
+          }
+        while (0 == (status & 0x04));;
 #endif
-          return true;
-        }
-#if defined(OS_DEBUG_DEVICE_TI_CC2400)
-      OSDeviceDebug::putString("calib failed");
-      OSDeviceDebug::putNewLine();
-#endif
-      return false;
     }
 
     // returns value of last RSSI measured by modem in RX mode

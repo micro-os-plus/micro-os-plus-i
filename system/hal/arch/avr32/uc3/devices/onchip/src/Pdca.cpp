@@ -221,6 +221,7 @@ namespace avr32
       Pdca(id)
     {
       OSDeviceDebug::putConstructor("avr32::uc3::PdcaTransmit", this);
+      // TODO: add eventNotifier
     }
 
     OSReturn_t
@@ -307,6 +308,7 @@ namespace avr32
       Pdca(id)
     {
       OSDeviceDebug::putConstructor("avr32::uc3::PdcaReceive", this);
+      // TODO: add eventNotifier
     }
 
     OSReturn_t

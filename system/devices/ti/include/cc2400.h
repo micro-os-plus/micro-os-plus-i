@@ -209,9 +209,13 @@ namespace device
       void
       configureRegisters();
 
-      // do the calibration, and return its status
-      bool
-      isCalibrationOk(bool isDebug);
+      // start calibration
+      void
+      startCalibration(void);
+
+      // wait calibration
+      void
+      waitCalibration(void);
 
       // clear FIFO buffer
       void
@@ -227,7 +231,7 @@ namespace device
 
       // set frecv and power level
       void
-      prepareTx(uint16_t frecv,
+          prepareTx(uint16_t frecv,
               device::ti::cc2400::TxPowerLevel_t txPowerLevel);
 
       void
