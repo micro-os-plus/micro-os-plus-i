@@ -39,7 +39,21 @@ OSEventNotifierArray::eventNotify(OSEvent_t event,
 
   for (std::size_t i = 0; i < m_count; ++i)
     {
+#if defined(OS_DEBUG_OSNOTIFIERARRAY_EVENTNOTIFY)
+      OSDeviceDebug::putString(" eN(");
+      OSDeviceDebug::putString((*ppThread)->getName());
+      OSDeviceDebug::putChar(',');
+      OSDeviceDebug::putHex(event);
+      OSDeviceDebug::putString(")=");
+#endif /* defined(OS_DEBUG_OSNOTIFIERARRAY_EVENTNOTIFY) */
+
       count += (*ppThread)->eventNotify(event, eventReturn);
+
+#if defined(OS_DEBUG_OSNOTIFIERARRAY_EVENTNOTIFY)
+      OSDeviceDebug::putDec(count);
+      OSDeviceDebug::putChar(' ');
+#endif /* defined(OS_DEBUG_OSNOTIFIERARRAY_EVENTNOTIFY) */
+
       ++ppThread;
     }
 
@@ -65,6 +79,12 @@ OSEventNotifierArray::registerThread(OSThread* pThread)
 
   if (m_count < m_size)
     {
+#if defined(OS_DEBUG_OSNOTIFIERARRAY_REGISTERTHREAD)
+      OSDeviceDebug::putString(" registerThread(");
+      OSDeviceDebug::putString(pThread->getName());
+      OSDeviceDebug::putString(") ");
+#endif /* defined(OS_DEBUG_OSNOTIFIERARRAY_REGISTERTHREAD) */
+
       // If array not full, store pointer to array
       m_ppThreadsArray[m_count++] = pThread;
       ret = OSReturn::OS_OK;
