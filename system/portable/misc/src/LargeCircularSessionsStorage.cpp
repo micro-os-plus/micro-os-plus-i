@@ -109,7 +109,6 @@ LargeCircularSessionsStorage::readStorageBlock(
       return OSReturn::OS_OUT_OF_RANGE;
     }
 
-
   // Compute the device address and call the device read
   return getDevice().readBlocks(blockNumber * getSessionBlockSizeBlocks(),
       pSessionBlock, deviceBlocksCount);
@@ -651,14 +650,11 @@ LargeCircularSessionsStorage::Writer::createSession(
 
   os.sched.lock.enter();
     {
-      if (!getStorage().getMostRecentlyWrittenSession().isValid())
-        {
-          // Update storage to point to this newly created session
-          // However, no new blocks are written, readers must wait.
+      // Update storage to point to this newly created session
+      // However, no new blocks are written, readers must wait.
 
-          getStorage().getMostRecentlyWrittenSession() = m_currentSession;
-          getStorage().getMostRecentlyWrittenSessionBlock() = m_currentBlock;
-        }
+      getStorage().getMostRecentlyWrittenSession() = m_currentSession;
+      getStorage().getMostRecentlyWrittenSessionBlock() = m_currentBlock;
     }
   os.sched.lock.exit();
 
@@ -760,7 +756,6 @@ LargeCircularSessionsStorage::Writer::closeSession(void)
       OSDeviceDebug::putString(" NOT_INITIALISED ");
       return OSReturn::OS_NOT_INITIALISED;
     }
-
 
   // Update the header of the current session to point to the next (future)
   // session. This is to help forward navigation, since backward
@@ -1121,7 +1116,7 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
   if (Header::readMagic(m_blockBuffer) != Header::MAGIC)
     {
       OSDeviceDebug::putString(" END_OF_COLLECTION_(magic) ");
-    return OSReturn::OS_END_OF_COLLECTION;
+      return OSReturn::OS_END_OF_COLLECTION;
     }
 
   // If valid, read header from block
