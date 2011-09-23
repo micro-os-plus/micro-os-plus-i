@@ -1010,11 +1010,11 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
 
       if (currentSessionUniqueId == sessionId)
         {
-          sessionFound: //
+          sessionFound: // label
 
           OSDeviceDebug::putString(" openSession() id=");
           OSDeviceDebug::putHex(m_currentSession.getUniqueId());
-          OSDeviceDebug::putString(", block=");
+          OSDeviceDebug::putString(", blocks=");
           OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
           OSDeviceDebug::putString("-");
           OSDeviceDebug::putDec(m_currentSession.getLastBlockNumber());
@@ -1199,9 +1199,9 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
 #if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
   OSDeviceDebug::putString(" readSessionBlock() blk=");
   OSDeviceDebug::putDec(sessionBlockNumber);
-  OSDeviceDebug::putString(", storage blk=");
+  OSDeviceDebug::putString(", sblk=");
   OSDeviceDebug::putDec(storageBlockNumber);
-  OSDeviceDebug::putString(", session leng=");
+  OSDeviceDebug::putString(", len=");
   OSDeviceDebug::putDec(m_currentSession.getLength());
   OSDeviceDebug::putNewLine();
 #else
@@ -1237,9 +1237,18 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
               if (storageSession.getUniqueId()
                   == m_currentSession.getUniqueId())
                 {
-                  // Get the most recently written session from the storage cache
-                  m_currentSession
-                      = getStorage().getMostRecentlyWrittenSession();
+                  // Update session from the storage cache
+                  m_currentSession = storageSession;
+
+#if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
+                  OSDeviceDebug::putString(" updated blocks=");
+                  OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
+                  OSDeviceDebug::putString("-");
+                  OSDeviceDebug::putDec(m_currentSession.getLastBlockNumber());
+                  OSDeviceDebug::putString(", len=");
+                  OSDeviceDebug::putDec(m_currentSession.getLength());
+                  OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
                 }
               else
                 {
@@ -1259,31 +1268,52 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
           // Here the m_currentSession must be up to date
 
           SessionBlockNumber_t currentLength;
-          currentLength = getStorage().computeCircularSessionBlockNumber(
+          currentLength = getStorage().computeCircularSessionLength(
               m_currentSession.getLastBlockNumber(),
               m_currentSession.getFirstBlockNumber());
 
-          if (sessionBlockNumber >= currentLength)
+#if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
+          OSDeviceDebug::putString(" clen=");
+          OSDeviceDebug::putDec(currentLength);
+          OSDeviceDebug::putString(", blk=");
+          OSDeviceDebug::putDec(sessionBlockNumber);
+          OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
+
+          if (sessionBlockNumber < currentLength)
             {
-              if (doNotBlock)
-                {
-                  OSDeviceDebug::putString(" WOULD_BLOCK ");
-                  return OSReturn::OS_WOULD_BLOCK;
-                }
+              break;
+            }
 
-              OSEvent_t event;
-              event = getStorage().getEvent();
+          if (doNotBlock)
+            {
+              OSDeviceDebug::putString(" WOULD_BLOCK ");
+              return OSReturn::OS_WOULD_BLOCK;
+            }
 
-              OSDeviceDebug::putString(" wait ");
-              // TODO: use scheduler lock to avoid race condition
-              OSEventWaitReturn_t eventWaitReturn;
-              eventWaitReturn = os.sched.eventWait(event);
-              OSDeviceDebug::putString(" wakeup ");
-              if (eventWaitReturn == OSEventWaitReturn::OS_CANCELED)
-                {
-                  OSDeviceDebug::putString(" CANCELLED ");
-                  return OSReturn::OS_CANCELLED;
-                }
+          OSEvent_t event;
+          event = getStorage().getEvent();
+
+#if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
+          OSDeviceDebug::putString(" wait(");
+          OSDeviceDebug::putHex(event);
+          OSDeviceDebug::putString(") ");
+#endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
+
+          // TODO: use scheduler lock to avoid race condition
+          OSEventWaitReturn_t eventWaitReturn;
+          eventWaitReturn = os.sched.eventWait(event);
+
+#if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
+          OSDeviceDebug::putString(" eventWait=");
+          OSDeviceDebug::putHex(eventWaitReturn);
+          OSDeviceDebug::putString(" ");
+#endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
+
+          if (eventWaitReturn == OSEventWaitReturn::OS_CANCELED)
+            {
+              OSDeviceDebug::putString(" CANCELLED ");
+              return OSReturn::OS_CANCELLED;
             }
         }
     }
