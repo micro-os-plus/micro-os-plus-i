@@ -27,13 +27,24 @@ public:
 
   // ----- Virtual methods ----------------------------------------------------
 
-  // Called in a loop to test when the condition is satisfied.
+  // Called to prepare to check condition and do a pre-check outside any
+  // critical regions. Can use any system calls.
+  //
   // Returns:
-  //    OSReturn::OS_OK when the condition is satisfied
-  //    OSReturn::OS_SHOULD_WAIT when the code should loop to wait for the condition
-  //    any error code
+  //    OSReturn::OS_OK if the condition is satisfied, make wait return
+  //    OSReturn::OS_SHOULD_WAIT if we should proceed to wait for the condition
+  //    any error code, make wait return
+  virtual OSReturn_t
+  prepareCheckCondition(void);
 
-  // It is abstract and it should be implemented by the derived class.
+  // Called to test when the condition is satisfied. Runs within a
+  // critical region and cannot use any system calls.
+  // Being abstract, must be implemented by the derived class.
+  //
+  // Returns:
+  //    OSReturn::OS_OK if the condition is satisfied, make wait return
+  //    OSReturn::OS_SHOULD_WAIT if we should proceed to wait for the condition
+  //    any error code, make wait return
   virtual OSReturn_t
   checkSynchronisedCondition(void) = 0;
 
