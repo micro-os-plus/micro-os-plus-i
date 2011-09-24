@@ -514,6 +514,9 @@ public:
       ~ReadCondition();
 
       virtual OSReturn_t
+      prepareCheckCondition(void);
+
+      virtual OSReturn_t
       checkSynchronisedCondition(void);
 
       void
