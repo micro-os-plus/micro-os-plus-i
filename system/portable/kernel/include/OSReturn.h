@@ -51,6 +51,8 @@ public:
   const static OSReturn_t OS_OUT_OF_RANGE = -33;
   const static OSReturn_t OS_BAD_DATE = -34;
   const static OSReturn_t OS_SHOULD_WAIT = -35;
+  const static OSReturn_t OS_SHOULD_RETRY = -36;
+  const static OSReturn_t OS_CANNOT_WAIT = -37;
 
 };
 
