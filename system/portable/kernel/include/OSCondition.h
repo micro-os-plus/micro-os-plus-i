@@ -33,7 +33,7 @@ public:
   // Returns:
   //    OSReturn::OS_OK if the condition is satisfied, make wait return
   //    OSReturn::OS_SHOULD_WAIT if we should proceed to wait for the condition
-  //    any error code, make wait return
+  //    any error code, make the wait() return
   virtual OSReturn_t
   prepareCheckCondition(void);
 
@@ -44,11 +44,12 @@ public:
   // Returns:
   //    OSReturn::OS_OK if the condition is satisfied, make wait return
   //    OSReturn::OS_SHOULD_WAIT if we should proceed to wait for the condition
-  //    any error code, make wait return
+  //    OSReturn::OS_SHOULD_RETRY if we should return to prepare
+  //    any error code, make the wait() return
   virtual OSReturn_t
   checkSynchronisedCondition(void) = 0;
 
-  // Should return true when the wait needs to be cancelled.
+  // Should return true when the wait() needs to be cancelled.
   // If not redefined, return false.
   virtual bool
   isCancelled(void);
