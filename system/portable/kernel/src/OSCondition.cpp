@@ -22,23 +22,24 @@ OSCondition::~OSCondition()
   OSDeviceDebug::putConstructor_P(PSTR("OSCondition"), this);
 }
 
-OSEventWaitReturn_t
+OSReturn_t
 OSCondition::wait(OSEvent_t event, bool doNotBlock)
 {
   OSThread* pThread;
   pThread = OSScheduler::getThreadCurrent();
 
-  OSEventWaitReturn_t ret;
+  OSReturn_t ret;
+  ret = OSReturn::OS_OK;
+
   pThread->setEventWaitReturn(OSEventWaitReturn::OS_IMMEDIATELY);
-  ret = OSEventWaitReturn::OS_IMMEDIATELY;
 
   for (;;)
     {
       bool doWait;
       doWait = false;
 
-      bool isConditionSatistied;
-      isConditionSatistied = false;
+      bool shouldWait;
+      shouldWait = false;
 
       // The purpose of this class is to avoid the race condition
       // that may occur between checking the condition and
@@ -46,20 +47,24 @@ OSCondition::wait(OSEvent_t event, bool doNotBlock)
 
       OSSchedulerLock::enter();
         {
-          isConditionSatistied = !isConditionSatisfied();
-          if (isConditionSatistied)
+          ret = checkSynchronisedCondition();
+          shouldWait = (ret == OSReturn::OS_SHOULD_WAIT);
+          if (shouldWait)
             {
+              //OSDeviceDebug::putString(" shouldWait ");
               if (!doNotBlock)
                 {
-                  doWait = pThread->eventWaitPrepare(event);
+                  doWait = pThread->eventWaitPrepareWhileLocked(event);
                 }
             }
         }
       OSSchedulerLock::exit();
 
-      if (isConditionSatistied)
+      if (!shouldWait)
         {
-          ret = pThread->getEventWaitReturn();
+          //OSDeviceDebug::putString(" done ");
+          // IF the condition was satisfied, need to prepare the response
+          m_eventWaitReturn = pThread->getEventWaitReturn();
           // The return value was set by
           // - the above eventWaitPrepare()
           // - the previous eventWait()
@@ -69,41 +74,70 @@ OSCondition::wait(OSEvent_t event, bool doNotBlock)
 
       if (doNotBlock)
         {
-          ret = OSEventWaitReturn::OS_WOULD_BLOCK;
+          OSDeviceDebug::putString(" WOULD_BLOCK ");
+          ret = OSReturn::OS_WOULD_BLOCK;
           break;
         }
 
       if (!doWait)
         {
-          // ret was set by eventWaitPrepare
-          ret = pThread->getEventWaitReturn();
+          // return value was set by eventWaitPrepare
           break;
         }
 
       if (isCancelled())
         {
           pThread->eventWaitClear();
-          ret = OSEventWaitReturn::OS_CANCELLED;
+          OSDeviceDebug::putString(" CANCELLED ");
+          ret = OSReturn::OS_CANCELLED;
           break;
         }
 
+#if defined(OS_DEBUG_OSCONDITION_WAIT)
+      OSDeviceDebug::putString(" wait(");
+      OSDeviceDebug::putHex(event);
+      OSDeviceDebug::putString(") ");
+#endif /* defined(OS_DEBUG_OSCONDITION_WAIT) */
+
       // Perform the actual scheduler yield
-      ret = pThread->eventWaitPerform();
+      OSEventWaitReturn_t eventWaitReturn;
+      eventWaitReturn = pThread->eventWaitPerform();
+
+#if defined(OS_DEBUG_OSCONDITION_WAIT)
+      OSDeviceDebug::putString(" eWR=");
+      OSDeviceDebug::putHex(eventWaitReturn);
+      OSDeviceDebug::putString(" ");
+#endif /* defined(OS_DEBUG_OSCONDITION_WAIT) */
 
       // When the control returns here, it might not be necessarily due to
       // the expected event, some special conditions must be checked
       // to prematurely terminate the wait
 
-      if ((ret == OSEventWaitReturn::OS_CANCELLED) || (ret
-          == OSEventWaitReturn::OS_TIMEOUT) || (ret
-          == OSEventWaitReturn::OS_LOCKED))
+      if ((eventWaitReturn == OSEventWaitReturn::OS_CANCELLED))
         {
-          // Prematurely terminate the wait on special conditions
+          OSDeviceDebug::putString(" CANCELLED ");
+          ret = OSReturn::OS_CANCELLED;
           break;
         }
 
+      if (eventWaitReturn == OSEventWaitReturn::OS_TIMEOUT)
+        {
+          OSDeviceDebug::putString(" TIMEOUT ");
+          ret = OSReturn::OS_TIMEOUT;
+          break;
+        }
+
+#if false
+      if (eventWaitReturn == OSEventWaitReturn::OS_LOCKED)
+        {
+          return OSReturn::OS_OK;
+        }
+#endif
+
       // For other events, loop until the condition is met
     }
+
+  m_eventWaitReturn = pThread->getEventWaitReturn();
 
   return ret;
 }
