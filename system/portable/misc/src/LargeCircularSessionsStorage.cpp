@@ -223,6 +223,9 @@ LargeCircularSessionsStorage::searchMostRecentlyWrittenBlock(
             }
         }
 
+      // To make the previous result more visible
+      OSDeviceDebug::putNewLine();
+
       // Found, the left block is the most recently written
       // The right is the first empty block, with invalid magic
 
@@ -308,6 +311,9 @@ LargeCircularSessionsStorage::searchMostRecentlyWrittenBlock(
           left = middle;
         }
     }
+
+  // To make the previous result more visible
+  OSDeviceDebug::putNewLine();
 
   // Found, the left block is the most recently written.
   // The right is the oldest written block, that we'll overwrite
@@ -1383,24 +1389,19 @@ LargeCircularSessionsStorage::Reader::ReadCondition::~ReadCondition()
 
 // ----- Public methods -------------------------------------------------------
 
-// Warning: runs with scheduler locked
-
 OSReturn_t
-LargeCircularSessionsStorage::Reader::ReadCondition::checkSynchronisedCondition(
-    void)
+LargeCircularSessionsStorage::Reader::ReadCondition::prepareCheckCondition(void)
 {
-#if true
+  // We first check the current reader session data, and if the session
+  // is complete, we gladly return from the wait().
 
-  LargeCircularSessionsStorage::Session& m_currentSession =
+  LargeCircularSessionsStorage::Session& currentSession =
       getReader().getCurrentSession();
 
-  SessionBlockNumber_t sessionBlockNumber;
-  sessionBlockNumber = m_sessionBlockNumber;
-
-  if (m_currentSession.isCompletelyWritten())
+  if (currentSession.isCompletelyWritten())
     {
       // If the session was completely written, validate block number
-      if (sessionBlockNumber >= m_currentSession.getLength())
+      if (m_sessionBlockNumber >= currentSession.getLength())
         {
           OSDeviceDebug::putString(" OUT_OF_RANGE ");
           return OSReturn::OS_OUT_OF_RANGE;
@@ -1408,6 +1409,7 @@ LargeCircularSessionsStorage::Reader::ReadCondition::checkSynchronisedCondition(
       else
         {
           //OSDeviceDebug::putString(" available ");
+          // We can proceed and read the block, it must be there
           return OSReturn::OS_OK;
         }
     }
@@ -1415,49 +1417,78 @@ LargeCircularSessionsStorage::Reader::ReadCondition::checkSynchronisedCondition(
   //OSDeviceDebug::putString(" not complete ");
 
   // If the session was not completely written, the block that we need
-  // might not have been written, so we need to wait for
+  // might have not been written, so we need to wait for
   // the writer to complete
 
   Session& storageSession =
       getReader().getStorage().getMostRecentlyWrittenSession();
 
-  bool needUpdate;
-  needUpdate = false;
-
-  if (storageSession.getUniqueId() == m_currentSession.getUniqueId())
+  if (storageSession.getUniqueId() != currentSession.getUniqueId())
     {
-      // Update session from the storage cache
-      m_currentSession = storageSession;
+      // The writer might have closed our session and open another one.
 
-#if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
-      OSDeviceDebug::putString(" updated blocks=");
-      OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
-      OSDeviceDebug::putString("-");
-      OSDeviceDebug::putDec(m_currentSession.getLastBlockNumber());
-      OSDeviceDebug::putString(", len=");
-      OSDeviceDebug::putDec(m_currentSession.getLength());
-      OSDeviceDebug::putNewLine();
-#endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
-    }
-  else
-    {
-      needUpdate = true;
-    }
+      // TODO: update session from storage (we can do it here, this
+      // code has no restrictions related to system calls)
 
-  if (needUpdate)
-    {
-      // The writer might have closed our session and open another one
-      // TODO: update session from storage, but we can't do it here
       OSDeviceDebug::putString(" BAD_STATE_todo ");
       return OSReturn::OS_BAD_STATE;
     }
 
-  // Here the m_currentSession must be up to date
+  return OSReturn::OS_SHOULD_WAIT;
+}
+
+// WARNING: runs within a scheduler critical section
+
+OSReturn_t
+LargeCircularSessionsStorage::Reader::ReadCondition::checkSynchronisedCondition(
+    void)
+{
+  LargeCircularSessionsStorage::Session& currentSession =
+      getReader().getCurrentSession();
+
+  Session& storageSession =
+      getReader().getStorage().getMostRecentlyWrittenSession();
+
+  if (storageSession.getUniqueId() != currentSession.getUniqueId())
+    {
+      // The writer might have closed our session and open another one. This
+      // means that the condition we are checking here is not stable, and
+      // we need to retry.
+      // This will make the flow go back to prepareCheckCondition()
+      // where we need to read the session data from storage.
+
+      OSDeviceDebug::putString(" SHOULD_RETRY ");
+      return OSReturn::OS_SHOULD_RETRY;
+    }
+
+  // We checked that we are waiting on a live session, so
+  // we can update the session info from the storage cache.
+
+  // This is a structure copy, but we are not concerned, since this
+  // runs in a critical section.
+
+  // currentSession being a reference, this will actually update
+  // the Reader instance.
+
+  currentSession = storageSession;
+
+#if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
+  OSDeviceDebug::putString(" updated blocks=");
+  OSDeviceDebug::putDec(currentSession.getFirstBlockNumber());
+  OSDeviceDebug::putString("-");
+  OSDeviceDebug::putDec(currentSession.getLastBlockNumber());
+  OSDeviceDebug::putString(", len=");
+  OSDeviceDebug::putDec(currentSession.getLength());
+  OSDeviceDebug::putNewLine();
+#endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
+
+  // Here the Reader m_currentSession must be up to date.
+  // We can compute the current session length.
 
   SessionBlockNumber_t currentLength;
   currentLength = getReader().getStorage().computeCircularSessionLength(
-      m_currentSession.getLastBlockNumber(),
-      m_currentSession.getFirstBlockNumber());
+      currentSession.getLastBlockNumber(),
+      currentSession.getFirstBlockNumber());
 
 #if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
   OSDeviceDebug::putString(" clen=");
@@ -1467,17 +1498,20 @@ LargeCircularSessionsStorage::Reader::ReadCondition::checkSynchronisedCondition(
   OSDeviceDebug::putNewLine();
 #endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
 
-  if (sessionBlockNumber < currentLength)
+  // This is the actual condition that we are checking, i.e. if the
+  // requested block was written and is available for read.
+
+  if (m_sessionBlockNumber < currentLength)
     {
+      // If so, make the wait return
       return OSReturn::OS_OK;
     }
 
-  //OSDeviceDebug::putString(" sW ");
-  return OSReturn::OS_SHOULD_WAIT;
+  // We did our best, but the block is not yet available,
+  // we'll wait for the writer to notify us after each writeSessioBlock()
+  // or closeSession().
 
-#else
-  return true;
-#endif
+  return OSReturn::OS_SHOULD_WAIT;
 }
 
 // ----------------------------------------------------------------------------
