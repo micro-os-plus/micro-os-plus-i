@@ -200,6 +200,9 @@ public:
   bool
   eventWaitPrepare(OSEvent_t event);
 
+  bool
+  eventWaitPrepareWhileLocked(OSEvent_t event);
+
   // Perform the actual wait
   OSEventWaitReturn_t
   eventWaitPerform(void);

@@ -415,6 +415,37 @@ OSThread::eventWaitPrepare(OSEvent_t event)
   return true;
 }
 
+// Runs with the scheduler locked
+bool
+OSThread::eventWaitPrepareWhileLocked(OSEvent_t event)
+{
+#if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
+
+  // Do not wait if the thread is interrupted
+  if (m_isInterrupted)
+    {
+      setEventWaitReturn(OSEventWaitReturn::OS_CANCELLED);
+      return false;
+    }
+
+#endif
+
+  // Do not wait if the event is NONE
+  if (event == OSEvent::OS_NONE)
+    {
+      // if no event, return NONE
+      setEventWaitReturn(OSEventWaitReturn::OS_NONE);
+      return false;
+    }
+
+  // Mark that the thread is waiting on the given event
+  m_event = event;
+  m_isWaiting = true;
+
+  // Later this response will allow yield()
+  return true;
+}
+
 #if defined(OS_INCLUDE_OSCPUSLEEPCRITICALSECTION)
 
 uint8_t
