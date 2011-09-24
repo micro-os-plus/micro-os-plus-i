@@ -11,6 +11,7 @@
 
 #include "portable/util/endianness/include/BigEndian.h"
 #include "portable/kernel/include/OSEventNotifier.h"
+#include "portable/kernel/include/OSCondition.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -474,7 +475,6 @@ public:
     OSReturn_t
     closeSession(void);
 
-
   private:
 
     // ----- Private methods --------------------------------------------------
@@ -505,6 +505,31 @@ public:
 
     Reader(LargeCircularSessionsStorage& storage);
     ~Reader();
+
+    class ReadCondition : public OSCondition
+    {
+    public:
+
+      ReadCondition(Reader& reader);
+      ~ReadCondition();
+
+      virtual OSReturn_t
+      checkSynchronisedCondition(void);
+
+      void
+      setSessionBlockNumber(SessionBlockNumber_t blockNumber);
+
+      Reader&
+      getReader(void);
+
+    private:
+
+      // Object that needs the synchronisation
+      Reader& m_reader;
+
+      // Input parameter
+      SessionBlockNumber_t m_sessionBlockNumber;
+    };
 
     // ----- Public methods ---------------------------------------------------
 
@@ -553,6 +578,9 @@ public:
     OSReturn_t
     closeSession(void);
 
+    Session&
+    getCurrentSession(void);
+
   protected:
 
     // ----- Private members --------------------------------------------------
@@ -561,6 +589,8 @@ public:
 
     Session m_currentSession;
     SessionBlock m_currentBlock;
+
+    ReadCondition m_readSessionBlockCondition;
 
     // temporary buffer
     uint8_t m_blockBuffer[512] __attribute__((aligned(4)));
@@ -937,8 +967,7 @@ LargeCircularSessionsStorage::setEvent(OSEvent_t event)
 }
 
 inline void
-LargeCircularSessionsStorage::setEventNotifier(
-    OSEventNotifier* pEventNotifier)
+LargeCircularSessionsStorage::setEventNotifier(OSEventNotifier* pEventNotifier)
 {
   m_pEventNotifier = pEventNotifier;
 }
@@ -976,6 +1005,27 @@ inline LargeCircularSessionsStorage::SessionBlockCount_t
 LargeCircularSessionsStorage::Reader::getSessionLength(void)
 {
   return m_currentSession.getLength();
+}
+
+inline LargeCircularSessionsStorage::Session&
+LargeCircularSessionsStorage::Reader::getCurrentSession(void)
+{
+  return m_currentSession;
+}
+
+// ============================================================================
+
+inline void
+LargeCircularSessionsStorage::Reader::ReadCondition::setSessionBlockNumber(
+    LargeCircularSessionsStorage::SessionBlockNumber_t blockNumber)
+{
+  m_sessionBlockNumber = blockNumber;
+}
+
+inline LargeCircularSessionsStorage::Reader&
+LargeCircularSessionsStorage::Reader::ReadCondition::getReader(void)
+{
+  return m_reader;
 }
 
 // ============================================================================
