@@ -480,7 +480,7 @@ OSDeviceCharacter::cancelRead(void)
 {
   m_doCancelRead = true;
 
-  OSScheduler::eventNotify(getReadEvent(), OSEventWaitReturn::OS_CANCELED);
+  OSScheduler::eventNotify(getReadEvent(), OSEventWaitReturn::OS_CANCELLED);
 }
 
 
@@ -581,7 +581,7 @@ OSDeviceCharacter::readByte(void)
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
           return OSReturn::OS_TIMEOUT;
         }
-      else if (ret == OSEventWaitReturn::OS_CANCELED)
+      else if (ret == OSEventWaitReturn::OS_CANCELLED)
         {
           OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte() cancelled"));
           OSDeviceDebug::putNewLine();

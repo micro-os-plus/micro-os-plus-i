@@ -873,7 +873,7 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
           // TODO: use scheduler lock to avoid race condition
           OSEventWaitReturn_t eventWaitReturn;
           eventWaitReturn = os.sched.eventWait(event);
-          if (eventWaitReturn == OSEventWaitReturn::OS_CANCELED)
+          if (eventWaitReturn == OSEventWaitReturn::OS_CANCELLED)
             {
               return OSReturn::OS_CANCELLED;
             }
@@ -1297,7 +1297,7 @@ LargeCircularSessionsStorage::Reader::readSessionBlock(
       OSDeviceDebug::putString(" ");
 #endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
 
-      if (eventWaitReturn == OSEventWaitReturn::OS_CANCELED)
+      if (eventWaitReturn == OSEventWaitReturn::OS_CANCELLED)
         {
           OSDeviceDebug::putString(" CANCELLED ");
           return OSReturn::OS_CANCELLED;

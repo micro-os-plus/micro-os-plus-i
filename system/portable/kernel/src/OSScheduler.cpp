@@ -463,7 +463,7 @@ OSScheduler::ISRcancelThread(OSThread* pThread)
       timerSeconds.eventRemove(event);
 
       // cancel current event
-      OSScheduler::eventNotify(event, OSEventWaitReturn::OS_CANCELED);
+      OSScheduler::eventNotify(event, OSEventWaitReturn::OS_CANCELLED);
     }
 }
 

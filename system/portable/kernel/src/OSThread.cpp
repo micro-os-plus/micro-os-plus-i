@@ -386,7 +386,7 @@ OSThread::eventWaitPrepare(OSEvent_t event)
   // Do not wait if the thread is interrupted
   if (m_isInterrupted)
     {
-      setEventWaitReturn(OSEventWaitReturn::OS_CANCELED);
+      setEventWaitReturn(OSEventWaitReturn::OS_CANCELLED);
       return false;
     }
 

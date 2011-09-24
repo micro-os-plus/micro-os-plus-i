@@ -100,10 +100,11 @@ public:
   const static OSEventWaitReturn_t OS_VOID = 0;
   const static OSEventWaitReturn_t OS_LOCKED = 1;
   const static OSEventWaitReturn_t OS_TIMEOUT = 2;
-  const static OSEventWaitReturn_t OS_CANCELED = 3;
+  const static OSEventWaitReturn_t OS_CANCELLED = 3;
   const static OSEventWaitReturn_t OS_ALL = 4;
   const static OSEventWaitReturn_t OS_IMMEDIATELY = 5;
   const static OSEventWaitReturn_t OS_FAILED = 6;
+  const static OSEventWaitReturn_t OS_WOULD_BLOCK = 7;
 
   // user values should be relative to this one
   const static OSEventWaitReturn_t OS_CUSTOM = 10;

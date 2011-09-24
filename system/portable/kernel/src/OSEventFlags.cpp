@@ -118,7 +118,7 @@ OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
       OSCriticalSection::exit();
 #endif
       // Event could be notified by thread interruption
-      // in this case the event return is OS_CANCELED
+      // in this case the event return is OS_CANCELLED
       if (!isStrict && (ret != (OSEventWaitReturn_t) this))
         break;
 

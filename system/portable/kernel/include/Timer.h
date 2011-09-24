@@ -33,7 +33,7 @@ public:
   void stop();
 
   // cancel the pending event, by notifying it with the given return value
-  void cancel(OSEventWaitReturn_t ret=OSEventWaitReturn::OS_CANCELED);
+  void cancel(OSEventWaitReturn_t ret=OSEventWaitReturn::OS_CANCELLED);
 
   // set the event to be triggered by the timer and the return value
   void eventSet(OSEvent_t event,

@@ -46,7 +46,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
 
       if (OSScheduler::getThreadCurrent()->isInterrupted())
         {
-          ret = OSEventWaitReturn::OS_CANCELED;
+          ret = OSEventWaitReturn::OS_CANCELLED;
         }
       else
 #endif /* OS_INCLUDE_OSTHREAD_INTERRUPTION */
