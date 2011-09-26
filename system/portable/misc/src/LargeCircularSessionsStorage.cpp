@@ -378,6 +378,12 @@ LargeCircularSessionsStorage::updateForwardReference(
 
 }
 
+void
+LargeCircularSessionsStorage::clearCachedValues(void)
+{
+  m_mostRecentlyWrittenSession.setFirstBlockNumber(Header::INVALID_BLOCKNUMBER);
+}
+
 // ============================================================================
 
 // ----- Constructors & destructors -------------------------------------------
@@ -1486,9 +1492,10 @@ LargeCircularSessionsStorage::Reader::ReadCondition::checkSynchronisedCondition(
   // We can compute the current session length.
 
   SessionBlockNumber_t currentLength;
-  currentLength = getReader().getStorage().computeCircularSessionLength(
-      currentSession.getLastBlockNumber(),
-      currentSession.getFirstBlockNumber());
+  currentLength
+      = getReader().getStorage().computeCircularSessionLength(
+          currentSession.getLastBlockNumber(),
+          currentSession.getFirstBlockNumber());
 
 #if defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK)
   OSDeviceDebug::putString(" clen=");

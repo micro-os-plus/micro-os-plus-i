@@ -329,6 +329,10 @@ public:
   OSReturn_t
   closeStorage(void);
 
+  // Required after erasing the storage, to force open to reread session
+  void
+  clearCachedValues(void);
+
   // Return the amount of space the application should reserve
   // at the beginning of each written session block, or the amount
   // of space the reader should skip
