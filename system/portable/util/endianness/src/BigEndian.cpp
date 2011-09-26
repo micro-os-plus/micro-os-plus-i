@@ -37,7 +37,7 @@ namespace util
         BigEndian::writeUnsigned16(uint16_t value,  uint8_t* pByte)
           {
             // Start from low byte and proceed in reverse order
-            pByte += sizeof(value);
+            pByte += 2;
 
             uint8_t b;
 
@@ -69,7 +69,7 @@ namespace util
         BigEndian::writeUnsigned24(uint32_t value, uint8_t* pByte)
           {
             // Start from low byte and proceed in reverse order
-            pByte += sizeof(value);
+            pByte += 3;
 
             uint8_t b;
 
@@ -106,7 +106,7 @@ namespace util
         BigEndian::writeUnsigned32(uint32_t value, uint8_t* pByte)
           {
             // Start from low byte and proceed in reverse order
-            pByte += sizeof(value);
+            pByte += 4;
 
             uint8_t b;
 
