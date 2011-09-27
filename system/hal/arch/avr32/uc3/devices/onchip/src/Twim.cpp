@@ -169,10 +169,16 @@ namespace avr32
 
       // Avoid null pointer references
       if (pOutgoingBytes == NULL)
-        outgoingBytesLength = 0;
+        {
+          //OSDeviceDebug::putString(" null_out ");
+          outgoingBytesLength = 0;
+        }
 
       if (pIncomingBytes == NULL)
-        incomingBytesSize = 0;
+        {
+          //OSDeviceDebug::putString(" null_in ");
+          incomingBytesSize = 0;
+        }
 
       if (!isEnabled())
         return OSReturn::OS_NOT_ENABLED;
@@ -196,7 +202,15 @@ namespace avr32
 
           // set the number of bytes to transmit
           twim_tx_nb_bytes = outgoingBytesLength;
-
+#if false
+          OSDeviceDebug::putString(" this");
+          OSDeviceDebug::putPtr((void*)this);
+          OSDeviceDebug::putString(" ptx");
+          OSDeviceDebug::putPtr((void*)&twim_tx_nb_bytes);
+          OSDeviceDebug::putChar(',');
+          OSDeviceDebug::putDec(twim_tx_nb_bytes);
+          OSDeviceDebug::putChar(' ');
+#endif
           // point to incoming buffer
           twim_rx_data = pIncomingBytes;
 
@@ -318,26 +332,36 @@ namespace avr32
       while ((transfer_status == TWI_SUCCESS) && !isIdle())
         {
           OSDeviceDebug::putChar('w');
-          // cannot use yield in inits :-(
-          //OSScheduler::yield();
+          // we cannot use yield in inits :-(
+          if (OSScheduler::isRunning())
+            OSScheduler::yield();
         }
 
       //OSDeviceDebug::putString(" we ");
 #endif
 
       if (pIncomingBytesLength != NULL)
-        *pIncomingBytesLength = twim_rx_ef_bytes;
+        {
+//          OSDeviceDebug::putString(" ptr");
+//          OSDeviceDebug::putPtr(pIncomingBytesLength);
+//          OSDeviceDebug::putChar(' ');
+
+          *pIncomingBytesLength = twim_rx_ef_bytes;
+        }
 
       if (transfer_status == TWI_RECEIVE_NACK)
         {
+          OSDeviceDebug::putString(" NACK ");
           return OSReturn::OS_NACK;
         }
 
       if (transfer_status != TWI_SUCCESS) // TWI_ARBITRATION_LOST)
         {
+          OSDeviceDebug::putString(" ERROR ");
           return OSReturn::OS_ERROR;
         }
 
+      //OSDeviceDebug::putString(" OK ");
       return OSReturn::OS_OK;
     }
 
@@ -348,6 +372,8 @@ namespace avr32
     {
 #if defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_INTERUPTSERVICEROUTINE)
       OSDeviceDebug::putChar('#');
+      //OSDeviceDebug::putPtr((void*) this);
+      //OSDeviceDebug::putChar(' ');
 #endif /* defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_INTERUPTSERVICEROUTINE) */
 
       // get masked status register value
@@ -397,7 +423,9 @@ namespace avr32
           & AVR32_TWIM_IMR_RXRDY_MASK) != 0))
         {
 #if defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_INTERUPTSERVICEROUTINE)
-          OSDeviceDebug::putString(" rx ");
+          OSDeviceDebug::putString(" rx");
+          OSDeviceDebug::putDec(twim_rx_nb_bytes);
+          OSDeviceDebug::putChar(' ');
 #endif /* defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_INTERUPTSERVICEROUTINE) */
 
           uchar_t ch;
@@ -435,8 +463,18 @@ namespace avr32
           & AVR32_TWIM_IMR_TXRDY_MASK) != 0))
         {
 #if defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_INTERUPTSERVICEROUTINE)
-          OSDeviceDebug::putString(" tx ");
+          OSDeviceDebug::putString(" tx");
+          OSDeviceDebug::putDec(twim_tx_nb_bytes);
+          OSDeviceDebug::putChar(' ');
 #endif /* defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_INTERUPTSERVICEROUTINE) */
+
+#if false
+          OSDeviceDebug::putString(" ptx");
+          OSDeviceDebug::putPtr((void*)&twim_tx_nb_bytes);
+          OSDeviceDebug::putChar(',');
+          OSDeviceDebug::putDec(twim_tx_nb_bytes);
+          OSDeviceDebug::putChar(' ');
+#endif
 
           // no more bytes to transmit
           if (twim_tx_nb_bytes == 0)
