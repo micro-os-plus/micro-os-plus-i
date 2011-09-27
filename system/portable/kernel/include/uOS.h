@@ -173,9 +173,9 @@
 #include "portable/tasks/include/CANLeds.h"
 #endif
 
-#if defined(OS_INCLUDE_EEPROM)
-#include "portable/devices/memory/include/EEPROM.h"
-#endif
+//#if defined(OS_INCLUDE_EEPROM)
+//#include "portable/devices/memory/include/EEPROM.h"
+//#endif
 
 #if defined(OS_INCLUDE_FLASH)
 #include "portable/devices/memory/include/Flash.h"
