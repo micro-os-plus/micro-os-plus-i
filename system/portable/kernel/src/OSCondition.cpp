@@ -85,6 +85,10 @@ OSCondition::wait(OSEvent_t event, bool doNotBlock)
         {
           // If the condition is not stable (checking the condition is not
           // possible) go to prepare it again.
+
+          // Since we are in a loop, it's a good idea to be nice with the
+          // other threads
+          OSScheduler::yield();
           continue;
         }
 
