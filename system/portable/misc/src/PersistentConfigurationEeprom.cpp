@@ -16,6 +16,7 @@ PersistentConfigurationEeprom::PersistentConfigurationEeprom(Eeprom& device) :
   m_magic = MAGIC;
   m_payloadLength = 0;
   m_beginAddress = 0;
+  m_persistentPayloadLength = 0;
 }
 
 PersistentConfigurationEeprom::~PersistentConfigurationEeprom()
@@ -30,7 +31,27 @@ PersistentConfigurationEeprom::initialise(void)
 }
 
 OSReturn_t
-PersistentConfigurationEeprom::checkHeader(void)
+PersistentConfigurationEeprom::readPersistentLength(void)
+{
+  OSReturn_t ret;
+  if (sizeof(Length_t) == 2)
+    {
+      ret = m_device.readUnsigned16(m_beginAddress + OFFSET_OF_LENGTH,
+          &m_persistentPayloadLength);
+    }
+  else
+    {
+      OSDeviceDebug::putString(" NOT_IMPLEMENTED ");
+      return OSReturn::OS_NOT_IMPLEMENTED;
+    }
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+PersistentConfigurationEeprom::verifyHeader(void)
 {
   Version_t version;
 
@@ -57,44 +78,33 @@ PersistentConfigurationEeprom::checkHeader(void)
       return OSReturn::OS_BAD_MAGIC;
     }
 
-  Length_t length;
-  ret = m_device.readUnsigned16(m_beginAddress + OFFSET_OF_LENGTH, &length);
+  // Compute the checksum for the entire stored content
+  ret = verifyPersistentChecksum();
   if (ret != OSReturn::OS_OK)
     return ret;
 
-  if (length != m_payloadLength)
+  // Finally compare the length. The application may or may not reuse the
+  // existing content.
+  ret = readPersistentLength();
+  if (m_persistentPayloadLength != m_payloadLength)
     {
       OSDeviceDebug::putString(" BAD_LENGTH ");
       return OSReturn::OS_BAD_LENGTH;
-    }
-
-  Crc_t crc;
-  ret = m_device.readUnsigned8(m_beginAddress + OFFSET_OF_CRC7, &crc);
-  if (ret != OSReturn::OS_OK)
-    return ret;
-
-  Crc_t computedCrc;
-  computeCRC(computedCrc);
-
-  if (crc != computedCrc)
-    {
-      OSDeviceDebug::putString(" BAD_CHECKSUM ");
-      return OSReturn::OS_BAD_CHECKSUM;
     }
 
   return OSReturn::OS_OK;
 }
 
 OSReturn_t
-PersistentConfigurationEeprom::computeCRC(Crc_t& crc)
+PersistentConfigurationEeprom::computeChecksum(Length_t length, Crc_t& crc)
 {
   OSReturn_t ret;
   ret = OSReturn::OS_OK;
 
-  crc = 0;
+  crc = util::crc::Crc7x42::INITIAL_VALUE;
 
   uint_t i;
-  for (i = 0; i < m_payloadLength + ADDITIONAL_LENGTH; ++i)
+  for (i = 0; i < length + ADDITIONAL_LENGTH; ++i)
     {
       uint8_t b;
       ret = m_device.readUnsigned8(
@@ -109,7 +119,39 @@ PersistentConfigurationEeprom::computeCRC(Crc_t& crc)
 }
 
 OSReturn_t
-PersistentConfigurationEeprom::writeHeader(void)
+PersistentConfigurationEeprom::verifyPersistentChecksum(void)
+{
+  OSReturn_t ret;
+
+  if (m_persistentPayloadLength == 0)
+    {
+      ret = readPersistentLength();
+      if (ret != OSReturn::OS_OK)
+        return ret;
+    }
+
+  Crc_t crc;
+  ret = computeChecksum(m_persistentPayloadLength, crc);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  Crc_t finalValue;
+  finalValue = 0;
+  util::crc::Crc7x42::computePolynomial(crc, finalValue);
+
+  if (!util::crc::Crc7x42::isFinalValueCorrect(finalValue))
+    {
+      OSDeviceDebug::putString(" fV=");
+      OSDeviceDebug::putHex(finalValue);
+      OSDeviceDebug::putString(" BAD_CHECKSUM ");
+      return OSReturn::OS_BAD_CHECKSUM;
+    }
+
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+PersistentConfigurationEeprom::updatePersistentHeader(void)
 {
   OSReturn_t ret;
 
@@ -136,12 +178,24 @@ PersistentConfigurationEeprom::writeHeader(void)
 }
 
 OSReturn_t
-PersistentConfigurationEeprom::fillPayload(uint8_t fillByte)
+PersistentConfigurationEeprom::fillEntirePayload(uint8_t fillByte)
+{
+  OSReturn_t ret;
+
+  // Fill all payload bytes
+  ret = fillLastBytesOfPayload(0, fillByte);
+
+  return ret;
+}
+
+OSReturn_t
+PersistentConfigurationEeprom::fillLastBytesOfPayload(Length_t startFrom,
+    uint8_t fillByte)
 {
   OSReturn_t ret;
   ret = OSReturn::OS_OK;
 
-  for (uint_t i = 0; i < m_payloadLength; ++i)
+  for (uint_t i = startFrom; i < m_payloadLength; ++i)
     {
       ret = m_device.writeUnsigned8(m_beginAddress + OFFSET_OF_PAYLOAD + 1,
           fillByte);
@@ -153,13 +207,15 @@ PersistentConfigurationEeprom::fillPayload(uint8_t fillByte)
 }
 
 OSReturn_t
-PersistentConfigurationEeprom::updateChecksum(void)
+PersistentConfigurationEeprom::updatePersistentChecksum(void)
 {
+  OSReturn_t ret;
+
   Crc_t crc;
   crc = 0;
 
-  OSReturn_t ret;
-  ret = computeCRC(crc);
+  crc = util::crc::Crc7x42::INITIAL_VALUE;
+  ret = computeChecksum(m_payloadLength, crc);
   if (ret != OSReturn::OS_OK)
     return ret;
 
