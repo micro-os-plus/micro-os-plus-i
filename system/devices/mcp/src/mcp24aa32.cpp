@@ -96,34 +96,36 @@ namespace device
       OSDeviceDebug::putNewLine();
 #endif /* defined(OS_DEBUG_DEVICE_MCP_MCP24AA32_WRITEBYTEARRAY) */
 
-      uint8_t outgoingBytes[2 + 4];
-      outgoingBytes[0] = ((address >> 8) & 0xFF);
-      outgoingBytes[1] = ((address) & 0xFF);
-      memcpy(outgoingBytes + 2, pOutgoingBytes, 4);
-
-      size_t firstSliceLength;
-      if (outgoingBytesLength <= 4)
-        {
-          firstSliceLength = 2 + outgoingBytesLength;
-          outgoingBytesLength = 0;
-        }
-      else
-        {
-          firstSliceLength = 2 + 4;
-          outgoingBytesLength -= 4;
-          pOutgoingBytes += 4;
-        }
-
       OSReturn_t ret;
-      ret = m_i2cDevice.writeByteArray(m_i2cAddress, outgoingBytes,
-          firstSliceLength);
-      if (ret != OSReturn::OS_OK)
-        return ret;
+      ret = OSReturn::OS_OK;
 
-      if (outgoingBytesLength > 0)
+      // Temporary buffer, we need to append the 2 bytes address in front
+      uint8_t outgoingBytes[2 + 16];
+
+      size_t sliceLength;
+      for (; outgoingBytesLength > 0;)
         {
-          ret = m_i2cDevice.writeByteArray(m_i2cAddress, pOutgoingBytes,
-              outgoingBytesLength);
+          if (outgoingBytesLength <= (sizeof(outgoingBytes) - 2))
+            {
+              sliceLength = outgoingBytesLength;
+            }
+          else
+            {
+              sliceLength = (sizeof(outgoingBytes) - 2);
+            }
+
+          outgoingBytes[0] = ((address >> 8) & 0xFF);
+          outgoingBytes[1] = ((address) & 0xFF);
+          memcpy(outgoingBytes + 2, pOutgoingBytes, sliceLength);
+
+          ret = m_i2cDevice.writeByteArray(m_i2cAddress, outgoingBytes,
+              sliceLength + 2);
+          if (ret != OSReturn::OS_OK)
+            return ret;
+
+          outgoingBytesLength -= sliceLength;
+          pOutgoingBytes += sliceLength;
+          address += sliceLength;
         }
 
       return ret;
