@@ -60,22 +60,38 @@ public:
   Eeprom&
   getDevice(void);
 
+  Length_t
+  getPayloadLength(void);
+
+  Length_t
+  getPersistentPayloadLength(void);
+
+  // Result is in member
   OSReturn_t
-  checkHeader(void);
+  readPersistentLength(void);
 
   OSReturn_t
-  computeCRC(Crc_t& crc);
+  verifyHeader(void);
 
   OSReturn_t
-  writeHeader(void);
+  verifyPersistentChecksum(void);
 
   OSReturn_t
-  fillPayload(uint8_t fillByte);
+  fillEntirePayload(uint8_t fillByte);
 
   OSReturn_t
-  updateChecksum(void);
+  fillLastBytesOfPayload(Length_t startFrom, uint8_t fillByte);
+
+  OSReturn_t
+  updatePersistentHeader(void);
+
+  OSReturn_t
+  updatePersistentChecksum(void);
 
 private:
+
+  OSReturn_t
+  computeChecksum(Length_t length, Crc_t& crc);
 
   // ----- Private members ----------------------------------------------------
 
@@ -86,6 +102,7 @@ private:
   Version_t m_version;
   Magic_t m_magic;
   Length_t m_payloadLength;
+  Length_t m_persistentPayloadLength;
 
   // --------------------------------------------------------------------------
 };
@@ -112,6 +129,18 @@ inline Eeprom&
 PersistentConfigurationEeprom::getDevice(void)
 {
   return m_device;
+}
+
+inline PersistentConfigurationEeprom::Length_t
+PersistentConfigurationEeprom::getPersistentPayloadLength(void)
+{
+  return m_persistentPayloadLength;
+}
+
+inline PersistentConfigurationEeprom::Length_t
+PersistentConfigurationEeprom::getPayloadLength(void)
+{
+  return m_payloadLength;
 }
 
 #endif /* PERSISTENTCONFIGURATIONEEPROM_H_ */
