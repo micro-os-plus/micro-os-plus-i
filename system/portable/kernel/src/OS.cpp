@@ -90,6 +90,7 @@ OS::resetHandler(void)
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
+  // Activity led turned on as early as possible
   OSScheduler::ledActiveInit();
   OSScheduler::ISR_ledActiveOn();
 
