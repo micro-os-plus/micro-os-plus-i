@@ -112,18 +112,14 @@ Eeprom::readString(Address_t address, uint8_t* pString, BytesCount_t size)
   DEBUG_ASSERT(pString != NULL);
   DEBUG_ASSERT(size > 1);
 
-  uint8_t b;
   OSReturn_t ret;
+  size_t incomingBytesLength;
 
-  for (uint8_t i = 0; i < (size - 1); ++i)
-    {
-      ret = readUnsigned8(address++, &b);
-      if (ret != OSReturn::OS_OK)
-        return ret;
+  ret = readByteArray(address, pString, size, &incomingBytesLength);
+  if (ret != OSReturn::OS_OK)
+     return ret;
 
-      *pString++ = b;
-    }
-  *pString = '\0';
+  pString[incomingBytesLength-1] = '\0';
 
   return OSReturn::OS_OK;
 }
@@ -181,23 +177,27 @@ Eeprom::writeString(Address_t address, uint8_t* pString, BytesCount_t size)
 
   OSReturn_t ret;
 
-  for (uint8_t i = 0; i < (size - 1); ++i, ++pString)
+  size_t len;
+  len = strlen((char*) pString);
+
+  size_t lenToWrite;
+  lenToWrite = len + 1; // Include terminating '\0'
+
+  if (lenToWrite > size)
     {
-      ret = writeUnsigned8(address++, *pString);
+      lenToWrite = size-1; // Leave space for terminating '\0'
+    }
+  ret = writeByteArray(address, pString, lenToWrite);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  if (lenToWrite != (len + 1))
+    {
+      // Add the terminator when the string was too long
+      ret = writeUnsigned8(address + lenToWrite, '\0');
       if (ret != OSReturn::OS_OK)
         return ret;
-
-      if (*pString == '\0')
-        break;
     }
-
-  if (*pString != '\0')
-    {
-      ret = writeUnsigned8(address++, '\0');
-      if (ret != OSReturn::OS_OK)
-        return ret;
-    }
-
   return OSReturn::OS_OK;
 }
 
