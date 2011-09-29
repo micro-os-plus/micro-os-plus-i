@@ -71,7 +71,7 @@ void
 OSUsbDeviceImpl::interruptComServiceRoutine(void)
 {
   //OSUsbLed::toggle();
-  //OSDeviceDebug::putString("!");
+  //OSDeviceDebug::putString("*");
 #if TO_BE_PORTED
   if (UEINT & _BV(EP_CONTROL))
 #endif
