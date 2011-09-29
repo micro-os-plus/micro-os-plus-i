@@ -46,6 +46,10 @@ OSTimerTicks OSScheduler::timerTicks;
 OSTimerSeconds OSScheduler::timerSeconds;
 #endif /* defined(OS_INCLUDE_OSTIMERSECONDS) */
 
+#if defined(OS_INCLUDE_OSTIMERRTC)
+OSTimerRtc OSScheduler::timerRtc;
+#endif /* defined(OS_INCLUDE_OSTIMERRTC) */
+
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
 bool OSScheduler::ms_allowDeepSleep;
 #endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
@@ -156,6 +160,10 @@ OSScheduler::start(void)
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
       timerSeconds.init();
 #endif /* defined(OS_INCLUDE_OSTIMERSECONDS) */
+
+#if defined(OS_INCLUDE_OSTIMERRTC)
+      timerRtc.init();
+#endif /* defined(OS_INCLUDE_OSTIMERRTC) */
 
       ms_isRunning = true;
 
