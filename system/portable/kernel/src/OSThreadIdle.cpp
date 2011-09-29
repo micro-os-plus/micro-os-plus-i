@@ -97,6 +97,10 @@ OSThreadIdle::enterSleep(void)
   if (OSScheduler::timerTicks.getCount() > 0)
     return false;
 
+#if defined(OS_INCLUDE_OSAPPLICATIONIMPL_PREPARESLEEP)
+  OSApplicationImpl::prepareSleep(bIsDeepSleepAllowed);
+#endif /* defined(OS_INCLUDE_OSAPPLICATIONIMPL_PREPARESLEEP) */
+
   // Finally enter (deep) sleep
   if (bIsDeepSleepAllowed)
     {
