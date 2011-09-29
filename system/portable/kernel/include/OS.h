@@ -221,6 +221,12 @@ public:
   static void
   initialiseExternalClock(void);
 #endif
+
+#if defined(OS_INCLUDE_OSAPPLICATIONIMPL_PREPARESLEEP)
+  static void
+  prepareSleep(bool isDeepSleepAllowed);
+#endif /* defined(OS_INCLUDE_OSAPPLICATIONIMPL_PREPARESLEEP) */
+
 };
 
 // ----------------------------------------------------------------------------
@@ -241,6 +247,10 @@ public:
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
 #include "portable/kernel/include/OSTimerSeconds.h"
+#endif
+
+#if defined(OS_INCLUDE_OSTIMERRTC)
+#include "portable/kernel/include/OSTimerRtc.h"
 #endif
 
 #include "portable/kernel/include/OSTimerTicks.h"
