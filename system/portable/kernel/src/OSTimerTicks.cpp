@@ -64,6 +64,7 @@ OSTimerTicks::interruptServiceRoutine(void)
 
   implAcknowledgeInterrupt();
 
+  //OSDeviceDebug::putChar('?');
   OSCriticalSection::enter();
     {
       interruptTick();
