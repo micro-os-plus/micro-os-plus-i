@@ -19,6 +19,10 @@ class OSActiveThreads;
 class OSTimerSeconds;
 #endif /* defined(OS_INCLUDE_OSTIMERSECONDS) */
 
+#if defined(OS_INCLUDE_OSTIMERRTC)
+class OSTimerRtc;
+#endif /* defined(OS_INCLUDE_OSTIMERRTC) */
+
 class OSTimerTicks;
 class OSThread;
 
@@ -212,6 +216,11 @@ public:
 #if defined(OS_INCLUDE_OSTIMERSECONDS)
   // timer expressed in seconds
   static OSTimerSeconds timerSeconds;
+#endif
+
+#if defined(OS_INCLUDE_OSTIMERRTC)
+  // timer expressed in seconds
+  static OSTimerRtc timerRtc;
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
