@@ -27,10 +27,10 @@
 class OSDeviceDebug
 
 #if defined(DEBUG)
-    :
+:
 
 #if defined(OS_CONFIG_DEBUG_DEVICE_I2C)
-    public DeviceDebugI2cImpl
+public DeviceDebugI2cImpl
 #elif defined(OS_CONFIG_DEBUG_DEVICE_USART)
 public OSDeviceDebugUsartImpl
 #else
@@ -186,56 +186,56 @@ private:
 
 inline OSStack_t
 OSDeviceDebug::criticalEnter(void)
-{
-  register OSStack_t tmp;
+  {
+    register OSStack_t tmp;
 
-  tmp = OSCPUImpl::getInterruptsMask();
-  OSCPUImpl::interruptsDisable();
+    tmp = OSCPUImpl::getInterruptsMask();
+    OSCPUImpl::interruptsDisable();
 
-  return tmp;
-}
+    return tmp;
+  }
 
 inline void
 OSDeviceDebug::criticalExit(OSStack_t mask)
-{
-  OSCPUImpl::setInterruptsMask(mask);
-}
+  {
+    OSCPUImpl::setInterruptsMask(mask);
+  }
 
 #if !defined(OS_DEBUG_CONSTRUCTORS)
 
 inline void
 OSDeviceDebug::putConstructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
-{
-}
+  {
+  }
 
 inline void
 OSDeviceDebug::putConstructorWithIndex(const char* pc __attribute__((unused)), uint16_t i __attribute__((unused)),
     const void* p __attribute__((unused)))
-{
-}
+  {
+  }
 
 inline void
 OSDeviceDebug::putDestructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
-{
-}
+  {
+  }
 
 #if defined(OS_INCLUDE_SEPARATE_PROGMEM)
 
 inline void
 OSDeviceDebug::putConstructor_P(const char* PROGMEM pc __attribute__((unused)), const void* p __attribute__((unused)))
-{
-}
+  {
+  }
 
 inline void
 OSDeviceDebug::putConstructorWithIndex_P(const char* pc __attribute__((unused)), uint16_t i __attribute__((unused)),
     const void* p __attribute__((unused)))
-{
-}
+  {
+  }
 
 inline void
 OSDeviceDebug::putDestructor_P(const char* PROGMEM pc __attribute__((unused)), const void* p __attribute__((unused)))
-{
-}
+  {
+  }
 
 #endif /* defined(OS_INCLUDE_SEPARATE_PROGMEM) */
 
@@ -246,39 +246,39 @@ OSDeviceDebug::putDestructor_P(const char* PROGMEM pc __attribute__((unused)), c
 // define empty functions for Release
 inline void
 OSDeviceDebug::putChar(unsigned char __attribute__((unused)) c)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putNewLine(void)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putString(const char __attribute__((unused)) * pc)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putString(uchar_t __attribute__((unused)) * pc)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putConstructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putConstructorWithIndex(const char* pc __attribute__((unused)), uint16_t i __attribute__((unused)),
     const void* p __attribute__((unused)))
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putDestructor(const char* pc __attribute__((unused)), const void* p __attribute__((unused)))
-  {
-  }
+{
+}
 
 #if defined(OS_INCLUDE_SEPARATE_PROGMEM)
 
@@ -309,19 +309,44 @@ OSDeviceDebug::putDestructor_P(const char* PROGMEM pc __attribute__((unused)), c
 
 inline void
 OSDeviceDebug::putHex(uint8_t __attribute__((unused)) c)
-  {
-  }
+{
+}
 
 inline void
 OSDeviceDebug::putHex(uint16_t __attribute__((unused)) w)
-  {
-  }
+{
+}
 
+inline void
+OSDeviceDebug::putHex(uint32_t l __attribute__((unused)))
+{
+
+}
+
+inline void
+OSDeviceDebug::putDec(uint8_t b __attribute__((unused)), uint16_t n __attribute__((unused)))
+{
+
+}
 inline void
 OSDeviceDebug::putDec(uint16_t __attribute__((unused)) w,
     uint16_t __attribute__((unused)) n)
-  {
-  }
+{
+}
+
+inline void
+OSDeviceDebug::putDec(uint32_t l __attribute__((unused)), uint16_t n __attribute__((unused)))
+{
+
+}
+
+#if !defined(OS_CONFIG_ARCH_AVR8)
+inline void
+OSDeviceDebug::putDec(uint_t i __attribute__((unused)), uint16_t n __attribute__((unused)))
+{
+
+}
+#endif
 
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_PUTDEC_LONG)
 inline void OSDeviceDebug::putDec(unsigned long __attribute__((unused)) l, unsigned short
@@ -332,17 +357,23 @@ inline void OSDeviceDebug::putDec(unsigned long __attribute__((unused)) l, unsig
 
 inline void
 OSDeviceDebug::putPC(const char* PROGMEM __attribute__((unused)) pc)
-  {
-    pc = pc;
-  }
+{
+  pc = pc;
+}
+
+inline void
+OSDeviceDebug::putPtr(const void* p __attribute__((unused)))
+{
+  ;
+}
 
 inline void
 OSDeviceDebug::assert(const char __attribute__((unused)) *func,
     const char __attribute__((unused)) *xfile,
     int __attribute__((unused)) lineno,
     const char __attribute__((unused)) *sexp)
-  {
-  }
+{
+}
 
 #endif
 
