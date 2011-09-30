@@ -98,7 +98,10 @@ OSDeviceCharacter::open(void)
 
   int r;
   if (m_isOpened)
-    return OSReturn::OS_ALREADY_OPENED;
+    {
+      OSDeviceDebug::putString_P(PSTR(" ALREADY_OPENED "));
+      return OSReturn::OS_ALREADY_OPENED;
+    }
 
   m_openEvent = implGetOpenEvent();
   m_readEvent = implGetReadEvent();
@@ -172,12 +175,13 @@ OSDeviceCharacter::open(void)
 
       if (ret == OSEventWaitReturn::OS_TIMEOUT)
         {
-#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
-          OSDeviceDebug::putString_P(
-              PSTR("OSDeviceCharacter::open() return timeout"));
-          OSDeviceDebug::putNewLine();
-#endif
+          OSDeviceDebug::putString_P(PSTR(" TIMEOUT "));
           return OSReturn::OS_TIMEOUT;
+        }
+      else if (ret == OSEventWaitReturn::OS_CANCELLED)
+        {
+          OSDeviceDebug::putString_P(PSTR(" CANCELLED "));
+          return OSReturn::OS_CANCELLED;
         }
       else
         {
@@ -214,7 +218,10 @@ OSDeviceCharacter::close(void)
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_CLOSE) */
 
   if (!m_isOpened)
-    return OSReturn::OS_NOT_OPENED;
+    {
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      return OSReturn::OS_NOT_OPENED;
+    }
 
   int r;
   r = implClose();
@@ -261,7 +268,10 @@ OSDeviceCharacter::writeByte(unsigned char b)
 #endif
 
   if (!m_isOpened)
-    return OSReturn::OS_NOT_OPENED;
+    {
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      return OSReturn::OS_NOT_OPENED;
+    }
 
   bool canWrite;
   for (;;)
@@ -322,11 +332,13 @@ OSDeviceCharacter::writeByte(unsigned char b)
 
       if (ret == OSEventWaitReturn::OS_TIMEOUT)
         {
-#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE)
-          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeByte() return timeout"));
-          OSDeviceDebug::putNewLine();
-#endif
+          OSDeviceDebug::putString_P(PSTR(" TIMEOUT "));
           return OSReturn::OS_TIMEOUT;
+        }
+      else if (ret == OSEventWaitReturn::OS_CANCELLED)
+        {
+          OSDeviceDebug::putString_P(PSTR(" CANCELLED "));
+          return OSReturn::OS_CANCELLED;
         }
       else
         {
@@ -340,7 +352,10 @@ OSDeviceCharacter::writeByte(unsigned char b)
     }
 
   if (!isConnected())
-    return OSReturn::OS_DISCONNECTED;
+    {
+      OSDeviceDebug::putString_P(PSTR(" DISCONNECTED "));
+      return OSReturn::OS_DISCONNECTED;
+    }
 
   implWriteByte(b);
 
@@ -356,7 +371,10 @@ OSDeviceCharacter::writeBytes(unsigned char* buf, int len)
 {
 
   if (!m_isOpened)
-    return OSReturn::OS_NOT_OPENED;
+    {
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      return OSReturn::OS_NOT_OPENED;
+    }
 
   bool canWrite;
   int i;
@@ -423,11 +441,13 @@ OSDeviceCharacter::writeBytes(unsigned char* buf, int len)
 
       if (ret == OSEventWaitReturn::OS_TIMEOUT)
         {
-#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE)
-          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeByte() return timeout"));
-          OSDeviceDebug::putNewLine();
-#endif
+          OSDeviceDebug::putString_P(PSTR(" TIMEOUT "));
           return OSReturn::OS_TIMEOUT;
+        }
+      else if (ret == OSEventWaitReturn::OS_CANCELLED)
+        {
+          OSDeviceDebug::putString_P(PSTR(" CANCELLED "));
+          return OSReturn::OS_CANCELLED;
         }
       else
         {
@@ -441,7 +461,10 @@ OSDeviceCharacter::writeBytes(unsigned char* buf, int len)
     }
 
   if (!isConnected())
-    return OSReturn::OS_DISCONNECTED;
+    {
+      OSDeviceDebug::putString_P(PSTR(" DISCONNECTED "));
+      return OSReturn::OS_DISCONNECTED;
+    }
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE)
   OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::writeBytes() return"));
@@ -468,7 +491,10 @@ int
 OSDeviceCharacter::flush(void)
 {
   if (!m_isOpened)
-    return OSReturn::OS_NOT_OPENED;
+    {
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      return OSReturn::OS_NOT_OPENED;
+    }
 
   int r;
   r = implFlush();
@@ -480,9 +506,9 @@ OSDeviceCharacter::cancelRead(void)
 {
   m_doCancelRead = true;
 
+  OSScheduler::eventNotify(getOpenEvent(), OSEventWaitReturn::OS_CANCELLED);
   OSScheduler::eventNotify(getReadEvent(), OSEventWaitReturn::OS_CANCELLED);
 }
-
 
 // OSReturn::OS_NOT_OPENED
 // OSReturn::OS_WOULD_BLOCK
@@ -502,14 +528,16 @@ OSDeviceCharacter::readByte(void)
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
       m_pReadMatchArray = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
       return OSReturn::OS_NOT_OPENED;
     }
 
-  if(m_doCancelRead)
+  if (m_doCancelRead)
     {
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
       m_pReadMatchArray = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+      OSDeviceDebug::putString_P(PSTR(" CANCELLED "));
       return OSReturn::OS_CANCELLED;
     }
 
@@ -571,10 +599,7 @@ OSDeviceCharacter::readByte(void)
 
       if (ret == OSEventWaitReturn::OS_TIMEOUT)
         {
-#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_READBYTE)
-          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte() return timeout"));
-          OSDeviceDebug::putNewLine();
-#endif
+          OSDeviceDebug::putString_P(PSTR(" TIMEOUT "));
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
           m_pReadMatchArray = 0;
@@ -583,8 +608,7 @@ OSDeviceCharacter::readByte(void)
         }
       else if (ret == OSEventWaitReturn::OS_CANCELLED)
         {
-          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte() cancelled"));
-          OSDeviceDebug::putNewLine();
+          OSDeviceDebug::putString_P(PSTR(" CANCELLED "));
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
           m_pReadMatchArray = 0;
@@ -604,7 +628,9 @@ OSDeviceCharacter::readByte(void)
 
   if (!isConnected())
     {
-#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+      OSDeviceDebug::putString_P(PSTR(" DISCONNECTED "));
+
+      #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
       m_pReadMatchArray = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
       return OSReturn::OS_DISCONNECTED;
@@ -644,6 +670,7 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
       m_pReadMatchArray = 0;
       *count = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
       return OSReturn::OS_NOT_OPENED;
     }
 
@@ -720,10 +747,7 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
 
       if (ret == OSEventWaitReturn::OS_TIMEOUT)
         {
-#if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_READBYTE)
-          OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte() return timeout"));
-          OSDeviceDebug::putNewLine();
-#endif
+          OSDeviceDebug::putString_P(PSTR(" TIMEOUT "));
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
           m_pReadMatchArray = 0;
@@ -735,6 +759,21 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
           m_countToRead = 0;
 
           return OSReturn::OS_TIMEOUT;
+        }
+      else if (ret == OSEventWaitReturn::OS_CANCELLED)
+        {
+          OSDeviceDebug::putString_P(PSTR(" CANCELLED "));
+
+#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+          m_pReadMatchArray = 0;
+#endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
+
+          av = implAvailableRead();
+          if (av > 0)
+            *count = implReadBytes(pBuf, bufSize);
+          m_countToRead = 0;
+
+          return OSReturn::OS_CANCELLED;
         }
       else
         {
@@ -749,7 +788,9 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
 
   if (!isConnected())
     {
-#if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
+      OSDeviceDebug::putString_P(PSTR(" DISCONNECTED "));
+
+      #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
       m_pReadMatchArray = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
