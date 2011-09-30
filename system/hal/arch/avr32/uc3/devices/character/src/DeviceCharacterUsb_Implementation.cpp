@@ -21,7 +21,7 @@ DeviceCharacterUsb::implOpen()
 {
   OSCriticalSection::enter();
     {
-      OSDeviceDebug::putString("DeviceCharacterUsb::open()");
+      OSDeviceDebug::putString("DeviceCharacterUsb::implOpen()");
       OSDeviceDebug::putNewLine();
     }
   OSCriticalSection::exit();
@@ -65,7 +65,7 @@ DeviceCharacterUsb::implIsConnected()
 int
 DeviceCharacterUsb::implClose()
 {
-  OSDeviceDebug::putString("DeviceCharacterUsb::close()");
+  OSDeviceDebug::putString("DeviceCharacterUsb::implClose()");
   OSDeviceDebug::putNewLine();
 
   m_opened = false;
