@@ -10,6 +10,8 @@
 
 #include "devices/mcp/include/mcp24aa32.h"
 
+#include <string.h>
+
 namespace device
 {
   namespace mcp
