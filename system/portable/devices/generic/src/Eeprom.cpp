@@ -13,6 +13,8 @@
 #include "portable/devices/generic/include/Eeprom.h"
 #include "portable/util/endianness/include/BigEndian.h"
 
+#include <string.h>
+
 Eeprom::Eeprom()
 {
   OSDeviceDebug::putConstructor_P(PSTR("Eeprom"), this);
