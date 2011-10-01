@@ -27,6 +27,26 @@ DateTime::DateTime()
   m_year = DEFAULT_EPOCH_YEAR;
 }
 
+DateTime::DateTime(Year_t year, Month_t month, Day_t day, Hour_t hour,
+    Minute_t minute, Second_t second)
+{
+  debug.putConstructor_P(PSTR("DateTime"), this);
+
+  m_second = second;
+  m_minute = minute;
+  m_hour = hour;
+  m_day = day;
+  m_month = month;
+  m_year = year;
+}
+
+DateTime::DateTime(DurationSeconds_t secondsFromEpoch)
+{
+  debug.putConstructor_P(PSTR("DateTime"), this);
+
+  processSecondsFromEpoch(secondsFromEpoch);
+}
+
 DateTime::~DateTime()
 {
   debug.putDestructor_P(PSTR("DateTime"), this);
@@ -118,8 +138,9 @@ DateTime::parseIso(const char* pStr)
 
         }
     }
-  if ((m_year < getEpochYear()) || (m_month < 1) || (m_month > 12) || (m_day < 1)
-      || (m_day > 31) || (m_hour > 24) || (m_minute > 60) || (m_second > 60))
+  if ((m_year < getEpochYear()) || (m_month < 1) || (m_month > 12) || (m_day
+      < 1) || (m_day > 31) || (m_hour > 24) || (m_minute > 60) || (m_second
+      > 60))
     {
       OSDeviceDebug::putString(" parseIso() bad fields ");
       return OSReturn::OS_BAD_DATE;
@@ -169,7 +190,7 @@ DateTime::computeSecondsFromEpoch()
   else
     fullYears = 0;
 
-  Day_t fullDays;
+  DayOfYear_t fullDays;
   fullDays = computeDayOfYear() - 1;
 
   seconds = (((((fullYears * 365) + fullDays) * 24) + m_hour) * 60 + m_minute)
@@ -202,15 +223,87 @@ DateTime::computeSecondsFromEpoch()
   return seconds;
 }
 
-bool
-DateTime::isLeapYear(void)
+void
+DateTime::processSecondsFromEpoch(DurationSeconds_t secondsFromEpoch)
 {
-  Year_t y;
-  y = m_year;
+  ldiv_t daysAndSeconds;
+  daysAndSeconds = ldiv(secondsFromEpoch, 60 * 60 * 24);
 
-  if ((y % 4) == 0)
+  // daysAndSeconds.quot = full days
+  // daysAndSeconds.rem = secondsInDay (0-86399)
+
+  div_t hoursAndSeconds;
+  hoursAndSeconds = div(daysAndSeconds.rem, 60 * 60);
+
+  m_hour = hoursAndSeconds.quot; // full hours (0-23)
+  // hoursAndSeconds.rem = seconds in hour (0-3599)
+
+  div_t minutesAndSeconds;
+  minutesAndSeconds = div(hoursAndSeconds.rem, 60);
+
+  m_minute = minutesAndSeconds.quot; // full minutes (0-59)
+  m_second = minutesAndSeconds.rem; // seconds (0-59)
+
+  // The hard part is to process the number of day and
+  // get the year/month/day fields
+
+  DurationDays_t remainingDays;
+  remainingDays = daysAndSeconds.quot;
+
+  bool isLeap;
+  isLeap = false;
+
+  // First identify year
+  Year_t year;
+  for (year = getEpochYear();; ++year)
     {
-      if (((y % 400) == 0) || ((y % 100) != 0))
+      DayOfYear_t daysInYear;
+      daysInYear = 365;
+
+      isLeap = isLeapYear(year);
+      if (isLeap)
+        ++daysInYear;
+
+      if (remainingDays < daysInYear)
+        break;
+
+      remainingDays -= daysInYear;
+    }
+
+  m_year = year;
+
+  // Now we know
+  // - the year
+  // - if it is leap
+  // - the remaining days in year
+
+  // Identify month
+  Month_t month;
+  for (month = 1; month <= 12; ++month)
+    {
+      Day_t daysInMonth;
+      daysInMonth = daysInMonths[month - 1];
+      if ((month == 2) && isLeap)
+        {
+          ++daysInMonth;
+        }
+
+      if (remainingDays < daysInMonth)
+        break;
+
+      remainingDays -= daysInMonth;
+    }
+
+  m_month = month; // already starts at 1
+  m_day = remainingDays + 1; // to make it start at 1
+}
+
+bool
+DateTime::isLeapYear(Year_t year)
+{
+  if ((year % 4) == 0)
+    {
+      if (((year % 400) == 0) || ((year % 100) != 0))
         return true;
       else
         return false;
@@ -246,4 +339,23 @@ DateTime::computeDayOfYear()
   return dayOfYear;
 }
 
+std::ostream&
+operator <<(std::ostream& out, DateTime& dt)
+{
+  out << std::dec;
+  out.width(4);
+  out << (uint_t) dt.getYear() << '-';
+  out.width(2);
+  out << (uint_t) dt.getMonth() << '-';
+  out.width(2);
+  out << (uint_t) dt.getDay() << ' ';
+  out.width(2);
+  out << (uint_t) dt.getHour() << ':';
+  out.width(2);
+  out << (uint_t) dt.getMinute() << ':';
+  out.width(2);
+  out << (uint_t) dt.getSecond();
+
+  return out;
+}
 #endif /* defined(OS_INCLUDE_DATETIME) */

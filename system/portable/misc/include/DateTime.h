@@ -16,6 +16,11 @@
 
 // ----------------------------------------------------------------------------
 
+class DateTime;
+std::ostream& operator <<(std::ostream& out, DateTime& dt);
+
+// ----------------------------------------------------------------------------
+
 class DateTime
 {
 public:
@@ -30,12 +35,17 @@ public:
   typedef uint16_t Year_t; // >= EPOCH
 
   typedef uint32_t DurationSeconds_t;
+  typedef uint32_t DurationDays_t;
 
   const static Day_t daysInMonths[];
 
   // ----- Constructors & destructors -----------------------------------------
 
   DateTime();
+  DateTime(Year_t year, Month_t month, Day_t day, Hour_t hour, Minute_t minute,
+      Second_t second);
+  DateTime(DurationSeconds_t secondsFromEpoch);
+
   ~DateTime();
 
   // ----- Public methods -----------------------------------------------------
@@ -67,12 +77,18 @@ public:
   DurationSeconds_t
   computeSecondsFromEpoch(void);
 
+  void
+  processSecondsFromEpoch(DurationSeconds_t secondsFromEpoch);
+
   // January 1st is day 1
   DayOfYear_t
   computeDayOfYear(void);
 
   bool
   isLeapYear(void);
+
+  static bool
+  isLeapYear(Year_t year);
 
   Year_t
   getEpochYear(void);
@@ -161,9 +177,9 @@ DateTime::getEpochYear(void)
 
 inline void
 DateTime::setYearEpoch(Year_t year)
-{
-  m_yearEpoch = year;
-}
+  {
+    m_yearEpoch = year;
+  }
 
 #endif /* defined(OS_INCLUDE_DATETIME_YEAR_EPOCH) */
 
@@ -171,6 +187,12 @@ inline DateTime::Year_t
 DateTime::getDefaultEpochYear(void)
 {
   return DEFAULT_EPOCH_YEAR;
+}
+
+inline bool
+DateTime::isLeapYear(void)
+{
+  return isLeapYear(m_year);
 }
 
 // ----------------------------------------------------------------------------
