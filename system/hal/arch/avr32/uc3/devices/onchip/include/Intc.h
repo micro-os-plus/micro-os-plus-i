@@ -140,6 +140,10 @@ namespace avr32
       registerInterruptHandler(intc::InterruptHandler_t handler,
           intc::InterruptIndex_t index, intc::Priority_t priority);
 
+      static void
+      registerInterruptHandler(intc::InterruptHandler_t handler,
+          intc::Group_t group, intc::Line_t line, intc::Priority_t priority);
+
       static intc::InterruptIndex_t
       computeInterruptIndex(intc::Group_t group, intc::Line_t line);
     };
@@ -148,6 +152,15 @@ namespace avr32
     Intc::computeInterruptIndex(intc::Group_t group, intc::Line_t line)
     {
       return ((group * intc::LINES_PER_GROUP) + line);
+    }
+
+    void
+    inline
+    Intc::registerInterruptHandler(intc::InterruptHandler_t handler,
+        intc::Group_t group, intc::Line_t line, intc::Priority_t priority)
+    {
+      registerInterruptHandler(handler, computeInterruptIndex(group, line),
+          priority);
     }
   }
 }
