@@ -96,6 +96,9 @@ OSDeviceCharacter::open(void)
   OSSchedulerLock::exit();
 #endif
 
+  // Clear cancel flag
+  m_doCancelRead = false;
+
   int r;
   if (m_isOpened)
     {
@@ -198,8 +201,6 @@ OSDeviceCharacter::open(void)
   // If everything is ok, mark that the device is opened
   m_isOpened = true;
 
-  m_doCancelRead = false;
-
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_OPEN)
   OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::open() return OK"));
   OSDeviceDebug::putNewLine();
@@ -217,6 +218,9 @@ OSDeviceCharacter::close(void)
   OSDeviceDebug::putNewLine();
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_CLOSE) */
 
+  // Clear cancel flag
+  m_doCancelRead = false;
+
   if (!m_isOpened)
     {
       OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
@@ -233,7 +237,7 @@ OSDeviceCharacter::close(void)
 bool
 OSDeviceCharacter::isOpened(void) const
 {
-  return m_isOpened;
+  return m_isOpened && !m_doCancelRead;
 }
 
 // OSReturn::OS_NOT_OPENED
