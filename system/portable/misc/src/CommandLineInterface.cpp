@@ -44,7 +44,7 @@ CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
   if (greeting != 0)
     cout << std::endl << std::endl << greeting << std::endl;
 
-  for (; dev.isConnected();)
+  for (; dev.isConnected() && dev.isOpened();)
     {
       int c;
 
