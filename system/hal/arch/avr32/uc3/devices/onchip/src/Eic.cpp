@@ -221,8 +221,7 @@ namespace avr32
           OSCriticalSection::enter();
             {
               // for this group, the interrupt line is identical to m_id
-              Intc::registerInterruptHandler(handler,
-                  Intc::computeInterruptIndex(intc::Group::EIC, m_id),
+              Intc::registerInterruptHandler(handler, intc::Group::EIC, m_id,
                   intc::GroupPriority::EIC);
             }
           OSCriticalSection::exit();
