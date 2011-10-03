@@ -153,6 +153,8 @@ PersistentConfigurationEeprom::verifyPersistentChecksum(void)
 OSReturn_t
 PersistentConfigurationEeprom::updatePersistentHeader(void)
 {
+  OSDeviceDebug::putString(" updatePersistentHeader() ");
+
   OSReturn_t ret;
 
   if (m_payloadLength == 0)
@@ -180,6 +182,8 @@ PersistentConfigurationEeprom::updatePersistentHeader(void)
 OSReturn_t
 PersistentConfigurationEeprom::fillEntirePayload(uint8_t fillByte)
 {
+  OSDeviceDebug::putString(" fillEntirePayload() ");
+
   OSReturn_t ret;
 
   // Fill all payload bytes
@@ -192,6 +196,8 @@ OSReturn_t
 PersistentConfigurationEeprom::fillLastBytesOfPayload(Length_t startFrom,
     uint8_t fillByte)
 {
+  OSDeviceDebug::putString(" fillLastBytesOfPayload() ");
+
   OSReturn_t ret;
   ret = OSReturn::OS_OK;
 
@@ -209,6 +215,8 @@ PersistentConfigurationEeprom::fillLastBytesOfPayload(Length_t startFrom,
 OSReturn_t
 PersistentConfigurationEeprom::updatePersistentChecksum(void)
 {
+  OSDeviceDebug::putString(" updatePersistentChecksum() ");
+
   OSReturn_t ret;
 
   Crc_t crc;
