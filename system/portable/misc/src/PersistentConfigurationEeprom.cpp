@@ -103,16 +103,39 @@ PersistentConfigurationEeprom::computeChecksum(Length_t length, Crc_t& crc)
 
   crc = util::crc::Crc7x42::INITIAL_VALUE;
 
-  uint_t i;
-  for (i = 0; i < length + ADDITIONAL_LENGTH; ++i)
+  Length_t remainingLength;
+  remainingLength = length + ADDITIONAL_LENGTH;
+
+  Eeprom::Address_t address;
+  address = m_beginAddress + OFFSET_OF_CRC_COMPUTATION_BEGIN;
+
+  // As an optimisation, we process slices of bytes, that we read in a local
+  // byte array with one call and compute crc again with one call.
+  while (remainingLength > 0)
     {
-      uint8_t b;
-      ret = m_device.readUnsigned8(
-          m_beginAddress + OFFSET_OF_CRC_COMPUTATION_BEGIN + i, &b);
+      uint8_t ba[16];
+
+      Length_t sliceLength;
+      sliceLength = (remainingLength > sizeof(ba)) ? sizeof(ba)
+          : remainingLength;
+
+      size_t incomingBytesLength;
+
+      ret = m_device.readByteArray(address, ba, sliceLength,
+          &incomingBytesLength);
       if (ret != OSReturn::OS_OK)
         return ret;
 
-      util::crc::Crc7x42::computePolynomial(crc, b);
+      if (incomingBytesLength != sliceLength)
+        {
+          OSDeviceDebug::putString(" NOT_ENOUGH_DATA ");
+          return OSReturn::OS_NOT_ENOUGH_DATA;
+        }
+
+      util::crc::Crc7x42::computePolynomial(crc, ba, sliceLength);
+
+      remainingLength -= sliceLength;
+      address += sliceLength;
     }
 
   return ret;
