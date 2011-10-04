@@ -1501,7 +1501,7 @@ LargeCircularSessionsStorage::Reader::ReadCondition::checkSynchronisedCondition(
   OSDeviceDebug::putString(" clen=");
   OSDeviceDebug::putDec(currentLength);
   OSDeviceDebug::putString(", blk=");
-  OSDeviceDebug::putDec(sessionBlockNumber);
+  OSDeviceDebug::putDec(m_sessionBlockNumber);
   OSDeviceDebug::putNewLine();
 #endif /* defined(OS_DEBUG_LARGECIRCULARSESSIONSSTORAGE_READSESSIONBLOCK) */
 
