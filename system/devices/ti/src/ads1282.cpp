@@ -17,17 +17,10 @@ namespace device
     namespace ads1282
     {
       Ads1282::Ads1282(avr32::uc3::SpiMaster& spi,
-          avr32::uc3::Gpio& gpioAds1282Cs, avr32::uc3::Gpio& gpioAds1282Sync,
-          avr32::uc3::Gpio& gpioAds1282Drdy,
-          avr32::uc3::Gpio& gpioAds1282Reset,
-          avr32::uc3::Gpio& gpioAds1282Pwdn, avr32::uc3::Gpio& gpioAds1282Sclk,
-          avr32::uc3::Gpio& gpioAds1282Miso, avr32::uc3::Gpio& gpioAds1282Mosi) :
-        m_spi(spi), m_gpioAds1282Cs(gpioAds1282Cs), m_gpioAds1282Sync(
-            gpioAds1282Sync), m_gpioAds1282Drdy(gpioAds1282Drdy),
-            m_gpioAds1282Reset(gpioAds1282Reset), m_gpioAds1282Pwdn(
-                gpioAds1282Pwdn), m_gpioAds1282Sclk(gpioAds1282Sclk),
-            m_gpioAds1282Miso(gpioAds1282Miso), m_gpioAds1282Mosi(
-                gpioAds1282Mosi)
+          avr32::uc3::Gpio gpioAds1282Drdy) :
+        m_spi(spi), m_gpioAds1282Cs(82), m_gpioAds1282Sync(1),
+            m_gpioAds1282Drdy(gpioAds1282Drdy), m_gpioAds1282Reset(26),
+            m_gpioAds1282Pwdn(25)
       {
 #if defined(OS_DEBUG_DEVICE_TI_ADS1282)
         OSDeviceDebug::putConstructor("device::ti::Ads1282", this);
@@ -46,8 +39,17 @@ namespace device
       }
 
       void
-      Ads1282::init(void)
+      Ads1282::powerUp(void)
       {
+        OSDeviceDebug::putString("device::ti::Ads1282::powerUp()");
+        OSDeviceDebug::putNewLine();
+
+        if (m_pGpioConfigurationArray != NULL)
+          {
+            avr32::uc3::Gpio::configPeripheralModeAndFunction
+                ( m_pGpioConfigurationArray);
+          }
+
         m_gpioAds1282Cs.configureModeGpio();
         m_gpioAds1282Cs.configureDirectionInput();
 
@@ -57,7 +59,6 @@ namespace device
 
         m_gpioAds1282Drdy.configureModeGpio();
         m_gpioAds1282Drdy.configureDirectionInput();
-        //        m_gpioAds1282Drdy.enableGlitchFilter();
 
         m_gpioAds1282Reset.setPinHigh();
         m_gpioAds1282Reset.configureModeGpio();
@@ -66,19 +67,33 @@ namespace device
         m_gpioAds1282Pwdn.setPinLow();
         m_gpioAds1282Pwdn.configureModeGpio();
         m_gpioAds1282Pwdn.configureDirectionOutput();
+      }
 
-        // set SPI pins
-        m_gpioAds1282Sclk.configureModePeripheral();
-        m_gpioAds1282Sclk.configurePeripheralFunction(
-            avr32::uc3::gpio::PeripheralFunction::A);
+      void
+      Ads1282::powerDown(void)
+      {
+        OSDeviceDebug::putString("device::ti::Ads1282::powerDown()");
+        OSDeviceDebug::putNewLine();
 
-        m_gpioAds1282Miso.configureModePeripheral();
-        m_gpioAds1282Miso.configurePeripheralFunction(
-            avr32::uc3::gpio::PeripheralFunction::A);
+        if (m_pGpioConfigurationArray != NULL)
+          {
+            avr32::uc3::Gpio::configGpioModeInput( m_pGpioConfigurationArray);
+          }
 
-        m_gpioAds1282Mosi.configureModePeripheral();
-        m_gpioAds1282Mosi.configurePeripheralFunction(
-            avr32::uc3::gpio::PeripheralFunction::A);
+        m_gpioAds1282Cs.configureModeGpio();
+        m_gpioAds1282Cs.configureDirectionInput();
+
+        m_gpioAds1282Sync.configureModeGpio();
+        m_gpioAds1282Sync.configureDirectionInput();
+
+        m_gpioAds1282Drdy.configureModeGpio();
+        m_gpioAds1282Drdy.configureDirectionInput();
+
+        m_gpioAds1282Reset.configureModeGpio();
+        m_gpioAds1282Reset.configureDirectionInput();
+
+        m_gpioAds1282Pwdn.configureModeGpio();
+        m_gpioAds1282Pwdn.configureDirectionInput();
       }
 
       void
@@ -216,7 +231,7 @@ namespace device
         m_gpioAds1282Sync.setPinHigh();
 
         // wait T_DLY > 24/fclck (5.85us)
-//        OS::busyWaitMicros(T_DLY_US);
+        //        OS::busyWaitMicros(T_DLY_US);
 
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);

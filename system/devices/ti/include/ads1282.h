@@ -97,17 +97,17 @@ namespace device
       class Ads1282
       {
       public:
-        Ads1282(avr32::uc3::SpiMaster& spi, avr32::uc3::Gpio& gpioAds1282Cs,
-            avr32::uc3::Gpio& gpioAds1282Sync,
-            avr32::uc3::Gpio& gpioAds1282Drdy,
-            avr32::uc3::Gpio& gpioAds1282Reset,
-            avr32::uc3::Gpio& gpioAds1282Pwdn,
-            avr32::uc3::Gpio& gpioAds1282Sclk,
-            avr32::uc3::Gpio& gpioAds1282Miso,
-            avr32::uc3::Gpio& gpioAds1282Mosi);
+        Ads1282(avr32::uc3::SpiMaster& spi, avr32::uc3::Gpio gpioAds1282Drdy);
 
         void
-        init();
+        setGpioConfigurationArray(
+            avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray);
+
+        void
+        powerUp(void);
+
+        void
+        powerDown(void);
 
         void
         startConfiguration();
@@ -160,16 +160,15 @@ namespace device
 
         spim_t& m_spi;
 
-        avr32::uc3::Gpio& m_gpioAds1282Cs;
-        avr32::uc3::Gpio& m_gpioAds1282Sync;
+        avr32::uc3::Gpio m_gpioAds1282Cs;
+        avr32::uc3::Gpio m_gpioAds1282Sync;
         avr32::uc3::Gpio& m_gpioAds1282Drdy;
-        avr32::uc3::Gpio& m_gpioAds1282Reset;
-        avr32::uc3::Gpio& m_gpioAds1282Pwdn;
-        avr32::uc3::Gpio& m_gpioAds1282Sclk;
-        avr32::uc3::Gpio& m_gpioAds1282Miso;
-        avr32::uc3::Gpio& m_gpioAds1282Mosi;
+        avr32::uc3::Gpio m_gpioAds1282Reset;
+        avr32::uc3::Gpio m_gpioAds1282Pwdn;
 
         volatile bool isDrdyHighToLowFlag;
+
+        avr32::uc3::gpio::PinPeripheralFunction_t* m_pGpioConfigurationArray;
       };
 
       // ===== Inline methods ===================================================
@@ -179,6 +178,13 @@ namespace device
       {
         return m_gpioAds1282Drdy.isPinHigh();
 
+      }
+
+      inline void
+      Ads1282::setGpioConfigurationArray(
+          avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray)
+      {
+        m_pGpioConfigurationArray = pGpioConfigurationArray;
       }
     }
   }
