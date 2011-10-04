@@ -224,9 +224,9 @@ PersistentConfigurationEeprom::fillLastBytesOfPayload(Length_t startFrom,
   OSReturn_t ret;
   ret = OSReturn::OS_OK;
 
-  for (uint_t i = startFrom; i < m_payloadLength; ++i)
+  for (Length_t i = startFrom; i < m_payloadLength; ++i)
     {
-      ret = m_device.writeUnsigned8(m_beginAddress + OFFSET_OF_PAYLOAD + 1,
+      ret = m_device.writeUnsigned8(m_beginAddress + OFFSET_OF_PAYLOAD + i,
           fillByte);
       if (ret != OSReturn::OS_OK)
         return ret;
