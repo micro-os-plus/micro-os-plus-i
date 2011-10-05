@@ -18,9 +18,10 @@ namespace device
     {
       Ads1282::Ads1282(avr32::uc3::SpiMaster& spi,
           avr32::uc3::Gpio gpioAds1282Drdy) :
-        m_spi(spi), m_gpioAds1282Cs(82), m_gpioAds1282Sync(1),
-            m_gpioAds1282Drdy(gpioAds1282Drdy), m_gpioAds1282Reset(26),
-            m_gpioAds1282Pwdn(25)
+        m_spi(spi), m_gpioAds1282Cs(CS_GPIO_PIN), m_gpioAds1282Sync(
+            SYNC_GPIO_PIN), m_gpioAds1282Drdy(gpioAds1282Drdy),
+            m_gpioAds1282Reset(RESET_GPIO_PIN),
+            m_gpioAds1282Pwdn(PWDN_GPIO_PIN)
       {
 #if defined(OS_DEBUG_DEVICE_TI_ADS1282)
         OSDeviceDebug::putConstructor("device::ti::Ads1282", this);

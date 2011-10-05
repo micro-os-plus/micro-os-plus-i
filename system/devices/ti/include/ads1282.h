@@ -54,6 +54,11 @@ namespace device
       static const uint32_t T_DR_MAX_TICKS = (T_DR_MAX_MS
           * OS_CFGINT_TICK_RATE_HZ) / 1000 + 1;
 
+      static const uint8_t CS_GPIO_PIN = 82;
+      static const uint8_t SYNC_GPIO_PIN = 1;
+      static const uint8_t RESET_GPIO_PIN = 26;
+      static const uint8_t PWDN_GPIO_PIN = 25;
+
       class Register
       {
       public:
