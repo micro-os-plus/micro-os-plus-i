@@ -221,6 +221,9 @@ public:
     bool
     isCompletelyWritten(void);
 
+    void
+    setCompletelyWritten(bool flag);
+
     bool
     isValid(void);
 
@@ -274,6 +277,8 @@ public:
 
     // INVALID_BLOCKNUMBER if unknown
     SessionBlockNumber_t m_nextSessionFirstBlockNumber;
+
+    bool m_isCompletelyWritten;
   };
 
   class SessionBlock
@@ -778,8 +783,15 @@ LargeCircularSessionsStorage::Header::readNextSessionFirstBlockNumber(
 inline bool
 LargeCircularSessionsStorage::Session::isCompletelyWritten(void)
 {
-  return (m_sessionLength > 0);
+  return m_isCompletelyWritten;
 }
+
+inline     void
+LargeCircularSessionsStorage::Session::setCompletelyWritten(bool flag)
+{
+  m_isCompletelyWritten = flag;
+}
+
 
 inline bool
 LargeCircularSessionsStorage::Session::isValid(void)

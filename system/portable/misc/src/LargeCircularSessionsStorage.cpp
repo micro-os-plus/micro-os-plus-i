@@ -339,17 +339,15 @@ LargeCircularSessionsStorage::searchMostRecentlyWrittenBlock(
       session.setNextSessionFirstBlockNumber(
           Header::readNextSessionFirstBlockNumber(pBlockBuffer));
 
+      session.setLength(
+          computeCircularSessionLength(session.getFirstBlockNumber(),
+              session.getLastBlockNumber()));
+
       // If the session was properly closed
       if (session.getNextSessionFirstBlockNumber()
           != Header::INVALID_BLOCKNUMBER)
         {
-          session.setLength(
-              computeCircularSessionLength(session.getFirstBlockNumber(),
-                  session.getLastBlockNumber()));
-        }
-      else
-        {
-          session.setLength(0);
+          session.setCompletelyWritten(true);
         }
     }
   return ret;
@@ -476,6 +474,7 @@ LargeCircularSessionsStorage::Session::Session()
   m_sessionFirstBlockNumber = Header::INVALID_BLOCKNUMBER;
   m_sessionFirstBlockNumber = Header::INVALID_BLOCKNUMBER;
   m_sessionLength = 0;
+  m_isCompletelyWritten = false;
   m_nextSessionFirstBlockNumber = Header::INVALID_BLOCKNUMBER;
 }
 
@@ -653,6 +652,7 @@ LargeCircularSessionsStorage::Writer::createSession(
   m_currentSession.setNextSessionFirstBlockNumber(Header::INVALID_BLOCKNUMBER);
   m_currentSession.setLastBlockNumber(Header::INVALID_BLOCKNUMBER);
   m_currentSession.setLength(0);
+  m_currentSession.setCompletelyWritten(false);
 
   OSDeviceDebug::putString(" createSession() done bid=");
   OSDeviceDebug::putHex(m_currentBlock.getUniqueId());
@@ -724,12 +724,17 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBlockBuffer)
 
   // Update session to remember the written block as the last session block
   m_currentSession.setLastBlockNumber(m_currentBlock.getBlockNumber());
+  m_currentSession.setLength(
+      getStorage().computeCircularSessionLength(
+          m_currentSession.getLastBlockNumber(),
+          m_currentSession.getFirstBlockNumber()));
 
   os.sched.lock.enter();
     {
+      Session& session = getStorage().getMostRecentlyWrittenSession();
       // Update common storage session class to point to the written block
-      getStorage().getMostRecentlyWrittenSession().setLastBlockNumber(
-          m_currentSession.getLastBlockNumber());
+      session.setLastBlockNumber(m_currentSession.getLastBlockNumber());
+      session.setLength(m_currentSession.getLength());
 
       // Update common storage session block class to point to the written block
       getStorage().getMostRecentlyWrittenSessionBlock() = m_currentBlock;
@@ -787,6 +792,7 @@ LargeCircularSessionsStorage::Writer::closeSession(void)
       getStorage().computeCircularSessionLength(
           m_currentSession.getLastBlockNumber(),
           m_currentSession.getFirstBlockNumber()));
+  m_currentSession.setCompletelyWritten(true);
 
   os.sched.lock.enter();
     {
@@ -1085,6 +1091,7 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
       getStorage().computeCircularSessionLength(
           previousSession.getLastBlockNumber(),
           previousSession.getFirstBlockNumber()));
+  previousSession.setCompletelyWritten(true);
 
   // Make the previous session the current session
   m_currentSession = previousSession;
@@ -1146,6 +1153,7 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
           getStorage().computeCircularSessionLength(
               nextSession.getLastBlockNumber(),
               nextSession.getFirstBlockNumber()));
+      nextSession.setCompletelyWritten(true);
     }
   else
     {
