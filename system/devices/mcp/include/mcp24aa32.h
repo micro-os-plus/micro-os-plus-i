@@ -57,6 +57,9 @@ namespace device
       initialise(void);
 
       virtual OSReturn_t
+      probeDevice(void);
+
+      virtual OSReturn_t
       readByteArray(Eeprom::Address_t address, uint8_t* pIncomingBytes,
           BytesCount_t incomingBytesSize, size_t* pIncomingBytesLength);
 

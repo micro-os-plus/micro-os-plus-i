@@ -47,6 +47,15 @@ namespace device
     }
 
     OSReturn_t
+    Mcp24aa32::probeDevice(void)
+    {
+      OSReturn_t ret;
+      ret = m_i2cDevice.probeDevice(m_i2cAddress);
+
+      return ret;
+    }
+
+    OSReturn_t
     Mcp24aa32::readByteArray(Address_t address, uint8_t* pIncomingBytes,
         BytesCount_t incomingBytesSize, size_t* pIncomingBytesLength)
     {
