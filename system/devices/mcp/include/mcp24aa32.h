@@ -34,8 +34,6 @@ namespace device
       typedef avr32::uc3::Twim::Address_t I2cAddress_t;
 #endif
 
-      typedef int RetryLimit_t;
-
       // ----- Constructors & destructors -------------------------------------
 
       Mcp24aa32(I2c_t& device);
@@ -69,12 +67,6 @@ namespace device
       writeByteArray(Address_t address, uint8_t* pOutgoingBytes,
           BytesCount_t outgoingBytesLength);
 
-      void
-      setRetryLimit(RetryLimit_t retryLimit);
-
-      RetryLimit_t
-      getRetryLimit(void);
-
     private:
 
       // ---- Private members -------------------------------------------------
@@ -82,7 +74,6 @@ namespace device
       I2c_t& m_i2cDevice;
       I2cAddress_t m_i2cAddress;
 
-      RetryLimit_t m_retryLimit;
 
       // ----------------------------------------------------------------------
 
@@ -100,18 +91,6 @@ namespace device
     Mcp24aa32::getI2cAddress(void)
     {
       return m_i2cAddress;
-    }
-
-    inline void
-    Mcp24aa32::setRetryLimit(RetryLimit_t retryLimit)
-    {
-      m_retryLimit = retryLimit;
-    }
-
-    inline Mcp24aa32::RetryLimit_t
-    Mcp24aa32::getRetryLimit(void)
-    {
-      return m_retryLimit;
     }
 
   // ------------------------------------------------------------------------

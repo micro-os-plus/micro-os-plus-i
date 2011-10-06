@@ -21,8 +21,6 @@ namespace device
       m_i2cDevice(device)
     {
       OSDeviceDebug::putConstructor("device::mcp::Mcp24aa32", this);
-
-      m_retryLimit = 0;
     }
 
     Mcp24aa32::~Mcp24aa32()
@@ -47,7 +45,7 @@ namespace device
     {
       m_i2cDevice.initialise();
 
-      m_retryLimit = 0;
+      setRetryLimit(0);
     }
 
     OSReturn_t
@@ -56,7 +54,7 @@ namespace device
       OSReturn_t ret;
       ret = OSReturn::OS_OK;
 
-      for (int i = m_retryLimit; i >= 0; --i)
+      for (int i = getRetryLimit(); i >= 0; --i)
         {
           ret = m_i2cDevice.probeDevice(m_i2cAddress);
           if (ret != OSReturn::OS_NACK)
@@ -86,7 +84,7 @@ namespace device
       OSReturn_t ret;
       ret = OSReturn::OS_OK;
 
-      for (int i = m_retryLimit; i >= 0; --i)
+      for (int i = getRetryLimit(); i >= 0; --i)
         {
           ret = m_i2cDevice.writeByteArrayReadByteArray(m_i2cAddress,
               outgoingBytes, sizeof(outgoingBytes), pIncomingBytes,
@@ -148,7 +146,7 @@ namespace device
           outgoingBytes[1] = ((address) & 0xFF);
           memcpy(outgoingBytes + 2, pOutgoingBytes, sliceLength);
 
-          for (int i = m_retryLimit; i >= 0; --i)
+          for (int i = getRetryLimit(); i >= 0; --i)
             {
               ret = m_i2cDevice.writeByteArray(m_i2cAddress, outgoingBytes,
                   sliceLength + 2);

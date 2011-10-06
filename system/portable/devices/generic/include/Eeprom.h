@@ -18,6 +18,8 @@ public:
   typedef uint16_t Address_t;
   typedef uint16_t BytesCount_t;
 
+  typedef int RetryLimit_t;
+
   // ----- Constructors & destructors -----------------------------------------
 
   Eeprom();
@@ -35,6 +37,12 @@ public:
 
   virtual OSReturn_t
   probeDevice(void) = 0;
+
+  void
+  setRetryLimit(RetryLimit_t retryLimit);
+
+  RetryLimit_t
+  getRetryLimit(void);
 
   virtual OSReturn_t
   readByteArray(Address_t address, uint8_t* pIncomingBytes,
@@ -71,6 +79,23 @@ public:
   writeString(Address_t address, uint8_t* pString, BytesCount_t size);
 
   // --------------------------------------------------------------------------
+
+private:
+
+  RetryLimit_t m_retryLimit;
+
 };
+
+inline void
+Eeprom::setRetryLimit(RetryLimit_t retryLimit)
+{
+  m_retryLimit = retryLimit;
+}
+
+inline Eeprom::RetryLimit_t
+Eeprom::getRetryLimit(void)
+{
+  return m_retryLimit;
+}
 
 #endif /* EEPROM_H_ */
