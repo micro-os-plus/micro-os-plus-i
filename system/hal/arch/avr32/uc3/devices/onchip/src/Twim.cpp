@@ -158,7 +158,7 @@ namespace avr32
         size_t* pIncomingBytesLength)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_WRITEBYTEARRAYREADBYTEARRAY)
-      OSDeviceDebug::putString("I2C a=");
+      OSDeviceDebug::putString(" TWIM a=");
       OSDeviceDebug::putHex(slaveAddress);
       OSDeviceDebug::putString(", wl=");
       OSDeviceDebug::putDec(outgoingBytesLength);
