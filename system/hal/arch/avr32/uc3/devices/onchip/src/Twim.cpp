@@ -340,7 +340,9 @@ namespace avr32
       // send data
       while ((transfer_status == TWI_SUCCESS) && !isIdle())
         {
+#if defined(OS_DEBUG_AVR32_UC3_TWIM_WRITEBYTEARRAYREADBYTEARRAY)
           OSDeviceDebug::putChar('w');
+#endif /* defined(OS_DEBUG_AVR32_UC3_TWIM_WRITEBYTEARRAYREADBYTEARRAY) */
           // we cannot use yield in inits :-(
           if (OSScheduler::isRunning())
             OSScheduler::yield();
