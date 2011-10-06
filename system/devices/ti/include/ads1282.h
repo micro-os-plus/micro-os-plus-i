@@ -97,7 +97,7 @@ namespace device
       class Ads1282
       {
       public:
-        Ads1282(avr32::uc3::SpiMaster& spi, avr32::uc3::Gpio gpioAds1282Drdy);
+        Ads1282(avr32::uc3::SpiMaster& spi, avr32::uc3::Gpio& gpioAds1282Drdy);
 
         void
         setGpioConfigurationArray(
