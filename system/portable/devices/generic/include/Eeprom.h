@@ -34,6 +34,9 @@ public:
   powerDown(void);
 
   virtual OSReturn_t
+  probeDevice(void) = 0;
+
+  virtual OSReturn_t
   readByteArray(Address_t address, uint8_t* pIncomingBytes,
       BytesCount_t incomingBytesSize, size_t* pIncomingBytesLength) = 0;
 
