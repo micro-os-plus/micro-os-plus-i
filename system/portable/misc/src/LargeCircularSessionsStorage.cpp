@@ -1138,8 +1138,17 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
       return OSReturn::OS_END_OF_COLLECTION;
     }
 
+  // Check if the next sessionId is higher
+  SessionUniqueId_t sessionId;
+  sessionId = Header::readSessionUniqueId(m_blockBuffer);
+  if (!(sessionId > m_currentSession.getUniqueId()))
+    {
+      OSDeviceDebug::putString(" END_OF_COLLECTION_(id) ");
+      return OSReturn::OS_END_OF_COLLECTION;
+    }
+
   // If valid, read header from block
-  nextSession.setUniqueId(Header::readSessionUniqueId(m_blockBuffer));
+  nextSession.setUniqueId(sessionId);
   nextSession.setNextSessionFirstBlockNumber(
       Header::readNextSessionFirstBlockNumber(m_blockBuffer));
   if (nextSession.getNextSessionFirstBlockNumber()
