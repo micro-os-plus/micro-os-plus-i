@@ -1118,7 +1118,7 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
 
   LargeCircularSessionsStorage::Session nextSession;
 
-  // Set next session begin one block further than current session end
+  // Set next session begins one block further than current session end
   nextSession.setFirstBlockNumber(
       getStorage().computeCircularSessionBlockNumber(
           m_currentSession.getLastBlockNumber(), 1));
