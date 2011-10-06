@@ -21,6 +21,8 @@ namespace device
       m_i2cDevice(device)
     {
       OSDeviceDebug::putConstructor("device::mcp::Mcp24aa32", this);
+
+      m_retryLimit = 0;
     }
 
     Mcp24aa32::~Mcp24aa32()
@@ -44,13 +46,22 @@ namespace device
     Mcp24aa32::initialise(void)
     {
       m_i2cDevice.initialise();
+
+      m_retryLimit = 0;
     }
 
     OSReturn_t
     Mcp24aa32::probeDevice(void)
     {
       OSReturn_t ret;
-      ret = m_i2cDevice.probeDevice(m_i2cAddress);
+      ret = OSReturn::OS_OK;
+
+      for (int i = m_retryLimit; i >= 0; --i)
+        {
+          ret = m_i2cDevice.probeDevice(m_i2cAddress);
+          if (ret != OSReturn::OS_NACK)
+            break;
+        }
 
       return ret;
     }
@@ -73,9 +84,17 @@ namespace device
       outgoingBytes[1] = ((address) & 0xFF);
 
       OSReturn_t ret;
-      ret = m_i2cDevice.writeByteArrayReadByteArray(m_i2cAddress,
-          outgoingBytes, sizeof(outgoingBytes), pIncomingBytes,
-          (size_t) incomingBytesSize, (size_t*) pIncomingBytesLength);
+      ret = OSReturn::OS_OK;
+
+      for (int i = m_retryLimit; i >= 0; --i)
+        {
+          ret = m_i2cDevice.writeByteArrayReadByteArray(m_i2cAddress,
+              outgoingBytes, sizeof(outgoingBytes), pIncomingBytes,
+              (size_t) incomingBytesSize, (size_t*) pIncomingBytesLength);
+
+          if (ret != OSReturn::OS_NACK)
+            break;
+        }
       if (ret != OSReturn::OS_OK)
         return ret;
 
@@ -129,8 +148,14 @@ namespace device
           outgoingBytes[1] = ((address) & 0xFF);
           memcpy(outgoingBytes + 2, pOutgoingBytes, sliceLength);
 
-          ret = m_i2cDevice.writeByteArray(m_i2cAddress, outgoingBytes,
-              sliceLength + 2);
+          for (int i = m_retryLimit; i >= 0; --i)
+            {
+              ret = m_i2cDevice.writeByteArray(m_i2cAddress, outgoingBytes,
+                  sliceLength + 2);
+
+              if (ret != OSReturn::OS_NACK)
+                break;
+            }
           if (ret != OSReturn::OS_OK)
             return ret;
 
