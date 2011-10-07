@@ -56,6 +56,7 @@ public:
   const static OSReturn_t OS_BAD_VERSION = -38;
   const static OSReturn_t OS_BAD_LENGTH = -39;
   const static OSReturn_t OS_NOT_ENOUGH_DATA = -40;
+  const static OSReturn_t OS_BAD_TIME = -41;
 };
 
 // ----------------------------------------------------------------------------
