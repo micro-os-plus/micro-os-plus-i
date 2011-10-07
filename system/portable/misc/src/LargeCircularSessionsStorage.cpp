@@ -1155,7 +1155,8 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
 
   LargeCircularSessionsStorage::Session nextSession;
 
-  // Set next session begins one block further than current session end
+  // Set the next session begin to one block further than
+  // the current session end
   nextSession.setFirstBlockNumber(
       getStorage().computeCircularSessionBlockNumber(
           m_currentSession.getLastBlockNumber(), 1));
@@ -1175,7 +1176,7 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
       return OSReturn::OS_END_OF_COLLECTION;
     }
 
-  // Check if the next sessionId is higher
+  // Check if the next session id is higher
   SessionUniqueId_t sessionId;
   sessionId = Header::readSessionUniqueId(m_blockBuffer);
   if (!(sessionId > m_currentSession.getUniqueId()))
@@ -1188,9 +1189,12 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
   nextSession.setUniqueId(sessionId);
   nextSession.setNextSessionFirstBlockNumber(
       Header::readNextSessionFirstBlockNumber(m_blockBuffer));
+
+  // Is this session already closed?
   if (nextSession.getNextSessionFirstBlockNumber()
       != Header::INVALID_BLOCKNUMBER)
     {
+      // Yes, we have all fields available
       nextSession.setLastBlockNumber(
           getStorage().computeCircularSessionBlockNumber(
               nextSession.getNextSessionFirstBlockNumber(), -1));
@@ -1200,15 +1204,24 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
               nextSession.getLastBlockNumber(),
               nextSession.getFirstBlockNumber()));
       nextSession.setCompletelyWritten(true);
+
+      // Make this next session the current session
+      m_currentSession = nextSession;
+    }
+  else if (getStorage().getMostRecentlyWrittenSession().isValid() && sessionId
+      == getStorage().getMostRecentlyWrittenSession().getUniqueId())
+    {
+      m_currentSession = getStorage().getMostRecentlyWrittenSession();
     }
   else
     {
+      //
       nextSession.setLastBlockNumber(Header::INVALID_BLOCKNUMBER);
       nextSession.setLength(0);
-    }
 
-  // Make the next session the current session
-  m_currentSession = nextSession;
+      // Make the next session the current session
+      m_currentSession = nextSession;
+    }
 
 #if true
   OSDeviceDebug::putString(" openNextSession() done id=");
