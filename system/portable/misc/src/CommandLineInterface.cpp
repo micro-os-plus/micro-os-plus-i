@@ -48,6 +48,7 @@ CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
     {
       int c;
 
+      // One new line is printed before the prompt
       c = readLine();
       if (c == std::traits::eof())
         {
@@ -78,6 +79,7 @@ CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
           return c;
         }
 
+      // one more new line before processing the line
       cout << std::endl;
       processLine();
     }
