@@ -37,7 +37,7 @@ public:
   virtual OSReturn_t
   prepareCheckCondition(void);
 
-  // Called to test when the condition is satisfied. Runs within a
+  // Called to test if the condition is satisfied. Runs within a
   // critical region and cannot use any system calls.
   // Being abstract, must be implemented by the derived class.
   //
