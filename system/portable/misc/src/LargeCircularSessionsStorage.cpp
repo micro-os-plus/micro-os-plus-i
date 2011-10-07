@@ -837,7 +837,8 @@ LargeCircularSessionsStorage::Writer::notifyReaders(void)
 
 LargeCircularSessionsStorage::Reader::Reader(
     LargeCircularSessionsStorage& storage) :
-  m_storage(storage), m_readSessionBlockCondition(*this)
+  m_storage(storage), m_readSessionBlockCondition(*this),
+      m_openSessionCondition(*this)
 {
   OSDeviceDebug::putConstructor_P(PSTR("LargeCircularSessionsStorage::Reader"),
       this);
@@ -867,6 +868,7 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
   OSReturn_t ret;
   ret = OSReturn::OS_OK;
 
+#if false
   while (!getStorage().getMostRecentlyWrittenSession().isValid())
     {
       // If there was no prior write, we need to search.
@@ -910,7 +912,7 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
 
               getStorage().getMostRecentlyWrittenSession() = m_currentSession;
               getStorage().getMostRecentlyWrittenSessionBlock()
-                  = m_currentBlock;
+              = m_currentBlock;
             }
         }
       os.sched.lock.exit();
@@ -930,7 +932,7 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
   // Did we ask for the newest session or the session we
   // asked is exactly the most recently written session?
   if ((sessionId == NEWEST_SESSSION_UNIQUE_ID) || (sessionId
-      == mostRecentSessionUniqueId))
+          == mostRecentSessionUniqueId))
     {
       goto sessionFound;
     }
@@ -975,12 +977,43 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
         }
 #endif
     }
+#else
+
+  // Set wait parameters
+  m_openSessionCondition.setSessionUniqueId(sessionId);
+
+  // If there are no sessions, or eventually the requested session is
+  // in the future, wait
+  ret = m_openSessionCondition.wait(getStorage().getEvent(), doNotBlock);
+  if (ret != OSReturn::OS_OK)
+    return ret;
+
+  os.sched.lock.enter();
+    {
+      // Get the most recently written session from the storage cache
+      m_currentSession = getStorage().getMostRecentlyWrittenSession();
+    }
+  os.sched.lock.exit();
+
+  // Now m_currentSession points to the most recently written session
+  SessionUniqueId_t mostRecentSessionUniqueId;
+  mostRecentSessionUniqueId = m_currentSession.getUniqueId();
+
+  // Did we ask for the newest session or the session we
+  // asked is exactly the most recently written session?
+  if (((sessionId == NEWEST_SESSSION_UNIQUE_ID) || (sessionId
+      == mostRecentSessionUniqueId)))
+    {
+      goto sessionFound;
+    }
+
+#endif
 
   // The storage has content and we were asked for a specific session.
   // Search for the given session id
   SessionUniqueId_t currentSessionUniqueId;
 
-  do
+  for (;;)
     {
       ret = openPreviousSession();
       if (ret == OSReturn::OS_END_OF_COLLECTION)
@@ -1002,22 +1035,26 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
 
       if (currentSessionUniqueId == sessionId)
         {
-          sessionFound: // label
-
-          OSDeviceDebug::putString(" openSession() done blks=");
-          OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
-          OSDeviceDebug::putString("-");
-          OSDeviceDebug::putDec(m_currentSession.getLastBlockNumber());
-          OSDeviceDebug::putNewLine();
-
-          return OSReturn::OS_OK;
+          break;
+        }
+      else if (currentSessionUniqueId < sessionId)
+        {
+          // Otherwise inform the caller that we could not find
+          // the requested session id
+          OSDeviceDebug::putString(" ITEM_NOT_FOUND ");
+          return OSReturn::OS_ITEM_NOT_FOUND;
         }
     }
-  while (currentSessionUniqueId > sessionId);
 
-  // Otherwise inform the caller we could not find the given session id
-  OSDeviceDebug::putString(" ITEM_NOT_FOUND ");
-  return OSReturn::OS_ITEM_NOT_FOUND;
+  sessionFound: // label
+
+  OSDeviceDebug::putString(" openSession() done blks=");
+  OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
+  OSDeviceDebug::putString("-");
+  OSDeviceDebug::putDec(m_currentSession.getLastBlockNumber());
+  OSDeviceDebug::putNewLine();
+
+  return OSReturn::OS_OK;
 }
 
 OSReturn_t
@@ -1390,6 +1427,123 @@ LargeCircularSessionsStorage::Reader::closeSession(void)
   OSDeviceDebug::putNewLine();
 
   return OSReturn::OS_OK;
+}
+
+// ============================================================================
+
+// ----- Constructors & destructors -------------------------------------------
+
+LargeCircularSessionsStorage::Reader::OpenCondition::OpenCondition(
+    Reader& reader) :
+  m_reader(reader)
+{
+  OSDeviceDebug::putConstructor_P(
+      PSTR("LargeCircularSessionsStorage::Reader::OpenCondition"), this);
+}
+
+LargeCircularSessionsStorage::Reader::OpenCondition::~OpenCondition()
+{
+  OSDeviceDebug::putDestructor_P(
+      PSTR("LargeCircularSessionsStorage::Reader::OpenCondition"), this);
+}
+
+// ----- Public methods -------------------------------------------------------
+
+OSReturn_t
+LargeCircularSessionsStorage::Reader::OpenCondition::prepareCheckCondition(void)
+{
+  OSReturn_t ret;
+  ret = OSReturn::OS_OK;
+
+  // Check if the storage knows of a previously written session
+  if (!getReader().getStorage().getMostRecentlyWrittenSession().isValid())
+    {
+      ;
+    }
+  else
+    {
+      LargeCircularSessionsStorage::Session currentSession;
+      LargeCircularSessionsStorage::SessionBlock currentBlock;
+
+      // If there was no prior write, we need to search.
+      // The result is in mostRecentlyWrittenBlock
+      ret = getReader().getStorage().searchMostRecentlyWrittenBlock(
+          getReader().getBlockBuffer(), currentBlock, currentSession);
+
+      if (ret == OSReturn::OS_OK)
+        {
+          os.sched.lock.enter();
+            {
+              if (!getReader().getStorage().getMostRecentlyWrittenSession().isValid())
+                {
+                  // Update the storage cache to point to this last session
+
+                  getReader().getStorage().getMostRecentlyWrittenSession()
+                      = currentSession;
+                  getReader().getStorage().getMostRecentlyWrittenSessionBlock()
+                      = currentBlock;
+                }
+            }
+          os.sched.lock.exit();
+        }
+      else if (ret == OSReturn::OS_NOT_FOUND)
+        {
+          OSDeviceDebug::putString(" SHOULD_WAIT ");
+          return OSReturn::OS_SHOULD_WAIT;
+        }
+      else
+        {
+          // for any other error, the search failed
+          return ret;
+        }
+    }
+
+  // Here the reader m_currentSession is not yet valid
+  SessionUniqueId_t mostRecentSessionUniqueId;
+  mostRecentSessionUniqueId
+      = getReader().getStorage().getMostRecentlyWrittenSession().getUniqueId();
+
+  // Did we ask for the newest session or the session we
+  // asked is exactly the most recently written session?
+  if ((m_sessionUniqueId == NEWEST_SESSSION_UNIQUE_ID) || (m_sessionUniqueId
+      == mostRecentSessionUniqueId))
+    {
+      return OSReturn::OS_OK;
+    }
+
+  // Did we ask for a future session?
+  if (m_sessionUniqueId > mostRecentSessionUniqueId)
+    {
+#if true
+      OSDeviceDebug::putString(" END_OF_COLLECTION ");
+      return OSReturn::OS_END_OF_COLLECTION;
+#else
+      OSDeviceDebug::putString(" SHOULD_WAIT ");
+      return OSReturn::OS_SHOULD_WAIT;
+#endif
+    }
+  return OSReturn::OS_OK;
+}
+
+// WARNING: runs within a scheduler critical section
+
+OSReturn_t
+LargeCircularSessionsStorage::Reader::OpenCondition::checkSynchronisedCondition(
+    void)
+{
+  if (getReader().getStorage().getMostRecentlyWrittenSession().isValid())
+    {
+      if (m_sessionUniqueId
+          <= getReader().getStorage().getMostRecentlyWrittenSession().getUniqueId())
+        {
+          // The session we are searching might be available
+          return OSReturn::OS_OK;
+        }
+    }
+
+  // If no session was ever written, or the requested session is
+  // in the future, wait.
+  return OSReturn::OS_SHOULD_WAIT;
 }
 
 // ============================================================================

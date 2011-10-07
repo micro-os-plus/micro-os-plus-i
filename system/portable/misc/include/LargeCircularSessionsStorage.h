@@ -515,6 +515,35 @@ public:
     Reader(LargeCircularSessionsStorage& storage);
     ~Reader();
 
+    class OpenCondition : public OSCondition
+    {
+    public:
+
+      OpenCondition(Reader& reader);
+      ~OpenCondition();
+
+      virtual OSReturn_t
+      prepareCheckCondition(void);
+
+      virtual OSReturn_t
+      checkSynchronisedCondition(void);
+
+      Reader&
+      getReader(void);
+
+      // Pass input parameter
+      void
+      setSessionUniqueId(SessionUniqueId_t sessionUniqueId);
+
+    private:
+
+      // Object that needs the synchronisation
+      Reader& m_reader;
+
+      // Input parameter
+      SessionUniqueId_t m_sessionUniqueId;
+    };
+
     class ReadCondition : public OSCondition
     {
     public:
@@ -528,6 +557,7 @@ public:
       virtual OSReturn_t
       checkSynchronisedCondition(void);
 
+      // Pass input parameter
       void
       setSessionBlockNumber(SessionBlockNumber_t blockNumber);
 
@@ -593,6 +623,9 @@ public:
     Session&
     getCurrentSession(void);
 
+    uint8_t*
+    getBlockBuffer(void);
+
   protected:
 
     // ----- Private members --------------------------------------------------
@@ -603,6 +636,7 @@ public:
     SessionBlock m_currentBlock;
 
     ReadCondition m_readSessionBlockCondition;
+    OpenCondition m_openSessionCondition;
 
     // temporary buffer
     uint8_t m_blockBuffer[512] __attribute__((aligned(4)));
@@ -786,12 +820,11 @@ LargeCircularSessionsStorage::Session::isCompletelyWritten(void)
   return m_isCompletelyWritten;
 }
 
-inline     void
+inline void
 LargeCircularSessionsStorage::Session::setCompletelyWritten(bool flag)
 {
   m_isCompletelyWritten = flag;
 }
-
 
 inline bool
 LargeCircularSessionsStorage::Session::isValid(void)
@@ -1019,6 +1052,12 @@ LargeCircularSessionsStorage::Reader::getStorage(void)
   return m_storage;
 }
 
+inline uint8_t*
+LargeCircularSessionsStorage::Reader::getBlockBuffer(void)
+{
+  return m_blockBuffer;
+}
+
 // Get the length of the current session, in session blocks
 inline LargeCircularSessionsStorage::SessionBlockCount_t
 LargeCircularSessionsStorage::Reader::getSessionLength(void)
@@ -1030,6 +1069,21 @@ inline LargeCircularSessionsStorage::Session&
 LargeCircularSessionsStorage::Reader::getCurrentSession(void)
 {
   return m_currentSession;
+}
+
+// ============================================================================
+
+inline void
+LargeCircularSessionsStorage::Reader::OpenCondition::setSessionUniqueId(
+    LargeCircularSessionsStorage::SessionUniqueId_t sessionUniqueId)
+{
+  m_sessionUniqueId = sessionUniqueId;
+}
+
+inline LargeCircularSessionsStorage::Reader&
+LargeCircularSessionsStorage::Reader::OpenCondition::getReader(void)
+{
+  return m_reader;
 }
 
 // ============================================================================
