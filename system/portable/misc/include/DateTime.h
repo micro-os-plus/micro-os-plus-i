@@ -74,6 +74,12 @@ public:
   OSReturn_t
   parseIso(const char* pStr);
 
+  OSReturn_t
+  parseNmeaDate(const char* pDate);
+
+  OSReturn_t
+  parseNmeaTime(const char* pTime);
+
   DurationSeconds_t
   computeSecondsFromEpoch(void);
 
@@ -92,6 +98,12 @@ public:
 
   Year_t
   getEpochYear(void);
+
+  bool
+  areDateFieldsValid(void);
+
+  bool
+  areTimeFieldsValid(void);
 
 #if defined(OS_INCLUDE_DATETIME_YEAR_EPOCH)
 

@@ -58,6 +58,8 @@ DateTime::~DateTime()
 OSReturn_t
 DateTime::parseIso(const char* pStr)
 {
+  DEBUG_ASSERT(pStr != NULL);
+
   if ((strlen(pStr) != 15) || pStr[8] != 'T')
     {
       OSDeviceDebug::putString(" parseIso() bad format ");
@@ -138,28 +140,17 @@ DateTime::parseIso(const char* pStr)
 
         }
     }
-  if ((m_year < getEpochYear()) || (m_month < 1) || (m_month > 12) || (m_day
-      < 1) || (m_day > 31) || (m_hour > 24) || (m_minute > 60) || (m_second
-      > 60))
+
+  if (!areTimeFieldsValid())
     {
-      OSDeviceDebug::putString(" parseIso() bad fields ");
-      return OSReturn::OS_BAD_DATE;
+      OSDeviceDebug::putString(" BAD_TIME (fields) ");
+      return OSReturn::OS_BAD_TIME;
     }
 
-  Day_t daysInMonth;
-  daysInMonth = daysInMonths[m_month - 1];
-
-  if (daysInMonth < 31)
+  if (!areDateFieldsValid())
     {
-      if (m_month == 2 && isLeapYear())
-        ++daysInMonth; // Adjust for February 29
-
-      // Check for impossible dates, like 'February 30', 'April 31', etc
-      if (m_day > daysInMonth)
-        {
-          OSDeviceDebug::putString(" parseIso() bad day ");
-          return OSReturn::OS_BAD_DATE;
-        }
+      OSDeviceDebug::putString(" BAD_DATE (fields) ");
+      return OSReturn::OS_BAD_DATE;
     }
 
   OSDeviceDebug::putString(" date ");
@@ -174,7 +165,189 @@ DateTime::parseIso(const char* pStr)
   OSDeviceDebug::putDec(m_minute, 2);
   OSDeviceDebug::putChar(':');
   OSDeviceDebug::putDec(m_second, 2);
-  OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putChar(' ');
+
+  return OSReturn::OS_OK;
+}
+
+bool
+DateTime::areDateFieldsValid(void)
+{
+  if ((m_year < getEpochYear()) || (m_month < 1) || (m_month > 12) || (m_day
+      < 1) || (m_day > 31))
+    {
+      return false;
+    }
+
+  Day_t daysInMonth;
+  daysInMonth = daysInMonths[m_month - 1];
+
+  if (daysInMonth < 31)
+    {
+      if (m_month == 2 && isLeapYear())
+        ++daysInMonth; // Adjust for February 29
+
+      // Check for impossible dates, like 'February 30', 'April 31', etc
+      if (m_day > daysInMonth)
+        {
+          return false;
+        }
+    }
+  return true;
+}
+
+bool
+DateTime::areTimeFieldsValid(void)
+{
+  if ((m_hour > 24) || (m_minute > 60) || (m_second > 60))
+    {
+      return false;
+    }
+
+  return true;
+}
+
+OSReturn_t
+DateTime::parseNmeaDate(const char* pDate)
+{
+  DEBUG_ASSERT(pDate != NULL);
+
+  if ((strlen(pDate) != 6))
+    {
+      OSDeviceDebug::putString(" BAD_DATE ");
+      return OSReturn::OS_BAD_DATE;
+    }
+
+  for (int i = 0; i < 6; ++i)
+    {
+      uchar_t ch;
+      ch = pDate[i];
+
+      uint8_t b;
+      if (('0' <= ch) && (ch <= '9'))
+        {
+          b = ch - '0';
+        }
+      else
+        {
+          OSDeviceDebug::putString(" BAD_DATE (ch) ");
+          return OSReturn::OS_BAD_DATE;
+        }
+      switch (i)
+        {
+      case 0:
+        m_day = b;
+        break;
+
+      case 1:
+        m_day = m_day * 10 + b;
+        break;
+
+      case 2:
+        m_month = b;
+        break;
+
+      case 3:
+        m_month = m_month * 10 + b;
+        break;
+
+      case 4:
+        m_year = b;
+        break;
+
+      case 5:
+        m_year = m_year * 10 + b;
+        m_year = m_year + 2000;
+        break;
+        }
+    }
+
+  if (!areDateFieldsValid())
+    {
+      OSDeviceDebug::putString(" BAD_DATE (fields) ");
+      return OSReturn::OS_BAD_DATE;
+    }
+
+  OSDeviceDebug::putString(" date ");
+  OSDeviceDebug::putDec(m_year, 4);
+  OSDeviceDebug::putChar('-');
+  OSDeviceDebug::putDec(m_month, 2);
+  OSDeviceDebug::putChar('-');
+  OSDeviceDebug::putDec(m_day, 2);
+  OSDeviceDebug::putChar(' ');
+
+  return OSReturn::OS_OK;
+}
+
+OSReturn_t
+DateTime::parseNmeaTime(const char* pTime)
+{
+  DEBUG_ASSERT(pTime != NULL);
+
+  if ((strlen(pTime) != 10) || pTime[6] != '.')
+    {
+      OSDeviceDebug::putString(" BAD_TIME ");
+      return OSReturn::OS_BAD_TIME;
+    }
+
+  for (int i = 0; i < 6; ++i)
+    {
+      uchar_t ch;
+      ch = pTime[i];
+
+      uint8_t b;
+      if (('0' <= ch) && (ch <= '9'))
+        {
+          b = ch - '0';
+        }
+      else
+        {
+          OSDeviceDebug::putString(" BAD_TIME (ch) ");
+          return OSReturn::OS_BAD_TIME;
+        }
+
+      switch (i)
+        {
+      case 0:
+        m_hour = b;
+        break;
+
+      case 1:
+        m_hour = m_hour * 10 + b;
+        break;
+
+      case 2:
+        m_minute = b;
+        break;
+
+      case 3:
+        m_minute = m_minute * 10 + b;
+        break;
+
+      case 4:
+        m_second = b;
+        break;
+
+      case 5:
+        m_second = m_second * 10 + b;
+        break;
+
+        }
+    }
+
+  if (!areTimeFieldsValid())
+    {
+      OSDeviceDebug::putString(" BAD_TIME (fields) ");
+      return OSReturn::OS_BAD_TIME;
+    }
+
+  OSDeviceDebug::putString(" time ");
+  OSDeviceDebug::putDec(m_hour, 2);
+  OSDeviceDebug::putChar(':');
+  OSDeviceDebug::putDec(m_minute, 2);
+  OSDeviceDebug::putChar(':');
+  OSDeviceDebug::putDec(m_second, 2);
+  OSDeviceDebug::putChar(' ');
 
   return OSReturn::OS_OK;
 }
