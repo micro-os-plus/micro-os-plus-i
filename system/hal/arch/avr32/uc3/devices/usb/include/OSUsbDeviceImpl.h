@@ -23,7 +23,6 @@
 
 #include "hal/arch/avr32/uc3/devices/usb/include/OSUsbDeviceDescriptors.h"
 
-
 // ----------------------------------------------------------------------------
 
 class OSUsbDeviceImpl
@@ -57,9 +56,11 @@ public:
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
   static uint32_t
-  usbReadEpRxPacket(uint8_t ep, void* rxbuf, uint32_t data_length, void** prxbuf);
+  usbReadEpRxPacket(uint8_t ep, void* rxbuf, uint32_t data_length,
+      void** prxbuf);
   static uint32_t
-  usbWriteEpTxPacket(uint8_t ep, const void* txbuf, uint32_t data_length, const void** ptxbuf);
+  usbWriteEpTxPacket(uint8_t ep, const void* txbuf, uint32_t data_length,
+      const void** ptxbuf);
   static void
   Usb_reset_endpoint_fifo_access(unsigned char ep);
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
@@ -329,6 +330,9 @@ public:
   Is_usb_endpoint_stall_requested(U8 ep);
 #endif /* defined(OS_CONFIG_FAMILY_AVR32UC3) */
 
+  static bool
+  isConnected(void);
+
   // members
   static unsigned char data_to_transfer;
   static PGM_VOID_P pbuffer;
@@ -348,6 +352,12 @@ public:
 
 //-----------------------------------------------------------------------------
 
+inline bool
+OSUsbDeviceImpl::isConnected(void)
+{
+  return usb_connected;
+}
+
 inline void
 OSUsbDeviceImpl::Usb_set_configuration_action(void)
 {
@@ -360,20 +370,17 @@ OSUsbDeviceImpl::Usb_sof_action(void)
   ; //sof_action();
 }
 
-
 inline void
 OSUsbDeviceImpl::Usb_resume_action(void)
 {
   ;
 }
 
-
 inline void
 OSUsbDeviceImpl::Usb_reset_action(void)
 {
   ;
 }
-
 
 inline void
 OSUsbDeviceImpl::Usb_suspend_action(void)
@@ -404,15 +411,15 @@ OSUsbDeviceImpl::Usb_wake_up_action(void)
 #if !defined(OS_INCLUDE_OSUSBDEVICEIMPL_VBUS_ACTIONS)
 inline void
 OSUsbDeviceImpl::Usb_vbus_on_action(void)
-{
-  ;
-}
+  {
+    ;
+  }
 
 inline void
 OSUsbDeviceImpl::Usb_vbus_off_action(void)
-{
-  ;
-}
+  {
+    ;
+  }
 
 #endif
 
