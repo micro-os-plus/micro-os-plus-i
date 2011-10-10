@@ -296,7 +296,7 @@ OSUsbDeviceImpl::usbDriverInit(void)
       /////////////////////
       // initialises the USB device controller.
       ////////////////////
-      usb_connected = FALSE;
+      usb_connected = false;
       usb_configuration_nb = 0;
 
       OSUsbDeviceImpl::Usb_disable();
