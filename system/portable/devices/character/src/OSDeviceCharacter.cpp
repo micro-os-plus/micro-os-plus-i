@@ -223,7 +223,7 @@ OSDeviceCharacter::close(void)
 
   if (!m_isOpened)
     {
-      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED_(close) "));
       return OSReturn::OS_NOT_OPENED;
     }
 
@@ -273,7 +273,7 @@ OSDeviceCharacter::writeByte(unsigned char b)
 
   if (!m_isOpened)
     {
-      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED_(wb) "));
       return OSReturn::OS_NOT_OPENED;
     }
 
@@ -376,7 +376,7 @@ OSDeviceCharacter::writeBytes(unsigned char* buf, int len)
 
   if (!m_isOpened)
     {
-      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED_(wba) "));
       return OSReturn::OS_NOT_OPENED;
     }
 
@@ -496,7 +496,7 @@ OSDeviceCharacter::flush(void)
 {
   if (!m_isOpened)
     {
-      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED_(flush) "));
       return OSReturn::OS_NOT_OPENED;
     }
 
@@ -532,7 +532,7 @@ OSDeviceCharacter::readByte(void)
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
       m_pReadMatchArray = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
-      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED_(rb) "));
       return OSReturn::OS_NOT_OPENED;
     }
 
@@ -541,7 +541,7 @@ OSDeviceCharacter::readByte(void)
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
       m_pReadMatchArray = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
-      OSDeviceDebug::putString_P(PSTR(" CANCELLED "));
+      OSDeviceDebug::putString_P(PSTR(" CANCELLED_(rb) "));
       return OSReturn::OS_CANCELLED;
     }
 
@@ -674,7 +674,7 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
       m_pReadMatchArray = 0;
       *count = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
-      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED "));
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED_(rba) "));
       return OSReturn::OS_NOT_OPENED;
     }
 
