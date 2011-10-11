@@ -54,6 +54,8 @@ namespace avr32
         {
           pRegionsArray[i].status = avr32::uc3::pdca::IS_EMPTY_MASK;
           pRegionsArray[i].externStatus = avr32::uc3::pdca::EXT_STATUS_OK;
+          pRegionsArray[i].isFree = true;
+          pRegionsArray[i].isOverrun = false;
         }
     }
 
@@ -87,6 +89,7 @@ namespace avr32
       registers.writeMemoryAddress(m_pRegionsArray[0].address);
       registers.writeTransferCount(m_pRegionsArray[0].size);
       m_pRegionsArray[0].externStatus = avr32::uc3::pdca::EXT_STATUS_OK;
+      m_pRegionsArray[0].isFree = false;
       m_currentRegionIndex = 0;
       m_candidateNotif = 0;
 
@@ -451,6 +454,16 @@ namespace avr32
               // disable RCZ interrupt
               registers.writeInterruptDisable(AVR32_PDCA_IDR_RCZ_MASK);
             }
+
+          // Set buffer as full.
+          if (!m_pRegionsArray[m_currentRegionIndex].isFree)
+            {
+              m_pRegionsArray[m_currentRegionIndex].isOverrun
+                  = true;
+            }
+
+          m_pRegionsArray[m_currentRegionIndex].isFree = false;
+            
         }
       if ((interruptFlag & AVR32_PDCA_IER_TRC_MASK) != 0) // transfer complete
         {

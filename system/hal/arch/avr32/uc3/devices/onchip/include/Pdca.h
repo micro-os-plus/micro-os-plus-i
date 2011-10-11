@@ -60,7 +60,28 @@ namespace avr32
         RegionStatus_t status;
         RegionExternStatus_t externStatus;
         uint16_t wordsRemaining;
+
+        volatile bool isOverrun; // // Used only for RX regions.
+        volatile bool isFree; // Used only for RX regions.
+
+        void
+        free(void);
+
+        void
+        clearOverrunStatus(void);
       } Region_t;
+
+      inline void
+      Region_t::free(void)
+      {
+        isFree = true;
+      }
+
+      inline void
+      Region_t::clearOverrunStatus(void)
+      {
+        isOverrun = false;
+      }
 
       typedef enum PeripheralId_e
       {
