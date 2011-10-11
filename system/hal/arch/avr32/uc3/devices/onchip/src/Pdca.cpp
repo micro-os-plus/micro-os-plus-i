@@ -55,7 +55,6 @@ namespace avr32
           pRegionsArray[i].status = avr32::uc3::pdca::IS_EMPTY_MASK;
           pRegionsArray[i].externStatus = avr32::uc3::pdca::EXT_STATUS_OK;
           pRegionsArray[i].isFree = true;
-          pRegionsArray[i].isOverrun = false;
         }
     }
 
@@ -414,6 +413,24 @@ namespace avr32
     }
 
     void
+    PdcaReceive::freeRegion(int regionIdx)
+    {
+      m_pRegionsArray[regionIdx].isFree = true;
+    }
+
+    bool
+    PdcaReceive::isOverrun(void)
+    {
+      return m_isOverrun;
+    }
+
+    void
+    PdcaReceive::clearOverrunStatus(void)
+    {
+      m_isOverrun = false;
+    }
+
+    void
     PdcaReceive::interruptServiceRoutine(void)
     {
       uint32_t interruptFlag;
@@ -458,12 +475,11 @@ namespace avr32
           // Set buffer as full.
           if (!m_pRegionsArray[m_currentRegionIndex].isFree)
             {
-              m_pRegionsArray[m_currentRegionIndex].isOverrun
-                  = true;
+              m_isOverrun = true;
             }
 
           m_pRegionsArray[m_currentRegionIndex].isFree = false;
-            
+
         }
       if ((interruptFlag & AVR32_PDCA_IER_TRC_MASK) != 0) // transfer complete
         {
