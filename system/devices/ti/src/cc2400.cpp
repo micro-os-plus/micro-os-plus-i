@@ -270,6 +270,8 @@ namespace device
       m_mdmTxStrb.setPinLow();
       m_mdmRxStrb.setPinLow();
 
+      //no need to send SRFOFF, just stop power supplies
+#if false
       registers.setSpiHighSpeed();
 
       // send SRFOFF, just to make sure
@@ -297,6 +299,7 @@ namespace device
             }
           while ((status & device::ti::cc2400::Status::FS_LOCK) != 0);
         }
+#endif
 
       // ??? cannot stop XOSC;
 #if false
