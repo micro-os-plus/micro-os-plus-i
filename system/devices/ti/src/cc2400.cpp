@@ -264,7 +264,9 @@ namespace device
     void
     Cc2400::powerOff(void)
     {
+#if false
       device::ti::cc2400::Status_t status;
+#endif
 
       // make sure RX and TX pins are low
       m_mdmTxStrb.setPinLow();
