@@ -157,6 +157,16 @@ namespace avr32
         uint8_t* pIncomingBytes, size_t incomingBytesSize,
         size_t* pIncomingBytesLength)
     {
+      if (outgoingBytesLength > 0xFF)
+        {
+          OSDeviceDebug::putString(" BAD_PARAMETER_(wl) ");
+          return OSReturn::OS_BAD_PARAMETER;
+        }
+      if (incomingBytesSize > 0xFF)
+        {
+          OSDeviceDebug::putString(" BAD_PARAMETER_(rl) ");
+          return OSReturn::OS_BAD_PARAMETER;
+        }
 #if defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_WRITEBYTEARRAYREADBYTEARRAY)
       OSDeviceDebug::putString(" TWIM a=");
       OSDeviceDebug::putHex(slaveAddress);
@@ -173,6 +183,10 @@ namespace avr32
         }
       OSDeviceDebug::putString("], rl=");
       OSDeviceDebug::putDec(incomingBytesSize);
+      if (pIncomingBytesLength == NULL)
+        {
+          OSDeviceDebug::putString(", null");
+        }
       OSDeviceDebug::putChar(' ');
 #endif /* defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_WRITEBYTEARRAYREADBYTEARRAY) */
 
@@ -190,7 +204,10 @@ namespace avr32
         }
 
       if (!isEnabled())
-        return OSReturn::OS_NOT_ENABLED;
+        {
+          OSDeviceDebug::putString(" NOT_ENABLED ");
+          return OSReturn::OS_NOT_ENABLED;
+        }
 
       bool isTenBit;
       isTenBit = isAddressTenBit(slaveAddress);
@@ -374,24 +391,27 @@ namespace avr32
 
 #if defined(DEBUG) && defined(OS_DEBUG_AVR32_UC3_TWIM_WRITEBYTEARRAYREADBYTEARRAY)
 
-       if (twim_rx_ef_bytes > 0)
-         {
-           OSDeviceDebug::putString(" [");
-           for (size_t i = 0; i < twim_rx_ef_bytes; ++i)
-             {
-               if (i != 0)
-                 {
-                   OSDeviceDebug::putChar(',');
-                 }
-               OSDeviceDebug::putHex(pIncomingBytes[i]);
-             }
-           OSDeviceDebug::putString("]");
-         }
-       OSDeviceDebug::putNewLine();
+      if (twim_rx_ef_bytes > 0)
+        {
+          OSDeviceDebug::putString(" [");
+          for (size_t i = 0; i < twim_rx_ef_bytes; ++i)
+            {
+              if (i != 0)
+                {
+                  OSDeviceDebug::putChar(',');
+                }
+              OSDeviceDebug::putHex(pIncomingBytes[i]);
+            }
+          OSDeviceDebug::putString("]");
+        }
+      else
+        {
+          OSDeviceDebug::putString(" OK");
+        }
+      OSDeviceDebug::putNewLine();
 
 #endif /* defined(OS_DEBUG_AVR32_UC3_TWIM_WRITEBYTEARRAYREADBYTEARRAY) */
 
-      //OSDeviceDebug::putString(" OK ");
       return OSReturn::OS_OK;
     }
 
