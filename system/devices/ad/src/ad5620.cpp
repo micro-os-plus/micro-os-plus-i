@@ -30,6 +30,10 @@ namespace device
 #else
       m_shadowValue = ad5620::Value::MIN;
 #endif /* defined(OS_CFGBOOL_DEVICE_AD_AD5620_START_WITH_MIDDLE_VALUE) */
+
+      m_middleValue = ad5620::Value::MIDDLE;
+      m_minSignedValue = ad5620::Value::MIN - ad5620::Value::MIDDLE;
+      m_maxSignedValue = ad5620::Value::MAX - ad5620::Value::MIDDLE;
     }
 
     Ad5620::~Ad5620()
@@ -88,25 +92,49 @@ namespace device
       OSReturn_t ret;
       ret = OSReturn::OS_OK;
 
-      if (signedValue < ad5620::Value::SIGNED_MIN)
+      if (signedValue < m_minSignedValue)
         {
-          signedValue = ad5620::Value::SIGNED_MIN;
+          signedValue = m_minSignedValue;
           ret = OSReturn::OS_OUT_OF_RANGE;
         }
-      else if (signedValue > ad5620::Value::SIGNED_MAX)
+      else if (signedValue > m_maxSignedValue)
         {
-          signedValue = ad5620::Value::SIGNED_MAX;
+          signedValue = m_maxSignedValue;
           ret = OSReturn::OS_OUT_OF_RANGE;
         }
 
       ad5620::Value_t value;
-      value = ad5620::Value::MIDDLE;
+      if (signedValue >= 0)
+        {
+          value = ((ad5620::Value_t) signedValue);
 
-      value += signedValue;
+          value += m_middleValue;
+          if (value > ad5620::Value::MAX)
+            value = ad5620::Value::MAX;
+        }
+      else
+        {
+          value = ((ad5620::Value_t) (-signedValue));
+
+          if (value <= m_middleValue)
+            {
+              value = m_middleValue - value;
+            }
+          else
+            {
+              value = 0;
+            }
+        }
 
       writeValue(value);
 
       return ret;
+    }
+
+    ad5620::SignedValue_t
+    Ad5620::getPreviouslyWrittenSignedValue(void)
+    {
+      return m_shadowValue - m_middleValue;
     }
 
     void
@@ -148,6 +176,15 @@ namespace device
         writeValue(m_shadowValue - 1);
 
       return m_shadowValue;
+    }
+
+    void
+    Ad5620::setMiddleValue(ad5620::Value_t value)
+    {
+      m_middleValue = value;
+
+      m_minSignedValue = ad5620::Value::MIN - m_middleValue;
+      m_maxSignedValue = ad5620::Value::MAX - m_middleValue;
     }
 
   // --------------------------------------------------------------------------

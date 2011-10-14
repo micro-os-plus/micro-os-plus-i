@@ -41,8 +41,8 @@ namespace device
         const static Value_t MAX = VALIDATION_MASK;
         const static Value_t MIDDLE = (MIN + ((MAX - MIN) / 2));
 
-        const static SignedValue_t SIGNED_MIN = MIN-MIDDLE;
-        const static SignedValue_t SIGNED_MAX = MAX-MIDDLE;
+        const static SignedValue_t SIGNED_MIN = MIN - MIDDLE;
+        const static SignedValue_t SIGNED_MAX = MAX - MIDDLE;
 
       };
 
@@ -113,6 +113,9 @@ namespace device
       ad5620::Value_t
       getPreviouslyWrittenValue(void);
 
+      ad5620::SignedValue_t
+      getPreviouslyWrittenSignedValue(void);
+
       // Also return new value
       ad5620::Value_t
       incrementValue(void);
@@ -121,16 +124,57 @@ namespace device
       ad5620::Value_t
       decrementValue(void);
 
+      ad5620::Value_t
+      getMiddleValue(void);
+
+      void
+      setMiddleValue(ad5620::Value_t value);
+
+      void
+      setMinSignedValue(ad5620::SignedValue_t value);
+
+      void
+      setMaxSignedValue(ad5620::SignedValue_t value);
+
       // ----- Private members ------------------------------------------------
 
       ad5620::ChipSelectActiveLow_t& m_cs;
       ad5620::SpiMaster_t& m_spi;
 
       ad5620::Value_t m_shadowValue;
+      ad5620::Value_t m_middleValue;
+
+      ad5620::SignedValue_t m_minSignedValue;
+      ad5620::SignedValue_t m_maxSignedValue;
 
       // ----------------------------------------------------------------------
 
     };
+
+    inline ad5620::Value_t
+    Ad5620::getMiddleValue(void)
+    {
+      return m_middleValue;
+    }
+
+    inline void
+    Ad5620::setMinSignedValue(ad5620::SignedValue_t value)
+    {
+      m_minSignedValue = value;
+    }
+
+    inline void
+    Ad5620::setMaxSignedValue(ad5620::SignedValue_t value)
+    {
+      m_maxSignedValue = value;
+    }
+
+    inline ad5620::Value_t
+    Ad5620::getPreviouslyWrittenValue(void)
+    {
+      return m_shadowValue;
+    }
+
   }
 }
 
