@@ -15,13 +15,13 @@
 #include "portable/kernel/include/OSTimerRtc.h"
 
 // static members
-OSTimerStruct_t OSTimerRtc::m_array[OS_CFGINT_OSTIMERTC_SIZE];
+OSTimerStruct_t volatile OSTimerRtc::m_array[OS_CFGINT_OSTIMERTC_SIZE];
 #if defined(OS_INCLUDE_OSTIMERRTC_UPTIME)
-OSTime_t OSTimerRtc::ms_uptime;
+OSTime_t volatile OSTimerRtc::ms_uptime;
 #endif
 
 OSTimerRtc::OSTimerRtc() :
-  OSTimer(&m_array[0], sizeof(m_array) / sizeof(m_array[0]))
+  OSTimer((OSTimerStruct_t*)&m_array[0], sizeof(m_array) / sizeof(m_array[0]))
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSTimerRtc"), this);
 

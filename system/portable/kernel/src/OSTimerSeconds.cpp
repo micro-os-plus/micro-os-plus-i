@@ -15,14 +15,14 @@
 #include "portable/kernel/include/OSTimerSeconds.h"
 
 // static members
-OSTimerStruct_t OSTimerSeconds::m_array[OS_CFGINT_OSTIMERSECONDS_SIZE];
-OSTimerTicks_t OSTimerSeconds::ms_schedulerTicks;
+OSTimerStruct_t volatile OSTimerSeconds::m_array[OS_CFGINT_OSTIMERSECONDS_SIZE];
+OSTimerTicks_t volatile OSTimerSeconds::ms_schedulerTicks;
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
-OSTime_t OSTimerSeconds::ms_uptime;
+OSTime_t volatile OSTimerSeconds::ms_uptime;
 #endif
 
 OSTimerSeconds::OSTimerSeconds() :
-OSTimer(&m_array[0], sizeof(m_array)/sizeof(m_array[0]))
+OSTimer((OSTimerStruct_t*)&m_array[0], sizeof(m_array)/sizeof(m_array[0]))
   {
     OSDeviceDebug::putConstructor_P(PSTR("OSTimerSeconds"), this);
 

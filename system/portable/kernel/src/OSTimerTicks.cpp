@@ -13,13 +13,13 @@
 #include "portable/kernel/include/OSTimerTicks.h"
 
 // static members
-OSTimerStruct_t OSTimerTicks::m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
+OSTimerStruct_t volatile OSTimerTicks::m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
 
 // TODO: delete if not needed
 // OSTimerTicks_t OSTimerTicks::ms_secondTicks;
 
 OSTimerTicks::OSTimerTicks() :
-  OSTimer(&m_array[0], sizeof(m_array) / sizeof(m_array[0]))
+  OSTimer((OSTimerStruct_t*)&m_array[0], sizeof(m_array) / sizeof(m_array[0]))
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSTimerTicks"), this);
 }

@@ -73,7 +73,7 @@ protected:
 
 private:
   // the current number of ticks
-  OSTimerTicks_t ms_ticks;
+  OSTimerTicks_t volatile ms_ticks;
   };
 
 inline OSTimerTicks_t OSTimer::getTicks(void) const

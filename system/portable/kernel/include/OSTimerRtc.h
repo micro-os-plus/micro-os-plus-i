@@ -52,11 +52,11 @@ protected:
 
 private:
   // contain the timeouts(expressed in ticks) for every alarm
-  static OSTimerStruct_t m_array[OS_CFGINT_OSTIMERTC_SIZE];
+  static OSTimerStruct_t volatile m_array[OS_CFGINT_OSTIMERTC_SIZE];
 
 #if defined(OS_INCLUDE_OSTIMERRTC_UPTIME)
   // current seconds number
-  static OSTime_t ms_uptime;
+  static OSTime_t volatile ms_uptime;
 #endif
 };
 

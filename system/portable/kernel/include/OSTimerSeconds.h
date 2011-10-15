@@ -45,7 +45,7 @@ public:
   interruptServiceRoutine(void);
 
   // the number of OS ticks within current second
-  static OSTimerTicks_t ms_schedulerTicks;
+  static OSTimerTicks_t volatile ms_schedulerTicks;
 
 protected:
   // OSScheduler calls OSTimerSeconds::initialise() from OSScheduler::start()
@@ -59,11 +59,11 @@ protected:
 
 private:
   // contain the timeouts(expressed in ticks) for every alarm
-  static OSTimerStruct_t m_array[OS_CFGINT_OSTIMERSECONDS_SIZE];
+  static OSTimerStruct_t volatile m_array[OS_CFGINT_OSTIMERSECONDS_SIZE];
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
   // current seconds number
-  static OSTime_t ms_uptime;
+  static OSTime_t volatile ms_uptime;
 #endif
 };
 

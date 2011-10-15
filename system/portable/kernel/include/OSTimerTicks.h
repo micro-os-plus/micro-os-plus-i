@@ -50,7 +50,7 @@ protected:
 
 private:
   // contain the timeouts (expressed in ticks) for every alarm
-  static OSTimerStruct_t m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
+  static OSTimerStruct_t volatile m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
   };
 
 // transform  the microseconds number into ticks number
