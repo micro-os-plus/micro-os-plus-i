@@ -22,11 +22,12 @@ OSTimer::OSTimer(OSTimerStruct_t* pArray, int size)
 // sleep the given ticks (non-zero)
 // normally return OSEventWaitReturn::OS_VOID
 // return OSEventWaitReturn::OS_IMMEDIATELY if no sleep
-// return custom if canceled
+// return custom if cancelled
 OSEventWaitReturn_t
 OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
 {
   OSEventWaitReturn_t ret;
+
   if (ticks != 0)
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_SLEEP)
@@ -35,6 +36,23 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
       OSDeviceDebug::putChar(')');
       //OSDeviceDebug::putNewLine();
 #endif /* OS_DEBUG_OSTIMER_SLEEP */
+
+#if true
+      if (OSSchedulerLock::isSet())
+        {
+          OSTimerTicks_t begTicks;
+          begTicks = getTicks();
+
+          while ((getTicks() - begTicks) < ticks)
+            {
+              // Busy wait
+              OSCPUImpl::watchdogReset();
+            }
+
+          ret = OSEventWaitReturn::OS_VOID;
+          return ret;
+        }
+#endif
 
       if (event == 0)
         {
