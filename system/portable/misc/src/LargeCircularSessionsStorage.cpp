@@ -528,6 +528,8 @@ LargeCircularSessionsStorage::Writer::createSession(
     SessionUniqueId_t sessionUniqueId)
 {
   OSDeviceDebug::putString(" createSession() sid=");
+  OSDeviceDebug::putHex(sessionUniqueId);
+  OSDeviceDebug::putString(", csid=");
   OSDeviceDebug::putHex(m_currentSession.getUniqueId());
   OSDeviceDebug::putChar(' ');
 
@@ -624,10 +626,27 @@ LargeCircularSessionsStorage::Writer::createSession(
     {
       // Subsequent sessions, i.e. most recently written block is known
 
-      // The forward reference should have been updated at closeSession().
+      // The forward reference should have been updated at closeSession()
+      // but if we write after a read, the internal cache is not set, so
+      // better initialise everything from scratch
 
-      // The m_currentBlockNumber and the m_currentHeader header were already
-      // updated by the previous writeSessionBlock()
+      os.sched.lock.enter();
+        {
+          // Update the local references to storage to the most recently
+          // written session
+
+          m_currentSession = getStorage().getMostRecentlyWrittenSession();
+          m_currentBlock = getStorage().getMostRecentlyWrittenSessionBlock();
+        }
+      os.sched.lock.exit();
+
+      // Increment the block number
+      m_currentBlock.setBlockNumber(
+          getStorage().computeCircularSessionBlockNumber(
+              m_currentBlock.getBlockNumber(), 1));
+
+      // Increment the monotone increasing unique block number
+      m_currentBlock.incrementUniqueId();
 
       if (sessionUniqueId != NEXT_SESSSION_UNIQUE_ID)
         {
@@ -654,7 +673,9 @@ LargeCircularSessionsStorage::Writer::createSession(
   m_currentSession.setLength(0);
   m_currentSession.setCompletelyWritten(false);
 
-  OSDeviceDebug::putString(" createSession() done bid=");
+  OSDeviceDebug::putString(" createSession() done sid=");
+  OSDeviceDebug::putHex(m_currentSession.getUniqueId());
+  OSDeviceDebug::putString(", bid=");
   OSDeviceDebug::putHex(m_currentBlock.getUniqueId());
   OSDeviceDebug::putString(", bno=");
   OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
@@ -862,6 +883,8 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
     bool doNotBlock)
 {
   OSDeviceDebug::putString(" openSession() sid=");
+  OSDeviceDebug::putHex(sessionId);
+  OSDeviceDebug::putString(", csid=");
   OSDeviceDebug::putHex(m_currentSession.getUniqueId());
   OSDeviceDebug::putChar(' ');
 
@@ -1052,6 +1075,8 @@ LargeCircularSessionsStorage::Reader::openSession(SessionUniqueId_t sessionId,
   OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
   OSDeviceDebug::putString("-");
   OSDeviceDebug::putDec(m_currentSession.getLastBlockNumber());
+  OSDeviceDebug::putString(" ");
+  OSDeviceDebug::putDec(m_currentSession.getLength());
   OSDeviceDebug::putNewLine();
 
   return OSReturn::OS_OK;
@@ -1137,6 +1162,8 @@ LargeCircularSessionsStorage::Reader::openPreviousSession(void)
   OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
   OSDeviceDebug::putString("-");
   OSDeviceDebug::putDec(m_currentSession.getLastBlockNumber());
+  OSDeviceDebug::putString(" ");
+  OSDeviceDebug::putDec(m_currentSession.getLength());
   OSDeviceDebug::putNewLine();
 
   ret = OSReturn::OS_OK;
@@ -1226,7 +1253,7 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
 #if true
   OSDeviceDebug::putString(" openNextSession() done id=");
   OSDeviceDebug::putHex(m_currentSession.getUniqueId());
-  OSDeviceDebug::putString(", blocks=");
+  OSDeviceDebug::putString(", blks=");
   OSDeviceDebug::putDec(m_currentSession.getFirstBlockNumber());
   OSDeviceDebug::putString("-");
   if (m_currentSession.getLastBlockNumber() != Header::INVALID_BLOCKNUMBER)
@@ -1237,6 +1264,8 @@ LargeCircularSessionsStorage::Reader::openNextSession(void)
     {
       OSDeviceDebug::putChar('?');
     }
+  OSDeviceDebug::putString(" ");
+  OSDeviceDebug::putDec(m_currentSession.getLength());
   OSDeviceDebug::putNewLine();
 #endif
 
@@ -1470,10 +1499,6 @@ LargeCircularSessionsStorage::Reader::OpenCondition::prepareCheckCondition(void)
 
   // Check if the storage knows of a previously written session
   if (!getReader().getStorage().getMostRecentlyWrittenSession().isValid())
-    {
-      ;
-    }
-  else
     {
       LargeCircularSessionsStorage::Session currentSession;
       LargeCircularSessionsStorage::SessionBlock currentBlock;
