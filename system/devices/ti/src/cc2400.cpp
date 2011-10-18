@@ -425,7 +425,7 @@ namespace device
       status = writeRegUseCs(device::ti::cc2400::Register::INT, (uint16_t) 16);
 
       // Wait until crystal oscillator is stable
-
+      //OSDeviceDebug::putString("X");
       readFsmState(status);
       m_cs.assert();
         {
@@ -445,6 +445,7 @@ namespace device
       OSDeviceDebug::putNewLine();
       readFsmState(status);
 #endif
+      //OSDeviceDebug::putString("Y");
     }
 
     // read all FIFO buffer to empty it
@@ -545,7 +546,7 @@ namespace device
 #endif
 
       // add the offset of the modem (-54dB) as in datasheet
-      rssiValue += RSSI_OFFSET;
+      rssiValue += cc2400::RSSI_OFFSET;
 
 #if false
       OSDeviceDebug::putString(" 3:");

@@ -111,7 +111,9 @@ OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
 
   if (count == 1)
     {
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
       OSDebugLed1::on();
+#endif
         {
           ret = prepareReadBlock(blockNumber);
           if (ret == OSReturn::OS_OK)
@@ -120,7 +122,9 @@ OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
               ret = finaliseReadBlock();
             }
         }
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
       OSDebugLed1::off();
+#endif
     }
   else
     {
@@ -136,7 +140,9 @@ OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
       for (; (count > 0) && (ret == OSReturn::OS_OK); count--, blockNumber++, pBuf
           += 512)
         {
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
           OSDebugLed1::on();
+#endif
             {
               ret = prepareReadBlock(blockNumber);
               if (ret == OSReturn::OS_OK)
@@ -146,7 +152,9 @@ OSDeviceMemoryCard::readBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
                   ret = finaliseReadBlock();
                 }
             }
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
           OSDebugLed1::off();
+#endif
         }
 #endif
     }
@@ -176,7 +184,9 @@ OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
 
   if (count == 1)
     {
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
       OSDebugLed1::on();
+#endif
         {
           ret = prepareWriteBlock(blockNumber);
           if (ret == OSReturn::OS_OK)
@@ -185,7 +195,9 @@ OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
               ret = finaliseWriteBlock();
             }
         }
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
       OSDebugLed1::off();
+#endif
     }
   else
     {
@@ -201,7 +213,9 @@ OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
       for (; (count > 0) && (ret == OSReturn::OS_OK); count--, blockNumber++, pBuf
           += 512)
         {
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
           OSDebugLed1::on();
+#endif
             {
               ret = prepareWriteBlock(blockNumber);
               if (ret == OSReturn::OS_OK)
@@ -211,7 +225,9 @@ OSDeviceMemoryCard::writeBlocks(OSDeviceBlock::BlockNumber_t blockNumber,
                   ret = finaliseWriteBlock();
                 }
             }
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
           OSDebugLed1::off();
+#endif
         }
 #endif
     }
@@ -318,8 +334,9 @@ OSDeviceMemoryCard::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attri
       addr2 <<= 9;
       addr2 += 511;
     }
-
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
   OSDebugLed1::on();
+#endif
     {
       // Select Slot card and prepare access
       ret = prepareAccess();
@@ -344,7 +361,9 @@ OSDeviceMemoryCard::eraseBlocks(OSDeviceBlock::BlockNumber_t blockNumber __attri
         }
 #endif
     }
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
   OSDebugLed1::off();
+#endif
 
   return ret;
 }
@@ -392,7 +411,9 @@ OSDeviceMemoryCard::waitNotBusy(void)
 OSReturn_t
 OSDeviceMemoryCard::initialise(void)
 {
+#if defined(OS_INCLUDE_OSDEVICEMEMORYCARD_OSDEBUGLED)
   OSDebugLed1::init();
+#endif
 
   m_implementation.initialise();
 

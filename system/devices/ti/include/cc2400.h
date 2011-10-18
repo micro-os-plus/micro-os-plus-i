@@ -39,6 +39,9 @@ namespace device
 
       typedef uint8_t TxPowerLevel_t;
 
+      // the offset of RSSI value, recorded inside RSSIREG
+      const static int16_t RSSI_OFFSET = -54;
+
       class TxPowerLevel
       {
       public:
@@ -272,9 +275,6 @@ namespace device
       //  assert CS, writes a CC2400 register, de-assert CS
       device::ti::cc2400::Status_t
       writeRegUseCs(device::ti::cc2400::RegisterId_t reg, uint16_t value);
-
-      // the offset of RSSI register
-      const static int16_t RSSI_OFFSET = -54;
 
       ChipSelectActiveLow& m_cs;
 
