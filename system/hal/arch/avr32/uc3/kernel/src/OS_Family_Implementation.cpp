@@ -246,7 +246,16 @@ void
 os_ex_nmi(void)
 {
 #if defined(OS_INCLUDE_OSAPPLICATIONIMPL_NONMASKABLEINTERRUPTHANDLER)
+  __asm__ __volatile__ (
+    "pushm   r0-r12, lr\n\t"  /* Save registers not saved upon NMI exception. */
+  );
+
   OSApplicationImpl::nonMaskableInterruptHandler();
+
+  __asm__ __volatile__ (
+    "popm   r0-r12, lr\n\t"   /* Restore the registers. */
+  );
+
   OSCPU::returnFromInterrupt();
 #else
   os_exception_handler(7, "NMI");
