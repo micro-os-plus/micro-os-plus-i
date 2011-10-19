@@ -168,6 +168,11 @@ namespace device
         OS::busyWaitMicros(T_SYNC_SPWH_US);
 
         m_gpioAds1282Sync.setPinLow();
+
+        // wait tSPWH > 2/fclck (0.488us)
+        OS::busyWaitMicros(T_SYNC_SPWL_US);
+
+        m_gpioAds1282Sync.setPinHigh();
       }
 
       OSReturn_t

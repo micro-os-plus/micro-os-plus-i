@@ -43,6 +43,9 @@ namespace device
       // SYNC pulse width, high. Min = 2/fclk.
       static const uint32_t T_SYNC_SPWH_US = (2 * 1000 * 1000) / SCLCK + 1;
 
+      // SYNC pulse width, low. Min = 2/fclk.
+      static const uint32_t T_SYNC_SPWL_US = (2 * 1000 * 1000) / SCLCK + 1;
+
       // RESET low. Min = 2/fclk.
       static const uint32_t T_RST_US = (2 * 1000 * 1000) / SCLCK + 1;
 
