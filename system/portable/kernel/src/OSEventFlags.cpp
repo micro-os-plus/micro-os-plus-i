@@ -30,13 +30,11 @@ OSEventFlagsBits_t
 OSEventFlags::notify(OSEventFlagsBits_t bits)
 {
   OSCriticalSection::enter();
-  //OSRealTimeCriticalSection::enter();
     {
       m_flags |= bits;
     }
   OSCriticalSection::exit();
-  //OSRealTimeCriticalSection::exit();
-  
+
   if (m_pThread != NULL)
     m_pThread->eventNotify((OSEvent_t) this, (OSEventWaitReturn_t) this);
   else
@@ -53,13 +51,11 @@ OSEventFlags::notify(OSEventFlagsBits_t bits)
 OSEventFlagsBits_t
 OSEventFlags::clear(OSEventFlagsBits_t bits)
 {
-  //OSRealTimeCriticalSection::enter();
   OSCriticalSection::enter();
     {
       m_flags &= ~bits;
     }
   OSCriticalSection::exit();
-  //OSRealTimeCriticalSection::exit();
 
   return m_flags;
 }
@@ -77,13 +73,10 @@ OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
 {
   OSEventFlagsBits_t flags;
   OSCriticalSection::enter();
-  //OSRealTimeCriticalSection::enter();
-
     {
       flags = m_flags;
     }
   OSCriticalSection::exit();
-  //OSRealTimeCriticalSection::exit();
 
   // if requested bits are already set, return immediately
   if (((flags & bits) != 0))
@@ -93,10 +86,9 @@ OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
   do
     {
 #if true
+
       ret = (OSEvent_t) this;
       OSCriticalSection::enter();
-      //OSRealTimeCriticalSection::enter();
-
         {
           flags = m_flags;
           if (((flags & bits) == 0))
@@ -106,7 +98,6 @@ OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
             }
         }
       OSCriticalSection::exit();
-      //OSRealTimeCriticalSection::exit();
 
 #else
       ret = OSScheduler::eventWait((OSEvent_t)this);
@@ -124,6 +115,22 @@ OSEventFlags::wait(OSEventFlagsBits_t bits, bool isStrict)
 
     }
   while ((flags & bits) == 0);
+
+  if (ret == OSEventWaitReturn::OS_TIMEOUT)
+    {
+      //OSDeviceDebug::putString(" TIMEOUT_(ef) ");
+      return OSReturn::OS_TIMEOUT;
+    }
+  else if (ret == OSEventWaitReturn::OS_CANCELLED)
+    {
+      OSDeviceDebug::putString(" CANCELLED_(ef) ");
+      return OSReturn::OS_CANCELLED;
+    }
+  else if (ret != (OSEventWaitReturn_t) this)
+    {
+      OSDeviceDebug::putString(" ERROR_(ef) ");
+      return OSReturn::OS_ERROR;
+    }
 
   return OSReturn::OS_OK;
 }

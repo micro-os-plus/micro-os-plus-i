@@ -44,8 +44,8 @@ public:
   clear(OSEventFlagsBits_t bits);
 
   // Loop until one the requested bits are set.
-  // If isStrict is true all the requested bits must be set, in order to return.
-  // If isStrict is false just one of the requested bits must be set, in order to return.
+  // If isStrict is true one of the requested bits must be set, in order to return.
+  // If isStrict is false the call may return due to an error.
   // If any flag is already set, return immediately.
   // For timeouts please set timers to send events; this function will return
   // the timer event.
