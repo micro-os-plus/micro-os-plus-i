@@ -104,6 +104,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
   OSDeviceDebug::putHex(ret);
   OSDeviceDebug::putNewLine();
 #endif
+
   return ret;
 }
 
