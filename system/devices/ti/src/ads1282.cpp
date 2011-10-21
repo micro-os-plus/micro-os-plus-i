@@ -160,7 +160,7 @@ namespace device
       }
 
       void
-      Ads1282::sync(void)
+      Ads1282::prepareSync(void)
       {
         m_gpioAds1282Sync.setPinHigh();
 
@@ -171,7 +171,11 @@ namespace device
 
         // wait tSPWH > 2/fclck (0.488us)
         OS::busyWaitMicros(T_SYNC_SPWL_US);
+      }
 
+      void
+      Ads1282::sync(void)
+      {
         m_gpioAds1282Sync.setPinHigh();
       }
 

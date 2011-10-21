@@ -125,6 +125,9 @@ namespace device
         powerOff(void);
 
         void
+        prepareSync(void);
+
+        void
         sync();
 
         OSReturn_t
