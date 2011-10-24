@@ -17,10 +17,10 @@ namespace device
     namespace ads1282
     {
       Ads1282::Ads1282(avr32::uc3::SpiMaster& spi,
-          avr32::uc3::Gpio& gpioAds1282Drdy) :
+          avr32::uc3::Gpio& gpioAds1282Drdy, avr32::uc3::Gpio& gpioAds1282Sync) :
         m_spi(spi), m_gpioAds1282Cs(OS_CFGPIN_ADS1282_CHIPSELECT_GPIO_PIN),
-            m_gpioAds1282Sync(OS_CFGPIN_ADS1282_SYNC_GPIO_PIN),
-            m_gpioAds1282Drdy(gpioAds1282Drdy), m_gpioAds1282Reset(
+            m_gpioAds1282Sync(gpioAds1282Sync), m_gpioAds1282Drdy(
+                gpioAds1282Drdy), m_gpioAds1282Reset(
                 OS_CFGPIN_ADS1282_RESET_GPIO_PIN), m_gpioAds1282Pwdn(
                 OS_CFGPIN_ADS1282_POWERDOWN_GPIO_PIN)
       {

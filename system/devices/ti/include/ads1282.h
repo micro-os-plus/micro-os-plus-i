@@ -100,7 +100,8 @@ namespace device
       class Ads1282
       {
       public:
-        Ads1282(avr32::uc3::SpiMaster& spi, avr32::uc3::Gpio& gpioAds1282Drdy);
+        Ads1282(avr32::uc3::SpiMaster& spi, avr32::uc3::Gpio& gpioAds1282Drdy,
+            avr32::uc3::Gpio& gpioAds1282Sync);
 
         void
         setGpioConfigurationArray(
@@ -167,7 +168,7 @@ namespace device
         spim_t& m_spi;
 
         avr32::uc3::Gpio m_gpioAds1282Cs;
-        avr32::uc3::Gpio m_gpioAds1282Sync;
+        avr32::uc3::Gpio& m_gpioAds1282Sync;
         avr32::uc3::Gpio& m_gpioAds1282Drdy;
         avr32::uc3::Gpio m_gpioAds1282Reset;
         avr32::uc3::Gpio m_gpioAds1282Pwdn;
