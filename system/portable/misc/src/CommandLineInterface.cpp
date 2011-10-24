@@ -39,7 +39,14 @@ CommandLineInterface::~CommandLineInterface()
 OSReturn_t
 CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
 {
+  if (!dev.isOpened())
+    {
+      return OSReturn::OS_NOT_OPENED;
+    }
+
   std::ostream& cout = m_cout;
+
+  //OSReturn_t ret;
 
   if (greeting != 0)
     cout << std::endl << std::endl << greeting << std::endl;
@@ -77,6 +84,11 @@ CommandLineInterface::loop(OSDeviceCharacter& dev, unsigned char* greeting)
 #endif /* defined(DEBUG) */
 
           return c;
+        }
+
+      if (!dev.isOpened())
+        {
+          return OSReturn::OS_NOT_OPENED;
         }
 
       // one more new line before processing the line
