@@ -15,53 +15,64 @@ class Timer;
 
 // structure of an alarm slot
 typedef struct timerStruct
-  {
+{
   OSTimerTicks_t ticks;
   OSEvent_t event;
   union
-    {
+  {
     OSEventWaitReturn_t ret;
     Timer *pTimer;
-    } u;
-  } OSTimerStruct_t;
+  } u;
+} OSTimerStruct_t;
 
 /*
  * Support class, used to store timer specific data.
  */
 class OSTimer
-  {
+{
 public:
   // constructor
   OSTimer(OSTimerStruct_t* pArray, int size);
 
   // sleep for the number of timer ticks
-  OSEventWaitReturn_t sleep(OSTimerTicks_t ticks, OSEvent_t event = 0);
+  OSEventWaitReturn_t
+  sleep(OSTimerTicks_t ticks, OSEvent_t event = 0);
 
   // schedule the timer to notify the event after the number of ticks
   // if event is OSEvent::OS_CUSTOM_TIMER, the ret value is the address
   // of the custom timer 
-  void eventNotify(OSTimerTicks_t ticks, OSEvent_t event,
-      OSEventWaitReturn_t ret);
+  void
+  eventNotify(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret);
 
   // remove the scheduled timer notification
-  int eventRemove(OSEvent_t event);
+  int
+  eventRemove(OSEvent_t event);
 
   // return the current number of tick
-  OSTimerTicks_t getTicks(void) const;
+  OSTimerTicks_t
+  getTicks(void) const;
 
   // return the number of jobs scheduled
-  int getCount(void) const;
+  int
+  getCount(void) const;
 
   // used in interrupt routines
-  void interruptTick(void);
-  void incrementTicks(void);
+  void
+  interruptTick(void);
+  void
+  incrementTicks(void);
 
 protected:
   // insert a new timeout into the array
-  bool insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret);
+  bool
+  insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret);
 
   // remove the timeout from the given slot
-  void remove(int i);
+  void
+  remove(int i);
+
+  int
+  find(OSEvent_t event);
 
   // the array of timeouts
   OSTimerStruct_t* m_pArray;
@@ -74,21 +85,24 @@ protected:
 private:
   // the current number of ticks
   OSTimerTicks_t volatile ms_ticks;
-  };
+};
 
-inline OSTimerTicks_t OSTimer::getTicks(void) const
-  {
-    return ms_ticks;
-  }
+inline OSTimerTicks_t
+OSTimer::getTicks(void) const
+{
+  return ms_ticks;
+}
 
-inline void OSTimer::incrementTicks(void)
-  {
-    ms_ticks++;
-  }
+inline void
+OSTimer::incrementTicks(void)
+{
+  ms_ticks++;
+}
 
-inline int OSTimer::getCount(void) const
-  {
-    return m_count;
-  }
+inline int
+OSTimer::getCount(void) const
+{
+  return m_count;
+}
 
 #endif /* OSTIMER_H_ */
