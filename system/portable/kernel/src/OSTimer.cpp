@@ -120,7 +120,7 @@ OSTimer::eventNotify(OSTimerTicks_t ticks, OSEvent_t event,
         {
           int i;
           i = find(event);
-          if (i > 0)
+          if (i >= 0)
             {
               remove(i);
             }
