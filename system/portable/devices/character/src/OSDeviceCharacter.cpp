@@ -273,7 +273,9 @@ OSDeviceCharacter::writeByte(unsigned char b)
 
   if (!m_isOpened)
     {
-      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED_(wb) "));
+      OSDeviceDebug::putString_P(PSTR(" NOT_OPENED_(wb"));
+      OSDeviceDebug::putHex(b);
+      OSDeviceDebug::putString_P(PSTR(") "));
       return OSReturn::OS_NOT_OPENED;
     }
 
