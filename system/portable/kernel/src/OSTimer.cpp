@@ -118,6 +118,12 @@ OSTimer::eventNotify(OSTimerTicks_t ticks, OSEvent_t event,
     {
       OSCriticalSection::enter();
         {
+          int i;
+          i = find(event);
+          if (i > 0)
+            {
+              remove(i);
+            }
           insert(ticks, event, ret);
         }
       OSCriticalSection::exit();
@@ -165,6 +171,26 @@ OSTimer::eventRemove(OSEvent_t event)
   OSCriticalSection::exit();
 
   return ret;
+}
+
+int
+OSTimer::find(OSEvent_t event)
+{
+  int cnt;
+  cnt = m_count;
+
+  OSTimerStruct_t* p;
+  p = m_pArray;
+
+  for (int i = 0; i < cnt; ++i, ++p)
+    {
+      if (event == p->event)
+        {
+          return i;
+        }
+    }
+
+  return -1;
 }
 
 // Insert an entry in the timer list.
