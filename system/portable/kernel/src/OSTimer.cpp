@@ -118,12 +118,15 @@ OSTimer::eventNotify(OSTimerTicks_t ticks, OSEvent_t event,
     {
       OSCriticalSection::enter();
         {
+#if false
+        // Does not work properly, good events are removed
           int i;
           i = find(event);
           if (i >= 0)
             {
               remove(i);
             }
+#endif
           insert(ticks, event, ret);
         }
       OSCriticalSection::exit();
