@@ -190,8 +190,11 @@ OSDeviceDebug::criticalEnter(void)
     register OSStack_t tmp;
 
     tmp = OSCPUImpl::getInterruptsMask();
+#if defined(OS_INCLUDE_OSDEVICEDEBUG_MASK_INTERRUPTS)
+  OSCPUImpl::setInterruptsMask(tmp | OS_CFGINT_OSDEVICEDEBUG_MASK);
+#else
     OSCPUImpl::interruptsDisable();
-
+#endif
     return tmp;
   }
 

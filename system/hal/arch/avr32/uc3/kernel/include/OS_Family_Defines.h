@@ -56,6 +56,11 @@
 #define OS_CFGINT_OSCRITICALSECTION_MASK                (0x3 << (16+1))
 #endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASK) */
 
+// Mask to disable regular and real-time interrupts (0, 1, 2)
+#if !defined(OS_CFGINT_OSDEVICEDEBUG_MASK)
+#define OS_CFGINT_OSDEVICEDEBUG_MASK                (0x7 << (16+1))
+#endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASK) */
+
 // Mask to disable regular (0,1) and real-time (2) interrupts
 // Used in yield() context switch code
 #if !defined(OS_CFGINT_OSCRITICALSECTION_MASKYIELD)
