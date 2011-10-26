@@ -10,6 +10,7 @@
 #include "portable/kernel/include/OS.h"
 
 #include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
+#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Adc_Definitions.h"
 
 namespace avr32
@@ -30,6 +31,9 @@ namespace avr32
       powerUp(void);
       void
       powerDown(void);
+
+      OSReturn_t
+      initialise(void);
 
       void
       setChannelsMask(avr32::uc3::adc::ChannelsMask_t mask);
@@ -52,6 +56,9 @@ namespace avr32
 
       avr32::uc3::adc::Mask_t
       getConvertedValue(avr32::uc3::adc::ChannelNumber_t channel);
+
+      uint32_t
+      getInputClockFrequencyHz(void);
 
       // -----
 
@@ -77,6 +84,12 @@ namespace avr32
         avr32::uc3::gpio::PinPeripheralFunction_t* pGpioConfigurationArray)
     {
       m_pGpioConfigurationArray = pGpioConfigurationArray;
+    }
+
+    inline uint32_t
+    Adc::getInputClockFrequencyHz(void)
+    {
+      return  Pm::getPbaClockFrequencyHz();
     }
 
     inline void

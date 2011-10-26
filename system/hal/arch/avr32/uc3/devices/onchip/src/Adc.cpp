@@ -10,7 +10,6 @@
 
 #if defined(OS_INCLUDE_AVR32_UC3_ADC)
 
-#include "hal/arch/avr32/uc3/devices/onchip/include/Pm.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Adc.h"
 
 namespace avr32
@@ -34,20 +33,14 @@ namespace avr32
 
     // ----- Public Methods ---------------------------------------------------
 
-    void
-    Adc::powerUp(void)
+    OSReturn_t
+    Adc::initialise(void)
     {
-      OSDeviceDebug::putString("avr32::uc3::Adc::powerUp()");
+      OSDeviceDebug::putString("avr32::uc3::Adc::initialise()");
       OSDeviceDebug::putNewLine();
 
       uint32_t ratio, prescal;
       adc::Mask_t mask = 0;
-
-      if (m_pGpioConfigurationArray != NULL)
-        {
-          avr32::uc3::Gpio::configPeripheralModeAndFunction(
-              m_pGpioConfigurationArray);
-        }
 
       // Use 10 bits.
       mask &= ~(1 << adc::ADC_LOWRES_OFFSET);
@@ -60,11 +53,26 @@ namespace avr32
 
       // Lower the ADC clock at 1MHZ. At 5MHz there are errors.
       // compute ratio. (PRESCAL+1) * 2 = ratio.
-      ratio = avr32::uc3::Pm::getPbaClockFrequencyHz() / 1000000;
+      ratio = getInputClockFrequencyHz() / 1000000;
       prescal = (ratio / 2) - 1;
       mask |= prescal << adc::ADC_MR_PRESCAL_OFFSET;
 
       moduleRegisters.writeMode(mask);
+
+      return OSReturn::OS_OK;
+    }
+
+    void
+    Adc::powerUp(void)
+    {
+      OSDeviceDebug::putString("avr32::uc3::Adc::powerUp()");
+      OSDeviceDebug::putNewLine();
+
+      if (m_pGpioConfigurationArray != NULL)
+        {
+          avr32::uc3::Gpio::configPeripheralModeAndFunction(
+              m_pGpioConfigurationArray);
+        }
     }
 
     void
@@ -98,39 +106,7 @@ namespace avr32
     avr32::uc3::adc::Mask_t
     Adc::getConvertedValue(avr32::uc3::adc::ChannelNumber_t channel)
     {
-      avr32::uc3::adc::Mask_t mask;
-
-      switch (channel)
-        {
-      case 0:
-        mask = moduleRegisters.readChannelData0();
-        break;
-      case 1:
-        mask = moduleRegisters.readChannelData1();
-        break;
-      case 2:
-        mask = moduleRegisters.readChannelData2();
-        break;
-      case 3:
-        mask = moduleRegisters.readChannelData3();
-        break;
-      case 4:
-        mask = moduleRegisters.readChannelData4();
-        break;
-      case 5:
-        mask = moduleRegisters.readChannelData5();
-        break;
-      case 6:
-        mask = moduleRegisters.readChannelData6();
-        break;
-      case 7:
-        mask = moduleRegisters.readChannelData7();
-        break;
-      default:
-        mask = 0xFFFFFFFF;
-        }
-
-      return mask;
+      return moduleRegisters.readChannelData(channel);
     }
   }
 }

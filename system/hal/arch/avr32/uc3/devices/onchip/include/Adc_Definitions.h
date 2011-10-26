@@ -51,14 +51,7 @@ namespace avr32
         regWriteOnly_t ier; //0x0024
         regWriteOnly_t idr; //0x0028
         regReadOnly_t imr; //0x002c
-        regReadOnly_t cdr0; //0x0030
-        regReadOnly_t cdr1; //0x0034
-        regReadOnly_t cdr2; //0x0038
-        regReadOnly_t cdr3; //0x003c
-        regReadOnly_t cdr4; //0x0040
-        regReadOnly_t cdr5; //0x0044
-        regReadOnly_t cdr6; //0x0048
-        regReadOnly_t cdr7; //0x004c
+        regReadOnly_t cdr[8]; //0x0030
         regNotAllocated_t dummy50[43]; //0x0050-0x00f8
         regReadOnly_t version;//0x00fc
 
@@ -98,28 +91,7 @@ namespace avr32
         readInterruptMask(void);
 
         Mask_t
-        readChannelData0(void);
-
-        Mask_t
-        readChannelData1(void);
-
-        Mask_t
-        readChannelData2(void);
-
-        Mask_t
-        readChannelData3(void);
-
-        Mask_t
-        readChannelData4(void);
-
-        Mask_t
-        readChannelData5(void);
-
-        Mask_t
-        readChannelData6(void);
-
-        Mask_t
-        readChannelData7(void);
+        readChannelData(ChannelNumber_t channel);
 
         Mask_t
         readVersion(void);
@@ -194,51 +166,9 @@ namespace avr32
       }
 
       inline Mask_t
-      ModuleRegisters::readChannelData0(void)
+      ModuleRegisters::readChannelData(ChannelNumber_t channel)
       {
-        return cdr0;
-      }
-
-      inline Mask_t
-      ModuleRegisters::readChannelData1(void)
-      {
-        return cdr1;
-      }
-
-      inline Mask_t
-      ModuleRegisters::readChannelData2(void)
-      {
-        return cdr2;
-      }
-
-      inline Mask_t
-      ModuleRegisters::readChannelData3(void)
-      {
-        return cdr3;
-      }
-
-      inline Mask_t
-      ModuleRegisters::readChannelData4(void)
-      {
-        return cdr4;
-      }
-
-      inline Mask_t
-      ModuleRegisters::readChannelData5(void)
-      {
-        return cdr5;
-      }
-
-      inline Mask_t
-      ModuleRegisters::readChannelData6(void)
-      {
-        return cdr6;
-      }
-
-      inline Mask_t
-      ModuleRegisters::readChannelData7(void)
-      {
-        return cdr7;
+        return cdr[channel];
       }
 
       inline Mask_t
