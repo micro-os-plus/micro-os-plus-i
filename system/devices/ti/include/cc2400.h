@@ -177,10 +177,14 @@ namespace device
         setSpiHighSpeed(void);
 
         void
-        switchToTxMode();
+        switchToTxMode(void);
 
         void
-        initSpi();
+        initSpi(void);
+
+        void
+        flushSpiRxFifo(void);
+
       private:
         spim_t& m_spi;
       };
@@ -269,6 +273,10 @@ namespace device
       bool
       isCrcPinOk(void);
 
+      // clear SPI RX FIFO 4byte buffer
+      void
+      clearSpiFifo(void);
+
       device::ti::cc2400::Registers registers;
 
     private:
@@ -341,6 +349,12 @@ namespace device
       return m_mdmGio6.isPinHigh();
     }
 
+    inline void
+    Cc2400::clearSpiFifo(void)
+    {
+      registers.flushSpiRxFifo();
+    }
+
     namespace cc2400
     {
       inline bool
@@ -387,7 +401,11 @@ namespace device
         setSpiHighSpeed();
         m_spi.enable();
       }
-
+      inline void
+      Registers::flushSpiRxFifo(void)
+      {
+        m_spi.flushRxFifo();
+      }
     }
   }
 }

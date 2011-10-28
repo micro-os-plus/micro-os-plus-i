@@ -28,11 +28,12 @@ namespace avr32
 
       // configure baud rate and other communication parameters
       void
-      configureChipSelect(spi::BaudRateFactor_t baudRateFactor, uint8_t delayBCT,
-          spi::BitsPerTransfer_t bitsPerTransfer);
+      configureChipSelect(spi::BaudRateFactor_t baudRateFactor,
+          uint8_t delayBCT, spi::BitsPerTransfer_t bitsPerTransfer);
 
       void
-      configureChipSelect(spi::BaudRateFactor_t baudRateFactor, uint8_t delayBCT, uint8_t delayBS,
+      configureChipSelect(spi::BaudRateFactor_t baudRateFactor,
+          uint8_t delayBCT, uint8_t delayBS,
           spi::BitsPerTransfer_t bitsPerTransfer, uint8_t configBits);
 
       void
@@ -73,6 +74,8 @@ namespace avr32
       uint32_t
       getInputClockFrequencyHz(void);
 
+      void
+      flushRxFifo(void);
     public:
       spi::Registers& registers;
     };
@@ -84,26 +87,29 @@ namespace avr32
     }
 
     inline void
-    SpiMaster::configureChipSelect(spi::BaudRateFactor_t baudRateFactor, uint8_t delayBCT,
-        spi::BitsPerTransfer_t bitsPerTransfer)
+    SpiMaster::configureChipSelect(spi::BaudRateFactor_t baudRateFactor,
+        uint8_t delayBCT, spi::BitsPerTransfer_t bitsPerTransfer)
     {
-      registers.writeChipSelect0(
-          ((uint32_t) ((delayBCT & 0xFF) << AVR32_SPI_CSR0_DLYBCT_OFFSET) & AVR32_SPI_CSR0_DLYBCT_MASK) |
-          ((uint32_t) ((baudRateFactor & 0xFF) << AVR32_SPI_CSR0_SCBR_OFFSET) & AVR32_SPI_CSR0_SCBR_MASK) |
-          ((uint32_t) ((bitsPerTransfer & 0xF) << AVR32_SPI_CSR0_BITS_OFFSET) & AVR32_SPI_CSR0_BITS_MASK) |
-          2);// hard-coded values for radio modem, i.e. NCPHA=1 and CPOL=0
+      registers.writeChipSelect0(((uint32_t) ((delayBCT & 0xFF)
+          << AVR32_SPI_CSR0_DLYBCT_OFFSET) & AVR32_SPI_CSR0_DLYBCT_MASK)
+          | ((uint32_t) ((baudRateFactor & 0xFF) << AVR32_SPI_CSR0_SCBR_OFFSET)
+              & AVR32_SPI_CSR0_SCBR_MASK)
+          | ((uint32_t) ((bitsPerTransfer & 0xF) << AVR32_SPI_CSR0_BITS_OFFSET)
+              & AVR32_SPI_CSR0_BITS_MASK) | 2);// hard-coded values for radio modem, i.e. NCPHA=1 and CPOL=0
     }
 
     inline void
-    SpiMaster::configureChipSelect(spi::BaudRateFactor_t baudRateFactor, uint8_t delayBCT, uint8_t delayBS,
+    SpiMaster::configureChipSelect(spi::BaudRateFactor_t baudRateFactor,
+        uint8_t delayBCT, uint8_t delayBS,
         spi::BitsPerTransfer_t bitsPerTransfer, uint8_t configBits)
     {
-      registers.writeChipSelect0(
-          ((uint32_t) ((delayBCT) << AVR32_SPI_CSR0_DLYBCT_OFFSET) & AVR32_SPI_CSR0_DLYBCT_MASK) |
-          ((uint32_t) ((delayBS) << AVR32_SPI_CSR0_DLYBS_OFFSET) & AVR32_SPI_CSR0_DLYBS_MASK) |
-          ((uint32_t) ((baudRateFactor) << AVR32_SPI_CSR0_SCBR_OFFSET) & AVR32_SPI_CSR0_SCBR_MASK) |
-          ((uint32_t) ((bitsPerTransfer) << AVR32_SPI_CSR0_BITS_OFFSET) & AVR32_SPI_CSR0_BITS_MASK) |
-          (configBits & 0xF));// hard-coded values for radio modem, i.e. NCPHA=1 and CPOL=0
+      registers.writeChipSelect0(((uint32_t) ((delayBCT)
+          << AVR32_SPI_CSR0_DLYBCT_OFFSET) & AVR32_SPI_CSR0_DLYBCT_MASK)
+          | ((uint32_t) ((delayBS) << AVR32_SPI_CSR0_DLYBS_OFFSET)
+              & AVR32_SPI_CSR0_DLYBS_MASK) | ((uint32_t) ((baudRateFactor)
+          << AVR32_SPI_CSR0_SCBR_OFFSET) & AVR32_SPI_CSR0_SCBR_MASK)
+          | ((uint32_t) ((bitsPerTransfer) << AVR32_SPI_CSR0_BITS_OFFSET)
+              & AVR32_SPI_CSR0_BITS_MASK) | (configBits & 0xF));// hard-coded values for radio modem, i.e. NCPHA=1 and CPOL=0
     }
 
     inline void
@@ -113,19 +119,21 @@ namespace avr32
 
       val = registers.readChipSelect0();
       val &= ~AVR32_SPI_CSR0_SCBR_MASK;
-      val |= ((uint32_t) ((baudRateFactor & 0xFF) << AVR32_SPI_CSR0_SCBR_OFFSET) & AVR32_SPI_CSR0_SCBR_MASK);
+      val
+          |= ((uint32_t) ((baudRateFactor & 0xFF) << AVR32_SPI_CSR0_SCBR_OFFSET)
+              & AVR32_SPI_CSR0_SCBR_MASK);
       registers.writeChipSelect0(val);
     }
 
     inline void
     SpiMaster::configureBaudRate(spi::BaudRate_t baudRate)
     {
-      if ((getInputClockFrequencyHz()/baudRate) > 255)
+      if ((getInputClockFrequencyHz() / baudRate) > 255)
         {
           OSDeviceDebug::putString("Spim::configBaudRate() out of range");
           OSDeviceDebug::putNewLine();
         }
-      configureBaudRateFactor(getInputClockFrequencyHz()/baudRate);
+      configureBaudRateFactor(getInputClockFrequencyHz() / baudRate);
     }
 
     inline void
@@ -167,8 +175,8 @@ namespace avr32
     inline bool
     SpiMaster::isTransmittedAndReceived(void)
     {
-      return (registers.readStatus() &
-          (AVR32_SPI_SR_TXEMPTY_MASK | AVR32_SPI_SR_RDRF_MASK)) != 0;
+      return (registers.readStatus() & (AVR32_SPI_SR_TXEMPTY_MASK
+          | AVR32_SPI_SR_RDRF_MASK)) != 0;
     }
 
     inline uint8_t
@@ -193,6 +201,12 @@ namespace avr32
     SpiMaster::disableLocalLoopback()
     {
       registers.writeMode(registers.readMode() & (~AVR32_SPI_MR_LLB_MASK));
+    }
+
+    inline void
+    SpiMaster::flushRxFifo(void)
+    {
+      registers.writeControl(AVR32_SPI_CR_FLUSHFIFO_MASK);
     }
   }
 }
