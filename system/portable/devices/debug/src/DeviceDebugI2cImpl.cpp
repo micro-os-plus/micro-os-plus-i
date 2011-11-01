@@ -12,7 +12,11 @@
 
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER)
 
-char DeviceDebugI2cImpl::ms_buffer[800];
+#if !defined(OS_CFGINT_DEVICEDEBUGI2CIMPL_BUFFER_SIZE)
+#define OS_CFGINT_DEVICEDEBUGI2CIMPL_BUFFER_SIZE 80
+#endif
+
+char DeviceDebugI2cImpl::ms_buffer[OS_CFGINT_DEVICEDEBUGI2CIMPL_BUFFER_SIZE];
 DeviceDebugI2cImpl::CircularBuffer DeviceDebugI2cImpl::ms_circularBuffer;
 DeviceDebugI2cImpl::Lock DeviceDebugI2cImpl::ms_lock;
 
