@@ -89,13 +89,13 @@ OSDeviceDebug::commonPutBytesSynchronised(const char* s, uint_t n)
   int ret;
 #if !defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER)
   register OSStack_t mask;
-  mask = criticalEnter();
+  mask = DeviceDebugImpl_t::criticalEnter();
 #endif /* !defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER) */
     {
       ret = commonPutBytes(s, n);
     }
 #if !defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER)
-  criticalExit(mask);
+    DeviceDebugImpl_t::criticalExit(mask);
 #endif /* !defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER) */
 
   return ret;
