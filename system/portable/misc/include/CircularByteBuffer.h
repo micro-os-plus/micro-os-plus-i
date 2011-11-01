@@ -7,7 +7,7 @@
 #ifndef CIRCULARBYTEBUFFER_H_
 #define CIRCULARBYTEBUFFER_H_
 
-#include "portable/kernel/include/OS.h"
+#include "portable/kernel/include/OS_Defines.h"
 
 class CircularByteBuffer
 {
@@ -17,8 +17,11 @@ public:
       unsigned short highWM, unsigned short lowWM);
 
   void
-  init(unsigned char* pc, unsigned short size, unsigned short highWM,
+  initialise(unsigned char* pc, unsigned short size, unsigned short highWM,
       unsigned short lowWM);
+
+  void
+  initialise(unsigned char* pc, unsigned short size);
 
   void
   clear(void);
