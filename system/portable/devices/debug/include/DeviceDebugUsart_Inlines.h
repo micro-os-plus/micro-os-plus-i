@@ -7,6 +7,8 @@
 #ifndef DEVICEDEBUGUSART_INLINES_H_
 #define DEVICEDEBUGUSART_INLINES_H_
 
+#include "portable/kernel/include/OS_Defines.h"
+
 #if defined(OS_CONFIG_BOARD_ATMEL_STK525)
 #include "hal/boards/Atmel/stk525/include/DeviceDebugUsart_Defines.h"
 #elif defined(OS_CONFIG_BOARD_METRILOG_M512)
