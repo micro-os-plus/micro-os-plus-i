@@ -23,11 +23,11 @@ CircularByteBuffer::CircularByteBuffer(unsigned char* pBuf,
 {
   OSDeviceDebug::putConstructor_P(PSTR("CircularByteBuffer"), this);
 
-  init(pBuf, size, highWM, lowWM);
+  initialise(pBuf, size, highWM, lowWM);
 }
 
 void
-CircularByteBuffer::init(unsigned char* pBuf, unsigned short size,
+CircularByteBuffer::initialise(unsigned char* pBuf, unsigned short size,
     unsigned short highWM, unsigned short lowWM)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_CIRCULARBYTEBUFFER_INIT)
@@ -47,6 +47,26 @@ CircularByteBuffer::init(unsigned char* pBuf, unsigned short size,
   m_sz = size;
   m_highWM = highWM;
   m_lowWM = lowWM;
+
+  clear();
+}
+
+void
+CircularByteBuffer::initialise(unsigned char* pBuf, unsigned short size)
+{
+#if defined(DEBUG) && defined(OS_DEBUG_CIRCULARBYTEBUFFER_INIT)
+  OSDeviceDebug::putString_P(PSTR("CircularByteBuffer::init("));
+  OSDeviceDebug::putHex((unsigned short)pBuf);
+  OSDeviceDebug::putChar(',');
+  OSDeviceDebug::putHex((unsigned short)size);
+  OSDeviceDebug::putChar(')');
+  OSDeviceDebug::putNewLine();
+#endif
+
+  m_pBuf = pBuf;
+  m_sz = size;
+  m_highWM = size * 2 / 3;
+  m_lowWM = size * 1 / 3;
 
   clear();
 }
@@ -129,10 +149,17 @@ unsigned char
 CircularByteBuffer::get(void)
 {
   unsigned char c;
-  c = *m_pGet++;
-  if ((unsigned short) (m_pGet - m_pBuf) >= m_sz)
-    m_pGet = m_pBuf;
-  m_len--;
+  if (m_len == 0)
+    {
+      c = '?';
+    }
+  else
+    {
+      c = *m_pGet++;
+      if ((unsigned short) (m_pGet - m_pBuf) >= m_sz)
+        m_pGet = m_pBuf;
+      m_len--;
+    }
   return c;
 }
 
@@ -140,22 +167,22 @@ CircularByteBuffer::get(void)
 
 void
 CircularByteBuffer::dump(void)
-{
-  OSDeviceDebug::putString_P(PSTR("CircularByteBuffer *"));
-  OSDeviceDebug::putPtr(this);
-  OSDeviceDebug::putString_P(PSTR("=("));
-  OSDeviceDebug::putPtr(m_pBuf);
-  OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putHex((unsigned short) m_len);
-  OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putHex((unsigned short) m_sz);
-  OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putHex((unsigned short) m_highWM);
-  OSDeviceDebug::putChar(',');
-  OSDeviceDebug::putHex((unsigned short) m_lowWM);
-  OSDeviceDebug::putChar(')');
-  OSDeviceDebug::putNewLine();
-}
+  {
+    OSDeviceDebug::putString_P(PSTR("CircularByteBuffer *"));
+    OSDeviceDebug::putPtr(this);
+    OSDeviceDebug::putString_P(PSTR("=("));
+    OSDeviceDebug::putPtr(m_pBuf);
+    OSDeviceDebug::putChar(',');
+    OSDeviceDebug::putHex((unsigned short) m_len);
+    OSDeviceDebug::putChar(',');
+    OSDeviceDebug::putHex((unsigned short) m_sz);
+    OSDeviceDebug::putChar(',');
+    OSDeviceDebug::putHex((unsigned short) m_highWM);
+    OSDeviceDebug::putChar(',');
+    OSDeviceDebug::putHex((unsigned short) m_lowWM);
+    OSDeviceDebug::putChar(')');
+    OSDeviceDebug::putNewLine();
+  }
 
 #endif /* OS_INCLUDE_CIRCULARBYTEBUFFER_DUMP */
 
