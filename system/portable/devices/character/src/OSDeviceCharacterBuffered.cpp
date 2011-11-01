@@ -46,8 +46,8 @@ OSDeviceCharacterBuffered::init(unsigned char* pTxBuf,
   m_type = OS_DEVICECHARACTER_USART;
 #endif
 
-  m_txBuf.init(pTxBuf, txBufSize, txHWM, txLWM);
-  m_rxBuf.init(pRxBuf, rxBufSize, rxHWM, rxLWM);
+  m_txBuf.initialise(pTxBuf, txBufSize, txHWM, txLWM);
+  m_rxBuf.initialise(pRxBuf, rxBufSize, rxHWM, rxLWM);
 }
 
 // ----- open/close -----------------------------------------------------------
