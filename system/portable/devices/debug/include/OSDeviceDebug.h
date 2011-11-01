@@ -7,6 +7,8 @@
 #ifndef OSDEVICEDEBUG_H_
 #define OSDEVICEDEBUG_H_
 
+#include "portable/kernel/include/OS_Defines.h"
+
 #include "portable/kernel/include/OS.h"
 
 #if defined(DEBUG) && defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
@@ -21,25 +23,25 @@
 
 // ============================================================================
 
-// This class is used for displaying the trace messages.
-// The actual device output is passed to an implementation helper.
-
-class OSDeviceDebug
-
-#if defined(DEBUG)
-:
-
 #if defined(OS_CONFIG_DEBUG_DEVICE_I2C)
-public DeviceDebugI2cImpl
+typedef DeviceDebugI2cImpl DeviceDebugImpl_t;
 #elif defined(OS_CONFIG_DEBUG_DEVICE_USART)
 public OSDeviceDebugUsartImpl
 #else
 #error "Missing OS_CONFIG_DEBUG_DEVICE_* definition"
 #endif
 
+// This class is used for displaying the trace messages.
+// The actual device output is passed to an implementation helper.
+
+class OSDeviceDebug
+
+#if defined(DEBUG)
+
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF)
-, public std::streambuf
+: public std::streambuf
 #endif
+
 #endif
 
 {
@@ -145,12 +147,6 @@ public:
   static void
   earlyInit();
 
-  static OSStack_t
-  criticalEnter(void);
-
-  static void
-  criticalExit(OSStack_t mask);
-
 private:
 
 #if defined(DEBUG)
@@ -159,12 +155,19 @@ private:
   static void
   nakedEarlyInit() __attribute__((naked, section(".init5")));
 #endif
+
+#if false
   // Send one byte to debug interface.
   static int
   commonPutByte(uchar_t c);
+#endif
+
   // Send the given buffer to debug interface.
   static int
   commonPutBytes(const char* pc, unsigned int n);
+
+  static int
+  commonPutBytesSynchronised(const char* pc, unsigned int n);
 
 #endif
 
@@ -181,28 +184,6 @@ private:
 };
 
 #if defined(DEBUG)
-
-// ----------------------------------------------------------------------------
-
-inline OSStack_t
-OSDeviceDebug::criticalEnter(void)
-  {
-    register OSStack_t tmp;
-
-    tmp = OSCPUImpl::getInterruptsMask();
-#if defined(OS_INCLUDE_OSDEVICEDEBUG_MASK_INTERRUPTS)
-  OSCPUImpl::setInterruptsMask(tmp | OS_CFGINT_OSDEVICEDEBUG_MASK);
-#else
-    OSCPUImpl::interruptsDisable();
-#endif
-    return tmp;
-  }
-
-inline void
-OSDeviceDebug::criticalExit(OSStack_t mask)
-  {
-    OSCPUImpl::setInterruptsMask(mask);
-  }
 
 #if !defined(OS_DEBUG_CONSTRUCTORS)
 
