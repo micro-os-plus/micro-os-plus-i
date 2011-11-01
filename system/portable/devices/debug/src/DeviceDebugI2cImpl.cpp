@@ -34,8 +34,12 @@ DeviceDebugI2cImpl::implEarlyInit(void)
     }
 #endif
 
+#if defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER)
+
   ms_lock.initialise();
   ms_circularBuffer.initialise(ms_buffer, sizeof(ms_buffer));
+
+#endif /* defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER) */
 
   masterInit();
 
