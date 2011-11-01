@@ -41,6 +41,13 @@ namespace device
 
       // the offset of RSSI value, recorded inside RSSIREG
       const static int16_t RSSI_OFFSET = -54;
+      const static uint16_t CC2400_BYTE_MICROS = 8;// microseconds need to send a byte
+      const static uint16_t CC2400_PREAMBLE_BYTESIZE = 32;
+      const static uint16_t CC2400_SYNC_BYTESIZE = 4;
+      const static uint16_t CC2400_CRC_BYTESIZE = 2;
+      // micros needed to send CC2400 header
+      const static uint16_t CC2400_HEADER_MICROS = CC2400_BYTE_MICROS
+          * (CC2400_PREAMBLE_BYTESIZE + CC2400_SYNC_BYTESIZE);
 
       class TxPowerLevel
       {
