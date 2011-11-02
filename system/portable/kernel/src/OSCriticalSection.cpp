@@ -242,8 +242,90 @@ OSRealTimeCriticalSection::exit(void)
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
 }
 
+#endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
+
+// ============================================================================
+
+#if defined(DEBUG)
+OSTotalCriticalSection::OSTotalCriticalSection()
+{
+  OSDeviceDebug::putConstructor_P(PSTR("OSTotalCriticalSection"), this);
+}
+#endif
+
+#if defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK)
+
+// When we cannot use the stack, we no longer need to inline, so here are
+// the usual routines to enter()/exit() critical sections.
+void
+OSTotalCriticalSection::enter(void)
+{
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+
+  register OSStack_t tmp;
+
+  tmp = OSCPUImpl::getInterruptsMask();
+
+#if defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS)
+  OSCPUImpl::setInterruptsMask(tmp | (OS_CFGINT_OSCRITICALSECTION_MASKALL));
+#else /* !defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
+  OSCPUImpl::interruptsDisable();
+#endif /* defined(OS_INCLUDE_OSREALTIMECRITICALSECTION_MASK_INTERRUPTS) */
+
+#if true
+  OSCriticalSection::pushInterruptMask(tmp);
+#else
+  // Push current interrupt mask onto the thread stack
+  OSScheduler::getThreadCurrent()->m_criticalSectionNestingStack[OSCriticalSection::ms_nestingLevel++]
+      = tmp;
+#endif
+
+#elif defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
+
+  OSCPUImpl::interruptsDisable();
+  ++OSCriticalSection::ms_nestingLevel;
+
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) */
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+}
+
+void
+OSTotalCriticalSection::exit(void)
+{
+#if !defined(OS_EXCLUDE_MULTITASKING)
+
+#if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
+
+  register OSStack_t tmp;
+
+#if true
+  tmp = OSCriticalSection::popInterruptMask();
+#else
+  // Pop current interrupt mask from the thread stack
+  tmp
+      = OSScheduler::getThreadCurrent()->m_criticalSectionNestingStack[--OSCriticalSection::ms_nestingLevel];
+  OSCPUImpl::setInterruptsMask(tmp);
+#endif
+
+  OSCPUImpl::setInterruptsMask(tmp);
+
+#elif defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL)
+
+  if ((OSCriticalSection::ms_nestingLevel > 0) && (--OSCriticalSection::ms_nestingLevel == 0))
+    {
+      OSCPUImpl::interruptsEnable();
+    }
+
+#endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_NESTING_LEVEL) */
+
+#endif /* !defined(OS_EXCLUDE_MULTITASKING) */
+}
+#endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
+
 #endif /* defined(OS_INCLUDE_OSREALTIME) */
 
-#endif /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 
 // ----------------------------------------------------------------------------

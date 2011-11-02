@@ -99,6 +99,40 @@ private:
   char m_dummy;
 };
 
+class OSTotalCriticalSection
+{
+public:
+#if defined(DEBUG)
+  OSTotalCriticalSection();
+#endif
+  // Pair of functions to enable disable interrupts
+
+#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK)
+
+  // Inlines using the stack to save/restore the interrupt status.
+
+  static void
+  enter(void) __attribute__((always_inline));
+
+  static void
+  exit(void) __attribute__((always_inline));
+
+#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
+
+  // Regular functions, using a nesting counter.
+
+  static void
+  enter(void);
+
+  static void
+  exit(void);
+
+#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
+
+private:
+  char m_dummy;
+};
+
 #endif /* defined(OS_INCLUDE_OSREALTIME) */
 
 // ============================================================================
