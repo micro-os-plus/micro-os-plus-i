@@ -20,6 +20,7 @@ public:
 
   // critical section support
   static OSRealTimeCriticalSection critical;
+  static OSTotalCriticalSection totalCritical;
 
   // Register the thread that will receive notifications
   static void
