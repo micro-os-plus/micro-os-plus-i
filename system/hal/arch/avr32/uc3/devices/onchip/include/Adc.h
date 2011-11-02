@@ -46,6 +46,9 @@ namespace avr32
       startConversion(void);
 
       void
+      softwareReset(void);
+
+      void
       enableChannels(void);
 
       void
@@ -55,7 +58,7 @@ namespace avr32
       isConversionEnded(void);
 
       avr32::uc3::adc::Mask_t
-      getConvertedValue(avr32::uc3::adc::ChannelNumber_t channel);
+      getConvertedValue(avr32::uc3::adc::ChannelId_t channel);
 
       uint32_t
       getInputClockFrequencyHz(void);
@@ -89,7 +92,7 @@ namespace avr32
     inline uint32_t
     Adc::getInputClockFrequencyHz(void)
     {
-      return  Pm::getPbaClockFrequencyHz();
+      return Pm::getPbaClockFrequencyHz();
     }
 
     inline void
@@ -102,6 +105,12 @@ namespace avr32
     Adc::startConversion(void)
     {
       moduleRegisters.writeControl(adc::ADC_START_MASK);
+    }
+
+    inline void
+    Adc::softwareReset(void)
+    {      // reset the ADC
+      moduleRegisters.writeControl(adc::ADC_CR_SWRST_MASK);
     }
 
     inline void

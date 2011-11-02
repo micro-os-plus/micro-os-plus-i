@@ -39,7 +39,6 @@ namespace avr32
       OSDeviceDebug::putString("avr32::uc3::Adc::initialise()");
       OSDeviceDebug::putNewLine();
 
-      uint32_t ratio, prescal;
       adc::Mask_t mask = 0;
 
       // Use 10 bits.
@@ -47,16 +46,22 @@ namespace avr32
       // set Sample/Hold time to max so that the ADC capacitor should be loaded entirely
       mask |= 0xF << adc::ADC_SHTIM_OFFSET;
       // set Startup to max so that the ADC capacitor should be loaded entirely
-      mask |= 0x1F << adc::ADC_STARTUP_OFFSET;
+      mask |= 0x7F << adc::ADC_STARTUP_OFFSET;
       // enable sleep mode
       mask |= 0x1 << adc::ADC_SLEEP_OFFSET;
+#if 0
+      uint32_t ratio, prescal;
 
       // Lower the ADC clock at 1MHZ. At 5MHz there are errors.
       // compute ratio. (PRESCAL+1) * 2 = ratio.
       ratio = getInputClockFrequencyHz() / 1000000;
       prescal = (ratio / 2) - 1;
       mask |= prescal << adc::ADC_MR_PRESCAL_OFFSET;
-
+#else
+      // Put prescaler to it's maximum value, otherwise
+      // SNS_P_VDA_LVL is not measured right.
+      mask |= 0xFF << adc::ADC_MR_PRESCAL_OFFSET;
+#endif
       moduleRegisters.writeMode(mask);
 
       return OSReturn::OS_OK;
@@ -81,9 +86,6 @@ namespace avr32
       OSDeviceDebug::putString("avr32::uc3::Adc::powerDown()");
       OSDeviceDebug::putNewLine();
 
-      // reset the ADC
-      moduleRegisters.writeControl(adc::ADC_CR_SWRST_MASK);
-
       if (m_pGpioConfigurationArray != NULL)
         {
           avr32::uc3::Gpio::configGpioModeInput(m_pGpioConfigurationArray);
@@ -93,7 +95,7 @@ namespace avr32
     bool
     Adc::isConversionEnded(void)
     {
-      adc::Mask_t mask = moduleRegisters.readStatus() & 0x000000FF;
+      adc::Mask_t mask = (moduleRegisters.readStatus() & 0x000000FF);
 
       if (mask == m_mask)
         {
@@ -104,7 +106,7 @@ namespace avr32
     }
 
     avr32::uc3::adc::Mask_t
-    Adc::getConvertedValue(avr32::uc3::adc::ChannelNumber_t channel)
+    Adc::getConvertedValue(avr32::uc3::adc::ChannelId_t channel)
     {
       return moduleRegisters.readChannelData(channel);
     }

@@ -22,10 +22,11 @@ namespace avr32
       static const uint32_t ADC_STARTUP_OFFSET = 16;
       static const uint32_t ADC_SLEEP_OFFSET = 5;
       static const uint32_t ADC_CR_SWRST_MASK = 0x00000001;
+      static const uint32_t ADC_MAX_VALUE_10_BITS = 0x3FF;
 
       // ----- Type definitions -----------------------------------------------
 
-      typedef uint8_t ChannelNumber_t;
+      typedef uint8_t ChannelId_t;
       typedef uint8_t ChannelsMask_t;
       typedef uint32_t Mask_t;
 
@@ -91,7 +92,7 @@ namespace avr32
         readInterruptMask(void);
 
         Mask_t
-        readChannelData(ChannelNumber_t channel);
+        readChannelData(ChannelId_t channel);
 
         Mask_t
         readVersion(void);
@@ -166,7 +167,7 @@ namespace avr32
       }
 
       inline Mask_t
-      ModuleRegisters::readChannelData(ChannelNumber_t channel)
+      ModuleRegisters::readChannelData(ChannelId_t channel)
       {
         return cdr[channel];
       }
