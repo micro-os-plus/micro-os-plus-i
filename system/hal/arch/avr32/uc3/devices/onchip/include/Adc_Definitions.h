@@ -15,14 +15,14 @@ namespace avr32
   {
     namespace adc
     {
-      static const uint32_t ADC_START_MASK = 0x00000002;
-      static const uint32_t ADC_LOWRES_OFFSET = 4;
-      static const uint32_t ADC_MR_PRESCAL_OFFSET = 8;
-      static const uint32_t ADC_SHTIM_OFFSET = 24;
-      static const uint32_t ADC_STARTUP_OFFSET = 16;
-      static const uint32_t ADC_SLEEP_OFFSET = 5;
-      static const uint32_t ADC_CR_SWRST_MASK = 0x00000001;
-      static const uint32_t ADC_MAX_VALUE_10_BITS = 0x3FF;
+      static const uint32_t START_MASK = 0x00000002;
+      static const uint32_t LOWRES_OFFSET = 4;
+      static const uint32_t MR_PRESCAL_OFFSET = 8;
+      static const uint32_t SHTIM_OFFSET = 24;
+      static const uint32_t STARTUP_OFFSET = 16;
+      static const uint32_t SLEEP_OFFSET = 5;
+      static const uint32_t CR_SWRST_MASK = 0x00000001;
+      static const uint32_t MAX_VALUE_10_BITS = 0x3FF;
 
       // ----- Type definitions -----------------------------------------------
 

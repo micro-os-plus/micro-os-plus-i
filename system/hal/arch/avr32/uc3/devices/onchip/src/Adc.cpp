@@ -42,13 +42,13 @@ namespace avr32
       adc::Mask_t mask = 0;
 
       // Use 10 bits.
-      mask &= ~(1 << adc::ADC_LOWRES_OFFSET);
+      mask &= ~(1 << adc::LOWRES_OFFSET);
       // set Sample/Hold time to max so that the ADC capacitor should be loaded entirely
-      mask |= 0xF << adc::ADC_SHTIM_OFFSET;
+      mask |= (0xF << adc::SHTIM_OFFSET);
       // set Startup to max so that the ADC capacitor should be loaded entirely
-      mask |= 0x7F << adc::ADC_STARTUP_OFFSET;
+      mask |= (0x7F << adc::STARTUP_OFFSET);
       // enable sleep mode
-      mask |= 0x1 << adc::ADC_SLEEP_OFFSET;
+      mask |= (0x1 << adc::SLEEP_OFFSET);
 #if 0
       uint32_t ratio, prescal;
 
@@ -56,11 +56,11 @@ namespace avr32
       // compute ratio. (PRESCAL+1) * 2 = ratio.
       ratio = getInputClockFrequencyHz() / 1000000;
       prescal = (ratio / 2) - 1;
-      mask |= prescal << adc::ADC_MR_PRESCAL_OFFSET;
+      mask |= (prescal << adc::MR_PRESCAL_OFFSET);
 #else
       // Put prescaler to it's maximum value, otherwise
       // SNS_P_VDA_LVL is not measured right.
-      mask |= 0xFF << adc::ADC_MR_PRESCAL_OFFSET;
+      mask |= 0xFF << (adc::MR_PRESCAL_OFFSET);
 #endif
       moduleRegisters.writeMode(mask);
 

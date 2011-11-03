@@ -104,13 +104,13 @@ namespace avr32
     inline void
     Adc::startConversion(void)
     {
-      moduleRegisters.writeControl(adc::ADC_START_MASK);
+      moduleRegisters.writeControl(adc::START_MASK);
     }
 
     inline void
     Adc::softwareReset(void)
     {      // reset the ADC
-      moduleRegisters.writeControl(adc::ADC_CR_SWRST_MASK);
+      moduleRegisters.writeControl(adc::CR_SWRST_MASK);
     }
 
     inline void
