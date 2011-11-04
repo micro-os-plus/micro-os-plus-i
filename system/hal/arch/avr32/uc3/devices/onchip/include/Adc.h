@@ -33,7 +33,7 @@ namespace avr32
       powerDown(void);
 
       OSReturn_t
-      initialise(void);
+      initialise(uint8_t prescaler);
 
       void
       setChannelsMask(avr32::uc3::adc::ChannelsMask_t mask);

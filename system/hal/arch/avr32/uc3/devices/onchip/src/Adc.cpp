@@ -34,7 +34,7 @@ namespace avr32
     // ----- Public Methods ---------------------------------------------------
 
     OSReturn_t
-    Adc::initialise(void)
+    Adc::initialise(uint8_t prescaler)
     {
       OSDeviceDebug::putString("avr32::uc3::Adc::initialise()");
       OSDeviceDebug::putNewLine();
