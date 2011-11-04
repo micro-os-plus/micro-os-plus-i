@@ -36,9 +36,6 @@ namespace avr32
     OSReturn_t
     Adc::initialise(uint8_t prescaler)
     {
-      OSDeviceDebug::putString("avr32::uc3::Adc::initialise()");
-      OSDeviceDebug::putNewLine();
-
       adc::Mask_t mask = 0;
 
       // Use 10 bits.
