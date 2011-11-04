@@ -60,7 +60,7 @@ namespace avr32
 #else
       // Put prescaler to it's maximum value, otherwise
       // SNS_P_VDA_LVL is not measured right.
-      mask |= 0xFF << (adc::MR_PRESCAL_OFFSET);
+      mask |= prescaler << (adc::MR_PRESCAL_OFFSET);
 #endif
       moduleRegisters.writeMode(mask);
 
