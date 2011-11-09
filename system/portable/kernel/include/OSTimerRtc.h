@@ -26,9 +26,11 @@ public:
 
 #if defined(OS_INCLUDE_OSTIMERRTC_UPTIME)
   // increment the current seconds number
-  static void incrementUptime(void);
+  static void
+  incrementUptime(void);
   // return the current seconds number
-  static unsigned long getUptime(void);
+  static unsigned long
+  getUptime(void);
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
@@ -62,15 +64,17 @@ private:
 
 #if defined(OS_INCLUDE_OSTIMERRTC_UPTIME)
 
-inline void OSTimerRtc::incrementUptime(void)
-  {
-    ms_uptime++;
-  }
+inline void
+OSTimerRtc::incrementUptime(void)
+{
+  ms_uptime++;
+}
 
-inline OSTime_t OSTimerRtc::getUptime(void)
-  {
-    return ms_uptime;
-  }
+inline OSTime_t
+OSTimerRtc::getUptime(void)
+{
+  return ms_uptime;
+}
 
 #endif
 
@@ -78,8 +82,8 @@ inline void
 OSTimerRtc::interruptServiceRoutine(void)
 {
   implAcknowledgeInterrupt();
+
   interruptTick();
-  incrementTicks();
 
 #if defined(OS_INCLUDE_OSTIMERRTC_UPTIME)
   incrementUptime();

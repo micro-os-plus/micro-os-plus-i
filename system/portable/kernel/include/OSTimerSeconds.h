@@ -91,8 +91,8 @@ inline void
 OSTimerSeconds::interruptServiceRoutine(void)
 {
   implAcknowledgeInterrupt();
+
   interruptTick();
-  incrementTicks();
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
   incrementUptime();
