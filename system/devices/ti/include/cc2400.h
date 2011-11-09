@@ -14,6 +14,7 @@
 
 #include "hal/arch/avr32/uc3/devices/onchip/include/Spi.h"
 #include "portable/devices/generic/include/ChipSelectActiveLow.h"
+#include "portable/kernel/include/uOS.h"
 
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"

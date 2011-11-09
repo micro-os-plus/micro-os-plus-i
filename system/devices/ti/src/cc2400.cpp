@@ -171,8 +171,8 @@ namespace device
         avr32::uc3::Gpio& mdmPwrEnCore) :
       registers(spi), m_cs(cs), m_mdmClkEn(mdmClkEn), m_mdmGio1(mdmGio1),
           m_mdmGio6(mdmGio6), m_mdmRxStrb(mdmRxStrb), m_mdmTxStrb(mdmTxStrb),
-          m_mdmPktRdy(mdmPktRdy), m_mdmFifoRdy(mdmFifoRdy), m_mdmPwrEnIo(
-              mdmPwrEnIo), m_mdmPwrEnCore(mdmPwrEnCore)
+          m_mdmPktRdy(mdmPktRdy), m_mdmFifoRdy(mdmFifoRdy),
+          m_mdmPwrEnIo(mdmPwrEnIo), m_mdmPwrEnCore(mdmPwrEnCore)
     {
 #if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putConstructor("device::ti::Cc2400", this);
@@ -435,11 +435,20 @@ namespace device
 #if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString("wait osc...");
 #endif
+      volatile uint32_t cyclesNum;
+      cyclesNum = 5;
       do
         {
           readFsmState(status);
+          --cyclesNum;
+          os.sched.timerTicks.sleep(1);
         }
-      while ((status & device::ti::cc2400::Status::XOSC16M_STABLE) == 0);
+      while ((status & device::ti::cc2400::Status::XOSC16M_STABLE) == 0
+          && (cyclesNum > 0));
+      if (cyclesNum == 0)
+        {
+          OSDeviceDebug::putString(" Radio OSC error ");
+        }
 #if defined(OS_DEBUG_DEVICE_TI_CC2400)
       OSDeviceDebug::putString(" conf reg done");
       OSDeviceDebug::putNewLine();
@@ -508,11 +517,11 @@ namespace device
         ;
       // wait calibration by reading status
 #else
-        do
-          {
-            readFsmState(status);
-          }
-        while (0 == (status & 0x04));;
+      do
+        {
+          readFsmState(status);
+        }
+      while (0 == (status & 0x04));;
 #endif
     }
 
