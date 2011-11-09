@@ -19,7 +19,7 @@ OSTimerStruct_t volatile OSTimerTicks::m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
 // OSTimerTicks_t OSTimerTicks::ms_secondTicks;
 
 OSTimerTicks::OSTimerTicks() :
-  OSTimer((OSTimerStruct_t*)&m_array[0], sizeof(m_array) / sizeof(m_array[0]))
+  OSTimer((OSTimerStruct_t*) &m_array[0], sizeof(m_array) / sizeof(m_array[0]))
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSTimerTicks"), this);
 }
@@ -64,13 +64,7 @@ OSTimerTicks::interruptServiceRoutine(void)
 
   implAcknowledgeInterrupt();
 
-  //OSDeviceDebug::putChar('?');
-  OSCriticalSection::enter();
-    {
-      interruptTick();
-      incrementTicks();
-    }
-  OSCriticalSection::exit();
+  interruptTick();
 
   OSScheduler::interruptTick();
 
