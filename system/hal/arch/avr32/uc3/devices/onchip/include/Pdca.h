@@ -296,7 +296,13 @@ namespace avr32
       registerInterruptHandler(avr32::uc3::intc::InterruptHandler_t handler);
 
       pdca::Status_t
-      getStatus();
+      getStatus(void);
+
+      OSEvent_t
+      getEvent(void);
+
+      void
+      setEvent(OSEvent_t event);
 
     public:
       // A reference (instead of a pointer) since it is not only more
@@ -329,7 +335,7 @@ namespace avr32
       OSEvent_t m_event;
 
       // the event return value of the event used for notification
-      OSEventWaitReturn_t m_eventRet;
+      //OSEventWaitReturn_t m_eventRet;
 
       // the status of this PDCA channel
       volatile pdca::Status_t m_status;
@@ -407,6 +413,19 @@ namespace avr32
     {
       return m_status;
     }
+
+    inline OSEvent_t
+    Pdca::getEvent(void)
+    {
+      return m_event;
+    }
+
+    inline void
+    Pdca::setEvent(OSEvent_t event)
+    {
+      m_event = event;
+    }
+
   // TODO: add the other
   }
 }

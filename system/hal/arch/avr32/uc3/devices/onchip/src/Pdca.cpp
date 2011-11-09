@@ -37,7 +37,7 @@ namespace avr32
 #endif
       m_regionsArraySize = 0;
       m_event = (OSEvent_t) this;
-      m_eventRet = OSEventWaitReturn::OS_NONE;
+      //m_eventRet = OSEventWaitReturn::OS_NONE;
       m_candidateNotif = -1; // no candidate to be notified, yet
     }
 
@@ -299,6 +299,11 @@ namespace avr32
               | AVR32_PDCA_IDR_TERR_MASK | AVR32_PDCA_IDR_TRC_MASK);
 
           m_status = avr32::uc3::pdca::STATUS_OK;
+
+          if (m_event == 0)
+            {
+              OSDeviceDebug::putString(" tev=0 ");
+            }
           // notify
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }
@@ -495,6 +500,11 @@ namespace avr32
               = avr32::uc3::pdca::IS_TRANFERRED_MASK;
 
           m_status = avr32::uc3::pdca::STATUS_OK;
+
+          if (m_event == 0)
+            {
+              OSDeviceDebug::putString(" rev=0 ");
+            }
           // notify
           OSScheduler::eventNotify(m_event, (OSEventWaitReturn_t) m_event);
         }
