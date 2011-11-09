@@ -17,6 +17,8 @@ OSTimer::OSTimer(OSTimerStruct_t* pArray, int size)
   m_pArray = pArray;
   m_size = size;
   m_count = 0;
+
+  m_ticks = 0;
 }
 
 // sleep the given ticks (non-zero)
@@ -36,6 +38,11 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
       OSDeviceDebug::putChar(')');
       //OSDeviceDebug::putNewLine();
 #endif /* OS_DEBUG_OSTIMER_SLEEP */
+
+#if defined(DEBUG)
+      OSTimerTicks_t begTicks;
+      begTicks = getTicks();
+#endif
 
 #if true
       if (OSSchedulerLock::isSet())
@@ -71,11 +78,13 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
         {
 
 #if true
+          eventRemove(event);
+
           bool doWait;
           ret = OSEventWaitReturn::OS_FAILED;
           OSCriticalSection::enter();
             {
-              doWait = insert(ticks, event, OSEventWaitReturn::OS_VOID)
+              doWait = insert(ticks, event, (OSEventWaitReturn_t) event)
                   && OSScheduler::eventWaitPrepare(event);
             }
           OSCriticalSection::exit();
@@ -84,6 +93,35 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
               OSScheduler::eventWaitPerform();
             }
           ret = OSScheduler::getEventWaitReturn();
+
+#if defined(DEBUG)
+          if (ret != (OSEventWaitReturn_t) event)
+            {
+              OSDeviceDebug::putString_P(PSTR("OSTimer::sleep() ret="));
+              OSDeviceDebug::putHex(ret);
+              OSDeviceDebug::putNewLine();
+            }
+          else
+            {
+              ret = OSEventWaitReturn::OS_VOID;
+            }
+
+          OSTimerTicks_t durationTicks;
+          durationTicks = getTicks() - begTicks;
+
+          if (durationTicks != ticks)
+            {
+              OSDeviceDebug::putString_P(PSTR("OSTimer::sleep("));
+              OSDeviceDebug::putDec(ticks);
+              OSDeviceDebug::putString_P(PSTR(") took "));
+              OSDeviceDebug::putDec(durationTicks);
+              OSDeviceDebug::putChar(' ');
+              OSDeviceDebug::putString(
+                  OSScheduler::getThreadCurrent()->getName());
+              OSDeviceDebug::putNewLine();
+            }
+#endif
+
 #else
           OSCriticalSection::enter();
             {
@@ -116,17 +154,11 @@ OSTimer::eventNotify(OSTimerTicks_t ticks, OSEvent_t event,
 {
   if (ticks != 0)
     {
+      // If the event is already in, remove it
+      eventRemove(event);
+
       OSCriticalSection::enter();
         {
-#if false
-        // Does not work properly, good events are removed
-          int i;
-          i = find(event);
-          if (i >= 0)
-            {
-              remove(i);
-            }
-#endif
           insert(ticks, event, ret);
         }
       OSCriticalSection::exit();
@@ -216,16 +248,58 @@ OSTimer::insert(OSTimerTicks_t ticks, OSEvent_t event, OSEventWaitReturn_t ret)
   if (cnt == m_size)
     {
 #if defined(DEBUG)
-      OSDeviceDebug::putString_P(PSTR("OSTimer::insert() full"));
+      OSDeviceDebug::putString_P(PSTR("OSTimer::insert() full "));
+      OSDeviceDebug::putPtr(this);
+      OSDeviceDebug::putChar(' ');
+      OSDeviceDebug::putString(OSScheduler::getThreadCurrent()->getName());
       OSDeviceDebug::putNewLine();
+
+      OSTimerStruct_t* p;
+      p = m_pArray;
+
+      int i;
+      i = 0;
+      // find position where to insert
+      for (i = 0; i < m_size; ++i, ++p)
+        {
+          OSDeviceDebug::putHex(p->event);
+          OSDeviceDebug::putChar('/');
+          OSDeviceDebug::putDec(p->ticks);
+          OSDeviceDebug::putNewLine();
+        }
+
 #endif
       return false;
     }
 
-  OSTimerStruct_t* p;
+  volatile OSTimerStruct_t* p;
+  int i;
+
+#if defined(DEBUG)
+
   p = m_pArray;
 
-  int i;
+  for (i = 0; i < cnt; ++i, ++p)
+    {
+      if (p->event == event)
+        {
+          OSDeviceDebug::putString_P(PSTR("OSTimer::insert() already in "));
+          OSDeviceDebug::putHex(event);
+          OSDeviceDebug::putChar('/');
+          OSDeviceDebug::putDec(ticks);
+          OSDeviceDebug::putChar('/');
+          OSDeviceDebug::putHex(ret);
+          OSDeviceDebug::putChar(' ');
+          OSDeviceDebug::putDec(p->ticks);
+          OSDeviceDebug::putChar('/');
+          OSDeviceDebug::putHex(p->u.ret);
+          OSDeviceDebug::putNewLine();
+        }
+    }
+
+#endif
+
+  p = m_pArray;
   i = 0;
   if (cnt > 0)
     {
@@ -300,12 +374,16 @@ OSTimer::interruptTick(void)
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
   OSDeviceDebug::putChar('[');
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK) */
+
+  m_ticks++;
+
   // decrement timer and eventually wake up related threads
   if (m_count > 0) // is there anything in the list?
     {
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK)
       OSDeviceDebug::putChar('*');
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK) */
+
       OSTimerStruct_t* p;
       p = m_pArray;
 

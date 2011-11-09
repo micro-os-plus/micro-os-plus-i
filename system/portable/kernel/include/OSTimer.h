@@ -59,8 +59,11 @@ public:
   // used in interrupt routines
   void
   interruptTick(void);
+
+#if false
   void
   incrementTicks(void);
+#endif
 
 protected:
   // insert a new timeout into the array
@@ -80,24 +83,26 @@ protected:
   // the size of m_pArray
   int m_size;
   // the number of slots used from m_pArray
-  int m_count;
+  int volatile  m_count;
 
 private:
   // the current number of ticks
-  OSTimerTicks_t volatile ms_ticks;
+  OSTimerTicks_t volatile m_ticks;
 };
 
 inline OSTimerTicks_t
 OSTimer::getTicks(void) const
 {
-  return ms_ticks;
+  return m_ticks;
 }
 
+#if false
 inline void
 OSTimer::incrementTicks(void)
 {
-  ms_ticks++;
+  m_ticks++;
 }
+#endif
 
 inline int
 OSTimer::getCount(void) const
