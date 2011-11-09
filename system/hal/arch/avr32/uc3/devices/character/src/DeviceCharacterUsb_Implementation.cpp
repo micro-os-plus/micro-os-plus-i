@@ -19,12 +19,7 @@
 int
 DeviceCharacterUsb::implOpen()
 {
-  OSCriticalSection::enter();
-    {
-      OSDeviceDebug::putString("DeviceCharacterUsb::implOpen()");
-      OSDeviceDebug::putNewLine();
-    }
-  OSCriticalSection::exit();
+  OSDeviceDebug::putString(" DeviceCharacterUsb::implOpen() ");
 
   static bool flagShouldNotInit;
 
