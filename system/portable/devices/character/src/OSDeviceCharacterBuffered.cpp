@@ -18,8 +18,8 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char* pRxBuf,
     unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
     unsigned char* pTxBuf, unsigned short txBufSize, unsigned short txHWM,
     unsigned short txLWM) :
-  m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM), m_txBuf(pTxBuf, txBufSize, txHWM,
-      txLWM)
+  m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM),
+      m_txBuf(pTxBuf, txBufSize, txHWM, txLWM)
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceCharacterBuffered"), this);
 
@@ -28,8 +28,8 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char* pRxBuf,
 
 OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char* pRxBuf,
     unsigned short rxBufSize, unsigned char* pTxBuf, unsigned short txBufSize) :
-  m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4), m_txBuf(pTxBuf,
-      txBufSize, txBufSize * 3 / 4, txBufSize / 4)
+  m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4),
+      m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4)
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceCharacterBuffered"), this);
 
@@ -56,13 +56,8 @@ int
 OSDeviceCharacterBuffered::implOpen(void)
 {
 #if defined(DEBUG)
-  OSCriticalSection::enter();
-    {
-      // TODO : eventually define and use lockEnter()/lockExit()
-      OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered::implOpen()"));
-      OSDeviceDebug::putNewLine();
-    }
-  OSCriticalSection::exit();
+  // TODO : eventually define and use lockEnter()/lockExit()
+  OSDeviceDebug::putString_P(PSTR(" OSDeviceCharacterBuffered::implOpen() "));
 #endif /* defined(DEBUG) */
 
   //assert(ms_pThis == this);
@@ -77,12 +72,7 @@ OSDeviceCharacterBuffered::implClose(void)
 {
 #if defined(DEBUG)
   // TODO : eventually define and use lockEnter()/lockExit()
-  OSCriticalSection::enter();
-    {
-      OSDeviceDebug::putString_P(PSTR("OSDeviceCharacterBuffered::implClose()"));
-      OSDeviceDebug::putNewLine();
-    }
-  OSCriticalSection::exit();
+  OSDeviceDebug::putString_P(PSTR(" OSDeviceCharacterBuffered::implClose() "));
 #endif /* defined(DEBUG) */
 
   // TODO: probably should wait queue to drain and disable port
@@ -188,7 +178,7 @@ OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
 
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH)
   if ((m_pReadMatchArray == 0) || m_rxBuf.isAboveHighWM() || (m_countToRead
-      == 0))
+          == 0))
     {
       // if the match array is not set or buffer is near full or single char read, notify every character
       m_pReadMatchArray = 0;
