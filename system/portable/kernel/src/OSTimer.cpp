@@ -117,6 +117,12 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
               OSDeviceDebug::putString_P(PSTR(") took "));
               OSDeviceDebug::putDec(durationTicks);
               OSDeviceDebug::putChar(' ');
+#if defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS)
+              OSDeviceDebug::putDec(
+                  (OSTimerTicks_t) (OSScheduler::getThreadCurrent()->getLastEventNotifyTicks()
+                      - begTicks));
+              OSDeviceDebug::putChar(' ');
+#endif
               OSDeviceDebug::putString(
                   OSScheduler::getThreadCurrent()->getName());
               OSDeviceDebug::putNewLine();
@@ -385,7 +391,7 @@ OSTimer::interruptTick(void)
       OSDeviceDebug::putChar('*');
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK) */
 
-      OSTimerStruct_t* p;
+      volatile OSTimerStruct_t* p;
       p = m_pArray;
 
       if (--(p->ticks) == 0)
