@@ -345,11 +345,23 @@ OSThread::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
           OSEvent_t ev;
           ev = m_event;
 
+#if true
+          if (event == OSEvent::OS_ALL)
+            {
+              OSDeviceDebug::putString(" notifyAll ");
+            }
+#endif
           // wakeup threads
           // - waiting for event
           // - waiting for OS_ALL
           // - notified with OS_ALL
-          if (ev == OSEvent::OS_ALL || ev == event || event == OSEvent::OS_ALL)
+          if (
+#if false
+              ev == OSEvent::OS_ALL || ev == event || event == OSEvent::OS_ALL
+#else
+              ev == event
+#endif
+              )
             {
               eventWaitClear();
 
@@ -407,6 +419,13 @@ OSThread::eventWaitPrepare(OSEvent_t event)
       return false;
     }
 
+#if true
+  if (event == OSEvent::OS_ALL)
+    {
+      OSDeviceDebug::putString(" waitAny ");
+    }
+#endif
+
   // Mark that the thread is waiting on the given event
   m_event = event;
   m_isWaiting = true;
@@ -437,6 +456,13 @@ OSThread::eventWaitPrepareWhileLocked(OSEvent_t event)
       setEventWaitReturn(OSEventWaitReturn::OS_NONE);
       return false;
     }
+
+#if true
+  if (event == OSEvent::OS_ALL)
+    {
+      OSDeviceDebug::putString(" waitAny ");
+    }
+#endif
 
   // Mark that the thread is waiting on the given event
   m_event = event;
