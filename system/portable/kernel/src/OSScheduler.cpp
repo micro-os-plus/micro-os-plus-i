@@ -333,7 +333,12 @@ OSScheduler::performContextSwitch()
   // If scheduler is not locked, perform the context switch
   if (!OSSchedulerLock::isSet())
     {
-      //OSCriticalSection::enter();
+      // The critical section is mandatory when running the scheduler
+      // on multiple interrupt levels and also for the yield() code
+
+      register OSStack_t tmp;
+      tmp = OSCPUImpl::getInterruptsMask();
+      OSCPUImpl::setInterruptsMask(tmp | OS_CFGINT_OSCRITICALSECTION_MASK);
         {
           OSThread* pThread;
           pThread = ms_pThreadRunning;
@@ -350,7 +355,7 @@ OSScheduler::performContextSwitch()
           // Prepare the global variable with the pointer to the m_pStack.
           ms_ppCurrentStack = (volatile OSStack_t**) &pThread->m_pStack;
         }
-      //OSCriticalSection::exit();
+      OSCPUImpl::setInterruptsMask(tmp);
     }
   else
     {
@@ -440,7 +445,7 @@ OSScheduler::interruptTick(void)
 
 #if defined(OS_INCLUDE_OSTHREAD_INTERRUPTION)
       if (pt->isInterrupted())
-        ISRcancelThread(pt);
+      ISRcancelThread(pt);
 #endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
     }
 
@@ -460,20 +465,20 @@ OSScheduler::interruptTick(void)
 // warning: not synchronised
 void
 OSScheduler::ISRcancelThread(OSThread* pThread)
-{
-  if (pThread->isWaiting())
-    {
-      OSEvent_t event;
-      event = pThread->getEvent();
+  {
+    if (pThread->isWaiting())
+      {
+        OSEvent_t event;
+        event = pThread->getEvent();
 
-      // cancel all timer related events
-      timerTicks.eventRemove(event);
-      timerSeconds.eventRemove(event);
+        // cancel all timer related events
+        timerTicks.eventRemove(event);
+        timerSeconds.eventRemove(event);
 
-      // cancel current event
-      OSScheduler::eventNotify(event, OSEventWaitReturn::OS_CANCELLED);
-    }
-}
+        // cancel current event
+        OSScheduler::eventNotify(event, OSEventWaitReturn::OS_CANCELLED);
+      }
+  }
 
 #endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
 
