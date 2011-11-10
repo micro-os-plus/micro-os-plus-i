@@ -39,11 +39,6 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
       //OSDeviceDebug::putNewLine();
 #endif /* OS_DEBUG_OSTIMER_SLEEP */
 
-#if defined(DEBUG)
-      OSTimerTicks_t begTicks;
-      begTicks = getTicks();
-#endif
-
 #if true
       if (OSSchedulerLock::isSet())
         {
@@ -59,6 +54,11 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
           ret = OSEventWaitReturn::OS_VOID;
           return ret;
         }
+#endif
+
+#if defined(DEBUG)
+      OSTimerTicks_t begTicks;
+      begTicks = getTicks();
 #endif
 
       if (event == 0)
@@ -78,6 +78,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
         {
 
 #if true
+          // Normally the event should not be there, but...
           eventRemove(event);
 
           bool doWait;
