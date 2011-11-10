@@ -361,10 +361,33 @@ inline unsigned int getSRfromStack(void)
     return ret;
   }
 
+unsigned int getSR(void) __attribute__ ((always_inline));
+
+inline unsigned int getSR(void)
+  {
+    register unsigned int ret;
+    ret = __builtin_mfsr(0);
+    return ret;
+  }
+
+// Mode bits in SR
+// 0 - Application
+// 1 - Supervisor
+// 2 - Interrupt Level 0
+// 3,4,5 - Interrupt Level 1,2,3
+// 6 - Exception
+// 7 - Non Maskable Interrupt
+
 inline bool
 OSSchedulerImpl::isContextSwitchAllowed(void)
   {
     return ((getSRfromStack() >> 22) & 0x7) > 1 ? false : true;
+  }
+
+inline bool
+OSSchedulerImpl::isYieldAllowed(void)
+  {
+    return ((getSR() >> 22) & 0x7) > 1 ? false : true;
   }
 
 #endif /* OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING */

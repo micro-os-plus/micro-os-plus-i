@@ -356,6 +356,9 @@ public:
   inline static bool
   isContextSwitchAllowed(void) __attribute__((always_inline));
 
+  inline static bool
+  isYieldAllowed(void) __attribute__((always_inline));
+
 #endif
 
 };
