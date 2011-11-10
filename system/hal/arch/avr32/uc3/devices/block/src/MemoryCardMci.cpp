@@ -355,7 +355,8 @@ namespace avr32
       while (!isRxReady())
         {
           OSDeviceDebug::putChar('R');
-          OSScheduler::yield();
+          OSScheduler::timerTicks.sleep(1);
+          //OSScheduler::yield();
         }
     }
 
@@ -365,7 +366,8 @@ namespace avr32
       while (!isTxReady())
         {
           OSDeviceDebug::putChar('T');
-          OSScheduler::yield();
+          OSScheduler::timerTicks.sleep(1);
+          //OSScheduler::yield();
         }
     }
 

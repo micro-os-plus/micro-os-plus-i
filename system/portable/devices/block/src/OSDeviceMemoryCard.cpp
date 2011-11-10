@@ -1229,7 +1229,8 @@ OSDeviceMemoryCard::finaliseWriteBlock(void)
   while (!m_implementation.isTransferDone())
     {
       OSDeviceDebug::putChar('f');
-      OSScheduler::yield();
+      OSScheduler::timerTicks.sleep(1);
+      //OSScheduler::yield();
     }
 #endif
 
