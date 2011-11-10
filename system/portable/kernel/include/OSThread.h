@@ -232,6 +232,13 @@ public:
   getCriticalSectionNestingStack(void);
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
+#if defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS)
+
+  OSTimerTicks_t
+  getLastEventNotifyTicks();
+
+#endif /* defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS) */
+
 private:
   friend class OSScheduler; // TODO: explain why they are here
   friend class OSActiveThreads;
@@ -240,9 +247,9 @@ private:
 
   // Initialise thread's environment.
   void
-  initialise(const char* pName, OSThreadMainPtr_t entryPoint, void* pParameters,
-      const OSStack_t* pStackBottom, OSStackSize_t stackSize,
-      OSThreadPriority_t priority);
+  initialise(const char* pName, OSThreadMainPtr_t entryPoint,
+      void* pParameters, const OSStack_t* pStackBottom,
+      OSStackSize_t stackSize, OSThreadPriority_t priority);
 
   // Redirect to virtual function (threadMain).
   static void
@@ -298,7 +305,8 @@ private:
 
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
   // This local stack grows to higher addresses
-  OSStack_t m_criticalSectionNestingStack[OS_CFGINT_OSTHREAD_CRITICALSECTIONNESTINGSTACK_ARRAY_SIZE];
+  OSStack_t
+      m_criticalSectionNestingStack[OS_CFGINT_OSTHREAD_CRITICALSECTIONNESTINGSTACK_ARRAY_SIZE];
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
@@ -313,6 +321,10 @@ private:
 #endif
 #endif
 
+#if defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS)
+  OSTimerTicks_t m_lastEventNotifyTicks;
+#endif /* defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS) */
+
 private:
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   unsigned short m_WDseconds;
@@ -323,9 +335,9 @@ private:
 
 inline void
 OSThread::ackInterruption(void)
-{
-  setInterruption(false);
-}
+  {
+    setInterruption(false);
+  }
 
 #endif
 
@@ -392,9 +404,9 @@ OSThread::getStackSize(void) const
 #if defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK)
 inline OSStack_t*
 OSThread::getCriticalSectionNestingStack(void)
-  {
-    return &m_criticalSectionNestingStack[0];
-  }
+{
+  return &m_criticalSectionNestingStack[0];
+}
 #endif /* defined(OS_INCLUDE_OSCRITICALSECTION_USE_THREAD_STACK) */
 
 // since all registers are saved on the thread stack,
@@ -497,16 +509,26 @@ OSThread::setAllowSleep(bool b)
 
 inline bool
 OSThread::isInterrupted(void) const
-{
-  return m_isInterrupted;
-}
+  {
+    return m_isInterrupted;
+  }
 
 inline void
 OSThread::setInterruption(bool flag)
-{
-  m_isInterrupted = flag;
-}
+  {
+    m_isInterrupted = flag;
+  }
 
 #endif /* defined(OS_INCLUDE_OSTHREAD_INTERRUPTION) */
+
+#if defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS)
+
+inline OSTimerTicks_t
+OSThread::getLastEventNotifyTicks()
+{
+  return m_lastEventNotifyTicks;
+}
+
+#endif /* defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS) */
 
 #endif /* OSTHREAD_H_ */

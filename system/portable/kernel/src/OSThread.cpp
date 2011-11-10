@@ -370,6 +370,11 @@ OSThread::eventNotify(OSEvent_t event, OSEventWaitReturn_t retVal)
               if (retVal == OSEventWaitReturn::OS_NONE)
                 OSDeviceDebug::putChar('^');
 #endif
+
+#if defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS)
+              m_lastEventNotifyTicks = OSScheduler::timerTicks.getTicks();
+#endif /* defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS) */
+
               OSActiveThreads::insert(this);
               ret = 1;
             }
