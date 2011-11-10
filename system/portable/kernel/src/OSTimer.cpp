@@ -118,10 +118,15 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
               OSDeviceDebug::putDec(durationTicks);
               OSDeviceDebug::putChar(' ');
 #if defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS)
-              OSDeviceDebug::putDec(
-                  (OSTimerTicks_t) (OSScheduler::getThreadCurrent()->getLastEventNotifyTicks()
-                      - begTicks));
-              OSDeviceDebug::putChar(' ');
+              OSTimerTicks_t duration2Ticks;
+              duration2Ticks
+                  = OSScheduler::getThreadCurrent()->getLastEventNotifyTicks()
+                      - begTicks;
+              if (duration2Ticks != ticks)
+                {
+                  OSDeviceDebug::putDec(duration2Ticks);
+                  OSDeviceDebug::putChar(' ');
+                }
 #endif
               OSDeviceDebug::putString(
                   OSScheduler::getThreadCurrent()->getName());
