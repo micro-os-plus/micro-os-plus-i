@@ -441,7 +441,7 @@ namespace device
         {
           readFsmState(status);
           --cyclesNum;
-          os.sched.timerTicks.sleep(1);
+          OSScheduler::timerTicks.sleep(1);
         }
       while ((status & device::ti::cc2400::Status::XOSC16M_STABLE) == 0
           && (cyclesNum > 0));
@@ -500,7 +500,7 @@ namespace device
     }
 
     // wait calibration
-    void
+    bool
     Cc2400::waitCalibration(void)
     {
       // TODO: should not wait forever
@@ -513,8 +513,16 @@ namespace device
 
 #if true
       // BUSY WAIT until GIO1 is set (max 100usec); meaning calibration done
-      while (!m_mdmGio1.isPinHigh())
-        ;
+      volatile uint16_t cyclesNum;
+      cyclesNum = 1000;
+      while ((!m_mdmGio1.isPinHigh()) && (cyclesNum > 0))
+        {
+          --cyclesNum;
+        };
+      if (cyclesNum == 0)
+        {
+          return false;
+        }
       // wait calibration by reading status
 #else
       do
@@ -523,6 +531,7 @@ namespace device
         }
       while (0 == (status & 0x04));;
 #endif
+      return true;
     }
 
     // returns value of last RSSI measured by modem in RX mode

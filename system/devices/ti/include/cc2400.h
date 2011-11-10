@@ -7,7 +7,6 @@
 #ifndef DEVICE_TI_CC2400_H_
 #define DEVICE_TI_CC2400_H_
 
-#include "portable/kernel/include/OS.h"
 #include "hal/arch/avr32/uc3/devices/onchip/include/Gpio.h"
 
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
@@ -229,7 +228,7 @@ namespace device
       startCalibration(void);
 
       // wait calibration
-      void
+      bool
       waitCalibration(void);
 
       // clear FIFO buffer
