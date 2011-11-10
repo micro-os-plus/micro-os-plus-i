@@ -110,9 +110,9 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
           OSTimerTicks_t durationTicks;
           durationTicks = getTicks() - begTicks;
 
-          if (durationTicks != ticks)
+          if ((durationTicks != ticks) && (durationTicks != (ticks + 1)))
             {
-              OSDeviceDebug::putString_P(PSTR("OSTimer::sleep("));
+              OSDeviceDebug::putString_P(PSTR(" OSTimer::sleep("));
               OSDeviceDebug::putDec(ticks);
               OSDeviceDebug::putString_P(PSTR(") took "));
               OSDeviceDebug::putDec(durationTicks);
@@ -122,7 +122,7 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
               duration2Ticks
                   = OSScheduler::getThreadCurrent()->getLastEventNotifyTicks()
                       - begTicks;
-              if (duration2Ticks != ticks)
+              if ((duration2Ticks != ticks) && (duration2Ticks != (ticks + 1)))
                 {
                   OSDeviceDebug::putDec(duration2Ticks);
                   OSDeviceDebug::putChar(' ');
