@@ -165,7 +165,15 @@ OSThread::staticMain(OSThread* pt)
 void
 OSThread::yield()
 {
-  OSSchedulerImpl::yield();
+  // yield() should not be used in interrupt contexts
+  if (OSSchedulerImpl::isYieldAllowed())
+    {
+      OSSchedulerImpl::yield();
+    }
+  else
+    {
+      OSDeviceDebug::putString(" yield() not allowed ");
+    }
 }
 
 // Should be overridden by actual implementation
