@@ -9,15 +9,150 @@
 #if defined(OS_INCLUDE_DATETIME)
 
 #include "portable/misc/include/DateTime.h"
+#include "portable/misc/include/DateTime_ostream.h"
+
+#include <stdlib.h>
 
 const DateTime::Day_t DateTime::daysInMonths[] =
   { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-// ----------------------------------------------------------------------------
+// ============================================================================
+
+Time::Time()
+{
+  OSDeviceDebug::putConstructor_P(PSTR("Time"), this);
+
+  setTime(0, 0, 0);
+}
+
+Time::Time(Hour_t hour,
+    Minute_t minute, Second_t second)
+{
+  OSDeviceDebug::putConstructor_P(PSTR("Time"), this);
+
+  setTime(hour, minute, second);
+}
+
+Time::~Time()
+{
+  OSDeviceDebug::putDestructor_P(PSTR("Time"), this);
+}
+
+void
+Time::setTime(Hour_t hour, Minute_t minute, Second_t second)
+{
+  m_second = second;
+  m_minute = minute;
+  m_hour = hour;
+}
+
+bool
+Time::areTimeFieldsValid(void)
+{
+  if ((m_hour > 24) || (m_minute > 60) || (m_second > 60))
+    {
+      return false;
+    }
+
+  return true;
+}
+
+bool
+Time::incrementSecond(void)
+{
+  if (++m_second < 60)
+    return false;
+
+  m_second = 0;
+  if (++m_minute < 60)
+    return false;
+
+  m_minute = 0;
+  if (++m_hour < 24)
+    return false;
+
+  m_hour = 0;
+  return true;
+}
+
+OSReturn_t
+Time::parseNmeaTime(const char* pTime)
+{
+  DEBUG_ASSERT(pTime != NULL);
+
+  if ((strlen(pTime) != 10) || pTime[6] != '.')
+    {
+      OSDeviceDebug::putString(" BAD_TIME ");
+      return OSReturn::OS_BAD_TIME;
+    }
+
+  for (int i = 0; i < 6; ++i)
+    {
+      uchar_t ch;
+      ch = pTime[i];
+
+      uint8_t b;
+      if (('0' <= ch) && (ch <= '9'))
+        {
+          b = ch - '0';
+        }
+      else
+        {
+          OSDeviceDebug::putString(" BAD_TIME (ch) ");
+          return OSReturn::OS_BAD_TIME;
+        }
+
+      switch (i)
+        {
+      case 0:
+        m_hour = b;
+        break;
+
+      case 1:
+        m_hour = m_hour * 10 + b;
+        break;
+
+      case 2:
+        m_minute = b;
+        break;
+
+      case 3:
+        m_minute = m_minute * 10 + b;
+        break;
+
+      case 4:
+        m_second = b;
+        break;
+
+      case 5:
+        m_second = m_second * 10 + b;
+        break;
+
+        }
+    }
+
+  if (!areTimeFieldsValid())
+    {
+      OSDeviceDebug::putString(" BAD_TIME (fields) ");
+      return OSReturn::OS_BAD_TIME;
+    }
+
+  OSDeviceDebug::putString(" time ");
+  OSDeviceDebug::putDec(m_hour, 2);
+  OSDeviceDebug::putChar(':');
+  OSDeviceDebug::putDec(m_minute, 2);
+  OSDeviceDebug::putChar(':');
+  OSDeviceDebug::putDec(m_second, 2);
+  OSDeviceDebug::putChar(' ');
+
+  return OSReturn::OS_OK;
+}
+
+// ============================================================================
 
 DateTime::DateTime()
 {
-  debug.putConstructor_P(PSTR("DateTime"), this);
+  OSDeviceDebug::putConstructor_P(PSTR("DateTime"), this);
 
   m_second = 0;
   m_minute = 0;
@@ -30,7 +165,7 @@ DateTime::DateTime()
 DateTime::DateTime(Year_t year, Month_t month, Day_t day, Hour_t hour,
     Minute_t minute, Second_t second)
 {
-  debug.putConstructor_P(PSTR("DateTime"), this);
+  OSDeviceDebug::putConstructor_P(PSTR("DateTime"), this);
 
   m_second = second;
   m_minute = minute;
@@ -42,14 +177,14 @@ DateTime::DateTime(Year_t year, Month_t month, Day_t day, Hour_t hour,
 
 DateTime::DateTime(DurationSeconds_t secondsFromEpoch)
 {
-  debug.putConstructor_P(PSTR("DateTime"), this);
+  OSDeviceDebug::putConstructor_P(PSTR("DateTime"), this);
 
   processSecondsFromEpoch(secondsFromEpoch);
 }
 
 DateTime::~DateTime()
 {
-  debug.putDestructor_P(PSTR("DateTime"), this);
+  OSDeviceDebug::putDestructor_P(PSTR("DateTime"), this);
 }
 
 // Parse dates like YYYYMMDDTHHMMSS into members

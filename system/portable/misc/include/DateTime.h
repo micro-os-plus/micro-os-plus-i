@@ -7,19 +7,78 @@
 #ifndef DATETIME_H_
 #define DATETIME_H_
 
-#include "portable/kernel/include/uOS.h"
+#include "portable/kernel/include/OS_Defines.h"
+
+#include "portable/kernel/include/OS_StdTypes.h"
+#include "portable/kernel/include/OSReturn.h"
 
 #if !defined(OS_CFGINT_DATETIME_DEFAULT_EPOCH_YEAR)
 // With 32 bits, this gives us 135 years, i.e. up to 2145
 #define OS_CFGINT_DATETIME_DEFAULT_EPOCH_YEAR 2010
 #endif
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 
-class DateTime;
-std::ostream& operator <<(std::ostream& out, DateTime& dt);
+class Time
+{
+public:
 
-// ----------------------------------------------------------------------------
+  // Names are singular, since they do not represent durations
+  typedef uint8_t Second_t; // 0-59
+  typedef uint8_t Minute_t; // 0-59
+  typedef uint8_t Hour_t; // 0-23
+
+  typedef uint32_t DurationSeconds_t;
+
+  // ----- Constructors & destructors -----------------------------------------
+
+  Time();
+  Time(Hour_t hour, Minute_t minute, Second_t second);
+
+  ~Time();
+
+  // ----- Public methods -----------------------------------------------------
+
+  void
+  setTime(Hour_t hour, Minute_t minute, Second_t second);
+
+  // Names are singular, since they do not return durations
+  Second_t
+  getSecond(void);
+
+  Minute_t
+  getMinute(void);
+
+  Hour_t
+  getHour();
+
+  void
+  setSecond(Second_t second);
+
+  void
+  setMinute(Minute_t minute);
+
+  void
+  setHour(Hour_t hour);
+
+  OSReturn_t
+  parseNmeaTime(const char* pTime);
+
+  bool
+  areTimeFieldsValid(void);
+
+  // Return true when day change
+  bool
+  incrementSecond(void);
+
+protected:
+
+  Second_t m_second; // 0-59
+  Minute_t m_minute; // 0-59
+  Hour_t m_hour; // 0-23
+};
+
+// ============================================================================
 
 class DateTime
 {
@@ -133,6 +192,46 @@ private:
 
 #endif /* defined(OS_INCLUDE_DATETIME_YEAR_EPOCH) */
 };
+
+// ============================================================================
+
+inline Time::Second_t
+Time::getSecond(void)
+{
+  return m_second;
+}
+
+inline Time::Minute_t
+Time::getMinute(void)
+{
+  return m_minute;
+}
+
+inline Time::Hour_t
+Time::getHour()
+{
+  return m_hour;
+}
+
+inline void
+Time::setSecond(Second_t second)
+{
+  m_second = second;
+}
+
+inline void
+Time::setMinute(Minute_t minute)
+{
+  m_minute = minute;
+}
+
+inline void
+Time::setHour(Hour_t hour)
+{
+  m_hour = hour;
+}
+
+// ============================================================================
 
 inline DateTime::Second_t
 DateTime::getSecond(void)
