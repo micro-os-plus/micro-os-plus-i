@@ -15,12 +15,14 @@ namespace avr32
   {
     namespace rtc
     {
-      class Registers
+      class ModuleRegisters
       {
       public:
+
         // --------------------------------------------------------------------
 
-        const static uint32_t MEMORY_ADDRESS = 0xFFFF0D00;
+        const static uint32_t MEMORY_ADDRESS =
+            avr32::uc3::PeripheralAddressMap::RTC;
 
         // ----- Memory Map ---------------------------------------------------
 
@@ -63,77 +65,71 @@ namespace avr32
         clearInterrupt(void);
       };
 
-      // ----------------------------------------------------------------------
-#if false
-      // in this context 'static' means visible only within this file
-      static Registers& registers =
-          *reinterpret_cast<Registers*> (Registers::MEMORY_ADDRESS);
-#endif
 
       // ----- Inline implementation ------------------------------------------
 
       inline void
-      Registers::writeControl(uint32_t v)
+      ModuleRegisters::writeControl(uint32_t v)
       {
         this->ctrl = v;
       }
 
       inline uint32_t
-      Registers::readControl(void)
+      ModuleRegisters::readControl(void)
       {
         return this->ctrl;
       }
 
       inline void
-      Registers::writeValue(uint_t v)
+      ModuleRegisters::writeValue(uint_t v)
       {
         this->val = v;
       }
 
       inline uint_t
-      Registers::readValue(void)
+      ModuleRegisters::readValue(void)
       {
         return this->val;
       }
 
       inline void
-      Registers::writeTop(uint_t v)
+      ModuleRegisters::writeTop(uint_t v)
       {
         this->top = v;
       }
 
       inline uint_t
-      Registers::readTop(void)
+      ModuleRegisters::readTop(void)
       {
         return this->top;
       }
 
       inline void
-      Registers::interruptEnable(void)
+      ModuleRegisters::interruptEnable(void)
       {
         this->ier = 1;
       }
 
       inline void
-      Registers::interruptDisable(void)
+      ModuleRegisters::interruptDisable(void)
       {
         this->idr = 1;
       }
 
       inline bool
-      Registers::isInterruptEnabled(void)
+      ModuleRegisters::isInterruptEnabled(void)
       {
         return ((this->imr & 1) != 0);
       }
 
       inline bool
-      Registers::isInterruptRequested(void)
+      ModuleRegisters::isInterruptRequested(void)
       {
         return ((this->isr & 1) != 0);
       }
 
       inline void
-      Registers::clearInterrupt(void)
+      ModuleRegisters::clearInterrupt(void)
       {
         this->icr = 1;
       }
@@ -146,8 +142,10 @@ namespace avr32
     public:
       Rtc();
 
-      rtc::Registers& registers;
+      rtc::ModuleRegisters& registers;
 
+      void
+      resetCounter(void);
     };
   }
 }
