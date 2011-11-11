@@ -23,6 +23,8 @@
 
 // ============================================================================
 
+#if defined(DEBUG)
+
 #if defined(OS_CONFIG_DEBUG_DEVICE_I2C)
 typedef DeviceDebugI2cImpl DeviceDebugImpl_t;
 #elif defined(OS_CONFIG_DEBUG_DEVICE_USART)
@@ -30,6 +32,8 @@ public OSDeviceDebugUsartImpl
 #else
 #error "Missing OS_CONFIG_DEBUG_DEVICE_* definition"
 #endif
+
+#endif /* defined(DEBUG) */
 
 // This class is used for displaying the trace messages.
 // The actual device output is passed to an implementation helper.
@@ -306,6 +310,17 @@ OSDeviceDebug::putHex(uint32_t l __attribute__((unused)))
 {
 
 }
+
+#if !defined(OS_CONFIG_ARCH_AVR8)
+
+inline void
+OSDeviceDebug::putHex(uint_t l __attribute__((unused)))
+{
+
+}
+
+#endif /* !defined(OS_CONFIG_ARCH_AVR8) */
+
 
 inline void
 OSDeviceDebug::putDec(uint8_t b __attribute__((unused)), uint16_t n __attribute__((unused)))
