@@ -13,6 +13,10 @@
 
 #include "portable/kernel/include/OS.h"
 
+#if defined(OS_INCLUDE_OSTIMERRTC_TIME)
+#include "portable/misc/include/DateTime.h"
+#endif /* defined(OS_INCLUDE_OSTIMERRTC_TIME) */
+
 #if !defined(OS_CFGINT_OSTIMERTC_SIZE)
 #define OS_CFGINT_OSTIMERTC_SIZE 	(OS_CFGINT_THREADS_ARRAY_SIZE)
 #endif
@@ -26,10 +30,10 @@ public:
 
 #if defined(OS_INCLUDE_OSTIMERRTC_UPTIME)
   // increment the current seconds number
-  static void
+  void
   incrementUptime(void);
   // return the current seconds number
-  static unsigned long
+  unsigned long
   getUptime(void);
 #endif
 
@@ -41,6 +45,11 @@ public:
   // interrupt service routine called each second
   void
   interruptServiceRoutine(void);
+
+#if defined(OS_INCLUDE_OSTIMERRTC_TIME)
+  Time&
+  getTime();
+#endif /* defined(OS_INCLUDE_OSTIMERRTC_TIME) */
 
 protected:
   // OSScheduler calls OSTimerSeconds::initialise() from OSScheduler::start()
@@ -54,12 +63,16 @@ protected:
 
 private:
   // contain the timeouts(expressed in ticks) for every alarm
-  static OSTimerStruct_t volatile m_array[OS_CFGINT_OSTIMERTC_SIZE];
+  OSTimerStruct_t volatile m_array[OS_CFGINT_OSTIMERTC_SIZE];
 
 #if defined(OS_INCLUDE_OSTIMERRTC_UPTIME)
   // current seconds number
-  static OSTime_t volatile ms_uptime;
+  OSTime_t volatile ms_uptime;
 #endif
+
+#if defined(OS_INCLUDE_OSTIMERRTC_TIME)
+  Time m_time;
+#endif /* defined(OS_INCLUDE_OSTIMERRTC_TIME) */
 };
 
 #if defined(OS_INCLUDE_OSTIMERRTC_UPTIME)
@@ -89,11 +102,25 @@ OSTimerRtc::interruptServiceRoutine(void)
   incrementUptime();
 #endif
 
+#if defined(OS_INCLUDE_OSTIMERRTC_TIME)
+  m_time.incrementSecond();
+#endif /* defined(OS_INCLUDE_OSTIMERRTC_TIME) */
+
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
   checkVirtualWatchdogs();
 #endif
 }
 
 #endif
+
+#if defined(OS_INCLUDE_OSTIMERRTC_TIME)
+
+inline Time&
+OSTimerRtc::getTime()
+{
+  return m_time;
+}
+
+#endif /* defined(OS_INCLUDE_OSTIMERRTC_TIME) */
 
 #endif /* OSTIMERRTC_H_ */
