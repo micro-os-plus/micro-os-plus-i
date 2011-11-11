@@ -26,9 +26,11 @@ public:
 
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
   // increment the current seconds number
-  static void incrementUptime(void);
+  static void
+  incrementUptime(void);
   // return the current seconds number
-  static unsigned long getUptime(void);
+  static unsigned long
+  getUptime(void);
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
@@ -39,6 +41,9 @@ public:
   // return the current number of ticks within the current second
   static OSTimerTicks_t
   getSchedulerTicks(void);
+
+  static void
+  resetSchedulerTicks(void);
 
   // interrupt service routine called each second
   void
@@ -73,17 +78,25 @@ OSTimerSeconds::getSchedulerTicks(void)
   return ms_schedulerTicks;
 }
 
+inline void
+OSTimerSeconds::resetSchedulerTicks(void)
+{
+  ms_schedulerTicks = 0;
+}
+
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
 
-inline void OSTimerSeconds::incrementUptime(void)
-  {
-    ms_uptime++;
-  }
+inline void
+OSTimerSeconds::incrementUptime(void)
+{
+  ms_uptime++;
+}
 
-inline OSTime_t OSTimerSeconds::getUptime(void)
-  {
-    return ms_uptime;
-  }
+inline OSTime_t
+OSTimerSeconds::getUptime(void)
+{
+  return ms_uptime;
+}
 
 #endif
 
