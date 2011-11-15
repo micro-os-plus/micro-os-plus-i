@@ -484,6 +484,22 @@ LargeCircularSessionsStorage::Session::~Session()
       this);
 }
 
+LargeCircularSessionsStorage::Session&
+LargeCircularSessionsStorage::Session::operator=(volatile Session& session) volatile
+{
+  if (this != &session)
+    {
+      // Perform a manual shallow copy
+      setUniqueId(session.getUniqueId());
+      setFirstBlockNumber(session.getFirstBlockNumber());
+      setLastBlockNumber(session.getLastBlockNumber());
+      setLength(session.getLength());
+      setNextSessionFirstBlockNumber(session.getNextSessionFirstBlockNumber());
+      setCompletelyWritten(session.isCompletelyWritten());
+    }
+  return (Session&) *this;
+}
+
 // ============================================================================
 
 // ----- Constructors & destructors -------------------------------------------
@@ -501,6 +517,19 @@ LargeCircularSessionsStorage::SessionBlock::~SessionBlock()
 {
   OSDeviceDebug::putDestructor_P(
       PSTR("LargeCircularSessionsStorage::SessionBlock"), this);
+}
+
+LargeCircularSessionsStorage::SessionBlock&
+LargeCircularSessionsStorage::SessionBlock::operator=(
+    volatile SessionBlock& sessionBlock) volatile
+{
+  if (this != &sessionBlock)
+    {
+      // Perform a manual shallow copy
+      setBlockNumber(sessionBlock.getBlockNumber());
+      setUniqueId(sessionBlock.getUniqueId());
+    }
+  return (SessionBlock&) *this;
 }
 
 // ============================================================================
@@ -752,7 +781,7 @@ LargeCircularSessionsStorage::Writer::writeSessionBlock(uint8_t* pBlockBuffer)
 
   os.sched.lock.enter();
     {
-      Session& session = getStorage().getMostRecentlyWrittenSession();
+      volatile Session& session = getStorage().getMostRecentlyWrittenSession();
       // Update common storage session class to point to the written block
       session.setLastBlockNumber(m_currentSession.getLastBlockNumber());
       session.setLength(m_currentSession.getLength());
@@ -817,7 +846,7 @@ LargeCircularSessionsStorage::Writer::closeSession(void)
 
   os.sched.lock.enter();
     {
-      LargeCircularSessionsStorage::Session storageSession =
+      volatile LargeCircularSessionsStorage::Session& storageSession =
           getStorage().getMostRecentlyWrittenSession();
 
       // Update common storage session class with session length
@@ -1635,7 +1664,7 @@ LargeCircularSessionsStorage::Reader::ReadCondition::prepareCheckCondition(void)
   // might have not been written, so we need to wait for
   // the writer to complete
 
-  Session& storageSession =
+  volatile Session& storageSession =
       getReader().getStorage().getMostRecentlyWrittenSession();
 
   if (storageSession.getUniqueId() != currentSession.getUniqueId())
@@ -1658,10 +1687,9 @@ OSReturn_t
 LargeCircularSessionsStorage::Reader::ReadCondition::checkSynchronisedCondition(
     void)
 {
-  LargeCircularSessionsStorage::Session& currentSession =
-      getReader().getCurrentSession();
+  Session& currentSession = getReader().getCurrentSession();
 
-  Session& storageSession =
+  volatile Session& storageSession =
       getReader().getStorage().getMostRecentlyWrittenSession();
 
   if (storageSession.getUniqueId() != currentSession.getUniqueId())

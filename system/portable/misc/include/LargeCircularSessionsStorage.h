@@ -60,6 +60,8 @@ public:
   typedef uint32_t SessionBlockNumber_t;
   typedef uint32_t SessionBlockCount_t;
 
+  // --------------------------------------------------------------------------
+
   // This inner class handles the session block header fields.
   // In addition to regular getters/setters, it has methods to read/write
   // header fields at proper byte positions.
@@ -212,52 +214,52 @@ public:
     // ----- Public methods ---------------------------------------------------
 
     // Used to copy all fields from one object to another
-    //Session&
-    //operator=(const Session& session);
+    Session&
+    operator=(volatile Session& session) volatile;
 
     //Session&
     //operator=(const Header& header);
 
     bool
-    isCompletelyWritten(void);
+    isCompletelyWritten(void) volatile;
 
     void
-    setCompletelyWritten(bool flag);
+    setCompletelyWritten(bool flag) volatile;
 
     bool
-    isValid(void);
+    isValid(void) volatile;
 
     void
-    setUniqueId(SessionUniqueId_t sessionUniqueId);
+    setUniqueId(SessionUniqueId_t sessionUniqueId) volatile;
     SessionUniqueId_t
-    getUniqueId(void);
+    getUniqueId(void) volatile;
 
     void
-    incrementUniqueId(void);
+    incrementUniqueId(void) volatile;
 
     void
-    setFirstBlockNumber(SessionBlockNumber_t sessionFirstBlockNumber);
+    setFirstBlockNumber(SessionBlockNumber_t sessionFirstBlockNumber) volatile;
     SessionBlockNumber_t
-    getFirstBlockNumber(void);
+    getFirstBlockNumber(void) volatile;
 
     void
-    setLastBlockNumber(SessionBlockNumber_t sessionLastBlockNumber);
+    setLastBlockNumber(SessionBlockNumber_t sessionLastBlockNumber) volatile;
     SessionBlockNumber_t
-    getLastBlockNumber(void);
+    getLastBlockNumber(void) volatile;
 
     void
-    setLength(SessionBlockNumber_t sessionLength);
+    setLength(SessionBlockNumber_t sessionLength) volatile;
     SessionBlockNumber_t
-    getLength(void);
+    getLength(void) volatile;
 
     void
     setNextSessionFirstBlockNumber(
-        SessionBlockNumber_t nextSessionFirstBlockNumber);
+        SessionBlockNumber_t nextSessionFirstBlockNumber) volatile;
     SessionBlockNumber_t
-    getNextSessionFirstBlockNumber(void);
+    getNextSessionFirstBlockNumber(void) volatile;
 
     bool
-    isForwardReferenceValid(void);
+    isForwardReferenceValid(void) volatile;
 
   private:
 
@@ -292,20 +294,23 @@ public:
 
     // ----- Public methods ---------------------------------------------------
 
+    SessionBlock&
+    operator=(volatile SessionBlock& sessionBlock) volatile;
+
     void
-    setUniqueId(BlockUniqueId_t blockUniqueId);
+    setUniqueId(BlockUniqueId_t blockUniqueId) volatile;
 
     BlockUniqueId_t
-    getUniqueId(void);
+    getUniqueId(void) volatile;
 
     void
-    incrementUniqueId(void);
+    incrementUniqueId(void) volatile;
 
     void
-    setBlockNumber(SessionBlockNumber_t sessionBlockNumber);
+    setBlockNumber(SessionBlockNumber_t sessionBlockNumber) volatile;
 
     SessionBlockNumber_t
-    getBlockNumber(void);
+    getBlockNumber(void) volatile;
 
   private:
 
@@ -378,11 +383,11 @@ public:
   void
   setIsWriting(bool flag);
 
-  Session&
-  getMostRecentlyWrittenSession(void);
+  volatile Session&
+  getMostRecentlyWrittenSession(void) volatile;
 
-  SessionBlock&
-  getMostRecentlyWrittenSessionBlock(void);
+  volatile SessionBlock&
+  getMostRecentlyWrittenSessionBlock(void) volatile;
 
   void
   setEventNotifier(OSEventNotifier* pEventNotifier);
@@ -428,10 +433,12 @@ private:
 
   OSDeviceBlock::BlockSize_t m_blockSizeBlocks;
 
-  Session m_mostRecentlyWrittenSession;
-  SessionBlock m_mostRecentlyWrittenSessionBlock;
+  // Being shared between one writer and multiple readers,
+  // these need to be volatile
+  Session volatile m_mostRecentlyWrittenSession;
+  SessionBlock volatile m_mostRecentlyWrittenSessionBlock;
 
-  bool m_isWriting;
+  bool volatile m_isWriting;
 
   OSEvent_t m_event;
 
@@ -815,96 +822,96 @@ LargeCircularSessionsStorage::Header::readNextSessionFirstBlockNumber(
 // ============================================================================
 
 inline bool
-LargeCircularSessionsStorage::Session::isCompletelyWritten(void)
+LargeCircularSessionsStorage::Session::isCompletelyWritten(void) volatile
 {
   return m_isCompletelyWritten;
 }
 
 inline void
-LargeCircularSessionsStorage::Session::setCompletelyWritten(bool flag)
+LargeCircularSessionsStorage::Session::setCompletelyWritten(bool flag) volatile
 {
   m_isCompletelyWritten = flag;
 }
 
 inline bool
-LargeCircularSessionsStorage::Session::isValid(void)
+LargeCircularSessionsStorage::Session::isValid(void) volatile
 {
   return (m_sessionFirstBlockNumber != Header::INVALID_BLOCKNUMBER);
 }
 
 inline void
 LargeCircularSessionsStorage::Session::setUniqueId(
-    SessionUniqueId_t sessionUniqueId)
+    SessionUniqueId_t sessionUniqueId) volatile
 {
   m_sessionUniqueId = sessionUniqueId;
 }
 
 inline LargeCircularSessionsStorage::SessionUniqueId_t
-LargeCircularSessionsStorage::Session::getUniqueId(void)
+LargeCircularSessionsStorage::Session::getUniqueId(void) volatile
 {
   return m_sessionUniqueId;
 }
 
 inline void
-LargeCircularSessionsStorage::Session::incrementUniqueId(void)
+LargeCircularSessionsStorage::Session::incrementUniqueId(void) volatile
 {
   ++m_sessionUniqueId;
 }
 
 inline void
 LargeCircularSessionsStorage::Session::setFirstBlockNumber(
-    SessionBlockNumber_t sessionFirstBlockNumber)
+    SessionBlockNumber_t sessionFirstBlockNumber) volatile
 {
   m_sessionFirstBlockNumber = sessionFirstBlockNumber;
 }
 
 inline LargeCircularSessionsStorage::SessionBlockNumber_t
-LargeCircularSessionsStorage::Session::getFirstBlockNumber(void)
+LargeCircularSessionsStorage::Session::getFirstBlockNumber(void) volatile
 {
   return m_sessionFirstBlockNumber;
 }
 
 inline void
 LargeCircularSessionsStorage::Session::setLastBlockNumber(
-    SessionBlockNumber_t sessionLastBlockNumber)
+    SessionBlockNumber_t sessionLastBlockNumber) volatile
 {
   m_sessionLastBlockNumber = sessionLastBlockNumber;
 }
 
 inline LargeCircularSessionsStorage::SessionBlockNumber_t
-LargeCircularSessionsStorage::Session::getLastBlockNumber(void)
+LargeCircularSessionsStorage::Session::getLastBlockNumber(void) volatile
 {
   return m_sessionLastBlockNumber;
 }
 
 inline void
 LargeCircularSessionsStorage::Session::setLength(
-    SessionBlockNumber_t sessionLength)
+    SessionBlockNumber_t sessionLength) volatile
 {
   m_sessionLength = sessionLength;
 }
 
 inline LargeCircularSessionsStorage::SessionBlockNumber_t
-LargeCircularSessionsStorage::Session::getLength(void)
+LargeCircularSessionsStorage::Session::getLength(void) volatile
 {
   return m_sessionLength;
 }
 
 inline void
 LargeCircularSessionsStorage::Session::setNextSessionFirstBlockNumber(
-    SessionBlockNumber_t nextSessionFirstBlockNumber)
+    SessionBlockNumber_t nextSessionFirstBlockNumber) volatile
 {
   m_nextSessionFirstBlockNumber = nextSessionFirstBlockNumber;
 }
 
 inline LargeCircularSessionsStorage::SessionBlockNumber_t
-LargeCircularSessionsStorage::Session::getNextSessionFirstBlockNumber(void)
+LargeCircularSessionsStorage::Session::getNextSessionFirstBlockNumber(void) volatile
 {
   return m_nextSessionFirstBlockNumber;
 }
 
 inline bool
-LargeCircularSessionsStorage::Session::isForwardReferenceValid(void)
+LargeCircularSessionsStorage::Session::isForwardReferenceValid(void) volatile
 {
   return (m_nextSessionFirstBlockNumber != Header::INVALID_BLOCKNUMBER);
 }
@@ -913,32 +920,32 @@ LargeCircularSessionsStorage::Session::isForwardReferenceValid(void)
 
 inline void
 LargeCircularSessionsStorage::SessionBlock::setUniqueId(
-    BlockUniqueId_t blockUniqueId)
+    BlockUniqueId_t blockUniqueId) volatile
 {
   m_blockUniqueId = blockUniqueId;
 }
 
 inline LargeCircularSessionsStorage::BlockUniqueId_t
-LargeCircularSessionsStorage::SessionBlock::getUniqueId(void)
+LargeCircularSessionsStorage::SessionBlock::getUniqueId(void) volatile
 {
   return m_blockUniqueId;
 }
 
 inline void
-LargeCircularSessionsStorage::SessionBlock::incrementUniqueId(void)
+LargeCircularSessionsStorage::SessionBlock::incrementUniqueId(void) volatile
 {
   ++m_blockUniqueId;
 }
 
 inline void
 LargeCircularSessionsStorage::SessionBlock::setBlockNumber(
-    SessionBlockNumber_t sessionBlockNumber)
+    SessionBlockNumber_t sessionBlockNumber) volatile
 {
   m_blockNumber = sessionBlockNumber;
 }
 
 inline LargeCircularSessionsStorage::SessionBlockNumber_t
-LargeCircularSessionsStorage::SessionBlock::getBlockNumber(void)
+LargeCircularSessionsStorage::SessionBlock::getBlockNumber(void) volatile
 {
   return m_blockNumber;
 }
@@ -994,14 +1001,14 @@ LargeCircularSessionsStorage::setIsWriting(bool flag)
   m_isWriting = flag;
 }
 
-inline LargeCircularSessionsStorage::Session&
-LargeCircularSessionsStorage::getMostRecentlyWrittenSession(void)
+inline volatile LargeCircularSessionsStorage::Session&
+LargeCircularSessionsStorage::getMostRecentlyWrittenSession(void) volatile
 {
   return m_mostRecentlyWrittenSession;
 }
 
-inline LargeCircularSessionsStorage::SessionBlock&
-LargeCircularSessionsStorage::getMostRecentlyWrittenSessionBlock(void)
+inline volatile LargeCircularSessionsStorage::SessionBlock&
+LargeCircularSessionsStorage::getMostRecentlyWrittenSessionBlock(void) volatile
 {
   return m_mostRecentlyWrittenSessionBlock;
 }
