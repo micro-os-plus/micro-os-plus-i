@@ -145,6 +145,8 @@ namespace device
             return OSReturn::OS_DISCONNECTED;
           }
 
+        m_gpioAds1282Sync.setPinLow();
+
         return OSReturn::OS_OK;
       }
 

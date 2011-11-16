@@ -37,17 +37,19 @@ namespace device
 
       static const uint32_t SCLCK = (4096 * 1000);
 
+      static const uint32_t ERROR_CORRECTOR = 10;
+
       // TDLY > 24/fclck (5.85us)
-      static const uint32_t T_DLY_US = (24 * 1000 * 1000) / SCLCK + 1;
+      static const uint32_t T_DLY_US = ERROR_CORRECTOR* (24 * 1000 * 1000) / SCLCK + 1;
 
       // SYNC pulse width, high. Min = 2/fclk.
-      static const uint32_t T_SYNC_SPWH_US = (2 * 1000 * 1000) / SCLCK + 1;
+      static const uint32_t T_SYNC_SPWH_US = ERROR_CORRECTOR * (2 * 1000 * 1000) / SCLCK + 1;
 
       // SYNC pulse width, low. Min = 2/fclk.
-      static const uint32_t T_SYNC_SPWL_US = (2 * 1000 * 1000) / SCLCK + 1;
+      static const uint32_t T_SYNC_SPWL_US = ERROR_CORRECTOR * (2 * 1000 * 1000) / SCLCK + 1;
 
       // RESET low. Min = 2/fclk.
-      static const uint32_t T_RST_US = (2 * 1000 * 1000) / SCLCK + 1;
+      static const uint32_t T_RST_US = ERROR_CORRECTOR* (2 * 1000 * 1000) / SCLCK + 1;
 
       // 1 second.
       static const uint32_t POWER_OFF_TIME_S = 1;
