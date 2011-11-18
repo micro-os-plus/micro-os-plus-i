@@ -16,6 +16,13 @@ namespace device
   {
     namespace cc2400
     {
+
+      TxPowerLevelValue_t TxPowerLevel::values[] =
+                { -25, -15, -10, -7, -5, -1, 0 };
+
+      TxPowerLevel_t TxPowerLevel::regValues[] =
+                { 0, 1, 2, 3, 4, 5, 6, 7 };
+
       Registers::Registers(spim_t& spi) :
         m_spi(spi)
       {
@@ -535,7 +542,7 @@ namespace device
     }
 
     // returns value of last RSSI measured by modem in RX mode
-    int16_t
+    device::ti::cc2400::Rssi_t
     Cc2400::readRssiValue(void)
     {
       device::ti::cc2400::Status_t status;
@@ -551,7 +558,7 @@ namespace device
       int8_t aux8;
       aux8 = (int8_t) (aux >> 8);
 
-      int16_t rssiValue;
+      device::ti::cc2400::Rssi_t rssiValue;
       rssiValue = aux8;
 
 #if false

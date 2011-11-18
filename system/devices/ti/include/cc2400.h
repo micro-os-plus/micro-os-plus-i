@@ -38,9 +38,11 @@ namespace device
       typedef uint8_t Status_t;
 
       typedef uint8_t TxPowerLevel_t;
+      typedef int16_t TxPowerLevelValue_t;
+      typedef int16_t Rssi_t;
 
       // the offset of RSSI value, recorded inside RSSIREG
-      const static int16_t RSSI_OFFSET = -54;
+      const static Rssi_t RSSI_OFFSET = -54;
       const static uint16_t CC2400_BYTE_MICROS = 8;// microseconds need to send a byte
       const static uint16_t CC2400_PREAMBLE_BYTESIZE = 32;
       const static uint16_t CC2400_SYNC_BYTESIZE = 4;
@@ -52,6 +54,8 @@ namespace device
       class TxPowerLevel
       {
       public:
+        // commented values are not used in implementation, being too discrete
+        // if are to be used, it must be added to the array bellow
         const static TxPowerLevel_t DBM_25 = 0; // -25 dBm
         const static TxPowerLevel_t DBM_15 = 1; // -15 dBm
         const static TxPowerLevel_t DBM_10 = 2; // -10 dBm
@@ -60,6 +64,15 @@ namespace device
         const static TxPowerLevel_t DBM_2_8 = 5; // -2.8 dBm
         const static TxPowerLevel_t DBM_1_3 = 6; // -1.3 dBm
         const static TxPowerLevel_t DBM_0 = 7; // 0 dBm
+
+        // number of available power levels
+        const static uint8_t TX_POWER_LEVELS_NUM = 8;
+        // the values of power level, expressed in dBm with sign
+
+        static TxPowerLevelValue_t values[];
+
+        // the value of power level register, to be used in CC2400 modem
+        static TxPowerLevel_t regValues[];
 
       };
 
@@ -236,7 +249,7 @@ namespace device
       clearFifoBuffer();
 
       // returns value of last RSSI measured by modem in RX mode
-      int16_t
+      device::ti::cc2400::Rssi_t
       readRssiValue(void);
 
       // returns current value of FSM
