@@ -16,13 +16,42 @@ namespace device
   {
     namespace ads1282
     {
+      void
+      adsBusyWaitUs(uint32_t microSeconds)
+      {
+        uint32_t ticks;
+        uint32_t ccountt1, ccountt2, dcount;
+
+        dcount = 0;
+
+        ticks = microSeconds * 16;
+
+        ccountt1 = Get_system_register(AVR32_COUNT);
+
+        do
+          {
+            ccountt2 = Get_system_register(AVR32_COUNT);
+
+            if (ccountt2 > ccountt1)
+              {
+                dcount += ccountt2 - ccountt1;
+              }
+            else
+              {
+                dcount += ccountt2 + (16000 - ccountt1);
+              }
+            ccountt1 = ccountt2;
+          }
+        while (dcount < ticks);
+      }
+
       Ads1282::Ads1282(avr32::uc3::SpiMaster& spi,
           avr32::uc3::Gpio& gpioAds1282Drdy, avr32::uc3::Gpio& gpioAds1282Sync) :
         m_spi(spi), m_gpioAds1282Cs(OS_CFGPIN_ADS1282_CHIPSELECT_GPIO_PIN),
-            m_gpioAds1282Sync(gpioAds1282Sync), m_gpioAds1282Drdy(
-                gpioAds1282Drdy), m_gpioAds1282Reset(
-                OS_CFGPIN_ADS1282_RESET_GPIO_PIN), m_gpioAds1282Pwdn(
-                OS_CFGPIN_ADS1282_POWERDOWN_GPIO_PIN)
+            m_gpioAds1282Sync(gpioAds1282Sync),
+            m_gpioAds1282Drdy(gpioAds1282Drdy),
+            m_gpioAds1282Reset(OS_CFGPIN_ADS1282_RESET_GPIO_PIN),
+            m_gpioAds1282Pwdn(OS_CFGPIN_ADS1282_POWERDOWN_GPIO_PIN)
       {
 #if defined(OS_DEBUG_DEVICE_TI_ADS1282)
         OSDeviceDebug::putConstructor("device::ti::Ads1282", this);
@@ -48,8 +77,8 @@ namespace device
 
         if (m_pGpioConfigurationArray != NULL)
           {
-            avr32::uc3::Gpio::configPeripheralModeAndFunction
-                ( m_pGpioConfigurationArray);
+            avr32::uc3::Gpio::configPeripheralModeAndFunction(
+                m_pGpioConfigurationArray);
           }
 
         m_gpioAds1282Cs.configureModeGpio();
@@ -79,7 +108,7 @@ namespace device
 
         if (m_pGpioConfigurationArray != NULL)
           {
-            avr32::uc3::Gpio::configGpioModeInput( m_pGpioConfigurationArray);
+            avr32::uc3::Gpio::configGpioModeInput(m_pGpioConfigurationArray);
           }
 
         m_gpioAds1282Cs.configureModeGpio();
@@ -123,16 +152,14 @@ namespace device
       OSReturn_t
       Ads1282::powerOn(void)
       {
+        m_gpioAds1282Pwdn.setPinHigh();
+
+        OSScheduler::timerTicks.sleep(POWER_ON_TIME_MS);
+
+        // Wait until DRDY is low.
         uint32_t i;
-
-        OSCriticalSection::enter();
-          {
-            isDrdyHighToLowFlag = false;
-            m_gpioAds1282Drdy.enableInterrupt();
-
-            m_gpioAds1282Pwdn.setPinHigh();
-          }
-        OSCriticalSection::exit();
+        isDrdyHighToLowFlag = false;
+        m_gpioAds1282Drdy.enableInterrupt();
 
         // wait for DRDY to be low again.
         for (i = 0; i < T_DR_MAX_TICKS && !isDrdyHighToLowFlag; i++)
@@ -145,7 +172,7 @@ namespace device
             return OSReturn::OS_DISCONNECTED;
           }
 
-        m_gpioAds1282Sync.setPinLow();
+//        OSScheduler::timerSeconds.sleep(1);
 
         return OSReturn::OS_OK;
       }
@@ -167,12 +194,12 @@ namespace device
         m_gpioAds1282Sync.setPinHigh();
 
         // wait tSPWH > 2/fclck (0.488us)
-        OS::busyWaitMicros(T_SYNC_SPWH_US);
+        adsBusyWaitUs(T_SYNC_SPWH_US);
 
         m_gpioAds1282Sync.setPinLow();
 
         // wait tSPWH > 2/fclck (0.488us)
-        OS::busyWaitMicros(T_SYNC_SPWL_US);
+        adsBusyWaitUs(T_SYNC_SPWL_US);
       }
 
       void
@@ -188,7 +215,7 @@ namespace device
         m_gpioAds1282Reset.setPinLow();
 
         // wait T_RST > 2/fclck (0.488us)
-        OS::busyWaitMicros(T_RST_US);
+        adsBusyWaitUs(T_RST_US);
 
         isDrdyHighToLowFlag = false;
         m_gpioAds1282Drdy.enableInterrupt();
@@ -215,7 +242,7 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
       }
 
       void
@@ -224,7 +251,7 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
       }
 
       void
@@ -233,7 +260,7 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATA);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
       }
 
       OSReturn_t
@@ -243,20 +270,21 @@ namespace device
 
         m_gpioAds1282Sync.setPinHigh();
 
-        // wait T_DLY > 24/fclck (5.85us)
-        //        OS::busyWaitMicros(T_DLY_US);
+        // wait tSPWH > 2/fclck (0.488us)
+        adsBusyWaitUs(T_SYNC_SPWH_US);
 
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
 
         // send SYNC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SYNC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        //OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
 
         isDrdyHighToLowFlag = false;
         m_gpioAds1282Drdy.enableInterrupt();
@@ -275,17 +303,19 @@ namespace device
             return OSReturn::OS_DISCONNECTED;
           }
 
+//        OSScheduler::timerSeconds.sleep(1);
+
         // send SDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SDATAC);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
 
         // send OFSCAL
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::OFSCAL);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
 
         isDrdyHighToLowFlag = false;
         m_gpioAds1282Drdy.enableInterrupt();
@@ -390,20 +420,18 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RREG + reg);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
 
         // One register.
         m_spi.writeWaitReadByte(0);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
 
         regValue = m_spi.writeWaitReadByte(0);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
-
-        OSDeviceDebug::putHex(regValue);
+        adsBusyWaitUs(T_DLY_US);
 
         return regValue;
       }
@@ -414,18 +442,18 @@ namespace device
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::WREG + reg);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
 
         // One register.
         m_spi.writeWaitReadByte(0);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
 
         m_spi.writeWaitReadByte(value);
 
         // wait T_DLY > 24/fclck (5.85us)
-        OS::busyWaitMicros(T_DLY_US);
+        adsBusyWaitUs(T_DLY_US);
       }
     }
   }

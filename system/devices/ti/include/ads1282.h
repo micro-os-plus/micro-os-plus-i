@@ -37,7 +37,7 @@ namespace device
 
       static const uint32_t SCLCK = (4096 * 1000);
 
-      static const uint32_t ERROR_CORRECTOR = 10;
+      static const uint32_t ERROR_CORRECTOR = 1;
 
       // TDLY > 24/fclck (5.85us)
       static const uint32_t T_DLY_US = ERROR_CORRECTOR* (24 * 1000 * 1000) / SCLCK + 1;
@@ -50,6 +50,9 @@ namespace device
 
       // RESET low. Min = 2/fclk.
       static const uint32_t T_RST_US = ERROR_CORRECTOR* (2 * 1000 * 1000) / SCLCK + 1;
+
+      // 2^16 fclks
+      static const uint32_t POWER_ON_TIME_MS = (1 << 16) * 1000 / SCLCK;
 
       // 1 second.
       static const uint32_t POWER_OFF_TIME_S = 1;
