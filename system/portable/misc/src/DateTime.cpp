@@ -143,6 +143,8 @@ Time::parseNmeaTime(const char* pTime)
   OSDeviceDebug::putDec(m_minute, 2);
   OSDeviceDebug::putChar(':');
   OSDeviceDebug::putDec(m_second, 2);
+  OSDeviceDebug::putChar('.');
+  OSDeviceDebug::putString(&pTime[7]);
   OSDeviceDebug::putChar(' ');
 
   return OSReturn::OS_OK;
@@ -482,6 +484,8 @@ DateTime::parseNmeaTime(const char* pTime)
   OSDeviceDebug::putDec(m_minute, 2);
   OSDeviceDebug::putChar(':');
   OSDeviceDebug::putDec(m_second, 2);
+  OSDeviceDebug::putChar('.');
+  OSDeviceDebug::putString(&pTime[7]);
   OSDeviceDebug::putChar(' ');
 
   return OSReturn::OS_OK;
