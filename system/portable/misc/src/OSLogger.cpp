@@ -178,7 +178,7 @@ OSLogger::log(LogLevel_t level, LogCode_t code, const char* msg)
     {
       OSSchedulerLock::enter();
         {
-          OSDeviceDebug::putString("DBGLOG(");
+          OSDeviceDebug::putString(" DBGLOG(");
           OSDeviceDebug::putString(convertLevelToString(level));
           OSDeviceDebug::putChar(',');
           OSDeviceDebug::putString(m_name);
