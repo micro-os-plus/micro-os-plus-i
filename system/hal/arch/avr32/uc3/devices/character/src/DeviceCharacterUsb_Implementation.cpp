@@ -21,14 +21,6 @@ DeviceCharacterUsb::implOpen()
 {
   OSDeviceDebug::putString(" DeviceCharacterUsb::implOpen() ");
 
-  static bool flagShouldNotInit;
-
-  if (!flagShouldNotInit)
-    {
-      // TODO: check if is ok to put it here!
-      flagShouldNotInit = OSUsbDevice::usbDriverInit();
-    }
-
   AVR32_usb_free_out(m_rx_ep);
   OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
   OSUsbDevice::Usb_reset_endpoint_fifo_access(m_rx_ep);
