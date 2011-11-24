@@ -109,6 +109,7 @@
 #define AVR32_USBB_UESTAXCLR_NAKOUTIC_MASK                  AVR32_USBB_UESTA0CLR_NAKOUTIC_MASK
 #define AVR32_USBB_UESTAX_NAKOUTI_MASK                      AVR32_USBB_UESTA0_NAKOUTI_MASK
 #define AVR32_USBB_UECONX_STALLRQ_MASK                      AVR32_USBB_UECON0_STALLRQ_MASK
+#define AVR32_USBB_UECONXCLR_RXSTPEC_MASK                   AVR32_USBB_UECON0CLR_RXSTPEC_MASK
 #define AVR32_USBB_UDINTESET_EP0INTES_MASK                  0x00001000
 
 #define AVR32_USBB_uerst                  (AVR32_USBB.uerst)
@@ -235,6 +236,14 @@
 #define AVR32_is_usb_clock_frozen()         (Tst_bits(AVR32_USBB_usbcon, AVR32_USBB_USBCON_FRZCLK_MASK))
 //! disables wake-up interrupt
 #define AVR32_usb_disable_wake_up_interrupt()           (AVR32_USBB_udinteclr = AVR32_USBB_UDINTECLR_WAKEUPEC_MASK)
+  //! disables Start-of-Frame Interrupt
+#define AVR32_usb_disable_sof_interrupt()               (AVR32_USBB_udinteclr = AVR32_USBB_UDINTECLR_SOFEC_MASK)
+  //! disables USB reset interrupt
+#define AVR32_usb_disable_reset_interrupt()             (AVR32_USBB_udinteclr = AVR32_USBB_UDINTECLR_EORSTEC_MASK)
+  //! disables SETUP received interrupt
+#define AVR32_usb_disable_setup_received_interrupt()    (AVR32_USBB_ueconxclr(EP_CONTROL) = AVR32_USBB_UECONXCLR_RXSTPEC_MASK)
+  //! disables suspend state interrupt
+#define AVR32_usb_disable_suspend_interrupt()           (AVR32_USBB_udinteclr = AVR32_USBB_UDINTECLR_SUSPEC_MASK)
 //! acks resume
 #define AVR32_usb_ack_resume()                          (AVR32_USBB_udintclr = AVR32_USBB_UDINTCLR_EORSMC_MASK)
 //! disables resume interrupt
