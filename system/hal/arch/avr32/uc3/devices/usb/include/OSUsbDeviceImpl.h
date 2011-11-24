@@ -39,6 +39,10 @@ public:
   // initialize USB driver
   static bool
   usbDriverInit(void);
+  static void
+  enable(void);
+  static void
+  disable(void);
 
   // read/write methods
   static unsigned char
@@ -170,6 +174,8 @@ public:
   Usb_select_device(void);
   static void
   Usb_enable_vbus_interrupt(void);
+  static void
+  Usb_disable_vbus_interrupt(void);
 
   static bool
   Is_usb_write_enabled(void);
@@ -332,6 +338,9 @@ public:
 
   static bool
   isConnected(void);
+
+  static bool
+  m_isUsbEnabled;
 
   // members
   static unsigned char data_to_transfer;
@@ -697,6 +706,17 @@ OSUsbDeviceImpl::Usb_enable_vbus_interrupt(void)
   USBCON |= _BV(VBUSTE);
 #else
   AVR32_usb_enable_vbus_interrupt();
+#endif
+}
+
+// disable VBUS interrupt
+inline void
+OSUsbDeviceImpl::Usb_disable_vbus_interrupt(void)
+{
+#if TO_BE_PORTED
+  USBCON |= _BV(VBUSTE);
+#else
+  AVR32_usb_disable_vbus_interrupt();
 #endif
 }
 

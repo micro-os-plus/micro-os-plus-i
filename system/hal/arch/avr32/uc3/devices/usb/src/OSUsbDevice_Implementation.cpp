@@ -41,6 +41,8 @@ unsigned char OSUsbDeviceImpl::usb_configuration_nb;
 
 unsigned char OSUsbDeviceImpl::m_selectedEndpoint;
 
+bool OSUsbDeviceImpl::m_isUsbEnabled;
+
 // ----------------------------------------------------------------------------
 
 extern void
@@ -124,10 +126,15 @@ OSUsbDeviceImpl::interruptGenServiceRoutine(void)
           OSDeviceDebug::putString(" uvH ");
           //OSDeviceDebug::putNewLine();
 
-          usb_start_device();
-
           OSUsbDeviceImpl::Usb_vbus_on_action();
           OSUsbDeviceImpl::Usb_send_event(EVT_USB_POWERED);
+
+          if (!m_isUsbEnabled)
+            {
+              return;
+            }
+
+          usb_start_device();
         }
       else
         {
@@ -310,14 +317,10 @@ OSUsbDeviceImpl::usbDriverInit(void)
       // Disable SOF interrupt.
       //AVR32_usb_disable_sof_interrupt();
 
+      m_isUsbEnabled = true;
+
       // Enable VBUS interrupt.
       OSUsbDeviceImpl::Usb_enable_vbus_interrupt();
-
-      if (AVR32_is_usb_vbus_high())
-        {
-          OSDeviceDebug::putString(" force ");
-          AVR32_usb_raise_vbus_transition();
-        }
 
       OSUsbDeviceImpl::Usb_ack_suspend(); // A suspend condition may be detected right after enabling the USB macro
       (void) OSUsbDeviceImpl::Is_usb_suspend();
@@ -329,6 +332,60 @@ OSUsbDeviceImpl::usbDriverInit(void)
   OSCriticalSection::exit();
 
   return TRUE;
+}
+
+void
+OSUsbDeviceImpl::enable(void)
+{
+  OSDeviceDebug::putString(" OSUsbDeviceImpl::enable ");
+  OSDeviceDebug::putNewLine();
+
+  m_isUsbEnabled = true;
+
+  OSCriticalSection::enter();
+    {
+      Usb_unfreeze_clock();
+      (void) Is_usb_clock_frozen();
+
+      // force VBus Transition Interrupt.
+      // if we have used DrvUsbStop to stop the driver and VBUS wasn't been disconnected,
+      // this interrupt must be raised manually.
+      if (Is_usb_vbus_high())
+        {
+          AVR32_usb_raise_vbus_transition();
+        }
+
+      Usb_freeze_clock();
+      (void) Is_usb_clock_frozen();
+    }
+  OSCriticalSection::exit();
+}
+
+void
+OSUsbDeviceImpl::disable()
+{
+  OSDeviceDebug::putString(" OSUsbDeviceImpl::disable ");
+  OSDeviceDebug::putNewLine();
+
+  OSCriticalSection::enter();
+    {
+      m_isUsbEnabled = false;
+
+      Usb_unfreeze_clock();
+      Usb_detach();
+
+      AVR32_usb_disable_sof_interrupt();
+      AVR32_usb_disable_reset_interrupt();
+      Usb_disable_wake_up_interrupt();
+      AVR32_usb_disable_setup_received_interrupt();
+      AVR32_usb_disable_suspend_interrupt();
+
+      AVR32_usb_reset_endpoint(EP_CONTROL);
+
+      Usb_freeze_clock();
+      (void) Is_usb_clock_frozen();
+    }
+  OSCriticalSection::exit();
 }
 
 bool
