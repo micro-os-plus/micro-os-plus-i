@@ -179,6 +179,8 @@
 #define AVR32_usb_disable()                 (Clr_bits(AVR32_USBB_usbcon, AVR32_USBB_USBCON_USBE_MASK))
 // Enable vbus interrupt.
 #define AVR32_usb_enable_vbus_interrupt()   (Set_bits(AVR32_USBB_usbcon, AVR32_USBB_USBCON_VBUSTE_MASK))
+// Disable vbus interrupt.
+#define AVR32_usb_disable_vbus_interrupt()  (Clr_bits(AVR32_USBB_usbcon, AVR32_USBB_USBCON_VBUSTE_MASK))
 // tests if endpoint write allowed
 #define AVR32_is_usb_write_enabled(ep)                  (Tst_bits(AVR32_USBB_uestax(ep), AVR32_USBB_UESTAX_RWALL_MASK))
 // sends current bank for IN endpoint
