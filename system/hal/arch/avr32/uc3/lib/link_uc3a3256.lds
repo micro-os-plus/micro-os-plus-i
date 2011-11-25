@@ -50,6 +50,7 @@ MEMORY
 {
   FLASH (rxai!w) : ORIGIN = 0x80000000, LENGTH = 0x00040000
   INTRAM (wxa!ri) : ORIGIN = 0x00000004, LENGTH = 0x0000FFFC
+  HRAM (wxa!ri) : ORIGIN = 0xFF000000, LENGTH = 0x00010000
   USERPAGE : ORIGIN = 0x80800000, LENGTH = 0x00000200
 }
 
@@ -59,6 +60,7 @@ PHDRS
   INTRAM_ALIGN PT_NULL;
   INTRAM_AT_FLASH PT_LOAD;
   INTRAM PT_NULL;
+  HRAM PT_NULL;
   USERPAGE PT_LOAD;
 }
 
@@ -275,6 +277,15 @@ SECTIONS
   } >INTRAM AT>INTRAM :INTRAM
   .userpage       : { *(.userpage .userpage.*) } >USERPAGE AT>USERPAGE :USERPAGE
   /DISCARD/ : { *(.note.GNU-stack) }
+  
+  . = ORIGIN(HRAM);
+  . = ALIGN(8);
+  .hram :
+  {
+    PROVIDE(__hram_start = .);
+    *(.hram)
+    PROVIDE(__hram_end = .);
+  } >HRAM AT>HRAM :HRAM
  
    __os_text_begin = __executable_start;
    __os_text_end = __etext;
@@ -289,5 +300,7 @@ SECTIONS
 
    __os_ctors_array_begin = LOADADDR (.ctors);
    __os_ctors_array_end = (__os_ctors_array_begin + SIZEOF (.ctors));
-    
+   
+   __os_hram_begin = __hram_start;
+   __os_hram_end = __hram_end;
 }
