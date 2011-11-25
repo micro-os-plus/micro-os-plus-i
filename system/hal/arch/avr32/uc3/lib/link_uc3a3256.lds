@@ -61,6 +61,7 @@ PHDRS
   INTRAM_AT_FLASH PT_LOAD;
   INTRAM PT_NULL;
   HRAM PT_NULL;
+  HRAM_DUMMY PT_LOAD;
   USERPAGE PT_LOAD;
 }
 
@@ -285,7 +286,7 @@ SECTIONS
     PROVIDE(__hram_start = .);
     *(.hram)
     PROVIDE(__hram_end = .);
-  } >HRAM AT>HRAM :HRAM
+  } >HRAM AT>HRAM :HRAM_DUMMY
  
    __os_text_begin = __executable_start;
    __os_text_end = __etext;
