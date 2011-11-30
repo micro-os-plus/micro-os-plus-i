@@ -56,14 +56,14 @@ USB_contextHandler(void)
 {
   OSScheduler::ISR_ledActiveOn();
 
-  OSUsbLed::toggle();
+  //OSUsbLed::toggle();
 
   // AVR32 does not have separate interrupts, so we call both
   // routines here
   OSUsbDeviceImpl::interruptGenServiceRoutine();
   OSUsbDeviceImpl::interruptComServiceRoutine();
 
-  OSUsbLed::toggle();
+  //OSUsbLed::toggle();
 }
 
 #if true
@@ -238,6 +238,8 @@ OSUsbDeviceImpl::usbDriverInit(void)
 {
   OSDeviceDebug::putString("OSUsbDeviceImpl::usbDriverInit()");
   OSDeviceDebug::putNewLine();
+
+  OSUsbLed::init();
 
   OSCriticalSection::enter();
     {
