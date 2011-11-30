@@ -570,7 +570,7 @@ DeviceCharacterUsb::cdcSetControlLineState()
       OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
       OSUsbDevice::endpointSelect(EP_CONTROL);
 
-      OSUsbLed::off(); // will be toggled to on() at interrupt prolog
+      // OSUsbLed::off(); // will be toggled to on() at interrupt prolog
       // Note: interface numbers must start at 0 to match index!!!
       if (index == IF0_NB)
         {
@@ -588,7 +588,7 @@ DeviceCharacterUsb::cdcSetControlLineState()
     }
   else
     {
-      OSUsbLed::on(); // will be toggled to off() at interrupt prolog
+      // OSUsbLed::on(); // will be toggled to off() at interrupt prolog
       if (index == IF0_NB)
         {
           OSScheduler::eventNotify(g_usb0->getReadEvent());
