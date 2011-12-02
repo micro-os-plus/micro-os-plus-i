@@ -67,7 +67,7 @@ OSCondition::wait(OSEvent_t event, bool doNotBlock)
 
       // Enter a critical section, eventNotify() sent from other threads
       // cannot occur.
-      OSSchedulerLock::enter();
+      criticalSectionEnter();
         {
           ret = checkSynchronisedCondition();
           shouldWait = (ret == OSReturn::OS_SHOULD_WAIT);
@@ -79,7 +79,7 @@ OSCondition::wait(OSEvent_t event, bool doNotBlock)
                 }
             }
         }
-      OSSchedulerLock::exit();
+      criticalSectionExit();
 
       if (ret == OSReturn::OS_SHOULD_RETRY)
         {
@@ -192,5 +192,43 @@ OSCondition::isCancelled(void)
 {
   return false;
 }
+
+void
+OSCondition::criticalSectionEnter(void)
+{
+  OSSchedulerLock::enter();
+}
+
+void
+OSCondition::criticalSectionExit(void)
+{
+  OSSchedulerLock::exit();
+}
+
+// ============================================================================
+
+OSRealTimeCondition::OSRealTimeCondition()
+{
+  OSDeviceDebug::putConstructor_P(PSTR("OSRealTimeCondition"), this);
+}
+
+OSRealTimeCondition::~OSRealTimeCondition()
+{
+  OSDeviceDebug::putConstructor_P(PSTR("OSRealTimeCondition"), this);
+}
+
+void
+OSRealTimeCondition::criticalSectionEnter(void)
+{
+  OSRealTimeCriticalSection::enter();
+}
+
+void
+OSRealTimeCondition::criticalSectionExit(void)
+{
+  OSRealTimeCriticalSection::exit();
+}
+
+// ----------------------------------------------------------------------------
 
 #endif

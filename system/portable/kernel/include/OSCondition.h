@@ -57,6 +57,12 @@ public:
   OSEventWaitReturn_t
   getEventWaitReturn(void);
 
+  virtual void
+  criticalSectionEnter(void);
+
+  virtual void
+  criticalSectionExit(void);
+
 private:
 
   OSEventWaitReturn_t m_eventWaitReturn;
@@ -69,6 +75,36 @@ OSCondition::getEventWaitReturn(void)
 {
   return m_eventWaitReturn;
 }
+
+// ============================================================================
+
+class OSRealTimeCondition : public OSCondition
+{
+public:
+
+  // ----- Constructors & destructors -----------------------------------------
+
+  OSRealTimeCondition();
+  virtual
+  ~OSRealTimeCondition();
+
+  // ----- Public methods -----------------------------------------------------
+
+  // ----- Virtual methods ----------------------------------------------------
+
+  virtual OSReturn_t
+  checkSynchronisedCondition(void) = 0;
+
+  virtual void
+  criticalSectionEnter(void);
+
+  virtual void
+  criticalSectionExit(void);
+
+private:
+
+  // --------------------------------------------------------------------------
+};
 
 // ----------------------------------------------------------------------------
 
