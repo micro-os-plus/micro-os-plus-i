@@ -9,6 +9,7 @@
 #if defined(DEBUG) && defined(OS_CONFIG_DEBUG_DEVICE_I2C)
 
 #include "portable/devices/debug/include/DeviceDebugI2cImpl.h"
+#include "portable/kernel/include/OSCPUImpl.h"
 
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER)
 
@@ -90,15 +91,67 @@ DeviceDebugI2cImpl::implPutBytes(const char* s, unsigned int n)
   mask = criticalEnter();
     {
       for (i = 0; i < n; ++i)
-        ms_circularBuffer.put(*s++);
+      ms_circularBuffer.put(*s++);
     }
   criticalExit(mask);
 
 #else
 
-  ms_circularBuffer.putBytes(s, n);
+  n = ms_circularBuffer.putBytes(s, n);
 
 #endif
+
+  if (OSCPUImpl::isInInterruptMode())
+    {
+      return n;
+    }
+
+  implFlush();
+
+  return n;
+
+#else
+
+  unsigned int i;
+#if defined(OS_INCLUDE_DEVICEDEBUGI2C_SINGLE_BYTE)
+  for (i = 0; i < n; ++i)
+  implPutByte(s[i]);
+#else
+  for (i = 0; i < n;)
+    { // loop until we succeed to transmit
+      masterStart();
+      masterPutAddress(OS_CFGINT8_DEBUG_I2C_DEBUGGER_ADDR, I2C_WRITE);
+      if (!masterGetAck())
+        {
+          masterCleanup();
+          goto retry;
+        }
+
+      for (; i < n; ++i)
+        {
+          masterPutByte(s[i]);
+          if (!masterGetAck())
+            {
+              masterCleanup();
+              goto retry;
+            }
+        }
+      masterStop();
+      break;
+
+      retry: masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT * 10);
+    }
+#endif
+
+  return n;
+
+#endif /* !defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER) */
+}
+
+void
+DeviceDebugI2cImpl::implFlush(void)
+{
+#if defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER)
 
   if (ms_lock.aquire())
     {
@@ -135,42 +188,7 @@ DeviceDebugI2cImpl::implPutBytes(const char* s, unsigned int n)
       ms_lock.release();
     }
 
-#else
-
-  unsigned int i;
-#if defined(OS_INCLUDE_DEVICEDEBUGI2C_SINGLE_BYTE)
-  for (i = 0; i < n; ++i)
-  implPutByte(s[i]);
-#else
-  for (i = 0; i < n;)
-    { // loop until we succeed to transmit
-      masterStart();
-      masterPutAddress(OS_CFGINT8_DEBUG_I2C_DEBUGGER_ADDR, I2C_WRITE);
-      if (!masterGetAck())
-        {
-          masterCleanup();
-          goto retry;
-        }
-
-      for (; i < n; ++i)
-        {
-          masterPutByte(s[i]);
-          if (!masterGetAck())
-            {
-              masterCleanup();
-              goto retry;
-            }
-        }
-      masterStop();
-      break;
-
-      retry: masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT * 10);
-    }
-#endif
-
-#endif /* !defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER) */
-
-  return n;
+#endif /* defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER) */
 }
 
 // ----- private methods ------------------------------------------------------
@@ -199,16 +217,19 @@ DeviceDebugI2cImpl::CircularBuffer::isEmpty()
   return flag;
 }
 
-void
+unsigned short
 DeviceDebugI2cImpl::CircularBuffer::putBytes(const char* pc,
     unsigned short size)
 {
+  unsigned short nBytes;
   register OSStack_t mask;
   mask = criticalEnter();
     {
-      CircularByteBuffer::putBytes((unsigned char*) pc, size);
+      nBytes = CircularByteBuffer::putBytes((unsigned char*) pc, size);
     }
   criticalExit(mask);
+
+  return nBytes;
 }
 
 unsigned char
