@@ -56,7 +56,6 @@ public:
   static void
   criticalExit(OSStack_t mask);
 
-
 private:
 
   const static int I2C_WRITE = 0x0;
@@ -115,7 +114,8 @@ public:
   class CircularBuffer : public CircularByteBuffer
   {
   public:
-    void initialise(char* pc, unsigned short size);
+    void
+    initialise(char* pc, unsigned short size);
 
 #if true
     bool
@@ -139,10 +139,13 @@ public:
   class Lock
   {
   public:
-    void initialise(void);
+    void
+    initialise(void);
 
-    bool aquire(void);
-    void release(void);
+    bool
+    aquire(void);
+    void
+    release(void);
 
   private:
     bool m_isAquired;
@@ -206,23 +209,23 @@ protected:
 
 inline OSStack_t
 DeviceDebugI2cImpl::criticalEnter(void)
-  {
-    register OSStack_t tmp;
+{
+  register OSStack_t tmp;
 
-    tmp = OSCPUImpl::getInterruptsMask();
+  tmp = OSCPUImpl::getInterruptsMask();
 #if defined(OS_INCLUDE_OSDEVICEDEBUG_MASK_INTERRUPTS)
   OSCPUImpl::setInterruptsMask(tmp | OS_CFGINT_OSDEVICEDEBUG_MASK);
 #else
-    OSCPUImpl::interruptsDisable();
+  OSCPUImpl::interruptsDisable();
 #endif
-    return tmp;
-  }
+  return tmp;
+}
 
 inline void
 DeviceDebugI2cImpl::criticalExit(OSStack_t mask)
-  {
-    OSCPUImpl::setInterruptsMask(mask);
-  }
+{
+  OSCPUImpl::setInterruptsMask(mask);
+}
 
 // ----------------------------------------------------------------------------
 
@@ -268,6 +271,9 @@ DeviceDebugI2cImpl::masterSclInit(void)
   // pull-ups to raise the level to high.
   OS_GPIO_PIN_CONFIG_INPUT(OS_CONFIG_DEBUG_SCL_PORT_CONFIG,
       OS_CONFIG_DEBUG_SCL_BIT);
+
+  // Enable the pin (required to allow read)
+  OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_DEBUG_SCL_PORT_CONFIG, OS_CONFIG_DEBUG_SCL_BIT);
 }
 
 inline void
@@ -304,6 +310,9 @@ DeviceDebugI2cImpl::masterSdaInit(void)
   // pull-ups to raise the level to high.
   OS_GPIO_PIN_CONFIG_INPUT(OS_CONFIG_DEBUG_SDA_PORT_CONFIG,
       OS_CONFIG_DEBUG_SDA_BIT);
+
+  // Enable the pin (required to allow read)
+  OS_GPIO_PIN_CONFIG_ENABLE(OS_CONFIG_DEBUG_SDA_PORT_CONFIG, OS_CONFIG_DEBUG_SDA_BIT);
 }
 
 inline void
