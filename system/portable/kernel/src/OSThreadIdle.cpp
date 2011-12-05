@@ -33,6 +33,7 @@ OSThreadIdle::threadMain(void)
 
   for (;;)
     {
+      OSDeviceDebug::flush();
 
 #if defined(OS_INCLUDE_OSTHREAD_SLEEP)
       if (!enterSleep())
