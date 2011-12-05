@@ -47,6 +47,9 @@ public:
   static void
   implWDReset(void);
 
+  static void
+  implFlush(void);
+
   static OSStack_t
   criticalEnter(void);
 
@@ -117,7 +120,7 @@ public:
 #if true
     bool
     isEmpty();
-    void
+    unsigned short
     putBytes(const char* pc, unsigned short size);
     unsigned char
     get(void);
