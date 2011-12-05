@@ -81,6 +81,10 @@ public:
 
   inline static bool
   isInInterruptMode(void) __attribute__((always_inline));
+
+  inline static bool
+  isInCriticalSection(void) __attribute__((always_inline));
+
 private:
 
 };

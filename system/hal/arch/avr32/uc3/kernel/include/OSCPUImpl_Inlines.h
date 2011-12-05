@@ -251,4 +251,13 @@ OSCPUImpl::isInInterruptMode(void)
     return false;
 }
 
+inline bool
+OSCPUImpl::isInCriticalSection(void)
+{
+  if (((getInterruptsMask() >> 16) & 0x1F) != 0)
+    return true;
+  else
+    return false;
+}
+
 #endif
