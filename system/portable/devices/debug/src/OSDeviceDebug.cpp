@@ -51,6 +51,12 @@ OSDeviceDebug::earlyInit(void)
 
 // ----------------------------------------------------------------------------
 
+void
+OSDeviceDebug::flush(void)
+{
+  DeviceDebugImpl_t::implFlush();
+}
+
 #if false
 int
 OSDeviceDebug::commonPutByte(uchar_t c)
@@ -95,7 +101,7 @@ OSDeviceDebug::commonPutBytesSynchronised(const char* s, uint_t n)
       ret = commonPutBytes(s, n);
     }
 #if !defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER)
-    DeviceDebugImpl_t::criticalExit(mask);
+  DeviceDebugImpl_t::criticalExit(mask);
 #endif /* !defined(OS_INCLUDE_OSDEVICEDEBUG_BUFFER) */
 
   return ret;
@@ -479,7 +485,7 @@ OSDeviceDebug::assert(const char* func, const char* file, int lineno,
       for (;;)
         DeviceDebugImpl_t::implWDReset();
     }
-    DeviceDebugImpl_t::criticalExit(mask);
+  DeviceDebugImpl_t::criticalExit(mask);
 }
 
 // streambuf methods

@@ -74,6 +74,9 @@ public:
   static void
   putDestructor(const char* pc, const void* p);
 
+  static void
+  flush(void);
+
 #if defined(OS_CONFIG_ARCH_AVR8)
 
   // Output, on debug interface, the bytes at pc address,
@@ -230,6 +233,11 @@ OSDeviceDebug::putDestructor_P(const char* PROGMEM pc __attribute__((unused)), c
 #endif /* !defined(OS_DEBUG_CONSTRUCTORS) */
 
 #else /* !DEBUG */
+
+inline void
+OSDeviceDebug::flush(void)
+{
+}
 
 // define empty functions for Release
 inline void
