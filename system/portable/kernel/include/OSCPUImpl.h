@@ -79,6 +79,8 @@ public:
   inline static OSStack_t
   stackPop(void) __attribute__((always_inline));
 
+  inline static bool
+  isInInterruptMode(void) __attribute__((always_inline));
 private:
 
 };

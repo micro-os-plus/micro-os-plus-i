@@ -18,7 +18,7 @@ OSCPUImpl::stackInit(void)
       :
       :
       :
-);
+  );
 }
 
 inline OSResetBits_t
@@ -36,7 +36,7 @@ OSCPUImpl::returnFromInterrupt(void)
       :
       :
       :
-);
+  );
   for (;;)
     ; // noreturn
 }
@@ -51,7 +51,7 @@ OSCPUImpl::returnFromSubroutine(void)
       :
       :
       :
-);
+  );
   for (;;)
     ; // noreturn
 }
@@ -66,7 +66,7 @@ OSCPUImpl::nop(void)
       :
       :
       :
-);
+  );
 }
 
 inline void
@@ -79,7 +79,7 @@ OSCPUImpl::interruptsEnable(void)
       :
       : [GM] "i" (AVR32_SR_GM_OFFSET)
       :
-);
+  );
 }
 
 inline void
@@ -92,7 +92,7 @@ OSCPUImpl::interruptsDisable(void)
       :
       : [GM] "i" (AVR32_SR_GM_OFFSET)
       :
-);
+  );
 }
 
 inline void
@@ -105,7 +105,7 @@ OSCPUImpl::idle(void)
       :
       :
       :
-);
+  );
 }
 
 inline void
@@ -118,7 +118,7 @@ OSCPUImpl::sleep(void)
       :
       :
       :
-);
+  );
 }
 
 inline void
@@ -131,7 +131,7 @@ OSCPUImpl::deepSleep(void)
       :
       :
       :
-);
+  );
 }
 
 inline void
@@ -145,7 +145,7 @@ OSCPUImpl::watchdogReset(void)
       :
       :
       :
-);
+  );
 }
 
 // as per manual, JMP 0 is not recommended since
@@ -175,7 +175,7 @@ OSCPUImpl::stackPush(OSStack_t reg)
       :
       : [R] "r" (tmp)
       : "sp"
-);
+  );
 #else
   *((OSStack_t*) __builtin_alloca(1)) = tmp;
 #endif
@@ -194,7 +194,7 @@ OSCPUImpl::stackPop(void)
       : [R] "=r" (tmp)
       :
       : "sp"
-);
+  );
 #else
   asm volatile
   (
@@ -203,7 +203,7 @@ OSCPUImpl::stackPop(void)
       : [R] "=r" (tmp)
       :
       : "sp"
-);
+  );
 #endif
   return tmp;
 }
@@ -220,7 +220,7 @@ OSCPUImpl::getInterruptsMask(void)
       : [R] "=r" (tmp)
       : [SR] "i" (AVR32_SR)
       :
-);
+  );
 
   return tmp;
 }
@@ -239,7 +239,16 @@ OSCPUImpl::setInterruptsMask(OSInterruptsMask_t mask)
       :
       : [SR] "i" (AVR32_SR), [R] "r" (tmp)
       :
-);
+  );
+}
+
+inline bool
+OSCPUImpl::isInInterruptMode(void)
+{
+  if (((getInterruptsMask() >> 22) & 0x7) > 1)
+    return true;
+  else
+    return false;
 }
 
 #endif
