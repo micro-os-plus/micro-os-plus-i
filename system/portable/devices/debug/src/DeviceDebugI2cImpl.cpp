@@ -101,7 +101,7 @@ DeviceDebugI2cImpl::implPutBytes(const char* s, unsigned int n)
 
 #endif
 
-  if (OSCPUImpl::isInInterruptMode())
+  if (OSCPUImpl::isInInterruptMode() || OSCPUImpl::isInCriticalSection())
     {
       return n;
     }
@@ -155,7 +155,12 @@ DeviceDebugI2cImpl::implFlush(void)
 
   if (ms_lock.aquire())
     {
-      for (; !ms_circularBuffer.isEmpty();)
+      unsigned char ch;
+      ch = '?';
+      bool shouldRetry;
+      shouldRetry = false;
+
+      for (; shouldRetry || !ms_circularBuffer.isEmpty();)
         {
           // loop until we succeed to transmit
           masterStart();
@@ -165,14 +170,21 @@ DeviceDebugI2cImpl::implFlush(void)
           if (masterGetAck())
             {
               // Address ACK ok, continue to send data
-              for (; !ms_circularBuffer.isEmpty();)
+              for (; shouldRetry || !ms_circularBuffer.isEmpty();)
                 {
-                  unsigned char ch;
-                  ch = ms_circularBuffer.get();
+                  if (!shouldRetry)
+                    {
+                      ch = ms_circularBuffer.get();
+                    }
                   masterPutByte(ch);
                   if (!masterGetAck())
                     {
+                      shouldRetry = true;
                       goto retry;
+                    }
+                  else
+                    {
+                      shouldRetry = false;
                     }
                 }
               masterStop();
