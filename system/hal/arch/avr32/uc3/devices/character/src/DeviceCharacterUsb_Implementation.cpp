@@ -21,12 +21,6 @@ DeviceCharacterUsb::implOpen()
 {
   OSDeviceDebug::putString(" DeviceCharacterUsb::implOpen() ");
 
-  AVR32_usb_free_out(m_rx_ep);
-  OSUsbDevice::Usb_reset_endpoint_fifo_access(m_tx_ep);
-  OSUsbDevice::Usb_reset_endpoint_fifo_access(m_rx_ep);
-
-  m_txCounter = 0;
-  m_rxCounter = 0;
   m_opened = true;
 
   m_baudRate = 0;
@@ -63,11 +57,7 @@ DeviceCharacterUsb::implClose()
 bool
 DeviceCharacterUsb::implCanWrite(void)
 {
-  // TODO: change this to work in inteerrupt mode
-  OSUsbDevice::endpointSelect(m_tx_ep);
-  while (!OSUsbDevice::Is_usb_write_enabled())
-    ;
-  return true;
+  return OSUsbDevice::Is_usb_write_enabled();
 }
 
 OSEvent_t
@@ -132,7 +122,7 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
       return 0;
     }
 
-  status = AVR32_is_usb_in_ready(m_tx_ep);
+  status = OSUsbDevice::Is_usb_write_enabled();
 
   if (status == 0)
     {
@@ -162,7 +152,7 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
       m_txCounter = 0;
 
       // acknowledge IN ready and sends current bank
-      AVR32_usb_ack_in_ready_send(m_tx_ep);
+      AVR32_usb_send_in(m_tx_ep);
 
       // check if there is a need for sending a zlp
       if (min == availableSize)
@@ -171,7 +161,7 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
           while (!AVR32_is_usb_in_ready(m_tx_ep))
             ;
           // send zlp
-          AVR32_usb_ack_in_ready_send(m_tx_ep);
+          AVR32_usb_send_in(m_tx_ep);
         }
     }
 
@@ -194,14 +184,14 @@ DeviceCharacterUsb::implFlush(void)
           zlp = true;
         }
 
-      AVR32_usb_ack_in_ready_send(m_tx_ep);
+      AVR32_usb_send_in(m_tx_ep);
       //OSDeviceDebug::putChar('^');
 
       if (zlp == TRUE)
         {
           while (!AVR32_is_usb_write_enabled(m_tx_ep))
             ; // Wait Endpoint ready...
-          AVR32_usb_ack_in_ready_send(m_tx_ep);
+          AVR32_usb_send_in(m_tx_ep);
         }
 
       m_txCounter = 0;
@@ -309,10 +299,6 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
           OSDeviceDebug::putString("Vo");
           OSDeviceDebug::putNewLine();
 #endif
-          // TODO: remove the next line - checks if m_rxCounter is 0
-          while (g_usb0->m_rxCounter != 0)
-            ;
-
           g_usb0->m_rxCounter = OSUsbDevice::Usb_byte_counter();
           if (g_usb0->m_rxCounter == 0) // if we have received a zlp
             {
@@ -331,6 +317,14 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
               OSScheduler::eventNotify(g_usb0->getReadEvent());
             }
         }
+    }
+
+  if (AVR32_is_usb_in_ready(TX_EP)
+      && AVR32_is_usb_in_ready_interrupt_enabled(TX_EP))
+    {
+      OSUsbDevice::UsbEnableEndpointInterrupt(TX_EP);
+      AVR32_usb_ack_in_ready(TX_EP);
+      OSScheduler::eventNotify(g_usb0->getWriteEvent());
     }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
   if (UEINT & _BV(RXb_EP))
@@ -565,9 +559,18 @@ DeviceCharacterUsb::cdcSetControlLineState()
       // TODO: check if it's ok to be here.
       // enable RX interrupt
       OSUsbDevice::endpointSelect(RX_EP);
+      AVR32_usb_free_out(RX_EP);
       OSUsbDevice::UsbEnableEndpointInterrupt(RX_EP);
       OSUsbDevice::interruptReceiveOutEnable();
       OSUsbDevice::Usb_reset_endpoint_fifo_access(RX_EP);
+      m_rxCounter = 0;
+
+      // enable TX interrupt
+      OSUsbDevice::UsbEnableEndpointInterrupt(TX_EP);
+      AVR32_usb_enable_in_ready_interrupt(TX_EP);
+      OSUsbDevice::Usb_reset_endpoint_fifo_access(TX_EP);
+      m_txCounter = 0;
+
       OSUsbDevice::endpointSelect(EP_CONTROL);
 
       // OSUsbLed::off(); // will be toggled to on() at interrupt prolog
@@ -592,6 +595,7 @@ DeviceCharacterUsb::cdcSetControlLineState()
       if (index == IF0_NB)
         {
           OSScheduler::eventNotify(g_usb0->getReadEvent());
+          OSScheduler::eventNotify(g_usb0->getWriteEvent());
 #if defined(DEBUG) && false
           OSDeviceDebug::putString("eventNotify(");
           OSDeviceDebug::putHex((unsigned short)(g_usb0->getReadEvent()));

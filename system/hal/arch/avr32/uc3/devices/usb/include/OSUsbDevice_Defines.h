@@ -79,6 +79,8 @@
 //extern UnionVPtr pep_fifo[AVR32_USBB_EPT_NUM];
 
 #define AVR32_USBB_UESTAX_TXINI_MASK                        AVR32_USBB_UESTA0_TXINI_MASK
+#define AVR32_USBB_UECONX_TXINE_MASK                        AVR32_USBB_UECON0_TXINE_MASK
+#define AVR32_USBB_UECONXSET_TXINES_MASK                    AVR32_USBB_UECON0SET_TXINES_MASK
 #define AVR32_USBB_UESTAX_RXSTPI_MASK                       AVR32_USBB_UESTA0_RXSTPI_MASK
 #define AVR32_USBB_UECONX_RXSTPE_MASK                       AVR32_USBB_UECON0_RXSTPE_MASK
 #define AVR32_USBB_UECONXSET_RXSTPES_MASK                   AVR32_USBB_UECON0SET_RXSTPES_MASK
@@ -142,10 +144,16 @@
 #define AVR32_is_usb_out_received(ep)                   (Tst_bits(AVR32_USBB_uestax(ep), AVR32_USBB_UESTAX_RXOUTI_MASK))
 // tests if OUT received interrupt is enabled
 #define AVR32_is_usb_out_received_interrupt_enabled(ep) (Tst_bits(AVR32_USBB_ueconx(ep), AVR32_USBB_UECONX_RXOUTE_MASK))
+  //! tests if IN ready interrupt is enabled
+#define AVR32_is_usb_in_ready_interrupt_enabled(ep)     (Tst_bits(AVR32_USBB_ueconx(ep), AVR32_USBB_UECONX_TXINE_MASK))
+  //! tests if IN ready
+#define AVR32_is_usb_in_ready(ep)                       (Tst_bits(AVR32_USBB_uestax(ep), AVR32_USBB_UESTAX_TXINI_MASK))
 // acks OUT received
 #define AVR32_usb_ack_out_received(ep)                  (AVR32_USBB_uestaxclr(ep) = AVR32_USBB_UESTAXCLR_RXOUTIC_MASK)
 // enables OUT received interrupt
 #define AVR32_usb_enable_out_received_interrupt(ep)     (AVR32_USBB_ueconxset(ep) = AVR32_USBB_UECONXSET_RXOUTES_MASK)
+  //! enables IN ready interrupt
+#define AVR32_usb_enable_in_ready_interrupt(ep)         (AVR32_USBB_ueconxset(ep) = AVR32_USBB_UECONXSET_TXINES_MASK)
 // returns the byte count
 #define AVR32_usb_byte_count(ep)                        (Rd_bitfield(AVR32_USBB_uestax(ep), AVR32_USBB_UESTAX_BYCT_MASK))
 // gets the configured selected endpoint size

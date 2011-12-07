@@ -1472,7 +1472,7 @@ OSUsbDeviceImpl::usb_clear_feature(void)
                   Usb_disable_stall_handshake();
                   endpointReset(wIndex);
                   Usb_reset_data_toggle();
-
+#if 0
                   if (wIndex == RX_EP)
                     {
                       // enable RX interrupt
@@ -1480,8 +1480,17 @@ OSUsbDeviceImpl::usb_clear_feature(void)
                       UsbEnableEndpointInterrupt(RX_EP);
                       interruptReceiveOutEnable();
                       Usb_reset_endpoint_fifo_access(RX_EP);
+                    }
+                  else if(wIndex == TX_EP)
+                    {
+                      // enable TX interrupt
+                      UsbEnableEndpointInterrupt(TX_EP);
+                      AVR32_usb_enable_in_ready_interrupt(TX_EP);
+                      Usb_reset_endpoint_fifo_access(TX_EP);
+
                       endpointSelect(EP_CONTROL);
                     }
+#endif
                 }
               Usb_ack_receive_setup();
               Usb_send_control_in();
