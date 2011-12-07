@@ -18,7 +18,7 @@ namespace device
     {
 
       TxPowerLevelValue_t TxPowerLevel::values[] =
-                { -25, -15, -10, -7, -5, -1, 0 };
+                { -25, -15, -10, -7, -5, -3, -1, 0 };
 
       TxPowerLevel_t TxPowerLevel::regValues[] =
                 { 0, 1, 2, 3, 4, 5, 6, 7 };
