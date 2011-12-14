@@ -97,6 +97,11 @@ CircularByteBuffer::putBytes(const unsigned char* pBuf, unsigned short count)
   if (count > (m_sz - m_len))
     sz = m_sz - m_len;
 
+  if (sz == 0)
+    {
+      return 0;
+    }
+
   endSz = (unsigned short) (m_sz - (m_pPut - m_pBuf));
   if (endSz >= sz)
     {
