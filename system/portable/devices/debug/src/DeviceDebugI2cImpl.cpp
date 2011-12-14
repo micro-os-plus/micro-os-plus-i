@@ -237,7 +237,15 @@ DeviceDebugI2cImpl::CircularBuffer::putBytes(const char* pc,
   register OSStack_t mask;
   mask = criticalEnter();
     {
-      nBytes = CircularByteBuffer::putBytes((unsigned char*) pc, size);
+      if (CircularByteBuffer::length() + size > CircularByteBuffer::size())
+        {
+          CircularByteBuffer::put('?');
+          nBytes = 0;
+        }
+      else
+        {
+          nBytes = CircularByteBuffer::putBytes((unsigned char*) pc, size);
+        }
     }
   criticalExit(mask);
 
