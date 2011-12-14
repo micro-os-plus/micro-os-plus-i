@@ -56,11 +56,11 @@ public:
 private:
   unsigned char* m_pBuf;
   unsigned short m_sz;
-  unsigned short m_len;
+  unsigned short volatile m_len;
   unsigned short m_highWM;
   unsigned short m_lowWM;
-  unsigned char* m_pPut;
-  unsigned char* m_pGet;
+  unsigned char* volatile m_pPut;
+  unsigned char* volatile m_pGet;
 };
 
 inline bool
