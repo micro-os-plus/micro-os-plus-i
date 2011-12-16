@@ -24,6 +24,7 @@ class Time
 public:
 
   // Names are singular, since they do not represent durations
+  typedef uint16_t Millisecond_t; // 0-999
   typedef uint8_t Second_t; // 0-59
   typedef uint8_t Minute_t; // 0-59
   typedef uint8_t Hour_t; // 0-23
@@ -33,16 +34,21 @@ public:
   // ----- Constructors & destructors -----------------------------------------
 
   Time();
-  Time(Hour_t hour, Minute_t minute, Second_t second);
+  Time(Hour_t hour, Minute_t minute, Second_t second,
+      Millisecond_t millisecond = 0);
 
   ~Time();
 
   // ----- Public methods -----------------------------------------------------
 
   void
-  setTime(Hour_t hour, Minute_t minute, Second_t second);
+  setTime(Hour_t hour, Minute_t minute, Second_t second,
+      Millisecond_t millisecond = 0);
 
   // Names are singular, since they do not return durations
+  Millisecond_t
+  getMillisecond(void);
+
   Second_t
   getSecond(void);
 
@@ -51,6 +57,9 @@ public:
 
   Hour_t
   getHour();
+
+  void
+  setMilliecond(Millisecond_t millisecond);
 
   void
   setSecond(Second_t second);
@@ -71,8 +80,12 @@ public:
   bool
   incrementSecond(void);
 
+  void
+  serialiseIsoTime(char* pTime, size_t size);
+
 protected:
 
+  Millisecond_t m_millisecond; // 0-999
   Second_t m_second; // 0-59
   Minute_t m_minute; // 0-59
   Hour_t m_hour; // 0-23
@@ -80,20 +93,16 @@ protected:
 
 // ============================================================================
 
-class DateTime
+class DateTime : public Time
 {
 public:
 
   // Names are singular, since they do not represent durations
-  typedef uint8_t Second_t; // 0-59
-  typedef uint8_t Minute_t; // 0-59
-  typedef uint8_t Hour_t; // 0-23
   typedef uint8_t Day_t; // 1-31
   typedef uint16_t DayOfYear_t; // 1-366
   typedef uint8_t Month_t; // 1-12
   typedef uint16_t Year_t; // >= EPOCH
 
-  typedef uint32_t DurationSeconds_t;
   typedef uint32_t DurationDays_t;
 
   const static Day_t daysInMonths[];
@@ -102,22 +111,14 @@ public:
 
   DateTime();
   DateTime(Year_t year, Month_t month, Day_t day, Hour_t hour, Minute_t minute,
-      Second_t second);
-  DateTime(DurationSeconds_t secondsFromEpoch);
+      Second_t second, Millisecond_t millisecond = 0);
+  DateTime(DurationSeconds_t secondsFromEpoch, Millisecond_t millisecond = 0);
 
   ~DateTime();
 
   // ----- Public methods -----------------------------------------------------
 
   // Names are singular, since they do not return durations
-  Second_t
-  getSecond(void);
-
-  Minute_t
-  getMinute(void);
-
-  Hour_t
-  getHour();
 
   Day_t
   getDay();
@@ -135,9 +136,6 @@ public:
 
   OSReturn_t
   parseNmeaDate(const char* pDate);
-
-  OSReturn_t
-  parseNmeaTime(const char* pTime);
 
   DurationSeconds_t
   computeSecondsFromEpoch(void);
@@ -161,8 +159,6 @@ public:
   bool
   areDateFieldsValid(void);
 
-  bool
-  areTimeFieldsValid(void);
 
 #if defined(OS_INCLUDE_DATETIME_YEAR_EPOCH)
 
@@ -174,14 +170,17 @@ public:
   Year_t
   getDefaultEpochYear(void);
 
+  void
+  serialiseIsoDate(char* pDate, size_t size);
+
+  void
+  serialiseIsoDateTime(char* pDate, size_t size);
+
 private:
 
   const static Year_t DEFAULT_EPOCH_YEAR =
       OS_CFGINT_DATETIME_DEFAULT_EPOCH_YEAR;
 
-  Second_t m_second; // 0-59
-  Minute_t m_minute; // 0-59
-  Hour_t m_hour; // 0-23
   Day_t m_day; // 1-31
   Month_t m_month; // 1-12
   Year_t m_year; // >= EPOCH
@@ -194,6 +193,12 @@ private:
 };
 
 // ============================================================================
+
+inline Time::Millisecond_t
+Time::getMillisecond(void)
+{
+  return m_millisecond;
+}
 
 inline Time::Second_t
 Time::getSecond(void)
@@ -211,6 +216,12 @@ inline Time::Hour_t
 Time::getHour()
 {
   return m_hour;
+}
+
+inline void
+Time::setMilliecond(Millisecond_t millisecond)
+{
+  m_millisecond = millisecond;
 }
 
 inline void
@@ -232,24 +243,6 @@ Time::setHour(Hour_t hour)
 }
 
 // ============================================================================
-
-inline DateTime::Second_t
-DateTime::getSecond(void)
-{
-  return m_second;
-}
-
-inline DateTime::Minute_t
-DateTime::getMinute(void)
-{
-  return m_minute;
-}
-
-inline DateTime::Hour_t
-DateTime::getHour()
-{
-  return m_hour;
-}
 
 inline DateTime::Day_t
 DateTime::getDay()
