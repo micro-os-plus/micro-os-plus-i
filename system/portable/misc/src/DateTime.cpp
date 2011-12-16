@@ -25,12 +25,12 @@ Time::Time()
   setTime(0, 0, 0);
 }
 
-Time::Time(Hour_t hour,
-    Minute_t minute, Second_t second)
+Time::Time(Hour_t hour, Minute_t minute, Second_t second,
+    Millisecond_t millisecond)
 {
   OSDeviceDebug::putConstructor_P(PSTR("Time"), this);
 
-  setTime(hour, minute, second);
+  setTime(hour, minute, second, millisecond);
 }
 
 Time::~Time()
@@ -39,8 +39,10 @@ Time::~Time()
 }
 
 void
-Time::setTime(Hour_t hour, Minute_t minute, Second_t second)
+Time::setTime(Hour_t hour, Minute_t minute, Second_t second,
+    Millisecond_t millisecond)
 {
+  m_millisecond = millisecond;
   m_second = second;
   m_minute = minute;
   m_hour = hour;
@@ -49,7 +51,8 @@ Time::setTime(Hour_t hour, Minute_t minute, Second_t second)
 bool
 Time::areTimeFieldsValid(void)
 {
-  if ((m_hour > 24) || (m_minute > 60) || (m_second > 60))
+  if ((m_hour > 24) || (m_minute > 60) || (m_second > 60) || (m_millisecond
+      > 999))
     {
       return false;
     }
@@ -85,6 +88,8 @@ Time::parseNmeaTime(const char* pTime)
       OSDeviceDebug::putString(" BAD_TIME ");
       return OSReturn::OS_BAD_TIME;
     }
+
+  setTime(0, 0, 0);
 
   for (int i = 0; i < 6; ++i)
     {
@@ -128,6 +133,25 @@ Time::parseNmeaTime(const char* pTime)
         m_second = m_second * 10 + b;
         break;
 
+      case 6:
+        if (ch != '.')
+          {
+            OSDeviceDebug::putString(" BAD_TIME (.) ");
+            return OSReturn::OS_BAD_TIME;
+          }
+        break;
+
+      case 7:
+        m_millisecond = b;
+        break;
+
+      case 8:
+        m_millisecond = m_millisecond * 10 + b;
+        break;
+
+      case 9:
+        m_millisecond = m_millisecond * 10 + b;
+        break;
         }
     }
 
@@ -144,10 +168,44 @@ Time::parseNmeaTime(const char* pTime)
   OSDeviceDebug::putChar(':');
   OSDeviceDebug::putDec(m_second, 2);
   OSDeviceDebug::putChar('.');
-  OSDeviceDebug::putString(&pTime[7]);
+  OSDeviceDebug::putDec(m_millisecond, 3);
   OSDeviceDebug::putChar(' ');
 
   return OSReturn::OS_OK;
+}
+
+void
+Time::serialiseIsoTime(char* pTime, size_t size)
+{
+  char* p;
+  p = pTime;
+
+  // TODO: optimise with div
+  if (size > 2)
+    {
+      *p++ = (m_hour / 10) + '0';
+      *p++ = (m_hour % 10) + '0';
+      if (size > 4)
+        {
+          *p++ = (m_minute / 10) + '0';
+          *p++ = (m_minute % 10) + '0';
+          if (size > 6)
+            {
+              *p++ = (m_second / 10) + '0';
+              *p++ = (m_second % 10) + '0';
+              if (size > 8)
+                {
+                  *p++ = '.';
+
+                  *p++ = (m_millisecond / 100) + '0';
+                  *p++ = ((m_millisecond % 100) / 10) + '0';
+                  *p++ = (m_millisecond % 10) + '0';
+                }
+            }
+        }
+
+    }
+  *p = '\0';
 }
 
 // ============================================================================
@@ -156,32 +214,29 @@ DateTime::DateTime()
 {
   OSDeviceDebug::putConstructor_P(PSTR("DateTime"), this);
 
-  m_second = 0;
-  m_minute = 0;
-  m_hour = 0;
   m_day = 0;
   m_month = 0;
   m_year = DEFAULT_EPOCH_YEAR;
 }
 
 DateTime::DateTime(Year_t year, Month_t month, Day_t day, Hour_t hour,
-    Minute_t minute, Second_t second)
+    Minute_t minute, Second_t second, Millisecond_t millisecond) :
+  Time(hour, minute, second, millisecond)
 {
   OSDeviceDebug::putConstructor_P(PSTR("DateTime"), this);
 
-  m_second = second;
-  m_minute = minute;
-  m_hour = hour;
   m_day = day;
   m_month = month;
   m_year = year;
 }
 
-DateTime::DateTime(DurationSeconds_t secondsFromEpoch)
+DateTime::DateTime(DurationSeconds_t secondsFromEpoch,
+    Millisecond_t millisecond)
 {
   OSDeviceDebug::putConstructor_P(PSTR("DateTime"), this);
 
   processSecondsFromEpoch(secondsFromEpoch);
+  m_millisecond = millisecond;
 }
 
 DateTime::~DateTime()
@@ -197,22 +252,27 @@ DateTime::parseIso(const char* pStr)
 {
   DEBUG_ASSERT(pStr != NULL);
 
-  if ((strlen(pStr) != 15) || pStr[8] != 'T')
+  size_t len;
+  len = strlen(pStr);
+  if ((len < 8) || ((len > 8) && (pStr[8] != 'T')))
     {
       OSDeviceDebug::putString(" parseIso() bad format ");
       return OSReturn::OS_BAD_DATE;
     }
 
-  int i;
+  setTime(0, 0, 0);
+
+  uint_t i;
   i = 0;
 
-  for (i = 0; i < 15; ++i)
+  for (i = 0; i < len; ++i)
     {
       if (i == 8)
         continue; // skip over 'T'
 
       uchar_t ch;
       ch = pStr[i];
+
       uint8_t b;
       if (('0' <= ch) && (ch <= '9'))
         {
@@ -220,8 +280,11 @@ DateTime::parseIso(const char* pStr)
         }
       else
         {
-          OSDeviceDebug::putString(" parseIso() bad character ");
-          return OSReturn::OS_BAD_DATE;
+          if (i != 15)
+            {
+              OSDeviceDebug::putString(" parseIso() bad character ");
+              return OSReturn::OS_BAD_DATE;
+            }
         }
       switch (i)
         {
@@ -275,6 +338,25 @@ DateTime::parseIso(const char* pStr)
         m_second = m_second * 10 + b;
         break;
 
+      case 15:
+        if (ch != '.')
+          {
+            OSDeviceDebug::putString(" BAD_TIME (.) ");
+            return OSReturn::OS_BAD_TIME;
+          }
+        break;
+
+      case 16:
+        m_millisecond = b;
+        break;
+
+      case 17:
+        m_millisecond = m_millisecond * 10 + b;
+        break;
+
+      case 18:
+        m_millisecond = m_millisecond * 10 + b;
+        break;
         }
     }
 
@@ -302,6 +384,8 @@ DateTime::parseIso(const char* pStr)
   OSDeviceDebug::putDec(m_minute, 2);
   OSDeviceDebug::putChar(':');
   OSDeviceDebug::putDec(m_second, 2);
+  OSDeviceDebug::putChar('.');
+  OSDeviceDebug::putDec(m_millisecond, 3);
   OSDeviceDebug::putChar(' ');
 
   return OSReturn::OS_OK;
@@ -330,17 +414,6 @@ DateTime::areDateFieldsValid(void)
           return false;
         }
     }
-  return true;
-}
-
-bool
-DateTime::areTimeFieldsValid(void)
-{
-  if ((m_hour > 24) || (m_minute > 60) || (m_second > 60))
-    {
-      return false;
-    }
-
   return true;
 }
 
@@ -416,81 +489,6 @@ DateTime::parseNmeaDate(const char* pDate)
   return OSReturn::OS_OK;
 }
 
-OSReturn_t
-DateTime::parseNmeaTime(const char* pTime)
-{
-  DEBUG_ASSERT(pTime != NULL);
-
-  if ((strlen(pTime) != 10) || pTime[6] != '.')
-    {
-      OSDeviceDebug::putString(" BAD_TIME ");
-      return OSReturn::OS_BAD_TIME;
-    }
-
-  for (int i = 0; i < 6; ++i)
-    {
-      uchar_t ch;
-      ch = pTime[i];
-
-      uint8_t b;
-      if (('0' <= ch) && (ch <= '9'))
-        {
-          b = ch - '0';
-        }
-      else
-        {
-          OSDeviceDebug::putString(" BAD_TIME (ch) ");
-          return OSReturn::OS_BAD_TIME;
-        }
-
-      switch (i)
-        {
-      case 0:
-        m_hour = b;
-        break;
-
-      case 1:
-        m_hour = m_hour * 10 + b;
-        break;
-
-      case 2:
-        m_minute = b;
-        break;
-
-      case 3:
-        m_minute = m_minute * 10 + b;
-        break;
-
-      case 4:
-        m_second = b;
-        break;
-
-      case 5:
-        m_second = m_second * 10 + b;
-        break;
-
-        }
-    }
-
-  if (!areTimeFieldsValid())
-    {
-      OSDeviceDebug::putString(" BAD_TIME (fields) ");
-      return OSReturn::OS_BAD_TIME;
-    }
-
-  OSDeviceDebug::putString(" time ");
-  OSDeviceDebug::putDec(m_hour, 2);
-  OSDeviceDebug::putChar(':');
-  OSDeviceDebug::putDec(m_minute, 2);
-  OSDeviceDebug::putChar(':');
-  OSDeviceDebug::putDec(m_second, 2);
-  OSDeviceDebug::putChar('.');
-  OSDeviceDebug::putString(&pTime[7]);
-  OSDeviceDebug::putChar(' ');
-
-  return OSReturn::OS_OK;
-}
-
 DateTime::DurationSeconds_t
 DateTime::computeSecondsFromEpoch()
 {
@@ -498,7 +496,7 @@ DateTime::computeSecondsFromEpoch()
   Year_t fullYears;
 
   if (m_year > getEpochYear())
-    fullYears = m_year - getEpochYear() - 1;
+    fullYears = m_year - getEpochYear();
   else
     fullYears = 0;
 
@@ -666,8 +664,51 @@ operator <<(std::ostream& out, DateTime& dt)
   out.width(2);
   out << (uint_t) dt.getMinute() << ':';
   out.width(2);
-  out << (uint_t) dt.getSecond();
+  out << (uint_t) dt.getSecond() << '.';
+  out.width(3);
+  out << (uint_t) dt.getMillisecond();
 
   return out;
 }
+
+void
+DateTime::serialiseIsoDate(char* pDate, size_t size)
+{
+  char* p;
+  p = pDate;
+
+  // TODO: optimise with div
+  if (size > 4)
+    {
+      *p++ = (m_year / 1000) + '0';
+      *p++ = ((m_year % 1000) / 100) + '0';
+      *p++ = ((m_year % 100) / 10) + '0';
+      *p++ = (m_year % 10) + '0';
+      if (size > 6)
+        {
+          *p++ = (m_month / 10) + '0';
+          *p++ = (m_month % 10) + '0';
+          if (size > 8)
+            {
+              *p++ = (m_day / 10) + '0';
+              *p++ = (m_day % 10) + '0';
+            }
+        }
+    }
+  *p = '\0';
+
+}
+
+void
+DateTime::serialiseIsoDateTime(char* pDate, size_t size)
+{
+  serialiseIsoDate(pDate, size);
+
+  if (size > 11)
+    {
+      pDate[8] = 'T';
+      serialiseIsoTime(pDate + 9, size - 9);
+    }
+}
+
 #endif /* defined(OS_INCLUDE_DATETIME) */
