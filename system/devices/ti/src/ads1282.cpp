@@ -154,7 +154,7 @@ namespace device
       {
         m_gpioAds1282Pwdn.setPinHigh();
 
-        OSScheduler::timerTicks.sleep(POWER_ON_TIME_MS);
+        //OSScheduler::timerTicks.sleep(POWER_ON_TIME_MS);
 
         // Wait until DRDY is low.
         uint32_t i;
@@ -222,6 +222,8 @@ namespace device
 
         m_gpioAds1282Reset.setPinHigh();
 
+        adsBusyWaitUs(1);
+
         // wait for DRDY to be low again (64 Data Periods).
         for (i = 0; i < T_DR_MAX_TICKS && !isDrdyHighToLowFlag; i++)
           {
@@ -279,15 +281,14 @@ namespace device
         // wait T_DLY > 24/fclck (5.85us)
         adsBusyWaitUs(T_DLY_US);
 
+        isDrdyHighToLowFlag = false;
+        m_gpioAds1282Drdy.enableInterrupt();
         // send SYNC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::SYNC);
 
         // wait T_DLY > 24/fclck (5.85us)
         //OS::busyWaitMicros(T_DLY_US);
         adsBusyWaitUs(T_DLY_US);
-
-        isDrdyHighToLowFlag = false;
-        m_gpioAds1282Drdy.enableInterrupt();
 
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
@@ -311,14 +312,13 @@ namespace device
         // wait T_DLY > 24/fclck (5.85us)
         adsBusyWaitUs(T_DLY_US);
 
+        isDrdyHighToLowFlag = false;
+        m_gpioAds1282Drdy.enableInterrupt();
         // send OFSCAL
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::OFSCAL);
 
         // wait T_DLY > 24/fclck (5.85us)
         adsBusyWaitUs(T_DLY_US);
-
-        isDrdyHighToLowFlag = false;
-        m_gpioAds1282Drdy.enableInterrupt();
 
         // send RDATAC
         m_spi.writeWaitReadByte(device::ti::ads1282::Commands::RDATAC);
