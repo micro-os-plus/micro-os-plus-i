@@ -16,7 +16,7 @@ namespace avr32
     // Register types
     typedef uint32_t volatile regReadWrite_t;
     typedef uint32_t const volatile regReadOnly_t;
-    typedef uint32_t regWriteOnly_t;
+    typedef uint32_t volatile regWriteOnly_t;
     typedef uint32_t regNotAllocated_t;
 
     // Table 5-2, page 36-37
