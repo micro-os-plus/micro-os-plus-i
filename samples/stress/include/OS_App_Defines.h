@@ -31,9 +31,11 @@
 #define OS_INCLUDE_OSTREAM_OSTHREAD                     (1)
 #define OS_INCLUDE_OSTREAM_PROGRAMPTR                   (1)
 
-// ----- Board Definitions ----------------------------------------------------
+// ----- Select one of the multiple test configs ------------------------------
 
 #define OS_TEST_PHASE 2
+
+// ----- Board Definitions ----------------------------------------------------
 
 #if defined(OS_CONFIG_BOARD_ATMEL_EVK1104)
 
@@ -60,6 +62,9 @@
 #endif
 
 #elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
+
+#define OS_INCLUDE_OSTREAM_LONG                         (1)
+#define OS_CFGINT_OSTIMER_SLEEP_REPORT_LIMIT            (2)
 
 #elif defined(OS_CONFIG_BOARD_METRILOG_M512)
 

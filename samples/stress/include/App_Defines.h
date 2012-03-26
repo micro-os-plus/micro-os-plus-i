@@ -22,7 +22,7 @@
 
 // ----------------------------------------------------------------------------
 
-extern void delayWithYield(schedTicks_t n);
+//extern void delayWithYield(schedTicks_t n);
 
 #if defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 
@@ -36,8 +36,8 @@ extern void delayWithYield(schedTicks_t n);
 
 #elif defined(OS_CONFIG_BOARD_ATMEL_STK525)
 
-#define APP_CFGINT_TASKBLINK_EXTRA_STACK_SIZE   (30)
-#define APP_CFGINT_TASKSTRESS_EXTRA_STACK_SIZE  (30)
+#define APP_CFGINT_TASKBLINK_EXTRA_STACK_SIZE   (70)
+#define APP_CFGINT_TASKSTRESS_EXTRA_STACK_SIZE  (100)
 
 #define APP_CONFIG_LED_PORT_WRITE       PORTD
 #define APP_CONFIG_LED_PORT_CONFIG      DDRD
@@ -46,6 +46,8 @@ extern void delayWithYield(schedTicks_t n);
 #define APP_CONFIG_LED1                 7
 #define APP_CONFIG_LED2                 6
 #define APP_CONFIG_LED3                 5
+
+#define APP_CFGINT_SIMULTANEOUS_THREADS 9
 
 #elif defined(OS_CONFIG_BOARD_METRILOG_M512)
 
@@ -120,6 +122,5 @@ extern void delayWithYield(schedTicks_t n);
 #define APP_CFGINT_NOTIFIES             5
 
 #define APP_CFGINT_TASKBLINK_LEDBIT                     APP_CONFIG_LED1
-
 
 #endif /* APP_DEFINES_H_ */

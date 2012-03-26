@@ -22,6 +22,9 @@ public:
   threadMain(void);
 
 private:
+  void
+  delayWithYield(schedTicks_t n);
+
   // members
   OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE + 400) / sizeof(OSStack_t)];
 

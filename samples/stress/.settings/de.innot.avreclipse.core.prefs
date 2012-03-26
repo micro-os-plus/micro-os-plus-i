@@ -1,0 +1,9 @@
+#Mon Mar 26 21:51:53 EEST 2012
+avrtarget/ClockFrequency=1000000
+avrtarget/ExtRAMSize=0
+avrtarget/ExtendedRAM=false
+avrtarget/MCUType=at90usb1287
+avrtarget/UseEEPROM=false
+avrtarget/UseExtendedRAMforHeap=true
+avrtarget/perConfig=false
+eclipse.preferences.version=1

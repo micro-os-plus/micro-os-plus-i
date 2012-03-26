@@ -67,10 +67,10 @@ TaskBlink::threadMain(void)
 #endif
 
   OSSchedulerLock::enter();
-  {
-    os.sched.timerTicks.sleep(n2);
-    os.sched.eventWait((OSEvent_t)&n2);
-  }
+    {
+      os.sched.timerTicks.sleep(n2);
+      os.sched.eventWait((OSEvent_t)&n2);
+    }
   OSSchedulerLock::exit();
 
   os.sched.timerTicks.sleep(n2);
@@ -82,7 +82,7 @@ TaskBlink::threadMain(void)
     {
       os.sched.timerTicks.sleep(m_rate);
 
-      debug.putChar(',');
+      debug.putString(getName());
 
 #if OS_TEST_PHASE == 1
       ;

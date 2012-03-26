@@ -8,23 +8,7 @@
 
 #include "TaskBlink.h"
 
-// ---------------------------------------------------------------------------
-
-/*
- * Perform a series of short (1 millisecond) busy waits  separated
- * by yields.
- */
-
-void
-delayWithYield(schedTicks_t n)
-{
-  for (; n--;)
-    {
-      os.busyWaitMillis(1); // busy wait one millisecond
-      os.sched.yield(); // release control to next thread
-    }
-}
-
+#if 1
 // ---------------------------------------------------------------------------
 
 // Since all threads share the processor, to compute the individual
@@ -36,5 +20,6 @@ delayWithYield(schedTicks_t n)
 TaskBlink task1("A", APP_CONFIG_LED1, MILLIS * 1);
 TaskBlink task2("B", APP_CONFIG_LED2, MILLIS * 2);
 TaskBlink task3("C", APP_CONFIG_LED3, MILLIS * 4);
+#endif
 
 // ---------------------------------------------------------------------------

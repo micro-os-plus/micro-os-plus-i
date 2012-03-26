@@ -62,3 +62,20 @@ TaskBlink::threadMain(void)
     }
 }
 
+/*
+ * Perform a series of short (1 millisecond) busy waits  separated
+ * by yields.
+ */
+
+void
+TaskBlink::delayWithYield(schedTicks_t n)
+{
+  for (; n--;)
+    {
+      os.busyWaitMillis(1); // busy wait one millisecond
+      os.sched.yield(); // release control to next thread
+    }
+}
+
+// ---------------------------------------------------------------------------
+

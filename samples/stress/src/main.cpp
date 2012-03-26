@@ -20,7 +20,7 @@
 
 //#define TICKS  (OS_CFGINT_TICK_RATE_HZ)
 
-TaskBlink taskA("A", APP_CONFIG_LED1, APP_CFGINT_BLINK_TICKS);
+TaskBlink taskBlink("B", APP_CONFIG_LED1, APP_CFGINT_BLINK_TICKS);
 
 #if !defined(APP_CFGINT_SIMULTANEOUS_THREADS)
 #define APP_CFGINT_SIMULTANEOUS_THREADS 9
@@ -57,7 +57,6 @@ TaskStress task9("9", 10, 90, 1, 800);
 #endif
 #endif /* APP_CFGINT_SIMULTANEOUS_THREADS > 0 */
 
-
 #if defined(APP_INCLUDE_TASKBLINKREALTIME)
 TaskBlinkRealTime taskRT("RT", APP_CFGINT_TASKBLINKREALTIME_LEDBIT,
     APP_CFGINT_TASKBLINKREALTIME_TICKS);
@@ -65,11 +64,9 @@ TaskBlinkRealTime taskRT("RT", APP_CFGINT_TASKBLINKREALTIME_LEDBIT,
 bool g_flagNotify;
 #endif
 
-
-StacksReporter taskR("R", APP_CFGINT_DUMP_INTERVAL_SECONDS,
+StacksReporter taskReporter("R", APP_CFGINT_DUMP_INTERVAL_SECONDS,
     APP_CFGINT_DUMP_MAX_INTERVAL_SECONDS,
     APP_CFGINT_DUMP_INCREASE_RATE_PROCENTS);
-
 
 // ---------------------------------------------------------------------------
 
@@ -80,13 +77,13 @@ StacksReporter taskR("R", APP_CFGINT_DUMP_INTERVAL_SECONDS,
 
 void
 OSApplicationImpl::interruptTick(void)
-{
+  {
 #if defined(APP_INCLUDE_LENGTHEN_SYSTICK)
 #if defined(APP_INCLUDE_BUSY_WAIT)
-  OS::busyWaitMicros(1000000/OS_CFGINT_TICK_RATE_HZ*APP_BUSY_PROCENTAGE/100);
+    OS::busyWaitMicros(1000000/OS_CFGINT_TICK_RATE_HZ*APP_BUSY_PROCENTAGE/100);
 #else /* !defined(APP_INCLUDE_BUSY_WAIT) */
-  for (int i = APP_CFGINT_NOTIFIES; --i;)
-  os.sched.eventNotify(APP_EVENT_DUMMY);
+    for (int i = APP_CFGINT_NOTIFIES; --i;)
+    os.sched.eventNotify(APP_EVENT_DUMMY);
 #endif /* defined(APP_INCLUDE_BUSY_WAIT) */
 #endif /* defined(APP_INCLUDE_LENGTHEN_SYSTICK) */
 
@@ -94,16 +91,16 @@ OSApplicationImpl::interruptTick(void)
 
 #if defined(APP_INCLUDE_LOCAL_NOTIFY)
 
-  if (g_flagNotify)
-    {
-      g_flagNotify = false;
-      os.sched.eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
-    }
+    if (g_flagNotify)
+      {
+        g_flagNotify = false;
+        os.sched.eventNotify(APP_CFGINT_TASKBLINKREALTIME_EVENT);
+      }
 
 #endif /* defined(APP_INCLUDE_LOCAL_NOTIFY) */
 
 #endif /* defined(APP_INCLUDE_TASKBLINKREALTIME) */
 
-}
+  }
 
 #endif /* defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK) */

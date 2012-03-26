@@ -6,15 +6,15 @@
 
 #include "TaskStress.h"
 
-unsigned int TaskStress::ms_rand;
+uint32_t TaskStress::ms_rand;
 
 /*
  * Active object constructor.
  * Initialise parent system thread and store parameters in private members.
  */
 
-TaskStress::TaskStress(const char *pName, unsigned int minMicros,
-    unsigned int maxMicros, unsigned int minTicks, unsigned int maxTicks) :
+TaskStress::TaskStress(const char *pName, uint16_t minMicros,
+    uint16_t maxMicros, uint16_t minTicks, uint16_t maxTicks) :
   OSThread(pName, m_stack, sizeof(m_stack))
 {
   debug.putConstructor_P(PSTR("TaskStress"), this);
@@ -40,20 +40,20 @@ TaskStress::threadMain(void)
           debug.putString("Thread '");
           debug.putString(getName());
           debug.putString("', micros=");
-          debug.putDec((unsigned short) m_minMicros);
+          debug.putDec(m_minMicros);
           debug.putString("..");
-          debug.putDec((unsigned short) m_maxMicros);
+          debug.putDec(m_maxMicros);
           debug.putString(", ticks=");
-          debug.putDec((unsigned short) m_minTicks);
+          debug.putDec(m_minTicks);
           debug.putString("..");
-          debug.putDec((unsigned short) m_maxTicks);
+          debug.putDec(m_maxTicks);
           debug.putNewLine();
         }
       os.sched.lock.exit();
     }
 
-  int nBusy, nSleep;
-  int nCnt;
+  uint16_t nBusy, nSleep;
+  uint16_t nCnt;
   nCnt = 0;
 
   // thread endless loop
@@ -85,18 +85,18 @@ TaskStress::threadMain(void)
     }
 }
 
-unsigned int
+uint16_t
 TaskStress::rand(void)
 {
 #if false
   return 9;
 #else
-  unsigned int ret;
+  uint16_t ret;
   os.sched.lock.enter();
   //os.sched.critical.enter();
     {
       ms_rand = ms_rand * 214013L + 2531011L;
-#if (__SIZEOF_INT__ == 2)
+#if (__SIZEOF_INT__ == 2) && false
       ret = (ms_rand & 0x7fff);
 #else
       ret = ((ms_rand >> 16) & 0x7fff);

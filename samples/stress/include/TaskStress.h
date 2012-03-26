@@ -11,26 +11,30 @@
 #include "portable/kernel/include/uOS.h"
 
 class TaskStress : public OSThread
-  {
+{
 public:
   // active object constructor
-  TaskStress(const char *pName, unsigned int minMicros, unsigned int maxMicros, unsigned int minTicks, unsigned int maxTicks);
+  TaskStress(const char *pName, uint16_t minMicros, uint16_t maxMicros,
+      uint16_t minTicks, uint16_t maxTicks);
 
   // actual thread main code
-  virtual void threadMain(void);
+  virtual void
+  threadMain(void);
 
-  static unsigned int rand(void);
+  static uint16_t
+  rand(void);
 
 private:
   // members
-  OSStack_t m_stack[ (OSThread::STACK_MINIMAL_SIZE + APP_CFGINT_TASKSTRESS_EXTRA_STACK_SIZE) / sizeof(OSStack_t) ];
+  OSStack_t m_stack[(OSThread::STACK_MINIMAL_SIZE
+      + APP_CFGINT_TASKSTRESS_EXTRA_STACK_SIZE) / sizeof(OSStack_t)];
 
-  unsigned int m_minMicros;
-  unsigned int m_maxMicros;
-  unsigned int m_minTicks;
-  unsigned int m_maxTicks;
+  uint16_t m_minMicros;
+  uint16_t m_maxMicros;
+  uint16_t m_minTicks;
+  uint16_t m_maxTicks;
 
-  static unsigned int ms_rand;
-  };
+  static uint32_t ms_rand;
+};
 
 #endif /* TASKSTRESS_H_ */
