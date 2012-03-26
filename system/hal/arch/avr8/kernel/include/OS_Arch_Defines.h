@@ -66,8 +66,12 @@ typedef unsigned char OSInterruptsMask_t;
 #define OS_EXCLUDE_RESET_HANDLER                        (1)
 
 #define OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING   (1)
-#define OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE      (1)
+//#define OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE      (1)
 
 #define OS_INCLUDE_SEPARATE_PROGMEM                     (1)
+
+//#if !defined(OS_CFGINT_OSCRITICALSECTION_MASK)
+//#define OS_CFGINT_OSCRITICALSECTION_MASK                (0x80)
+//#endif /* !defined(OS_CFGINT_OSCRITICALSECTION_MASK) */
 
 #endif /* HAL_OS_ARCH_DEFS_H_ */

@@ -45,7 +45,7 @@
 #define OS_CONFIG_ACTIVE_LED_PORT_WRITE			PORTD
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
-#define OS_CONFIG_ACTIVE_LED_BIT			PORTD4
+#define OS_CONFIG_ACTIVE_LED_BIT			4
 #endif
 
 // ----------------------------------------------------------------------------
@@ -57,7 +57,7 @@
 #define OS_CFGREG_OSUSBLED_LED_PORT_WRITE               PORTD
 #endif
 #if !defined(OS_CFGPIN_OSUSBLED_LED_PIN)
-#define OS_CFGPIN_OSUSBLED_LED_PIN                      PORTD7
+#define OS_CFGPIN_OSUSBLED_LED_PIN                      7
 #endif
 
 // ----------------------------------------------------------------------------
@@ -79,7 +79,7 @@
 #define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                DDRD
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED1_BIT)
-#define OS_CONFIG_DEBUG_LED1_BIT			PORTD5
+#define OS_CONFIG_DEBUG_LED1_BIT			5
 #endif
 
 #if !defined(OS_CONFIG_DEBUG_LED2_PORT_WRITE)
@@ -89,7 +89,7 @@
 #define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                DDRD
 #endif
 #if !defined(OS_CONFIG_DEBUG_LED2_BIT)
-#define OS_CONFIG_DEBUG_LED2_BIT			PORTD6
+#define OS_CONFIG_DEBUG_LED2_BIT			6
 #endif
 
 #if defined(DEBUG) && !defined(OS_CONFIG_DEBUG_DEVICE_I2C)

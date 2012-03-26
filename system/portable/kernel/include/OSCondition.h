@@ -78,6 +78,8 @@ OSCondition::getEventWaitReturn(void)
 
 // ============================================================================
 
+#if defined(OS_INCLUDE_OSREALTIME)
+
 class OSRealTimeCondition : public OSCondition
 {
 public:
@@ -105,6 +107,8 @@ private:
 
   // --------------------------------------------------------------------------
 };
+
+#endif /* defined(OS_INCLUDE_OSREALTIME) */
 
 // ----------------------------------------------------------------------------
 

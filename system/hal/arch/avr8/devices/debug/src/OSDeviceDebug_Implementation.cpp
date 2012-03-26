@@ -17,7 +17,9 @@ OSDeviceDebug::putString_P(const char* PROGMEM pc)
   if (pc == 0)
     return;
 
-  OSCriticalSection::enter();
+  register OSStack_t mask;
+
+  mask = DeviceDebugImpl_t::criticalEnter();
     {
       unsigned char buff[10];
       unsigned short i;
@@ -34,10 +36,11 @@ OSDeviceDebug::putString_P(const char* PROGMEM pc)
 
       if (i > 1)
         {
+          i--; // do not count the ending zero
           commonPutBytes((const char*) buff, i);
         }
     }
-  OSCriticalSection::exit();
+  DeviceDebugImpl_t::criticalExit(mask);
 }
 
 #if defined(OS_DEBUG_CONSTRUCTORS)
@@ -48,14 +51,14 @@ OSDeviceDebug::putConstructor_P(const char* PROGMEM pc, const void* p)
 {
   register OSStack_t mask;
 
-  mask = criticalEnter();
+  mask = DeviceDebugImpl_t::criticalEnter();
     {
       putString_P(pc);
       putString("() @");
       putPtr(p);
       putNewLine();
     }
-  criticalExit(mask);
+  DeviceDebugImpl_t::criticalExit(mask);
 }
 
 // display constructor name and object address
@@ -65,7 +68,7 @@ OSDeviceDebug::putConstructorWithIndex_P(const char* PROGMEM pc, uint16_t i,
 {
   register OSStack_t mask;
 
-  mask = criticalEnter();
+  mask = DeviceDebugImpl_t::criticalEnter();
     {
       putString_P(pc);
       putChar('(');
@@ -74,7 +77,7 @@ OSDeviceDebug::putConstructorWithIndex_P(const char* PROGMEM pc, uint16_t i,
       putPtr(p);
       putNewLine();
     }
-  criticalExit(mask);
+  DeviceDebugImpl_t::criticalExit(mask);
 }
 
 // display destructor name and object address
@@ -83,7 +86,7 @@ OSDeviceDebug::putDestructor_P(const char* PROGMEM pc, const void* p)
 {
   register OSStack_t mask;
 
-  mask = criticalEnter();
+  mask = DeviceDebugImpl_t::criticalEnter();
     {
       putChar('~');
       putString_P(pc);
@@ -91,7 +94,7 @@ OSDeviceDebug::putDestructor_P(const char* PROGMEM pc, const void* p)
       putPtr(p);
       putNewLine();
     }
-  criticalExit(mask);
+  DeviceDebugImpl_t::criticalExit(mask);
 }
 
 #endif /* defined(OS_DEBUG_CONSTRUCTORS) */

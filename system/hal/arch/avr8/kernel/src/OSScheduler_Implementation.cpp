@@ -80,9 +80,8 @@ OSSchedulerImpl::stackInitialise(OSStack_t* pStackTop, void
   *pStackTop-- = 0x30; /* R30 Z       +2 */
   *pStackTop-- = 0x31; /* R31         +1 */
 
-#if defined(DEBUG)
+#if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_STACKINITIALIZE)
 
-  if (false)
     {
       OSDeviceDebug::putString("Init S=");
       OSDeviceDebug::putHex((unsigned short) pStackTop);
@@ -110,8 +109,9 @@ OSSchedulerImpl::stackInitialise(OSStack_t* pStackTop, void
 void
 OSSchedulerImpl::start(void)
 {
+  OSSchedulerImpl::stackPointerRestore();
+  OSSchedulerImpl::registersRestore();
   // interrupts enabled after pop-ing flags
-  OSScheduler::contextRestore();
 
   OSCPU::returnFromSubroutine();
 }

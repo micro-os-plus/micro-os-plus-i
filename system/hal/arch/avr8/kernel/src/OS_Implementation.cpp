@@ -34,6 +34,37 @@
 
 #endif
 
+/*
+ * The AVR8 start sequence:
+ * - the reset vector
+ *      clear r1
+ *      set stack to end of ram
+ * - .init3
+ *      processor_init()
+ * - do_copy_data()
+ * - do_clear_bss()
+ * - .init5
+ *      OSDeviceDebug::nakedEarlyInit
+ *              call OSDeviceDebug::earlyInit()
+ *                      call DeviceDebugImpl_t::implEarlyInit()
+ *                      commonPutBytes(greeting, ...)
+ *
+ * - .init5
+ *      OS::naked_early_init()
+ *              call OS::earlyInit()
+ *                      // display
+ *                      OS::familyEarlyInit()
+ *                      OSScheduler::earlyInit()
+ *
+ * - do_global_ctors()
+ *
+ * - call main()
+ *      call OSScheduler::start()
+ *
+ * - jump _exit()
+ *
+ */
+
 // ----- init3 ---------------------------------------------------------------
 // earliest moment we can use C code to initialise processor,
 // before constructors

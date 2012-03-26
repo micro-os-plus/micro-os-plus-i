@@ -89,10 +89,20 @@ private:
 
 };
 
+#if defined(OS_CONFIG_ARCH_AVR32)
+
 #if defined(OS_CONFIG_FAMILY_AVR32UC3)
 #include "hal/arch/avr32/uc3/kernel/include/OSCPUImpl_Inlines.h"
 #else
 #error "Missing OS_CONFIG_FAMILY_* definition"
+#endif
+
+#elif defined(OS_CONFIG_ARCH_AVR8)
+
+#include "hal/arch/avr8/kernel/include/OSCPUImpl_Inlines.h"
+
+#else
+#error "Missing OS_CONFIG_ARCH_* definition"
 #endif
 
 #endif

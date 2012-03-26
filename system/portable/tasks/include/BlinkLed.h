@@ -39,7 +39,7 @@ inline void BlinkLed::toggle(void)
     OSCriticalSection::enter();
       {
         // toggle led
-        OS_CONFIG_BLINK_LED_PORT ^= _BV(OS_CONFIG_BLINK_LED_BIT);
+        OS_CONFIG_BLINK_LED_PORT_WRITE ^= _BV(OS_CONFIG_BLINK_LED_BIT);
       }
     OSCriticalSection::exit();
   }
@@ -49,7 +49,7 @@ inline void BlinkLed::on(void)
     OSCriticalSection::enter();
       {
         // toggle led
-        OS_CONFIG_BLINK_LED_PORT |= _BV(OS_CONFIG_BLINK_LED_BIT);
+        OS_CONFIG_BLINK_LED_PORT_WRITE |= _BV(OS_CONFIG_BLINK_LED_BIT);
       }
     OSCriticalSection::exit();
   }
@@ -59,7 +59,7 @@ inline void BlinkLed::off(void)
     OSCriticalSection::enter();
       {
         // toggle led
-        OS_CONFIG_BLINK_LED_PORT &= ~_BV(OS_CONFIG_BLINK_LED_BIT);
+        OS_CONFIG_BLINK_LED_PORT_WRITE &= ~_BV(OS_CONFIG_BLINK_LED_BIT);
       }
     OSCriticalSection::exit();
   }

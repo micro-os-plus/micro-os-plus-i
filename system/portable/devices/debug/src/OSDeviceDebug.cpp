@@ -45,8 +45,8 @@ OSDeviceDebug::earlyInit(void)
   commonPutBytes("\r\n\r\n", 4);
   commonPutBytes(greeting, strlen(greeting));
   commonPutBytes("\r\n", 2);
-  commonPutBytes(OS_CFGSTR_GREETING, sizeof(OS_CFGSTR_GREETING));
-  commonPutBytes("\r\n", 4);
+  commonPutBytes(OS_CFGSTR_GREETING, sizeof(OS_CFGSTR_GREETING)-1);
+  commonPutBytes("\r\n", 2);
 }
 
 // ----------------------------------------------------------------------------
@@ -115,14 +115,14 @@ OSDeviceDebug::putConstructor(const char* pc, const void* p)
   {
     register OSStack_t mask;
 
-    mask = criticalEnter();
+    mask = DeviceDebugImpl_t::criticalEnter();
       {
         putString(pc);
         putString("() @");
         putPtr(p);
         putNewLine();
       }
-    criticalExit(mask);
+    DeviceDebugImpl_t::criticalExit(mask);
   }
 
 // display constructor name and object address
@@ -132,7 +132,7 @@ OSDeviceDebug::putConstructorWithIndex(const char* pc, uint16_t i,
   {
     register OSStack_t mask;
 
-    mask = criticalEnter();
+    mask = DeviceDebugImpl_t::criticalEnter();
       {
         putString(pc);
         putChar('(');
@@ -141,7 +141,7 @@ OSDeviceDebug::putConstructorWithIndex(const char* pc, uint16_t i,
         putPtr(p);
         putNewLine();
       }
-    criticalExit(mask);
+    DeviceDebugImpl_t::criticalExit(mask);
   }
 
 // display destructor name and object address
@@ -150,7 +150,7 @@ OSDeviceDebug::putDestructor(const char* pc, const void* p)
   {
     register OSStack_t mask;
 
-    mask = criticalEnter();
+    mask = DeviceDebugImpl_t::criticalEnter();
       {
         putChar('~');
         putString(pc);
@@ -158,7 +158,7 @@ OSDeviceDebug::putDestructor(const char* pc, const void* p)
         putPtr(p);
         putNewLine();
       }
-    criticalExit(mask);
+    DeviceDebugImpl_t::criticalExit(mask);
   }
 
 #endif /* defined(OS_DEBUG_CONSTRUCTORS) */

@@ -77,7 +77,8 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
 #endif /* OS_INCLUDE_OSTHREAD_INTERRUPTION */
         {
 
-#if true
+#if !defined(OS_EXCLUDE_OSTIMER_SLEEP_CHECKS)
+
           // Normally the event should not be there, but...
           eventRemove(event);
 
@@ -110,31 +111,39 @@ OSTimer::sleep(OSTimerTicks_t ticks, OSEvent_t event)
           OSTimerTicks_t durationTicks;
           durationTicks = getTicks() - begTicks;
 
-          if ((durationTicks != ticks) && (durationTicks != (ticks + 1)))
-            {
-              OSDeviceDebug::putString_P(PSTR(" OSTimer::sleep("));
-              OSDeviceDebug::putDec(ticks);
-              OSDeviceDebug::putString_P(PSTR(") took "));
-              OSDeviceDebug::putDec(durationTicks);
-              OSDeviceDebug::putChar(' ');
-#if defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS)
-              OSTimerTicks_t duration2Ticks;
-              duration2Ticks
-                  = OSScheduler::getThreadCurrent()->getLastEventNotifyTicks()
-                      - begTicks;
-              if ((duration2Ticks != ticks) && (duration2Ticks != (ticks + 1)))
-                {
-                  OSDeviceDebug::putDec(duration2Ticks);
-                  OSDeviceDebug::putChar(' ');
-                }
+#if !defined(OS_CFGINT_OSTIMER_SLEEP_REPORT_LIMIT)
+#define OS_CFGINT_OSTIMER_SLEEP_REPORT_LIMIT    1
 #endif
-              OSDeviceDebug::putString(
-                  OSScheduler::getThreadCurrent()->getName());
-              OSDeviceDebug::putNewLine();
+//          if ((durationTicks != ticks) && (durationTicks != (ticks + 1)))
+          if ((durationTicks - ticks) > OS_CFGINT_OSTIMER_SLEEP_REPORT_LIMIT)
+            {
+              OSScheduler::lock.enter();
+                {
+                  OSDeviceDebug::putString_P(PSTR(" OSTimer::sleep("));
+                  OSDeviceDebug::putDec(ticks);
+                  OSDeviceDebug::putString_P(PSTR(") took "));
+                  OSDeviceDebug::putDec(durationTicks);
+                  OSDeviceDebug::putChar(' ');
+#if defined(OS_INCLUDE_OSTHREAD_LASTEVENTNOTIFYTICKS)
+                  OSTimerTicks_t duration2Ticks;
+                  duration2Ticks
+                  = OSScheduler::getThreadCurrent()->getLastEventNotifyTicks()
+                  - begTicks;
+                  if ((duration2Ticks != ticks) && (duration2Ticks != (ticks + 1)))
+                    {
+                      OSDeviceDebug::putDec(duration2Ticks);
+                      OSDeviceDebug::putChar(' ');
+                    }
+#endif
+                  OSDeviceDebug::putString(
+                      OSScheduler::getThreadCurrent()->getName());
+                  OSDeviceDebug::putNewLine();
+                }
+              OSScheduler::lock.exit();
             }
 #endif
 
-#else
+#else /* !defined(OS_EXCLUDE_OSTIMER_SLEEP_CHECKS) */
           OSCriticalSection::enter();
             {
               if (insert(ticks, event, OSEventWaitReturn::OS_VOID))

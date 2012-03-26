@@ -222,6 +222,8 @@ OS::staticConstructorsInit(void)
 int
 main(void)
 {
+  OSDeviceDebug::putString_P(PSTR("main() "));
+  OSDeviceDebug::putNewLine();
 
 #if defined(DEBUG)
 

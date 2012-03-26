@@ -109,9 +109,21 @@ StacksReporter::threadMain(void)
                       if (pt != 0)
                         {
                           clog << std::endl;
+
                           clog << ((pt == this) ? '*' : ' ');
                           clog << pt->getName() << ' ' << pt->getStackUsed()
                               << '/' << pt->getStackSize();
+                          if (pt->isWaiting())
+                            {
+                              if ((OSEvent_t)pt == pt->getEvent())
+                                {
+                                  clog << " s";
+                                }
+                              else
+                                {
+                                  clog << " w " << std::hex << pt->getEvent();
+                                }
+                            }
                         }
                     }
                   clog << std::endl << std::endl;

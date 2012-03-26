@@ -254,7 +254,7 @@ private:
   // members
 
   // true if the scheduler is preemptive
-  static bool ms_isPreemptive;
+  static bool volatile ms_isPreemptive;
 
   // true if the scheduler was started
   static bool ms_isRunning;
@@ -264,7 +264,7 @@ private:
   // list of threads registered to the scheduler
   static OSThread* ms_threads[OS_CFGINT_THREADS_ARRAY_SIZE + 1];
   // the number of threads registered to the scheduler
-  static unsigned char ms_threadsCount;
+  static unsigned char volatile ms_threadsCount;
   //static unsigned char threadsIdx;
 
   #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
@@ -399,9 +399,9 @@ private:
   // members
 
   // array of ready threads
-  static OSThread* ms_array[];
+  static OSThread* volatile ms_array[];
   // number of ready threads (ready to run) in ms_array
-  static unsigned char ms_count;
+  static unsigned char volatile ms_count;
 };
 
 //-----------------------------------------------------------------------------
@@ -450,11 +450,7 @@ OSSchedulerLock::enter(void)
 inline void
 OSSchedulerLock::exit(void)
 {
-#if !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) && false
-  ms_isLocked = OSCPUImpl::stackPop();
-#else /* defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
   --ms_nestingLevel;
-#endif /* !defined(OS_EXCLUDE_OSCRITICALSECTION_USE_SYSTEM_STACK) */
 }
 
 // ============================================================================

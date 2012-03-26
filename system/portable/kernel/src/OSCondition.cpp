@@ -207,6 +207,8 @@ OSCondition::criticalSectionExit(void)
 
 // ============================================================================
 
+#if defined(OS_INCLUDE_OSREALTIME)
+
 OSRealTimeCondition::OSRealTimeCondition()
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSRealTimeCondition"), this);
@@ -228,6 +230,8 @@ OSRealTimeCondition::criticalSectionExit(void)
 {
   OSRealTimeCriticalSection::exit();
 }
+
+#endif /* defined(OS_INCLUDE_OSREALTIME) */
 
 // ----------------------------------------------------------------------------
 

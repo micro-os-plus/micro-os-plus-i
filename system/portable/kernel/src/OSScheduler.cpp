@@ -25,9 +25,9 @@ OSThread* OSScheduler::ms_pThreadIdle;
 OSThread* volatile OSScheduler::ms_pThreadRunning;
 
 bool OSScheduler::ms_isRunning;
-bool OSScheduler::ms_isPreemptive;
+bool volatile OSScheduler::ms_isPreemptive;
 
-unsigned char OSScheduler::ms_threadsCount;
+unsigned char volatile OSScheduler::ms_threadsCount;
 #if defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY)
 unsigned char OSScheduler::ms_notifyIndex;
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_ROUND_ROBIN_NOTIFY) */
@@ -54,10 +54,10 @@ OSTimerRtc OSScheduler::timerRtc;
 bool OSScheduler::ms_allowDeepSleep;
 #endif /* defined(OS_INCLUDE_OSTHREAD_SLEEP) */
 
-// ----- OSActiveThreads static variables ---------------------------------------
+// ----- OSActiveThreads static variables -------------------------------------
 
-unsigned char OSActiveThreads::ms_count;
-OSThread* OSActiveThreads::ms_array[OS_CFGINT_THREADS_ARRAY_SIZE + 1];
+unsigned char volatile OSActiveThreads::ms_count;
+OSThread* volatile OSActiveThreads::ms_array[OS_CFGINT_THREADS_ARRAY_SIZE + 1];
 
 // ============================================================================
 
@@ -338,7 +338,11 @@ OSScheduler::performContextSwitch()
 
       register OSStack_t tmp;
       tmp = OSCPUImpl::getInterruptsMask();
+#if defined(OS_INCLUDE_OSCRITICALSECTION_MASK_INTERRUPTS)
       OSCPUImpl::setInterruptsMask(tmp | OS_CFGINT_OSCRITICALSECTION_MASK);
+#else
+      OSCPUImpl::interruptsDisable();
+#endif
         {
           OSThread* pThread;
           pThread = ms_pThreadRunning;

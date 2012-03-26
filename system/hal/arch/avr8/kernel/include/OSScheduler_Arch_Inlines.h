@@ -44,7 +44,7 @@ OSSchedulerImpl::registersSave(void)
     (
         " push  r0 \n"
         " in    r0, __SREG__ \n"
-        " cli      \n"
+        " cli      \n"          // Enter a critical region
         " push  r0 \n"
         " push  r1 \n"
         " clr   r1 \n"
@@ -126,7 +126,7 @@ OSSchedulerImpl::registersRestore(void)
         " pop   r2 \n"
         " pop   r1 \n"
         " pop   r0 \n"
-        " out   __SREG__, r0 \n"
+        " out   __SREG__, r0 \n" // Restore interrupts
         " pop   r0 \n"
 
         :
@@ -141,6 +141,15 @@ OSSchedulerImpl::isContextSwitchAllowed(void)
     // The AVR8 architecture does not implement nested interrupts
     return true;
   }
+
+inline  bool
+OSSchedulerImpl::isYieldAllowed(void)
+{
+  if ((OSCPUImpl::getInterruptsMask() & 0x80) == 0)
+    return false;
+  else
+    return true;
+}
 
 inline void
 OSSchedulerImpl::stackPointerSave(void)
