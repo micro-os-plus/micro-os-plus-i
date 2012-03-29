@@ -48,7 +48,7 @@ DeviceDebugI2cImpl::implEarlyInit(void)
   masterSdaInit();
 }
 
-#if false
+#if defined(OS_INCLUDE_DEVICEDEBUGI2C_SINGLE_BYTE)
 void
 DeviceDebugI2cImpl::implPutByte(unsigned char c)
   {

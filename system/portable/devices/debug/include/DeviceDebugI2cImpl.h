@@ -25,7 +25,7 @@ public:
   static void
   implEarlyInit(void);
 
-#if false
+#if defined(OS_INCLUDE_DEVICEDEBUGI2C_SINGLE_BYTE)
   // Ouput one byte on the debug interface.
   static void
   implPutByte(unsigned char c);
