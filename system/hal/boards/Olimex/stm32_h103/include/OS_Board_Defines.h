@@ -58,11 +58,11 @@
 #endif
 
 #if false
-#if !defined(OS_CONFIG_USB_LED_PORT_INIT)
-#define OS_CONFIG_USB_LED_PORT_INIT                     DDRD
+#if !defined(OS_CFGREG_OSUSBLED_LED_PORT_CONFIG)
+#define OS_CFGREG_OSUSBLED_LED_PORT_CONFIG                     DDRD
 #endif
-#if !defined(OS_CONFIG_USB_LED_PORT)
-#define OS_CONFIG_USB_LED_PORT                          PORTD
+#if !defined(OS_CFGREG_OSUSBLED_LED_PORT_WRITE)
+#define OS_CFGREG_OSUSBLED_LED_PORT_WRITE                          PORTD
 #endif
 #if !defined(OS_CFGPIN_OSUSBLED_LED_PIN)
 #define OS_CFGPIN_OSUSBLED_LED_PIN                           PORTD7
