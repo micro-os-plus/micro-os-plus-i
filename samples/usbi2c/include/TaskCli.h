@@ -30,8 +30,8 @@ private:
   unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 100];
   OSDeviceCharacter& m_dev;
 
-  istream m_cin;
-  ostream m_cout;
+  std::istream m_cin;
+  std::ostream m_cout;
   SimpleCli m_cli;
 
   OSDeviceCharacter& m_devIn;

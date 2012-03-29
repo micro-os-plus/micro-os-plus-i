@@ -46,16 +46,16 @@ TaskCli::threadMain(void)
     {
       os.sched.lock.enter();
         {
-          clog << "TaskCli::threadMain(" << showbase << hex << this << ") SP="
-              << hex << (unsigned short) SP << endl;
+          clog << "TaskCli::threadMain(" << std::showbase << std::hex << this << ") SP="
+              << std::hex << (unsigned short) SP << std::endl;
         }
       os.sched.lock.exit();
     }
 
   OSDeviceCharacter& dev = m_dev;
 
-  istream& cin = m_cin;
-  ostream& cout = m_cout;
+  std::istream& cin = m_cin;
+  std::ostream& cout = m_cout;
 
   SimpleCli & cli = m_cli;
 
@@ -74,7 +74,7 @@ TaskCli::threadMain(void)
 
       os.sched.lock.enter();
         {
-          cout << endl << endl << greeting << endl;
+          cout << std::endl << std::endl << greeting << std::endl;
 
 #if defined(OS_CONFIG_BOARD_A0739)
           if (SignalIMUX::isI2C())
@@ -88,29 +88,29 @@ TaskCli::threadMain(void)
 
       for (; dev.isConnected();)
         {
-          cout << endl << prompt;
+          cout << std::endl << prompt;
 
           int c;
 
           c = cli.readLine(cin, cout);
-          if (c == traits::eof())
+          if (c == std::traits::eof())
             {
               if (os.isDebug)
-                clog << "disconnected" << endl;
+                clog << "disconnected" << std::endl;
 
               break;
             }
           else if (c == OSReturn::OS_TIMEOUT)
             {
               if (os.isDebug)
-                clog << "timeout" << endl;
+                clog << "timeout" << std::endl;
 
               break;
             }
           else if (c < 0)
             {
               if (os.isDebug)
-                clog << "error -" << dec << (int) (-c) << endl;
+                clog << "error -" << std::dec << (int) (-c) << std::endl;
 
               break;
             }
@@ -146,7 +146,7 @@ TaskCli::lineProcess()
   pc = m_line;
 
   SimpleCli &cli = m_cli;
-  ostream& cout = m_cout;
+  std::ostream& cout = m_cout;
 
   unsigned char *p;
   unsigned char c;
@@ -158,7 +158,7 @@ TaskCli::lineProcess()
 
   // ?? os.WDTreset();
 
-  cli .parseReset(); // reset pointer to start of line
+  cli.parseReset(); // reset pointer to start of line
 
   p = cli.parseNext();
   if (p == 0)
@@ -167,7 +167,7 @@ TaskCli::lineProcess()
   c = *p | 0x20;
   if (*p == '?')
     {
-      cout << endl << str_help;
+      cout << std::endl << str_help;
     }
   else if (c == 's')
     {
@@ -187,7 +187,7 @@ TaskCli::lineProcess()
               OSThread *pt;
               pt = os.sched.getThread(i);
 
-              cout << endl;
+              cout << std::endl;
               if (pt == this)
                 cout << '*';
               else
@@ -226,7 +226,7 @@ TaskCli::lineProcess()
 
   return;
 
-  err: cout << endl << str_unknown;
-  cout << endl << str_help;
+  err: cout << std::endl << str_unknown;
+  cout << std::endl << str_help;
 }
 

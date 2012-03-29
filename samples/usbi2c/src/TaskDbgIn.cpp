@@ -28,7 +28,7 @@ TaskDbgIn::threadMain(void)
     {
       if (os.isDebug())
         {
-          clog << "TaskDbgIn::threadMain(" << showbase << hex << this << endl;
+          clog << "TaskDbgIn::threadMain(" << std::showbase << std::hex << this << std::endl;
         }
 
       outDev = m_outDev;
@@ -65,24 +65,24 @@ TaskDbgIn::threadMain(void)
           int c;
 
           c = inDev->readByte();
-          if (c == traits::eof())
+          if (c == std::traits::eof())
             {
               if (os.isDebug)
-                clog << "disconnected" << endl;
+                clog << "disconnected" << std::endl;
 
               break;
             }
           else if (c == OSReturn::OS_TIMEOUT)
             {
               if (os.isDebug)
-                clog << "timeout" << endl;
+                clog << "timeout" << std::endl;
 
               break;
             }
           else if (c < 0)
             {
               if (os.isDebug)
-                clog << "error -" << dec << (int) (-c) << endl;
+                clog << "error -" << std::dec << (int) (-c) << std::endl;
 
               break;
             }
