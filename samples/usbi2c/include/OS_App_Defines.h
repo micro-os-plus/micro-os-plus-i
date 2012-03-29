@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2011 Liviu Ionescu.
+ *	Copyright (C) 2007-2012 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -26,6 +26,7 @@
 #define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
 #define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
 
+#define OS_INCLUDE_SIMPLECLI_PARSER                     1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_LONG             1
 #define OS_INCLUDE_SIMPLECLI_PARSE_HEX_NIBBLE           1
 
@@ -45,7 +46,7 @@
 #if defined(DEBUG)
 
 #define OS_DEBUG_CONSTRUCTORS                           1
-#define OS_INCLUDE_DEVICEDEBUGI2C_SINGLE_BYTE           1
+//#define OS_INCLUDE_DEVICEDEBUGI2C_SINGLE_BYTE           1
 
 #endif /* DEBUG */
 

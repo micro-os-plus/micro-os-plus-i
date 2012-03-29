@@ -18,7 +18,7 @@
 // Notice: do not use parenthesis! (the values will be stringified)
 #define APP_CFGINT_VERSION_MAJOR                        2
 #define APP_CFGINT_VERSION_MINOR                        3
-#define APP_CFGINT_VERSION_REVISION                     1740
+#define APP_CFGINT_VERSION_REVISION                     1741
 
 // ----------------------------------------------------------------------------
 
