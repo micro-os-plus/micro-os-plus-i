@@ -137,9 +137,15 @@ DeviceDebugI2cImpl::implPutBytes(const char* s, unsigned int n)
             }
         }
       masterStop();
+
+#define OS_CFGINT_DEBUG_I2C_EMU_DELAY_STOP_COUNT ((OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT+1) * 10)
+
+      // To avoid NAK for fast sequences
+      masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_STOP_COUNT);
+
       break;
 
-      retry: masterDelay(OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT * 10);
+      retry: masterDelay((OS_CFGINT_DEBUG_I2C_EMU_DELAY_COUNT+1) * 10);
     }
 #endif
 
