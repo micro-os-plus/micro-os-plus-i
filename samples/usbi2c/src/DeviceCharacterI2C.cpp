@@ -20,6 +20,8 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
   m_type = DEVICECHARACTER_USART;
 #endif
 
+  m_timeoutCounterTicks = 0;
+
   pDevice = this;
 }
 
@@ -34,6 +36,8 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
 #if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
   m_type = DEVICECHARACTER_USART;
 #endif
+
+  m_timeoutCounterTicks = 0;
 
   pDevice = this;
 }
@@ -50,6 +54,8 @@ DeviceCharacterI2C::implOpen(void)
   OSDeviceDebug::putString("DeviceCharacterI2C::implOpen()");
   OSDeviceDebug::putNewLine();
 #endif
+
+  m_timeoutCounterTicks = 0;
 
   TWBR = 2; // 400000 at 8MHz
   TWSR = 0; // prescaller = 1
@@ -77,6 +83,9 @@ DeviceCharacterI2C::implClose(void)
   OSDeviceDebug::putString("DeviceCharacterI2C::implClose()");
   OSDeviceDebug::putNewLine();
 #endif
+
+  // Disable timeout checking
+  m_timeoutCounterTicks = 0;
 
   TWCR = 0; // disable interface
 
@@ -139,8 +148,14 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
   // See Table 20.5 Status Codes for Slave Receiver Mode
   switch (status)
     {
+  // Warning: the SLA is not protected by timeout
+
   case 0x60:
     // Own SLA+W received, should return ACK
+
+    // Start timeout counting
+    m_timeoutCounterTicks = 1;
+
     if (!m_rxBuf.isFull())
       {
         TWCR |= _BV(TWEA); // ACK
@@ -154,6 +169,10 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
 
   case 0x80:
     // Data received
+
+    // Start timeout counting
+    m_timeoutCounterTicks = 1;
+
     if (!m_rxBuf.isFull())
       {
         m_rxBuf.put(portRead());
@@ -200,6 +219,9 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
   case 0xA0:
     // A STOP condition or repeated START condition has been received
     // while still addressed as Slave
+
+    // Disable timeout checking
+    m_timeoutCounterTicks = 0;
 
     // Notify readers
     os.sched.eventNotify(implGetReadEvent());
@@ -255,28 +277,20 @@ DeviceCharacterI2C * DeviceCharacterI2C::pDevice;
 
 //-----------------------------------------------------------------------------
 
-inline void
-DeviceCharacterI2C::interruptTxEnable(void)
-{
-  ;
-}
 
-inline void
-DeviceCharacterI2C::interruptTxDisable(void)
+void
+DeviceCharacterI2C::interruptTimerTick(void)
 {
-  ;
-}
+  if (m_timeoutCounterTicks > 0)
+    {
+      m_timeoutCounterTicks++;
 
-inline unsigned char
-DeviceCharacterI2C::portRead(void)
-{
-  return TWDR;
-}
-
-inline void
-DeviceCharacterI2C::portWrite(unsigned char b)
-{
-  TWDR = b;
+      if (m_timeoutCounterTicks > OS_CFGINT_TICK_RATE_HZ * 2)
+        {
+          os.sched.eventNotify(implGetReadEvent(), OSEventWaitReturn::OS_TIMEOUT);
+          OSDeviceDebug::putChar('T');
+        }
+    }
 }
 
 // ===== ISRs =================================================================

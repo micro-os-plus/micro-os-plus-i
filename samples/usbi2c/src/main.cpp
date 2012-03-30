@@ -22,11 +22,10 @@ DeviceCharacterUsb devUsb;
 unsigned char tx_store[OS_CFGINT_DEVICECHARACTERI2C_TXBUF_SIZE];
 unsigned char rx_store[OS_CFGINT_DEVICECHARACTERMI2C_RXBUF_SIZE];
 
-DeviceCharacterI2C devI2C(tx_store,
-    sizeof(tx_store), rx_store,
+DeviceCharacterI2C devI2C(tx_store, sizeof(tx_store), rx_store,
     sizeof(rx_store));
 
-TaskDbgIn taskDbgIn("input", devUsb,  devI2C);
+TaskDbgIn taskDbgIn("input", devUsb, devI2C);
 
 // ----------------------------------------------------------------------------
 // Cli Task
@@ -44,3 +43,14 @@ TaskPitpalac taskBlink("blink");
 // and in the CLI session at open
 const char greeting[] = APP_CFGSTR_GREETING;
 
+// ---------------------------------------------------------------------------
+
+#if defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK)
+
+void
+OSApplicationImpl::interruptTick(void)
+{
+  DeviceCharacterI2C::pDevice->interruptTimerTick();
+}
+
+#endif /* defined(OS_INCLUDE_OSSAPPLICATIONIMPL_INTERRUPTTICK) */

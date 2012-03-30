@@ -45,6 +45,9 @@ public:
   virtual
   ~DeviceCharacterI2C();
 
+  void
+  interruptTimerTick(void);
+
   static DeviceCharacterI2C *pDevice;
 
 private:
@@ -88,8 +91,35 @@ private:
   inline void
   portWrite(unsigned char b);
 
+
   CircularByteBuffer m_txBuf;
   CircularByteBuffer m_rxBuf;
+
+  unsigned short m_timeoutCounterTicks;
 };
+
+inline void
+DeviceCharacterI2C::interruptTxEnable(void)
+{
+  ;
+}
+
+inline void
+DeviceCharacterI2C::interruptTxDisable(void)
+{
+  ;
+}
+
+inline unsigned char
+DeviceCharacterI2C::portRead(void)
+{
+  return TWDR;
+}
+
+inline void
+DeviceCharacterI2C::portWrite(unsigned char b)
+{
+  TWDR = b;
+}
 
 #endif /*DEVICECHARACTERI2C_H_*/
