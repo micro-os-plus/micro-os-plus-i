@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2011 Liviu Ionescu.
+ *	Copyright (C) 2007-2012 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -17,7 +17,7 @@
 
 // Notice: do not use parenthesis! (the values will be stringified)
 #define APP_CFGINT_VERSION_MAJOR                        2
-#define APP_CFGINT_VERSION_MINOR                        3
+#define APP_CFGINT_VERSION_MINOR                        4
 #define APP_CFGINT_VERSION_REVISION                     1741
 
 // ----------------------------------------------------------------------------
