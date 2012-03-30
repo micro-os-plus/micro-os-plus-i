@@ -11,8 +11,8 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM,
     unsigned char *pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
     unsigned short rxLWM) :
-  m_txBuf(pTxBuf, txBufSize, txHWM, txLWM), m_rxBuf(pRxBuf, rxBufSize, rxHWM,
-      rxLWM)
+  m_txBuf(pTxBuf, txBufSize, txHWM, txLWM),
+      m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM)
 {
   OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterI2C"), this);
 
@@ -26,8 +26,8 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
 // use default 3/4 high and 1/4 low water marks
 DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned char *pRxBuf, unsigned short rxBufSize) :
-  m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4), m_rxBuf(pRxBuf,
-      rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4)
+  m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4),
+      m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4)
 {
   OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterI2C"), this);
 
@@ -133,17 +133,23 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
   //OSDeviceDebug::putChar('!');
   unsigned char status;
 
-  status = TWSR & ~0x03;
+  // Get rid of the prescaler bits
+  status = TWSR & (~0x03);
 
+  // See Table 20.5 Status Codes for Slave Receiver Mode
   switch (status)
     {
   case 0x60:
-    // Own SLA+W received, ACK returned
+    // Own SLA+W received, should return ACK
     if (!m_rxBuf.isFull())
-      TWCR |= _BV(TWEA); // ACK
+      {
+        TWCR |= _BV(TWEA); // ACK
+      }
     else
-      TWCR &= ~_BV(TWEA); // NOT ACK
-
+      {
+        TWCR &= ~_BV(TWEA); // NOT ACK
+        OSDeviceDebug::putChar('A');
+      }
     break;
 
   case 0x80:
@@ -151,12 +157,16 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     if (!m_rxBuf.isFull())
       {
         m_rxBuf.put(portRead());
-        os.sched.eventNotify(implGetReadEvent());
         if (!m_rxBuf.isFull())
-          TWCR |= _BV(TWEA); // ACK
+          {
+            os.sched.eventNotify(implGetReadEvent());
+            TWCR |= _BV(TWEA); // ACK
+          }
         else
-          TWCR &= ~_BV(TWEA); // NOT ACK
-
+          {
+            TWCR &= ~_BV(TWEA); // NOT ACK
+            OSDeviceDebug::putChar('N');
+          }
       }
     else
       {
@@ -167,13 +177,37 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     break;
 
   case 0x88:
+    // Previously addressed with own SLA+W; data has been received;
+    // NOT ACK has been returned
+
+    unsigned char ch;
+    ch = portRead(); // The manual says "Read data byte", so we comply
+
+#if defined(DEBUG)
+    OSDeviceDebug::putHex(status);
+    OSDeviceDebug::putChar(' ');
+    OSDeviceDebug::putHex(ch);
+    OSDeviceDebug::putChar('|');
+#endif
+
     //TWCR &= ~ ( _BV(TWSTO)); // clear stop
     TWCR |= _BV(TWEA); // ACK
+
+    // Switched to the not addressed Slave mode;
+    // own SLA will be recognised;
     break;
 
   case 0xA0:
-    // STOP or repeated START received
+    // A STOP condition or repeated START condition has been received
+    // while still addressed as Slave
+
+    // Notify readers
+    os.sched.eventNotify(implGetReadEvent());
+
     TWCR |= _BV(TWEA); // ACK
+
+    // Switched to the not addressed Slave mode;
+    // own SLA will be recognised;
     break;
 
   default:
@@ -200,7 +234,7 @@ DeviceCharacterI2C::implCanRead()
 int
 DeviceCharacterI2C::implAvailableRead()
 {
-  return !m_rxBuf.length();
+  return m_rxBuf.length();
 }
 
 OSEvent_t
@@ -252,8 +286,7 @@ DeviceCharacterI2C::portWrite(unsigned char b)
 extern "C" void
 TWI_vect(void) __attribute__( ( signal, naked ) );
 
-void
-TWI_vect(void)
+void TWI_vect(void)
 {
   OSScheduler::interruptEnter();
     {

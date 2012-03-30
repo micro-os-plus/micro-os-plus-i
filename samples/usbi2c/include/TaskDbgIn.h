@@ -26,6 +26,8 @@ private:
   unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 100];
   OSDeviceCharacter & m_outDev;
   OSDeviceCharacter & m_inDev2;
+
+  unsigned char m_buff[100]; // Buffer for multiple bytes reads/writes
 };
 
 #endif /* TASKDBGIN_H_ */

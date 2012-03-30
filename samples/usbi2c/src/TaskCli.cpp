@@ -95,21 +95,21 @@ TaskCli::threadMain(void)
           c = cli.readLine(cin, cout);
           if (c == std::traits::eof())
             {
-              if (os.isDebug)
+              if (os.isDebug())
                 clog << "disconnected" << std::endl;
 
               break;
             }
           else if (c == OSReturn::OS_TIMEOUT)
             {
-              if (os.isDebug)
+              if (os.isDebug())
                 clog << "timeout" << std::endl;
 
               break;
             }
           else if (c < 0)
             {
-              if (os.isDebug)
+              if (os.isDebug())
                 clog << "error -" << std::dec << (int) (-c) << std::endl;
 
               break;
