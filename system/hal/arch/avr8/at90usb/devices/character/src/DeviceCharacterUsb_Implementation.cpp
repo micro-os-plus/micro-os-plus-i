@@ -114,9 +114,9 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
 
       OSDeviceDebug::putChar('}');
       if (b >= ' ')
-        OSDeviceDebug::putChar(b);
+      OSDeviceDebug::putChar(b);
       else
-        OSDeviceDebug::putHex(b);
+      OSDeviceDebug::putHex(b);
 
 #endif
 
@@ -129,6 +129,80 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
     }
   OSCriticalSection::exit();
   return b;
+}
+
+int
+DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
+{
+#if true
+
+  // if closed return -1
+  if (!m_opened)
+    return OSReturn::OS_DISCONNECTED;
+
+  if (size == 0)
+    {
+      return 0;
+    }
+
+#if false
+  // TODO: implement properly, it does not work
+  bool status;
+  status = OSUsbDevice::Is_usb_write_enabled();
+
+  if (!status)
+    {
+      return 0;
+    }
+#endif
+
+  int i;
+  OSCriticalSection::enter();
+    {
+      while (!OSUsbDevice::Is_usb_tx_ready())
+        {
+          //OSDeviceDebug::putChar('>');
+          //os.sched.eventWait(&m_txCounter);       // Wait Endpoint ready
+          OSUsbDevice::endpointSelect(m_tx_ep);
+        }
+
+      for (i = 0; i < size; ++i)
+        {
+          OSUsbDevice::endpointSelect(m_tx_ep);
+          OSUsbDevice::writeByte(pBuf[i]);
+          m_txCounter++;
+
+#if defined(OS_DEBUG_DEVICECHARACTERUSB_WRITE)
+
+          OSDeviceDebug::putChar('}');
+          if (b >= ' ')
+          OSDeviceDebug::putChar(b);
+          else
+          OSDeviceDebug::putHex(b);
+
+#endif
+
+          if (!OSUsbDevice::Is_usb_tx_ready()) //If Endpoint full -> flush
+            {
+              OSUsbDevice::Usb_send_in();
+              //OSDeviceDebug::putChar('^');
+              m_txCounter = 0;
+
+              // Return when endpoint full
+              break;
+            }
+
+        }
+    }
+  OSCriticalSection::exit();
+
+  return i;
+
+#else
+
+  return OSDeviceCharacter::implWriteBytes(pBuf, size);
+
+#endif
 }
 
 int
@@ -195,9 +269,9 @@ DeviceCharacterUsb::implReadByte(void)
 
       OSDeviceDebug::putChar('{');
       if (c >= ' ')
-        OSDeviceDebug::putChar(c);
+      OSDeviceDebug::putChar(c);
       else
-        OSDeviceDebug::putHex((unsigned char) c);
+      OSDeviceDebug::putHex((unsigned char) c);
 
 #endif
 
@@ -205,6 +279,13 @@ DeviceCharacterUsb::implReadByte(void)
   OSCriticalSection::exit();
   // OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
   return c;
+}
+
+int
+DeviceCharacterUsb::implReadBytes(unsigned char* pBuf, int size)
+{
+  // TODO: implement it here
+  return OSDeviceCharacter::implReadBytes(pBuf, size);
 }
 
 // USB CDC support functions
