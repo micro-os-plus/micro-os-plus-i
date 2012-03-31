@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
 <provider id="org.eclipse.egit.core.GitProvider">
-<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus.git,master,system"/>
-<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus.git,master,samples/minimal"/>
-<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus.git,master,samples/blinkX3BusyWait"/>
-<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus.git,master,samples/blinkX3Cooperative"/>
-<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus.git,master,samples/blinkX3Preemptive"/>
-<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus.git,master,samples/stress"/>
+<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus,master,system"/>
+<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus,master,samples/minimal"/>
+<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus,master,samples/blinkX3BusyWait"/>
+<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus,master,samples/blinkX3Cooperative"/>
+<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus,master,samples/blinkX3Preemptive"/>
+<project reference="1.0,ssh://ilg-ul@micro-os-plus.git.sourceforge.net/gitroot/micro-os-plus/micro-os-plus,master,samples/stress"/>
 </provider>
 </psf>
