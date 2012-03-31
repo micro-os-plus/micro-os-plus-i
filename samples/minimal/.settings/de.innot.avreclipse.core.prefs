@@ -1,4 +1,3 @@
-#Thu Jul 07 22:53:37 EEST 2011
 avrtarget/ClockFrequency=7372800
 avrtarget/ExtRAMSize=0
 avrtarget/ExtendedRAM=false
@@ -20,6 +19,12 @@ avrtarget/avrdude/ProgrammerID=programmerconfig.1
 avrtarget/avrdude/UseCounter=false
 avrtarget/avrdude/WriteEEPROM=false
 avrtarget/avrdude/WriteFlash=true
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056/ClockFrequency=1000000
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056/ExtRAMSize=0
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056/ExtendedRAM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056/MCUType=at90usb1287
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056/UseEEPROM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056/UseExtendedRAMforHeap=true
 avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.862864490/ClockFrequency=7372800
 avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.862864490/ExtRAMSize=0
 avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.862864490/ExtendedRAM=false
@@ -41,5 +46,11 @@ avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.86286
 avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.862864490/avrdude/UseCounter=false
 avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.862864490/avrdude/WriteEEPROM=false
 avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450.862864490/avrdude/WriteFlash=true
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450/ClockFrequency=1000000
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450/ExtRAMSize=0
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450/ExtendedRAM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450/MCUType=at90usb1287
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450/UseEEPROM=false
+avrtarget/de.innot.avreclipse.configuration.app.debug.1445805257.275369450/UseExtendedRAMforHeap=true
 avrtarget/perConfig=true
 eclipse.preferences.version=1
