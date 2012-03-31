@@ -381,7 +381,7 @@
 								<option id="de.innot.avreclipse.assembler.option.debug.level.1119541676" name="Generate Debugging Info" superClass="de.innot.avreclipse.assembler.option.debug.level" value="de.innot.avreclipse.assembler.option.debug.level.g3" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.asm.option.include.paths.1102842563" name="#include paths for preprocessor(-I)" superClass="de.innot.avreclipse.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus.git/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
 								</option>
 								<option id="de.innot.avreclipse.assembler.option.debug.type.254435772" name="Debug Info Format" superClass="de.innot.avreclipse.assembler.option.debug.type" value="de.innot.avreclipse.assembler.option.debug.level.dwarf-2" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.asm.option.flags.2021916599" name="Other GCC Flags" superClass="de.innot.avreclipse.asm.option.flags" value="-Wa,-adhlns=&quot;$@.lst&quot;" valueType="string"/>
@@ -397,7 +397,7 @@
 								</option>
 								<option id="de.innot.avreclipse.compiler.option.incpath.410738812" name="Include Paths (-I)" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus.git/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
 								</option>
 								<option id="de.innot.avreclipse.compiler.option.std.23435730" name="Language Standard" superClass="de.innot.avreclipse.compiler.option.std" value="de.innot.avreclipse.compiler.option.std.gnu99" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.compiler.option.language.ubitfields.1710771034" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.compiler.option.language.ubitfields" value="false" valueType="boolean"/>
@@ -418,7 +418,7 @@
 								</option>
 								<option id="de.innot.avreclipse.cppcompiler.option.incpath.381265561" name="Include Paths (-I)" superClass="de.innot.avreclipse.cppcompiler.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus.git/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
 								</option>
 								<option id="de.innot.avreclipse.cppcompiler.option.debug.type.1359715793" name="Debug Info Format" superClass="de.innot.avreclipse.cppcompiler.option.debug.type" value="de.innot.avreclipse.cppcompiler.option.debug.level.dwarf-2" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.packstruct.2033045249" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.packstruct" value="false" valueType="boolean"/>
@@ -487,7 +487,7 @@
 								<option id="de.innot.avreclipse.assembler.option.debug.level.48174563" name="Generate Debugging Info" superClass="de.innot.avreclipse.assembler.option.debug.level"/>
 								<option id="de.innot.avreclipse.asm.option.include.paths.1970467373" name="#include paths for preprocessor(-I)" superClass="de.innot.avreclipse.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus.git/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
 								</option>
 								<option id="de.innot.avreclipse.assembler.option.debug.type.741554168" name="Debug Info Format" superClass="de.innot.avreclipse.assembler.option.debug.type" value="de.innot.avreclipse.assembler.option.debug.level.dwarf-2" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.asm.option.flags.42195046" name="Other GCC Flags" superClass="de.innot.avreclipse.asm.option.flags" value=" -Wa,-adhlns=&quot;$@.lst&quot;" valueType="string"/>
@@ -501,7 +501,7 @@
 								</option>
 								<option id="de.innot.avreclipse.compiler.option.incpath.1879167954" name="Include Paths (-I)" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus.git/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
 								</option>
 								<option id="de.innot.avreclipse.compiler.option.std.1890364267" name="Language Standard" superClass="de.innot.avreclipse.compiler.option.std" value="de.innot.avreclipse.compiler.option.std.gnu99" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.compiler.option.language.ubitfields.1914245776" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.compiler.option.language.ubitfields" value="false" valueType="boolean"/>
@@ -520,7 +520,7 @@
 								</option>
 								<option id="de.innot.avreclipse.cppcompiler.option.incpath.1398826263" name="Include Paths (-I)" superClass="de.innot.avreclipse.cppcompiler.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus.git/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
 								</option>
 								<option id="de.innot.avreclipse.cppcompiler.option.debug.type.1368384352" name="Debug Info Format" superClass="de.innot.avreclipse.cppcompiler.option.debug.type" value="de.innot.avreclipse.cppcompiler.option.debug.level.dwarf-2" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.packstruct.1576261503" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.packstruct" value="false" valueType="boolean"/>
@@ -1385,49 +1385,6 @@
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.;avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.1539239020;avr32.managedbuild.tool.gnu.cpp.compiler.input.1927311103">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileCPP"/>
-			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324;de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324.">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileC"/>
 			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 				<buildOutputProvider>
 					<openAction enabled="true" filePath=""/>

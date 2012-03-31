@@ -86,7 +86,7 @@
 		<link>
 			<name>micro-os-plus</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/micro-os-plus.git/system</locationURI>
+			<locationURI>WORKSPACE_LOC/micro-os-plus/system</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
