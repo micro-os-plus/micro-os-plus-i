@@ -1,0 +1,11 @@
+
+Device signature:	0x1E 0x97 0x82
+
+Extended:	0xFE
+High:		0x99
+Low:		0x5E
+
+No DFU allowed with the above.
+
+The second device is locked (or damaged).
+
