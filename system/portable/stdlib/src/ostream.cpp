@@ -374,7 +374,7 @@ namespace std
   ostream::operator <<(void* p)
   {
     //sentry s(*this);
-    p = p;
+    //p = p;
     //-- char buffer[20];
     //-- write(buffer, snprintf(buffer, 20, "%p", p));
 #if (__SIZEOF_INT__ == 2)
