@@ -40,10 +40,10 @@ OSUsbDeviceImpl::OSUsbDeviceImpl()
 
 // ----------------------------------------------------------------------------
 
-extern void
-usb_process_request(void);
-extern void
-interruptGenServiceRoutine(void);
+//extern void
+//usb_process_request(void);
+//extern void
+//interruptGenServiceRoutine(void);
 
 extern "C" void
 USB_GEN_vect(void) __attribute__((signal));
@@ -429,7 +429,7 @@ OSUsbDeviceImpl::standardProcessRequest(void)
   case SET_DESCRIPTOR:
   case SYNCH_FRAME:
   default:
-    ;
+    break;
     }
 
   // for un-supported requests call the specific read request

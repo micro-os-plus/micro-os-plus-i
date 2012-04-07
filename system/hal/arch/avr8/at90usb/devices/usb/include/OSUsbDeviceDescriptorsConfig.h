@@ -184,37 +184,45 @@
   , Usb_unicode('l') \
 }
 
-#define USB_PN_LENGTH           20
+#define USB_PN_LENGTH           19
 #define USB_PRODUCT_NAME \
 { Usb_unicode('A') \
   ,Usb_unicode('V') \
   ,Usb_unicode('R') \
+  ,Usb_unicode('8') \
   ,Usb_unicode(' ') \
+  ,Usb_unicode('A') \
+  ,Usb_unicode('T') \
+  ,Usb_unicode('9') \
+  ,Usb_unicode('0') \
   ,Usb_unicode('U') \
   ,Usb_unicode('S') \
   ,Usb_unicode('B') \
+  ,Usb_unicode('1') \
+  ,Usb_unicode('2') \
+  ,Usb_unicode('8') \
   ,Usb_unicode(' ') \
   ,Usb_unicode('C') \
   ,Usb_unicode('D') \
   ,Usb_unicode('C') \
-  ,Usb_unicode('/') \
-  ,Usb_unicode('A') \
-  ,Usb_unicode('C') \
-  ,Usb_unicode('M') \
-  ,Usb_unicode(' ') \
-  ,Usb_unicode('D') \
-  ,Usb_unicode('E') \
-  ,Usb_unicode('M') \
-  ,Usb_unicode('0') \
 }
 
-#define USB_SN_LENGTH         0x05
+#define USB_SN_LENGTH         13
 #define USB_SERIAL_NUMBER \
-{Usb_unicode('1') \
- ,Usb_unicode('.') \
- ,Usb_unicode('0') \
- ,Usb_unicode('.') \
- ,Usb_unicode('0') \
+{\
+  Usb_unicode('1'),\
+  Usb_unicode('.'),\
+  Usb_unicode('0'),\
+  Usb_unicode('.'),\
+  Usb_unicode('0'),\
+  Usb_unicode('.'),\
+  Usb_unicode('0'),\
+  Usb_unicode('.'),\
+  Usb_unicode('0'),\
+  Usb_unicode('.'),\
+  Usb_unicode('0'),\
+  Usb_unicode('.'),\
+  Usb_unicode('A') \
 }
 
 // ----------------------------------------------------------------------------
