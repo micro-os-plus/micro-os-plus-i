@@ -26,3 +26,9 @@ TaskCli taskCliUsb("usb", devUsb0);
 TaskBlink taskBlink("blink");
 
 // ----------------------------------------------------------------------------
+
+// message to be displayed on the debugging device at startup
+// and in the CLI session at open
+const char greeting[] = APP_CFGSTR_GREETING;
+
+// ----------------------------------------------------------------------------
