@@ -11,10 +11,6 @@
 			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 				<dictionary>
-					<key>?children?</key>
-					<value>?name?=outputEntries\|?children?=?name?=entry\\\\\\\|\\\|?name?=entry\\\\\\\|\\\|?name?=entry\\\\\\\|\\\|?name?=entry\\\\\\\|\\\|\||</value>
-				</dictionary>
-				<dictionary>
 					<key>?name?</key>
 					<value></value>
 				</dictionary>
@@ -90,7 +86,7 @@
 		<link>
 			<name>micro-os-plus</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/micro-os-plus</locationURI>
+			<locationURI>WORKSPACE_LOC/micro-os-plus/system</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
