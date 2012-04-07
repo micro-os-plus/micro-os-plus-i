@@ -31,7 +31,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/device-avi-usbi2c/Release}</value>
+					<value>${workspace_loc:/device-avi-usbi2c/Debug}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
@@ -85,7 +85,7 @@
 		<link>
 			<name>micro-os-plus</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/micro-os-plus.git/system</locationURI>
+			<locationURI>WORKSPACE_LOC/micro-os-plus/system</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
