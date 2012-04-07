@@ -10,6 +10,7 @@
 
 #if defined(OS_INCLUDE_DEVICECHARACTERUSB)
 
+#include <avr/io.h>
 #include "portable/devices/character/include/DeviceCharacterUsb.h"
 #include "portable/devices/usb/include/OSUsbDevice.h"
 
@@ -131,6 +132,7 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
   return b;
 }
 
+#if defined(OS_INCLUDE_DEVICECHARACTERUSB_MULTIBYTE)
 int
 DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
 {
@@ -204,6 +206,8 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
 
 #endif
 }
+
+#endif
 
 int
 DeviceCharacterUsb::implFlush(void)
@@ -281,12 +285,16 @@ DeviceCharacterUsb::implReadByte(void)
   return c;
 }
 
+#if defined(OS_INCLUDE_DEVICECHARACTERUSB_MULTIBYTE)
+
 int
 DeviceCharacterUsb::implReadBytes(unsigned char* pBuf, int size)
 {
   // TODO: implement it here
   return OSDeviceCharacter::implReadBytes(pBuf, size);
 }
+
+#endif
 
 // USB CDC support functions
 
@@ -415,6 +423,7 @@ DeviceCharacterUsb::specificCdcGetDescriptor(unsigned char type,
     default:
       return false;
       }
+    break;
 
   case DEVICE_QUALIFIER_DESCRIPTOR:
     OSDeviceDebug::putString("DEVICE QUALIFIER - ???");
