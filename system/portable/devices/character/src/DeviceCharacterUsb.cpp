@@ -47,7 +47,7 @@ DeviceCharacterUsb::DeviceCharacterUsb(int device)
 
 DeviceCharacterUsb::~DeviceCharacterUsb()
 {
-  OSDeviceDebug::putDestructor("DeviceCharacterUsb", this);
+  OSDeviceDebug::putDestructor_P(PSTR("DeviceCharacterUsb"), this);
 }
 
 #if false
