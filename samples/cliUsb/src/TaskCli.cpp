@@ -41,6 +41,7 @@ static const char prompt[] = "> ";
  *
  */
 
+
 void
 TaskCli::threadMain(void)
 {
