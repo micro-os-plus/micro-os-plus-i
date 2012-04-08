@@ -168,6 +168,12 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
           OSUsbDevice::endpointSelect(m_tx_ep);
         }
 
+#if defined(OS_DEBUG_DEVICECHARACTERUSB_WRITE)
+
+      OSDeviceDebug::putChar('}');
+
+#endif
+
       for (i = 0; i < size; ++i)
         {
           OSUsbDevice::endpointSelect(m_tx_ep);
@@ -176,7 +182,8 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
 
 #if defined(OS_DEBUG_DEVICECHARACTERUSB_WRITE)
 
-          OSDeviceDebug::putChar('}');
+          uchar_t b;
+          b = pBuf[i];
           if (b >= ' ')
           OSDeviceDebug::putChar(b);
           else
@@ -415,10 +422,12 @@ DeviceCharacterUsb::specificCdcGetDescriptor(unsigned char type,
           &usb_user_product_string_descriptor);
       return true;
 
+#if !defined(OS_EXCLUDE_USBSERIALNUMBER)
     case STRING_INDEX_SN:
       OSUsbDevice::usb_set_return(sizeof(usb_user_serial_number),
           &usb_user_serial_number);
       return true;
+#endif
 
     default:
       return false;

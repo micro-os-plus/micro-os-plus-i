@@ -1104,14 +1104,20 @@ PROGMEM S_usb_manufacturer_string_descriptor
     usb_user_manufacturer_string_descriptor =
       { sizeof(usb_user_manufacturer_string_descriptor), STRING_DESCRIPTOR,
       USB_MANUFACTURER_NAME };
+
 // usb_user_product_string_descriptor
 PROGMEM S_usb_product_string_descriptor usb_user_product_string_descriptor =
   { sizeof(usb_user_product_string_descriptor), STRING_DESCRIPTOR,
   USB_PRODUCT_NAME };
+
+#if !defined(OS_EXCLUDE_USBSERIALNUMBER)
+
 // usb_user_serial_number
 PROGMEM S_usb_serial_number usb_user_serial_number =
   { sizeof(usb_user_serial_number), STRING_DESCRIPTOR,
   USB_SERIAL_NUMBER };
+
+#endif
 
 // ----------------------------------------------------------------------------
 
