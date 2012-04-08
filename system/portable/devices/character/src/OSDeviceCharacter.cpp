@@ -30,7 +30,7 @@ OSDeviceCharacter::OSDeviceCharacter()
   m_pReadMatchArray = 0;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
-  m_countToRead = 0;
+  //m_countToRead = 0;
 
   // initialise events with default values
   // will be set to the implementation values at open
@@ -666,7 +666,7 @@ int
 OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_READBYTE)
-  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte()"));
+  OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readBytes()"));
   OSDeviceDebug::putNewLine();
 #endif
 
@@ -682,14 +682,15 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
 
   int av;
 
+  // If any bytes available, return up to bufSize of them
   av = implAvailableRead();
-  if (av >= bufSize)
+  if (av > 0)
     {
       *count = implReadBytes(pBuf, bufSize);
       return OSReturn::OS_OK;
     }
 
-  m_countToRead = bufSize;
+  //m_countToRead = bufSize;
   *count = 0;
 
   bool canRead;
@@ -762,7 +763,7 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
           av = implAvailableRead();
           if (av > 0)
             *count = implReadBytes(pBuf, bufSize);
-          m_countToRead = 0;
+          //m_countToRead = 0;
 
           return OSReturn::OS_TIMEOUT;
         }
@@ -777,7 +778,7 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
           av = implAvailableRead();
           if (av > 0)
             *count = implReadBytes(pBuf, bufSize);
-          m_countToRead = 0;
+          //m_countToRead = 0;
 
           return OSReturn::OS_CANCELLED;
         }
@@ -803,14 +804,14 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
       av = implAvailableRead();
       if (av > 0)
         *count = implReadBytes(pBuf, bufSize);
-      m_countToRead = 0;
+      //m_countToRead = 0;
 
       return OSReturn::OS_DISCONNECTED;
     }
   av = implAvailableRead();
   if (av > 0)
     *count = implReadBytes(pBuf, bufSize);
-  m_countToRead = 0;
+  //m_countToRead = 0;
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSDEVICECHARACTER_READBYTE)
   OSDeviceDebug::putString_P(PSTR("OSDeviceCharacter::readByte() returns "));

@@ -60,13 +60,14 @@ public:
   bool
   isSending(void);
 
-  // blocking read.
+  // blocking byte read.
   // return byte or negative (OSReturn::OS_DISCONNECTED, OSReturn::OS_TIMEOUT)
   OSReturn_t
   readByte(void);
 
-  // blocking read multiple byte read
+  // blocking multiple byte read
   // return number of the bytes read or error
+  // if not enough bytes, return those available
   OSReturn_t
   readBytes(unsigned char* pBuf, int bufSize, int* count);
 
@@ -75,7 +76,7 @@ public:
   OSReturn_t
   availableRead(void);
 
-  // blocking write. does not flush, unless buffer full.
+  // blocking byte write. does not flush, unless buffer full.
   // return byte or negative (OSReturn::OS_DISCONNECTED, OSReturn::OS_TIMEOUT)
   int
   writeByte(unsigned char b);
@@ -189,7 +190,7 @@ protected:
   unsigned char* m_pReadMatchArray;
 #endif /* defined(OS_INCLUDE_OSDEVICECHARACTER_READMATCH) */
 
-  int m_countToRead;
+  //int m_countToRead;
 
 protected:
 
