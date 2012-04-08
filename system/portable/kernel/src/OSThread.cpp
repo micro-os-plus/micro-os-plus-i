@@ -28,6 +28,11 @@ OSThread::OSThread(const char* pName, OSThreadMainPtr_t entryPoint,
   OSThread::initialise(pName, entryPoint, pParameters, pStack, stackSize, priority);
 }
 
+OSThread::~OSThread()
+{
+  OSDeviceDebug::putConstructor_P(PSTR("OSThread"), this);
+}
+
 // The stack size is in multiples of OSStack_t
 void
 OSThread::initialise(const char* pName, OSThreadMainPtr_t entryPoint,
