@@ -11,8 +11,8 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM,
     unsigned char *pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
     unsigned short rxLWM) :
-  m_txBuf(pTxBuf, txBufSize, txHWM, txLWM),
-      m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM)
+    m_txBuf(pTxBuf, txBufSize, txHWM, txLWM), m_rxBuf(pRxBuf, rxBufSize, rxHWM,
+        rxLWM)
 {
   OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterI2C"), this);
 
@@ -28,8 +28,8 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
 // use default 3/4 high and 1/4 low water marks
 DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned char *pRxBuf, unsigned short rxBufSize) :
-  m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4),
-      m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4)
+    m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4), m_rxBuf(
+        pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4)
 {
   OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterI2C"), this);
 
@@ -106,7 +106,14 @@ DeviceCharacterI2C::implIsConnected() const
 bool
 DeviceCharacterI2C::implCanWrite(void)
 {
-  return !m_txBuf.isFull();
+  bool f;
+  OSCriticalSection::enter();
+    {
+      f = !m_txBuf.isFull();
+    }
+  OSCriticalSection::exit();
+
+  return f;
 }
 
 OSEvent_t
@@ -139,9 +146,10 @@ DeviceCharacterI2C::implFlush(void)
 void
 DeviceCharacterI2C::interruptServiceRoutine(void)
 {
+  unsigned char ch;
+
   //OSDeviceDebug::putChar('!');
   unsigned char status;
-
   // Get rid of the prescaler bits
   status = TWSR & (~0x03);
 
@@ -173,25 +181,25 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     // Start timeout counting
     m_timeoutCounterTicks = 1;
 
+    ch = portRead();
+
+#if false && defined(DEBUG)
+    OSDeviceDebug::putHex(ch);
+#endif
+
     if (!m_rxBuf.isFull())
       {
-        m_rxBuf.put(portRead());
-        if (!m_rxBuf.isFull())
+        m_rxBuf.put(ch);
+        if (m_rxBuf.isAboveHighWM())
           {
             os.sched.eventNotify(implGetReadEvent());
-            TWCR |= _BV(TWEA); // ACK
           }
-        else
-          {
-            TWCR &= ~_BV(TWEA); // NOT ACK
-            OSDeviceDebug::putChar('N');
-          }
+        TWCR |= _BV(TWEA); // ACK
       }
     else
       {
-        // Normally should not reach this point
-        // since character is lost...
         TWCR &= ~_BV(TWEA); // NOT ACK
+        OSDeviceDebug::putChar('N');
       }
     break;
 
@@ -199,7 +207,6 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     // Previously addressed with own SLA+W; data has been received;
     // NOT ACK has been returned
 
-    unsigned char ch;
     ch = portRead(); // The manual says "Read data byte", so we comply
 
 #if defined(DEBUG)
@@ -239,7 +246,7 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     OSDeviceDebug::putHex(TWDR);
     OSDeviceDebug::putChar('|');
 #endif
-    ;
+    break;
     }
 
   TWCR |= _BV(TWINT); // clear interrupt
@@ -250,13 +257,27 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
 bool
 DeviceCharacterI2C::implCanRead()
 {
-  return !m_rxBuf.isEmpty();
+  bool f;
+  OSCriticalSection::enter();
+    {
+      f = m_rxBuf.isEmpty();
+    }
+  OSCriticalSection::exit();
+
+  return !f;
 }
 
 int
 DeviceCharacterI2C::implAvailableRead()
 {
-  return m_rxBuf.length();
+  int r;
+  OSCriticalSection::enter();
+    {
+      r = m_rxBuf.length();
+    }
+  OSCriticalSection::exit();
+
+  return r;
 }
 
 OSEvent_t
@@ -268,7 +289,14 @@ DeviceCharacterI2C::implGetReadEvent(void)
 int
 DeviceCharacterI2C::implReadByte(void)
 {
-  return m_rxBuf.get();
+  int r;
+  OSCriticalSection::enter();
+    {
+      r = m_rxBuf.get();
+    }
+  OSCriticalSection::exit();
+
+  return r;
 }
 
 // ----- static data ----------------------------------------------------------
@@ -276,7 +304,6 @@ DeviceCharacterI2C::implReadByte(void)
 DeviceCharacterI2C * DeviceCharacterI2C::pDevice;
 
 //-----------------------------------------------------------------------------
-
 
 void
 DeviceCharacterI2C::interruptTimerTick(void)
@@ -287,7 +314,8 @@ DeviceCharacterI2C::interruptTimerTick(void)
 
       if (m_timeoutCounterTicks > OS_CFGINT_TICK_RATE_HZ * 2)
         {
-          os.sched.eventNotify(implGetReadEvent(), OSEventWaitReturn::OS_TIMEOUT);
+          os.sched.eventNotify(implGetReadEvent(),
+              OSEventWaitReturn::OS_TIMEOUT);
           OSDeviceDebug::putChar('T');
         }
     }

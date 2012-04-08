@@ -98,6 +98,10 @@ TaskDbgIn::threadMain(void)
 
           if (cnt > 0)
             {
+#if false
+              debug.putChar('|');
+              debug.putDec((unsigned short)cnt);
+#endif
               if (outDev.isConnected())
                 {
                   outDev.writeBytes(m_buff, cnt);

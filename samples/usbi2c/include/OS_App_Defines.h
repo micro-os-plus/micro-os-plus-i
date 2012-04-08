@@ -19,6 +19,7 @@
 //#define OS_INCLUDE_DEVICECHARACTERMULTIUSART1         1
 #define OS_INCLUDE_DEVICECHARACTERUSB                 1
 #define OS_INCLUDE_DEVICECHARACTERUSB_MULTIBYTE         1
+#define OS_EXCLUDE_USBSERIALNUMBER                      (1)
 
 #define OS_INCLUDE_OSDEVICEDEBUG_STREAMBUF              1
 
@@ -50,6 +51,9 @@
 
 #define OS_DEBUG_CONSTRUCTORS                           1
 //#define OS_INCLUDE_DEVICEDEBUGI2C_SINGLE_BYTE           1
+
+#define OS_DEBUG_DEVICECHARACTERUSB_WRITE               1
+#define OS_DEBUG_DEVICECHARACTERUSB_READ                1
 
 #endif /* DEBUG */
 
