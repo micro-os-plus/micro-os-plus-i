@@ -30,6 +30,7 @@ OSTimerTicks::OSTimerTicks() :
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
 static int i;
+static int s;
 #endif
 
 void
@@ -44,6 +45,7 @@ OSTimerTicks::init(void)
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
   i = 0;
+  s = 0;
 #endif
 
 #if defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED)
@@ -79,6 +81,17 @@ OSTimerTicks::interruptServiceRoutine(void)
       OSTimerSeconds::ms_schedulerTicks = 0;
 
       OSScheduler::timerSeconds.interruptServiceRoutine();
+
+#if defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
+
+      if (++s == 60)
+        {
+          s = 0;
+          // Mark every minute by a new line
+          OSDeviceDebug::putNewLine();
+        }
+
+#endif
     }
 
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT) */
