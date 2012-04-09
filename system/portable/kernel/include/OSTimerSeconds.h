@@ -31,6 +31,9 @@ public:
   // return the current seconds number
   static unsigned long
   getUptime(void);
+
+  static void
+  getUptime(unsigned long* pSeconds, OSTimerTicks_t* pTicks);
 #endif
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
