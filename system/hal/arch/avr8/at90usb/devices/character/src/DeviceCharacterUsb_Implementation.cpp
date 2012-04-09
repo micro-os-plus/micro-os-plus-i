@@ -67,7 +67,7 @@ DeviceCharacterUsb::implIsConnected()
 {
   //OSDeviceDebug::putString("DeviceCharacterUsb::isConnected()");
   //    OSDeviceDebug::putNewLine();
-  return m_opened;
+  return m_connected;
 }
 
 int
@@ -75,6 +75,8 @@ DeviceCharacterUsb::implClose()
 {
   OSDeviceDebug::putString("DeviceCharacterUsb::close()");
   OSDeviceDebug::putNewLine();
+
+  m_opened = false;
 
   return 0;
 }
@@ -95,7 +97,7 @@ int
 DeviceCharacterUsb::implWriteByte(unsigned char b)
 {
   // if closed return -1
-  if (!m_opened)
+  if (!m_connected)
     return OSReturn::OS_DISCONNECTED;
 
   OSCriticalSection::enter();
@@ -139,7 +141,7 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
 #if true
 
   // if closed return -1
-  if (!m_opened)
+  if (!m_connected)
     return OSReturn::OS_DISCONNECTED;
 
   if (size == 0)
@@ -220,7 +222,7 @@ int
 DeviceCharacterUsb::implFlush(void)
 {
   // if closed return -1
-  if (!m_opened)
+  if (!m_connected)
     return OSReturn::OS_DISCONNECTED;
 
   OSCriticalSection::enter();
@@ -567,22 +569,22 @@ DeviceCharacterUsb::cdcSetControlLineState()
   OSDeviceDebug::putString(" ");
 #endif
 
-  bool opened;
-  opened = (value & 0x0001) ? true : false;
+  bool connected;
+  connected = (value & 0x0001) ? true : false;
 
   if (index == IF0_NB)
     {
-      g_usb0->m_opened = opened;
+      g_usb0->m_connected = connected;
 #if defined(DEBUG) && defined(OS_DEBUG_OSUSBDEVICE_REQUEST)
       OSDeviceDebug::putString("set ");
 #endif
     }
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
   if (index == IF0b_NB)
-  g_usb1->m_opened = opened;
+  g_usb1->m_connected = connected;
 #endif
 
-  if (opened)
+  if (connected)
     {
       OSUsbLed::off(); // will be toggled to on() at interrupt prolog
       // Note: interface numbers must start at 0 to match index!!!
@@ -619,7 +621,7 @@ DeviceCharacterUsb::cdcSetControlLineState()
     }
 
 #if defined(DEBUG)
-  if (opened)
+  if (connected)
     {
       OSDeviceDebug::putString("DTR ready");
     }
