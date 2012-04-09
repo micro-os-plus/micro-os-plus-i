@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2011 Liviu Ionescu.
+ *	Copyright (C) 2007-2012 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -13,7 +13,8 @@ class TaskCli : public OSThread
 {
 public:
   // active object constructor
-  TaskCli(const char *pName, OSDeviceCharacter& dev, OSDeviceCharacter& devIn);
+  TaskCli(const char *pName, OSDeviceCharacter& dev, OSDeviceCharacter& devIn,
+      std::istream& cin, std::ostream& cout);
 
   // actual thread main code
   virtual void
@@ -30,8 +31,8 @@ private:
   unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 100];
   OSDeviceCharacter& m_dev;
 
-  std::istream m_cin;
-  std::ostream m_cout;
+  std::istream& m_cin;
+  std::ostream& m_cout;
   SimpleCli m_cli;
 
   OSDeviceCharacter& m_devIn;
