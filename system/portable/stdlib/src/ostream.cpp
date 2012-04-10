@@ -15,7 +15,7 @@
 namespace std
 {
   ostream::ostream(streambuf * sb) :
-    ios(sb)
+      ios(sb)
   {
     OSDeviceDebug::putConstructor_P(PSTR("ostream"), this);
   }
@@ -163,11 +163,20 @@ namespace std
         int i;
         unsigned char buff[10];
 
+        int len;
+        len = 0;
         for (i = sizeof(buff) - 1; i >= 0; i--)
           {
             buff[i] = (l % 10) + '0';
             l /= 10;
+            if (l == 0 && len == 0)
+              {
+                len = sizeof(buff) - i;
+              }
           }
+
+        if (len > width)
+          width = len;
 
         if (0 < width && width <= (int) sizeof(buff))
           i = (int) sizeof(buff) - width;
@@ -187,88 +196,98 @@ namespace std
 
 #if (__SIZEOF_INT__ == 2)
 
-  void print16(ostream& out, unsigned short w, bool sign = false);
+  void
+  print16(ostream& out, unsigned short w, bool sign = false);
 
-  void print16(ostream& out, unsigned short w, bool sign)
-    {
-      streamsize width;
-      width = out.width();
-      if ((out.flags() & ios_base::basefield) == ios_base::hex)
-        {
-          unsigned char upp;
-          upp = 0;
-          if (!(out.flags() & ios_base::uppercase))
+  void
+  print16(ostream& out, unsigned short w, bool sign)
+  {
+    streamsize width;
+    width = out.width();
+    if ((out.flags() & ios_base::basefield) == ios_base::hex)
+      {
+        unsigned char upp;
+        upp = 0;
+        if (!(out.flags() & ios_base::uppercase))
           upp = 'a' - 'A';
 
-          if (out.flags() & ios_base::showbase)
-            {
-              out.put('0');
-              out.put('X' + upp);
-            }
+        if (out.flags() & ios_base::showbase)
+          {
+            out.put('0');
+            out.put('X' + upp);
+          }
 
-          upp = 0; // ! explicitly set all hex to upper case
+        upp = 0; // ! explicitly set all hex to upper case
 
-          unsigned char c;
-          unsigned char b;
-          b = (w >> 8);
-          if (width == 0|| width > 3)
-            {
-              c = ((b >> 4) & 0x0F);
-              out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
-            }
-          if (width == 0|| width > 2)
-            {
-              c = (b & 0x0F);
-              out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
-            }
-          b = (w & 0xFF);
-          if (width == 0|| width > 1)
-            {
-              c = ((b >> 4) & 0x0F);
-              out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
-            }
-          c = (b & 0x0F);
-          out.put(c < 10 ? c + '0' : c + 'A'+ upp - 10);
-        }
-      else if ((out.flags() & ios_base::basefield) == ios_base::oct)
-        {
-          ; // not yet implemented
-        }
-      else // decimal
+        unsigned char c;
+        unsigned char b;
+        b = (w >> 8);
+        if (width == 0 || width > 3)
+          {
+            c = ((b >> 4) & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A' + upp - 10);
+          }
+        if (width == 0 || width > 2)
+          {
+            c = (b & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A' + upp - 10);
+          }
+        b = (w & 0xFF);
+        if (width == 0 || width > 1)
+          {
+            c = ((b >> 4) & 0x0F);
+            out.put(c < 10 ? c + '0' : c + 'A' + upp - 10);
+          }
+        c = (b & 0x0F);
+        out.put(c < 10 ? c + '0' : c + 'A' + upp - 10);
+      }
+    else if ((out.flags() & ios_base::basefield) == ios_base::oct)
+      {
+        ; // not yet implemented
+      }
+    else // decimal
 
-        {
-          if (sign)
-            {
-              int n;
-              n = w;
-              if (n < 0)
-                {
-                  out.put('-');
-                  w = -n;
-                }
-            }
-          int i;
-          unsigned char buff[5];
+      {
+        if (sign)
+          {
+            int n;
+            n = w;
+            if (n < 0)
+              {
+                out.put('-');
+                w = -n;
+              }
+          }
+        int i;
+        unsigned char buff[5];
 
-          for (i = sizeof(buff) - 1; i >= 0; i--)
-            {
-              buff[i] = (w % 10) + '0';
-              w /= 10;
-            }
+        int len;
+        len = 0;
+        for (i = sizeof(buff) - 1; i >= 0; i--)
+          {
+            buff[i] = (w % 10) + '0';
+            w /= 10;
+            if (w == 0 && len == 0)
+              {
+                len = sizeof(buff) - i;
+              }
+          }
 
-          if (0 < width && width <= (int) sizeof(buff))
+        if (len > width)
+          width = len;
+        if (0 < width && width <= (int) sizeof(buff))
           i = (int) sizeof(buff) - width;
-          else
-            {
-              for (i = 0; i < (int) sizeof(buff) - 1; ++i)
+        else
+          {
+            for (i = 0; i < (int) sizeof(buff) - 1; ++i)
               if (buff[i] != '0')
-              break;
-            }
-          for (; i < (int) sizeof(buff); ++i)
+                break;
+          }
+        for (; i < (int) sizeof(buff); ++i)
           out.put(buff[i]);
-        }
-      out.width(0);
-    }
+      }
+    out.width(0);
+  }
 #endif
 
   ostream&
@@ -559,16 +578,16 @@ namespace std
   operator <<(ostream& out, const signed char* c)
   {
     //ostream::sentry s(out);
-    out.write(reinterpret_cast<const char*> (c),
-        traits::length(reinterpret_cast<const char*> (c)));
+    out.write(reinterpret_cast<const char*>(c),
+        traits::length(reinterpret_cast<const char*>(c)));
     return out;
   }
 
   ostream&
   operator <<(ostream& out, const unsigned char* c)
   {
-    out.write(reinterpret_cast<const char*> (c),
-        traits::length(reinterpret_cast<const char*> (c)));
+    out.write(reinterpret_cast<const char*>(c),
+        traits::length(reinterpret_cast<const char*>(c)));
     return out;
   }
 
