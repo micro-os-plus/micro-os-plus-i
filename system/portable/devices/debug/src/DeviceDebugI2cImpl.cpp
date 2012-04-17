@@ -388,7 +388,9 @@ void
 DeviceDebugI2cImpl::masterCleanup(void)
 {
   masterSclHigh();
+  masterSclSynchronize();
   masterSdaHigh();
+  masterSdaSynchronize();
 }
 
 // No arbitration implemented yet
