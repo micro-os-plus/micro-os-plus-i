@@ -5,14 +5,15 @@
  */
 
 #include "DeviceCharacterI2C.h"
+#include <ctype.h>
 
 // set custom high/low water marks
 DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM,
     unsigned char *pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
     unsigned short rxLWM) :
-    m_txBuf(pTxBuf, txBufSize, txHWM, txLWM), m_rxBuf(pRxBuf, rxBufSize, rxHWM,
-        rxLWM)
+    OSDeviceCharacterBuffered(pTxBuf, txBufSize, txHWM, txLWM, pRxBuf,
+        rxBufSize, rxHWM, rxLWM)
 {
   OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterI2C"), this);
 
@@ -28,13 +29,12 @@ DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
 // use default 3/4 high and 1/4 low water marks
 DeviceCharacterI2C::DeviceCharacterI2C(unsigned char *pTxBuf,
     unsigned short txBufSize, unsigned char *pRxBuf, unsigned short rxBufSize) :
-    m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4), m_rxBuf(
-        pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4)
+    OSDeviceCharacterBuffered(pTxBuf, txBufSize, pRxBuf, rxBufSize)
 {
   OSDeviceDebug::putConstructor_P(PSTR("DeviceCharacterI2C"), this);
 
 #if defined(OS_INCLUDE_DEVICECHARACTER_TYPE)
-  m_type = DEVICECHARACTER_USART;
+  m_type = DEVICECHARACTER_I2C;
 #endif
 
   m_timeoutCounterTicks = 0;
@@ -47,13 +47,13 @@ DeviceCharacterI2C::~DeviceCharacterI2C()
   OSDeviceDebug::putDestructor_P(PSTR("DeviceCharacterI2C"), this);
 }
 
+// --------
+
+// port implementation routines
 int
-DeviceCharacterI2C::implOpen(void)
+DeviceCharacterI2C::implPortInit(void)
 {
-#if defined(DEBUG)
-  OSDeviceDebug::putString("DeviceCharacterI2C::implOpen()");
-  OSDeviceDebug::putNewLine();
-#endif
+  //OSDeviceDebug::putString_P(PSTR("DeviceCharacterI2C::implPortInit"));
 
   m_timeoutCounterTicks = 0;
 
@@ -65,24 +65,14 @@ DeviceCharacterI2C::implOpen(void)
 
   TWCR = _BV(TWEN) | _BV(TWEA) | _BV(TWIE);
 
-  m_rxBuf.clear();
-
-  return 0;
+  return OSReturn::OS_OK;
 }
-
-OSEvent_t
-DeviceCharacterI2C::implGetOpenEvent(void)
-{
-  return OSEvent::OS_NONE;
-}
+// called from implOpen()
 
 int
-DeviceCharacterI2C::implClose(void)
+DeviceCharacterI2C::implPortDisable(void)
 {
-#if defined(DEBUG)
-  OSDeviceDebug::putString("DeviceCharacterI2C::implClose()");
-  OSDeviceDebug::putNewLine();
-#endif
+  //OSDeviceDebug::putString_P(PSTR("DeviceCharacterI2C::implPortDisable"));
 
   // Disable timeout checking
   m_timeoutCounterTicks = 0;
@@ -92,63 +82,59 @@ DeviceCharacterI2C::implClose(void)
   // leave bits as input
   DDRD &= ~(_BV(0) | _BV(1));
 
-  return 0;
+  return OSReturn::OS_OK;
 }
+// called from implClose()
 
-bool
-DeviceCharacterI2C::implIsConnected() const
+unsigned char
+DeviceCharacterI2C::implPortRead(void)
 {
-  return true;
+  return TWDR;
 }
+// called from interruptRxServiceRoutine()
 
-// ----- write ----------------------------------------------------------------
-
-bool
-DeviceCharacterI2C::implCanWrite(void)
+void
+DeviceCharacterI2C::implPortWrite(unsigned char b)
 {
-  bool f;
-  OSCriticalSection::enter();
-    {
-      f = !m_txBuf.isFull();
-    }
-  OSCriticalSection::exit();
-
-  return f;
+  TWDR = b;
 }
 
-OSEvent_t
-DeviceCharacterI2C::implGetWriteEvent(void)
+void
+DeviceCharacterI2C::implInterruptTxEnable(void)
 {
-  return (OSEvent_t) &m_txBuf;
+  ; // TODO: implement
 }
+// called from implWriteByte() in critical section
+// called from implFlush() in critical section
 
-int
-DeviceCharacterI2C::implWriteByte(unsigned char b)
+void
+DeviceCharacterI2C::implInterruptTxDisable(void)
 {
-  m_txBuf.put(b);
-
-  if (m_txBuf.isAboveHighWM())
-    interruptTxEnable(); // start transmission
-
-  return b;
+  ; // TODO: implement
 }
 
-int
-DeviceCharacterI2C::implFlush(void)
+void
+DeviceCharacterI2C::implResumeReception(void)
 {
-  //OSDeviceDebug::putChar('f');
-  if (!m_txBuf.isEmpty())
-    interruptTxEnable();
+  OSDeviceDebug::putChar('*');
 
-  return 0;
+  TWCR |= _BV(TWEA); // ACK
 }
+
+// ----------------------------------------------------------------------------
 
 void
 DeviceCharacterI2C::interruptServiceRoutine(void)
 {
   unsigned char ch;
 
-  //OSDeviceDebug::putChar('!');
+#if false
+  OSDeviceDebug::putChar('#');
+#endif
+
+  OSEvent_t readEvent;
+  readEvent = getReadEvent();
+
   unsigned char status;
   // Get rid of the prescaler bits
   status = TWSR & (~0x03);
@@ -159,7 +145,7 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
   // Warning: the SLA is not protected by timeout
 
   case 0x60:
-    // Own SLA+W received, should return ACK
+    // Own SLA+W has been received; ACK has been returned
 
     // Start timeout counting
     m_timeoutCounterTicks = 1;
@@ -167,21 +153,25 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     if (!m_rxBuf.isFull())
       {
         TWCR |= _BV(TWEA); // ACK
+        m_isReceiving = true;
       }
     else
       {
         TWCR &= ~_BV(TWEA); // NOT ACK
+        m_isReceiving = false;
+        os.sched.eventNotify(readEvent);
         OSDeviceDebug::putChar('A');
       }
     break;
 
   case 0x80:
-    // Data received
+    // Previously addressed with own SLA+W; data has been received;
+    // ACK has been returned
 
     // Start timeout counting
     m_timeoutCounterTicks = 1;
 
-    ch = portRead();
+    ch = TWDR;
 
 #if false && defined(DEBUG)
     OSDeviceDebug::putHex(ch);
@@ -190,15 +180,36 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     if (!m_rxBuf.isFull())
       {
         m_rxBuf.put(ch);
+#if false
+        if (isprint(ch))
+          {
+            OSDeviceDebug::putChar(ch);
+          }
+        else
+          {
+            OSDeviceDebug::putHex(ch);
+          }
+#endif
         if (m_rxBuf.isAboveHighWM())
           {
-            os.sched.eventNotify(implGetReadEvent());
+            TWCR &= ~_BV(TWEA); // NOT ACK
+            m_isReceiving = false;
+
+            os.sched.eventNotify(readEvent);
+            OSDeviceDebug::putChar('H');
           }
-        TWCR |= _BV(TWEA); // ACK
+        else
+          {
+            TWCR |= _BV(TWEA); // ACK
+            m_isReceiving = true;
+          }
       }
     else
       {
+        // Char lost!
         TWCR &= ~_BV(TWEA); // NOT ACK
+        m_isReceiving = false;
+        os.sched.eventNotify(readEvent);
         OSDeviceDebug::putChar('N');
       }
     break;
@@ -207,17 +218,26 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     // Previously addressed with own SLA+W; data has been received;
     // NOT ACK has been returned
 
-    ch = portRead(); // The manual says "Read data byte", so we comply
+    ch = TWDR; // The manual says "Read data byte", so we comply
 
-#if defined(DEBUG)
+#if false && defined(DEBUG)
     OSDeviceDebug::putHex(status);
     OSDeviceDebug::putChar(' ');
     OSDeviceDebug::putHex(ch);
     OSDeviceDebug::putChar('|');
 #endif
 
-    //TWCR &= ~ ( _BV(TWSTO)); // clear stop
-    TWCR |= _BV(TWEA); // ACK
+    if (m_rxBuf.isBelowLowWM())
+      {
+        TWCR |= _BV(TWEA); // ACK
+        m_isReceiving = true;
+      }
+    else
+      {
+        TWCR &= ~_BV(TWEA); // NOT ACK
+        m_isReceiving = false;
+        os.sched.eventNotify(readEvent);
+      }
 
     // Switched to the not addressed Slave mode;
     // own SLA will be recognised;
@@ -231,9 +251,10 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     m_timeoutCounterTicks = 0;
 
     // Notify readers
-    os.sched.eventNotify(implGetReadEvent());
+    os.sched.eventNotify(readEvent);
 
     TWCR |= _BV(TWEA); // ACK
+    m_isReceiving = true;
 
     // Switched to the not addressed Slave mode;
     // own SLA will be recognised;
@@ -241,7 +262,10 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
 
   default:
 #if defined(DEBUG)
+    OSDeviceDebug::putChar('I');
     OSDeviceDebug::putHex(status);
+    OSDeviceDebug::putChar(' ');
+    OSDeviceDebug::putHex(TWCR);
     OSDeviceDebug::putChar(' ');
     OSDeviceDebug::putHex(TWDR);
     OSDeviceDebug::putChar('|');
@@ -250,53 +274,6 @@ DeviceCharacterI2C::interruptServiceRoutine(void)
     }
 
   TWCR |= _BV(TWINT); // clear interrupt
-}
-
-// ----- read -----------------------------------------------------------------
-
-bool
-DeviceCharacterI2C::implCanRead()
-{
-  bool f;
-  OSCriticalSection::enter();
-    {
-      f = m_rxBuf.isEmpty();
-    }
-  OSCriticalSection::exit();
-
-  return !f;
-}
-
-int
-DeviceCharacterI2C::implAvailableRead()
-{
-  int r;
-  OSCriticalSection::enter();
-    {
-      r = m_rxBuf.length();
-    }
-  OSCriticalSection::exit();
-
-  return r;
-}
-
-OSEvent_t
-DeviceCharacterI2C::implGetReadEvent(void)
-{
-  return (OSEvent_t) &m_rxBuf;
-}
-
-int
-DeviceCharacterI2C::implReadByte(void)
-{
-  int r;
-  OSCriticalSection::enter();
-    {
-      r = m_rxBuf.get();
-    }
-  OSCriticalSection::exit();
-
-  return r;
 }
 
 // ----- static data ----------------------------------------------------------
@@ -314,9 +291,10 @@ DeviceCharacterI2C::interruptTimerTick(void)
 
       if (m_timeoutCounterTicks > OS_CFGINT_TICK_RATE_HZ * 2)
         {
-          os.sched.eventNotify(implGetReadEvent(),
-              OSEventWaitReturn::OS_TIMEOUT);
+#if true
+          os.sched.eventNotify(getReadEvent(), OSEventWaitReturn::OS_TIMEOUT);
           OSDeviceDebug::putChar('T');
+#endif
         }
     }
 }

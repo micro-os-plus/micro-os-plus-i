@@ -29,7 +29,7 @@
 #define OS_CFGINT_DEVICECHARACTERI2C_CONTEXT_SWITCH             (true)
 #endif
 
-class DeviceCharacterI2C : public OSDeviceCharacter
+class DeviceCharacterI2C : public OSDeviceCharacterBuffered
 {
 public:
   DeviceCharacterI2C(unsigned char *pTxBuf, unsigned short txBufSize,
@@ -51,75 +51,38 @@ public:
   static DeviceCharacterI2C *pDevice;
 
 private:
-  virtual int
-  implOpen(void);
-  virtual OSEvent_t
-  implGetOpenEvent(void);
 
+  // port implementation routines
   virtual int
-  implClose(void);
-
-  virtual bool
-  implIsConnected(void) const;
-
-  virtual bool
-  implCanWrite(void);
-  virtual OSEvent_t
-  implGetWriteEvent(void);
-  virtual int
-  implWriteByte(unsigned char b);
+  implPortInit(void);
+  // called from implOpen()
 
   virtual int
-  implFlush(void);
+  implPortDisable(void);
+  // called from implClose()
 
-  virtual bool
-  implCanRead(void);
-  virtual int
-  implAvailableRead(void);
-  virtual OSEvent_t
-  implGetReadEvent(void);
-  virtual int
-  implReadByte(void);
+  virtual unsigned char
+  implPortRead(void);
+  // called from interruptRxServiceRoutine()
 
-  //void init(void);
-  inline static void
-  interruptTxEnable(void);
-  inline static void
-  interruptTxDisable(void);
-  inline unsigned char
-  portRead(void);
-  inline void
-  portWrite(unsigned char b);
+  virtual void
+  implPortWrite(unsigned char b);
+  // called from interruptTxServiceRoutine()
 
+  virtual void
+  implResumeReception(void);
 
-  CircularByteBuffer m_txBuf;
-  CircularByteBuffer m_rxBuf;
+  virtual void
+  implInterruptTxEnable(void);
+  // called from implWriteByte() in critical section
+  // called from implFlush() in critical section
+
+  virtual void
+  implInterruptTxDisable(void);
 
   unsigned short m_timeoutCounterTicks;
 };
 
-inline void
-DeviceCharacterI2C::interruptTxEnable(void)
-{
-  ;
-}
 
-inline void
-DeviceCharacterI2C::interruptTxDisable(void)
-{
-  ;
-}
-
-inline unsigned char
-DeviceCharacterI2C::portRead(void)
-{
-  return TWDR;
-}
-
-inline void
-DeviceCharacterI2C::portWrite(unsigned char b)
-{
-  TWDR = b;
-}
 
 #endif /*DEVICECHARACTERI2C_H_*/
