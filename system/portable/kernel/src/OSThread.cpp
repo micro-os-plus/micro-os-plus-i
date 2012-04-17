@@ -444,6 +444,12 @@ OSThread::eventWaitPrepare(OSEvent_t event)
     }
 #endif
 
+#if defined(OS_INCLUDE_OSTHREAD_EVENTWAITPREPARE)
+  OSDeviceDebug::putString_P(PSTR(" eWP("));
+  OSDeviceDebug::putHex(event);
+  OSDeviceDebug::putString_P(PSTR(") "));
+#endif
+
   // Mark that the thread is waiting on the given event
   m_event = event;
   m_isWaiting = true;
