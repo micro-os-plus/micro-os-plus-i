@@ -53,14 +53,20 @@ TaskDbgIn::threadMain(void)
       inDev = &m_inDev2;
 #endif
 
-      //m_taskCli.resume();
     }
   os.sched.lock.exit();
+
+  // A delay, to allow the CLI task to initialise the port
+
+  os.sched.timerTicks.sleep(1000);
 
   // thread endless loop
   for (;;)
     {
       inDev->open();
+
+      bool isNewLineFound;
+      isNewLineFound = false;
 
       for (; inDev->isOpened() && inDev->isConnected();)
         {
@@ -99,20 +105,43 @@ TaskDbgIn::threadMain(void)
 
           if (cnt > 0)
             {
-#if false
+#if true
               debug.putChar('|');
               debug.putDec((unsigned short)cnt);
 #endif
 
+#if true
               int first;
               first = 0;
 
               int last;
-
-              for (;;)
+              for (; first < cnt; first = last + 1)
                 {
-                  bool isNewLineFound;
-                  isNewLineFound = false;
+                  if (isNewLineFound)
+                    {
+                      unsigned long seconds;
+                      OSTimerTicks_t ticks;
+                      os.sched.timerSeconds.getUptime(&seconds, &ticks);
+
+                      unsigned long minutes;
+                      minutes = seconds / 60;
+
+                      seconds %= 60;
+
+#if true
+                      os.sched.lock.enter();
+                        {
+                          m_cout.width(2);
+                          m_cout << std::dec << minutes << ':';
+                          m_cout.width(2);
+                          m_cout << std::dec << seconds << '.';
+                          m_cout.width(3);
+                          m_cout << std::dec << ticks << ": ";
+                         }
+                      os.sched.lock.exit();
+#endif
+                      isNewLineFound = false;
+                    }
 
                   last = cnt - 1;
                   int i;
@@ -122,6 +151,7 @@ TaskDbgIn::threadMain(void)
                         {
                           isNewLineFound = true;
                           last = i;
+                          break;
                         }
                     }
                   if (outDev.isConnected() && outDev.isOpened())
@@ -135,34 +165,15 @@ TaskDbgIn::threadMain(void)
                         {
                           for (int j = first; j <= last; ++j)
                             clog.put(m_buff[j]);
-
                         }
                     }
-                  if (isNewLineFound)
-                    {
-                      unsigned long seconds;
-                      OSTimerTicks_t ticks;
-                      os.sched.timerSeconds.getUptime(&seconds, &ticks);
-
-                      unsigned long minutes;
-                      minutes = seconds / 60;
-
-                      seconds %= 60;
-
-                      m_cout.width(2);
-                      m_cout << std::dec << minutes << ':';
-                      m_cout.width(2);
-                      m_cout << std::dec << seconds << '.';
-                      m_cout.width(3);
-                      m_cout << std::dec << ticks << ": ";
-
-                      first = last + 1;
-                    }
-                  else
-                    {
-                      break;
-                    }
                 }
+              //outDev.writeByte('|');
+
+#else
+              outDev.writeBytes(&m_buff[0], cnt);
+              outDev.flush();
+#endif
             }
         }
       inDev->close();
