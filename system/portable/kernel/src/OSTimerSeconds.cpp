@@ -34,6 +34,8 @@ OSTimerSeconds::OSTimerSeconds() :
   ;
 }
 
+#if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
+
 void
 OSTimerSeconds::getUptime(unsigned long* pSeconds, OSTimerTicks_t* pTicks)
 {
@@ -44,6 +46,8 @@ OSTimerSeconds::getUptime(unsigned long* pSeconds, OSTimerTicks_t* pTicks)
     }
   OSCriticalSection::exit();
 }
+
+#endif
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
 void OSTimerSeconds::checkVirtualWatchdogs(void)
