@@ -84,7 +84,7 @@ DeviceCharacterUsb::implClose()
 bool
 DeviceCharacterUsb::implCanWrite(void)
 {
-  return true;
+  return true; //OSUsbDevice::Is_usb_tx_ready();
 }
 
 OSEvent_t
@@ -96,15 +96,23 @@ DeviceCharacterUsb::implGetWriteEvent(void)
 int
 DeviceCharacterUsb::implWriteByte(unsigned char b)
 {
+#if defined(OS_DEBUG_OSDEVICECHARACTERUSB_WRITE)
+  OSDeviceDebug::putString("DeviceCharacterUsb::implWriteByte(");
+  OSDeviceDebug::putHex(b);
+  OSDeviceDebug::putString(")");
+  OSDeviceDebug::putNewLine();
+#endif
+
   // if closed return -1
   if (!m_connected)
     return OSReturn::OS_DISCONNECTED;
 
   OSCriticalSection::enter();
     {
+      // TODO: fix this busy wait
       while (!OSUsbDevice::Is_usb_tx_ready())
         {
-          //OSDeviceDebug::putChar('>');
+          OSDeviceDebug::putChar('>');
           //os.sched.eventWait(&m_txCounter);       // Wait Endpoint ready
           OSUsbDevice::endpointSelect(m_tx_ep);
         }
@@ -123,10 +131,19 @@ DeviceCharacterUsb::implWriteByte(unsigned char b)
 
 #endif
 
+#if false
+      if (m_txCounter >= 30 )
+        {
+          OSUsbDevice::Usb_send_in();
+          OSDeviceDebug::putChar('&');
+          m_txCounter = 0;
+        }
+#endif
+
       if (!OSUsbDevice::Is_usb_tx_ready()) //If Endpoint full -> flush
         {
           OSUsbDevice::Usb_send_in();
-          //OSDeviceDebug::putChar('^');
+          OSDeviceDebug::putChar('^');
           m_txCounter = 0;
         }
     }
@@ -163,9 +180,10 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
   int i;
   OSCriticalSection::enter();
     {
+      // TODO: fix this busy wait
       while (!OSUsbDevice::Is_usb_tx_ready())
         {
-          //OSDeviceDebug::putChar('>');
+          OSDeviceDebug::putChar('>');
           //os.sched.eventWait(&m_txCounter);       // Wait Endpoint ready
           OSUsbDevice::endpointSelect(m_tx_ep);
         }
@@ -176,10 +194,11 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
 
 #endif
 
-      for (i = 0; i < size; ++i)
+      for (i = 0; i < size; )
         {
           OSUsbDevice::endpointSelect(m_tx_ep);
           OSUsbDevice::writeByte(pBuf[i]);
+          ++i;
           m_txCounter++;
 
 #if defined(OS_DEBUG_DEVICECHARACTERUSB_WRITE)
@@ -196,7 +215,7 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
           if (!OSUsbDevice::Is_usb_tx_ready()) //If Endpoint full -> flush
             {
               OSUsbDevice::Usb_send_in();
-              //OSDeviceDebug::putChar('^');
+              OSDeviceDebug::putChar('^');
               m_txCounter = 0;
 
               // Return when endpoint full
@@ -425,7 +444,7 @@ DeviceCharacterUsb::specificCdcGetDescriptor(unsigned char type,
       return true;
 
 #if !defined(OS_EXCLUDE_USBSERIALNUMBER)
-    case STRING_INDEX_SN:
+      case STRING_INDEX_SN:
       OSUsbDevice::usb_set_return(sizeof(usb_user_serial_number),
           &usb_user_serial_number);
       return true;
