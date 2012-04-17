@@ -25,18 +25,21 @@ std::ostream cout(&devUsb);
 
 // I2C buffers
 unsigned char tx_store[OS_CFGINT_DEVICECHARACTERI2C_TXBUF_SIZE];
-unsigned char rx_store[OS_CFGINT_DEVICECHARACTERMI2C_RXBUF_SIZE];
+unsigned char rx_store[OS_CFGINT_DEVICECHARACTERI2C_RXBUF_SIZE];
 
 DeviceCharacterI2C devI2C(tx_store, sizeof(tx_store), rx_store,
     sizeof(rx_store));
 
-TaskDbgIn taskDbgIn("input", devUsb, devI2C, cout);
-
 // ----------------------------------------------------------------------------
-// Cli Task
+// CLI thread
 
 // active object
 TaskCli taskCli("usb", devUsb, devI2C, cin, cout);
+
+// ----------------------------------------------------------------------------
+// I2C input thread
+
+TaskDbgIn taskDbgIn("input", devUsb, devI2C, cout);
 
 // ----------------------------------------------------------------------------
 // Blink Task
