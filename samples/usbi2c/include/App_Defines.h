@@ -22,6 +22,10 @@
 
 // ----------------------------------------------------------------------------
 
+#define APP_CFGINT_TASKCLI_EXTRA_STACK_SIZE             (150)
+#define APP_CFGINT_TASKDBGIN_EXTRA_STACK_SIZE           (150)
+
+
 #if defined(OS_CONFIG_BOARD_AVI_A07523)
 
 #elif defined(OS_CONFIG_BOARD_AVI_A0739)

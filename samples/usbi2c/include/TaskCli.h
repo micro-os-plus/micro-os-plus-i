@@ -28,7 +28,7 @@ private:
   xorCheck(unsigned char *pc);
 
   // members
-  unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 100];
+  unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + APP_CFGINT_TASKCLI_EXTRA_STACK_SIZE];
   OSDeviceCharacter& m_dev;
 
   std::istream& m_cin;

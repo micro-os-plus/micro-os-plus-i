@@ -23,7 +23,7 @@ public:
 private:
 
   // members
-  unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + 100];
+  unsigned char m_stack[OSThread::STACK_MINIMAL_SIZE + APP_CFGINT_TASKDBGIN_EXTRA_STACK_SIZE];
   OSDeviceCharacter & m_outDev;
   OSDeviceCharacter & m_inDev2;
 
