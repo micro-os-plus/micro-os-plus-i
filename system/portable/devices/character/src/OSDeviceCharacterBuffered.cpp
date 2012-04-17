@@ -18,29 +18,30 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char* pRxBuf,
     unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM,
     unsigned char* pTxBuf, unsigned short txBufSize, unsigned short txHWM,
     unsigned short txLWM) :
-  m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM),
-      m_txBuf(pTxBuf, txBufSize, txHWM, txLWM)
+    m_rxBuf(pRxBuf, rxBufSize, rxHWM, rxLWM), m_txBuf(pTxBuf, txBufSize, txHWM,
+        txLWM)
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceCharacterBuffered"), this);
 
   m_sending = false;
+  m_isReceiving = true;
 }
 
 OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char* pRxBuf,
     unsigned short rxBufSize, unsigned char* pTxBuf, unsigned short txBufSize) :
-  m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4),
-      m_txBuf(pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4)
+    m_rxBuf(pRxBuf, rxBufSize, rxBufSize * 3 / 4, rxBufSize / 4), m_txBuf(
+        pTxBuf, txBufSize, txBufSize * 3 / 4, txBufSize / 4)
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSDeviceCharacterBuffered"), this);
 
   m_sending = false;
+  m_isReceiving = true;
 }
 
 void
-OSDeviceCharacterBuffered::init(unsigned char* pTxBuf,
-    unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM,
-    unsigned char* pRxBuf, unsigned short rxBufSize, unsigned short rxHWM,
-    unsigned short rxLWM)
+OSDeviceCharacterBuffered::init(unsigned char* pTxBuf, unsigned short txBufSize,
+    unsigned short txHWM, unsigned short txLWM, unsigned char* pRxBuf,
+    unsigned short rxBufSize, unsigned short rxHWM, unsigned short rxLWM)
 {
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TYPE)
   m_type = OS_DEVICECHARACTER_USART;
@@ -48,6 +49,8 @@ OSDeviceCharacterBuffered::init(unsigned char* pTxBuf,
 
   m_txBuf.initialise(pTxBuf, txBufSize, txHWM, txLWM);
   m_rxBuf.initialise(pRxBuf, rxBufSize, rxHWM, rxLWM);
+
+  m_isReceiving = true;
 }
 
 // ----- open/close -----------------------------------------------------------
@@ -61,6 +64,9 @@ OSDeviceCharacterBuffered::implOpen(void)
 #endif /* defined(DEBUG) */
 
   //assert(ms_pThis == this);
+
+  m_rxBuf.clear();
+  m_txBuf.clear();
 
   implPortInit();
 
@@ -122,6 +128,25 @@ OSDeviceCharacterBuffered::implAvailableRead()
   return r;
 }
 
+void
+OSDeviceCharacterBuffered::resumeReceptionIfBelowLowWM(void)
+{
+  if (!m_isReceiving)
+    {
+      bool isBelowLowWM;
+      OSCriticalSection::enter();
+        {
+          isBelowLowWM = m_rxBuf.isBelowLowWM();
+        }
+      OSCriticalSection::exit();
+      if (isBelowLowWM)
+        {
+          implResumeReception();
+          m_isReceiving = true;
+        }
+    }
+}
+
 int
 OSDeviceCharacterBuffered::implReadByte(void)
 {
@@ -131,6 +156,8 @@ OSDeviceCharacterBuffered::implReadByte(void)
       r = m_rxBuf.get();
     }
   OSCriticalSection::exit();
+
+  resumeReceptionIfBelowLowWM();
 
   return r;
 }
@@ -145,8 +172,17 @@ OSDeviceCharacterBuffered::implReadBytes(unsigned char* pBuf, int size)
     }
   OSCriticalSection::exit();
 
+  resumeReceptionIfBelowLowWM();
+
   return r;
 }
+
+void
+OSDeviceCharacterBuffered::implResumeReception(void)
+{
+  ;
+}
+
 void
 OSDeviceCharacterBuffered::interruptRxServiceRoutine(void)
 {

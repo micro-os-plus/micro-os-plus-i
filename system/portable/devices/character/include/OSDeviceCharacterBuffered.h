@@ -40,8 +40,11 @@ protected:
   CircularByteBuffer m_txBuf;
 
   bool m_sending;
+  bool m_isReceiving;
 
 private:
+  void resumeReceptionIfBelowLowWM(void);
+
   // open/close
   virtual int
   implOpen(void);
@@ -62,6 +65,9 @@ private:
   implReadByte(void);
   virtual int
   implReadBytes(unsigned char* pBuf, int size);
+
+  virtual void
+  implResumeReception(void);
 
   // write
   virtual bool
