@@ -35,7 +35,7 @@ private:
 
   };
 
-#if defined(OS_CONFIG_BOARD_AVI_A07527) || defined(OS_CONFIG_BOARD_AVI_A07527)
+#if defined(OS_CONFIG_BOARD_AVI_A07521) || defined(OS_CONFIG_BOARD_AVI_A07524) || defined(OS_CONFIG_BOARD_AVI_A07527)
 #include "portable/tasks/include/TaskPitpalac_Inlines.h"
 #else
 #include "App_TaskPitpalac_Inlines.h"
