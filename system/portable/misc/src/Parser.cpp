@@ -227,7 +227,7 @@ Parser::parseNextSubstring(size_t len)
 }
 
 OSReturn_t
-Parser::convertHex(uchar_t* pChar)
+Parser::convertHex(uint8_t* pChar)
 {
   return convertHex(m_pToken, pChar, 1);
 }
@@ -244,11 +244,15 @@ Parser::convertHex(uint32_t* pLong)
   return convertHex(m_pToken, pLong, 4);
 }
 
+#if !defined(OS_CONFIG_ARCH_AVR8)
+
 OSReturn_t
 Parser::convertHex(uint_t* pInt)
 {
   return convertHex(m_pToken, pInt, sizeof(*pInt));
 }
+
+#endif
 
 OSReturn_t
 Parser::convertUnsigned(uint16_t* pShort)
@@ -262,14 +266,25 @@ Parser::convertUnsigned(uint32_t* pLong)
   return convertUnsigned(m_pToken, pLong);
 }
 
+#if !defined(OS_CONFIG_ARCH_AVR8)
+
 OSReturn_t
 Parser::convertUnsigned(uint_t* pInt)
 {
   return convertUnsigned(m_pToken, pInt);
 }
 
+
 OSReturn_t
 Parser::convertSigned(signed long* pLong)
+{
+  return convertSigned(m_pToken, pLong);
+}
+
+#endif
+
+OSReturn_t
+Parser::convertSigned(int32_t* pLong)
 {
   return convertSigned(m_pToken, pLong);
 }
@@ -292,6 +307,12 @@ OSReturn_t
 Parser::convertFixedPrecision(int32_t* pLong, uint_t prec)
 {
   return convertFixedPrecision(m_pToken, pLong, prec, true);
+}
+
+OSReturn_t
+Parser::convertFixedPrecision(uint32_t* pLong, uint_t prec)
+{
+  return convertFixedPrecision(m_pToken, (int32_t*)pLong, prec, false);
 }
 
 OSReturn_t
@@ -398,6 +419,7 @@ Parser::convertUnsigned(uchar_t* pStr, uint16_t* pShort)
   return OSReturn::OS_OK;
 }
 
+
 OSReturn_t
 Parser::convertSigned(uchar_t* pStr, int32_t* pLong)
 {
@@ -410,6 +432,8 @@ Parser::convertUnsigned(uchar_t* pStr, uint32_t* pLong)
   return convertFixedPrecision(pStr, (int32_t*) pLong, 0, false);
 }
 
+#if !defined(OS_CONFIG_ARCH_AVR8)
+
 OSReturn_t
 Parser::convertUnsigned(uchar_t* pStr, uint_t* pInt)
 {
@@ -420,6 +444,8 @@ Parser::convertUnsigned(uchar_t* pStr, uint_t* pInt)
   *pInt = l;
   return ret;
 }
+
+#endif
 
 OSReturn_t
 Parser::convertFixedPrecision(uchar_t* pStr, int32_t* pLong, uint_t prec,
