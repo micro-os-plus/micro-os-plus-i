@@ -1,6 +1,6 @@
 all:
-	@echo 'Building system (empty)'
+	@echo 'Building micro-os-plus (empty)'
 
 clean:
-	@echo 'Cleaning system (empty)'
+	@echo 'Cleaning micro-os-plus (empty)'
 	
