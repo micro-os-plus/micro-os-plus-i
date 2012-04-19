@@ -17,7 +17,7 @@ public:
   static void toggle(void);
   static void on(void);
   static void off(void);
-  static void init(void);
+  static void initialise(void);
 
   unsigned char bitNumber(void);
 
@@ -28,10 +28,10 @@ inline BlinkLed::BlinkLed()
   {
   }
 
-inline void BlinkLed::init(void)
+inline void BlinkLed::initialise(void)
   {
     // initialise led port as output
-    OS_CONFIG_BLINK_LED_PORT_INIT |= _BV(OS_CONFIG_BLINK_LED_BIT);
+    OS_CONFIG_BLINK_LED_PORT_CONFIG |= _BV(OS_CONFIG_BLINK_LED_BIT);
   }
 
 inline void BlinkLed::toggle(void)
