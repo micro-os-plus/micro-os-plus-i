@@ -12,13 +12,10 @@
 
 #include "portable/devices/block/include/OSDeviceCAN.h"
 
-namespace OSDeviceCAN
-  {
-    bool m_isConnected;
-    bool m_isPowered;
-    CircularBlockBuffer m_rxBuf;
-    CircularBlockBuffer m_txBuf;
-  }
+    bool OSDeviceCAN::m_isConnected;
+    bool OSDeviceCAN::m_isPowered;
+    CircularBlockBuffer OSDeviceCAN::m_rxBuf;
+    CircularBlockBuffer OSDeviceCAN::m_txBuf;
 
 OSDeviceCAN::OSDeviceCAN(CANPacket *pRxBuf, unsigned short rxBufSize,
     unsigned short rxHWM, unsigned short rxLWM, CANPacket *pTxBuf,
