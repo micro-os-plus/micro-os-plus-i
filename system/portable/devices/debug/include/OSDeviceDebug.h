@@ -363,7 +363,7 @@ inline void OSDeviceDebug::putDec(unsigned long __attribute__((unused)) l, unsig
 #endif
 
 inline void
-OSDeviceDebug::putPC(const char* PROGMEM __attribute__((unused)) pc)
+OSDeviceDebug::putPC(const char* PROGMEM pc __attribute__((unused)))
 {
   //pc = pc;
 }
