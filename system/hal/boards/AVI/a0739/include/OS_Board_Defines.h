@@ -14,8 +14,8 @@
 #define OS_CONFIG_BOARD_A0739				1
 #endif
 
-#define OS_CONFIG_ACTIVE_LED_PORT_INIT                  DDRD
-#define OS_CONFIG_ACTIVE_LED_PORT			PORTD
+#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG                  DDRD
+#define OS_CONFIG_ACTIVE_LED_PORT_WRITE			PORTD
 #define OS_CONFIG_ACTIVE_LED_BIT			PORTD4
 
 #if !defined(OS_CFGLONG_OSCILLATOR_HZ)
@@ -25,11 +25,11 @@
 #define OS_CFGINT_CLOCK_PRESCALER			(1)
 #endif
 
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT_INIT)
-#define OS_CONFIG_ACTIVE_LED_PORT_INIT                  DDRD
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
+#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG                  DDRD
 #endif
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT)
-#define OS_CONFIG_ACTIVE_LED_PORT			PORTD
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_WRITE)
+#define OS_CONFIG_ACTIVE_LED_PORT_WRITE			PORTD
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
 #define OS_CONFIG_ACTIVE_LED_BIT			PORTD4
@@ -45,10 +45,10 @@
 #define OS_CFGPIN_OSUSBLED_LED_PIN                      PORTD7
 #endif
 
-#if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)
-#define OS_CONFIG_BLINK_LED_PORT_INIT                   DDRD
+#if !defined(OS_CONFIG_BLINK_LED_PORT_CONFIG)
+#define OS_CONFIG_BLINK_LED_PORT_CONFIG                   DDRD
 #endif
-#if !defined(OS_CONFIG_BLINK_LED_PORT)
+#if !defined(OS_CONFIG_BLINK_LED_PORT_WRITE)
 #define OS_CONFIG_BLINK_LED_PORT                        PORTD
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_BIT)

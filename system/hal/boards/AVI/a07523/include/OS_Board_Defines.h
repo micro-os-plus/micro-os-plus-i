@@ -52,8 +52,8 @@
 #define OS_CFGPIN_OSUSBLED_LED_PIN                      PORTA2
 #endif
 
-#if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)
-#define OS_CONFIG_BLINK_LED_PORT_INIT                   DDRA
+#if !defined(OS_CONFIG_BLINK_LED_PORT_CONFIG)
+#define OS_CONFIG_BLINK_LED_PORT_CONFIG                   DDRA
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_PORT_WRITE)
 #define OS_CONFIG_BLINK_LED_PORT_WRITE                  PORTA

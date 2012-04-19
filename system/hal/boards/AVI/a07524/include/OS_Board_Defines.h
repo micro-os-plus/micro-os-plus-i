@@ -32,21 +32,21 @@
 #define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
 #endif
 
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT_INIT)
-#define OS_CONFIG_ACTIVE_LED_PORT_INIT                  DDRA
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
+#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG                  DDRA
 #endif
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT)
-#define OS_CONFIG_ACTIVE_LED_PORT			PORTA
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_WRITE)
+#define OS_CONFIG_ACTIVE_LED_PORT_WRITE			PORTA
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
 #define OS_CONFIG_ACTIVE_LED_BIT			7
 #endif
 
-#if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)
-#define OS_CONFIG_BLINK_LED_PORT_INIT                   DDRA
+#if !defined(OS_CONFIG_BLINK_LED_PORT_CONFIG)
+#define OS_CONFIG_BLINK_LED_PORT_CONFIG                   DDRA
 #endif
-#if !defined(OS_CONFIG_BLINK_LED_PORT)
-#define OS_CONFIG_BLINK_LED_PORT                        PORTA
+#if !defined(OS_CONFIG_BLINK_LED_PORT_WRITE)
+#define OS_CONFIG_BLINK_LED_PORT_WRITE                        PORTA
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_BIT)
 #define OS_CONFIG_BLINK_LED_BIT                         6
