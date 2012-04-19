@@ -26,7 +26,7 @@ void DeviceRTC4574::init(void)
 void DeviceRTC4574::delay(void)
   {
     for (int i=0; i < 10; ++i)
-    OS::NOP();
+    OSCPU::nop();
   }
 
 unsigned char DeviceRTC4574::readBytes(unsigned char addr, unsigned char* pBuf,
