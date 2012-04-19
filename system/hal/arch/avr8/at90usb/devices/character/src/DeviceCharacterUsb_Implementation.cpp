@@ -309,7 +309,7 @@ DeviceCharacterUsb::implReadByte(void)
 
     }
   OSCriticalSection::exit();
-  // OS_CONFIG_USBINT_LED_PORT &= ~_BV(PORTD0);
+  // OS_CONFIG_USBINT_LED_PORT_WRITE &= ~_BV(PORTD0);
   return c;
 }
 
@@ -331,8 +331,8 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
 {
   if (UEINT & _BV(RX_EP))
     {
-#if defined(OS_CONFIG_USBINT_LED_PORT)
-      OS_CONFIG_USBINT_LED_PORT |= _BV(OS_CONFIG_USBINT_LED_BIT);
+#if defined(OS_CONFIG_USBINT_LED_PORT_WRITE)
+      OS_CONFIG_USBINT_LED_PORT_WRITE |= _BV(OS_CONFIG_USBINT_LED_BIT);
 #endif
 
       OSUsbDevice::endpointSelect(RX_EP);
@@ -349,8 +349,8 @@ DeviceCharacterUsb::specificCdcInterruptServiceRoutine(void)
 #if defined(OS_INCLUDE_USB_CDC_DUAL_INTERFACE)
   if (UEINT & _BV(RXb_EP))
     {
-#if defined(OS_CONFIG_USBINT_LED_PORT)
-      OS_CONFIG_USBINT_LED_PORT |= _BV(OS_CONFIG_USBINT_LED_BIT);
+#if defined(OS_CONFIG_USBINT_LED_PORT_WRITE)
+      OS_CONFIG_USBINT_LED_PORT_WRITE |= _BV(OS_CONFIG_USBINT_LED_BIT);
 #endif
 
       OSUsbDevice::endpointSelect(RXb_EP);
