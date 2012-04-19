@@ -355,7 +355,7 @@ OSDeviceCharacter::writeByte(unsigned char b)
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
           if (timeout != OSTimeout::OS_NEVER)
             {
-              m_pWriteTimer->eventRemove(event);
+              m_pWriteTimer->eventRemove(writeEvent);
             }
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
         }
@@ -648,7 +648,7 @@ OSDeviceCharacter::readByte(void)
 #if defined(OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS)
           if (timeout != OSTimeout::OS_NEVER)
             {
-              m_pReadTimer->eventRemove(event);
+              m_pReadTimer->eventRemove(readEvent);
             }
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
         }
@@ -756,7 +756,7 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
           av = implAvailableRead();
           if (av > 0)
           *count = implReadBytes(pBuf, bufSize);
-          m_countToRead = 0;
+          //m_countToRead = 0;
           return OSReturn::OS_WOULD_BLOCK;
         }
 #endif /* OS_INCLUDE_OSDEVICECHARACTER_TIMEOUTS */
