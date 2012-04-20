@@ -30,6 +30,8 @@ public:
       unsigned short rxHWM, unsigned short rxLWM, CANPacket *pTxBuf,
       unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM);
 
+  ~DeviceCAN_MCP2510();
+
   static void interruptInit(void);
   static void interruptEnable(void);
   static void interruptDisable(void);
