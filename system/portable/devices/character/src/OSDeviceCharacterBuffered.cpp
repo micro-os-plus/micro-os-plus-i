@@ -38,6 +38,11 @@ OSDeviceCharacterBuffered::OSDeviceCharacterBuffered(unsigned char* pRxBuf,
   m_isReceiving = true;
 }
 
+OSDeviceCharacterBuffered::~OSDeviceCharacterBuffered()
+{
+  OSDeviceDebug::putDestructor_P(PSTR("OSDeviceCharacterBuffered"), this);
+}
+
 void
 OSDeviceCharacterBuffered::init(unsigned char* pTxBuf, unsigned short txBufSize,
     unsigned short txHWM, unsigned short txLWM, unsigned char* pRxBuf,

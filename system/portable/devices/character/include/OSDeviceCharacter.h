@@ -31,6 +31,9 @@ class OSDeviceCharacter
 public:
   OSDeviceCharacter();
 
+  virtual
+  ~OSDeviceCharacter();
+
   // open device, blocking if necessary
   OSReturn_t
   open(void);

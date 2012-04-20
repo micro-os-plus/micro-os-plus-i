@@ -45,6 +45,11 @@ OSDeviceCharacter::OSDeviceCharacter()
   m_isOpened = false;
 }
 
+OSDeviceCharacter::~OSDeviceCharacter()
+{
+  OSDeviceDebug::putDestructor_P(PSTR("OSDeviceCharacter"), this);
+}
+
 // Defaults for event codes; return their addresses,
 // guaranteed to be unique.
 OSEvent_t
@@ -285,6 +290,8 @@ OSDeviceCharacter::writeByte(unsigned char b)
       bool doWait;
       doWait = false;
       OSEvent_t writeEvent;
+      writeEvent = getWriteEvent();
+
       OSCriticalSection::enter();
         {
           canWrite = implCanWrite() || !implIsConnected();
@@ -400,6 +407,8 @@ OSDeviceCharacter::writeBytes(unsigned char* buf, int len)
       bool doWait;
       doWait = false;
       OSEvent_t writeEvent;
+      writeEvent = getWriteEvent();
+
       OSCriticalSection::enter();
         {
           canWrite = implCanWrite() || !implIsConnected();
@@ -567,6 +576,8 @@ OSDeviceCharacter::readByte(void)
       bool doWait;
       doWait = false;
       OSEvent_t readEvent;
+      readEvent = getReadEvent();
+
       OSCriticalSection::enter();
         {
           // when not connected, do not wait, to return error
@@ -728,6 +739,8 @@ OSDeviceCharacter::readBytes(unsigned char* pBuf, int bufSize, int* count)
       bool doWait;
       doWait = false;
       OSEvent_t readEvent;
+      readEvent = getReadEvent();
+
       OSCriticalSection::enter();
         {
           canRead = implCanRead() || !implIsConnected();
