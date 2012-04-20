@@ -30,24 +30,30 @@ DeviceCharacterUsb::implOpen()
 
   if (!flagShouldNotInit)
     {
+      OSCriticalSection::enter();
+        {
 #if !defined(USE_USB_PADS_REGULATOR_ENABLE)	// Otherwise assume USB PADs regulator is not used
-      OSUsbDevice::Usb_enable_regulator();
+          OSUsbDevice::Usb_enable_regulator();
 #endif
 
-      OSUsbDevice::Usb_force_device_mode();
+          OSUsbDevice::Usb_force_device_mode();
 
-      //Enable_interrupt();
-      OSUsbDevice::Usb_disable();
-      OSUsbDevice::Usb_enable();
-      OSUsbDevice::Usb_select_device();
-      OSUsbDevice::Usb_enable_vbus_interrupt();
-      //Enable_interrupt();
+          //Enable_interrupt();
+          OSUsbDevice::Usb_disable();
+          OSUsbDevice::Usb_enable();
+          OSUsbDevice::Usb_select_device();
+          OSUsbDevice::Usb_enable_vbus_interrupt();
+          //Enable_interrupt();
 
-      flagShouldNotInit = true;
+          flagShouldNotInit = true;
 
-      OSUsbLed::init();
-      //DDRD |= _BV(DDD6);
-      //DDRD |= _BV(DDD7);
+          OSUsbLed::init();
+          OSUsbLed::on();
+
+          //DDRD |= _BV(DDD6);
+          //DDRD |= _BV(DDD7);
+        }
+      OSCriticalSection::exit();
     }
 
   m_txCounter = 0;
@@ -75,6 +81,8 @@ DeviceCharacterUsb::implClose()
 {
   OSDeviceDebug::putString("DeviceCharacterUsb::close()");
   OSDeviceDebug::putNewLine();
+
+  OSUsbLed::off();
 
   m_opened = false;
 
@@ -194,7 +202,7 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
 
 #endif
 
-      for (i = 0; i < size; )
+      for (i = 0; i < size;)
         {
           OSUsbDevice::endpointSelect(m_tx_ep);
           OSUsbDevice::writeByte(pBuf[i]);
