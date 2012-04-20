@@ -442,7 +442,7 @@ OSTimer::interruptTick(void)
                 {
                   if (OSScheduler::eventNotify(p->event, p->u.ret) == 0)
                     {
-                      // Missing task to notify
+                      // Missing thread to notify
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK_MISSED_NOTIFY)
                       OSDeviceDebug::putChar('m');
 #endif /* defined(DEBUG) && defined(OS_DEBUG_OSTIMER_INTERRUPTTICK_MISSED_NOTIFY) */

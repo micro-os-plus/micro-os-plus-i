@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2008-2011 Liviu Ionescu.
+ *	Copyright (C) 2008-2012 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -7,7 +7,7 @@
 #ifndef HAL_BOARD_OS_DEFINES_H_
 #define HAL_BOARD_OS_DEFINES_H_
 
-#define OS_CONFIG_ARCH_AVR8                              1
+#define OS_CONFIG_ARCH_AVR8                             1
 #define OS_CONFIG_FAMILY_AT90USB			1
 #define OS_CONFIG_VARIANT_AT90USB1287                   1
 #if !defined(OS_CONFIG_BOARD_AVI_A07527)
@@ -43,13 +43,13 @@
 #endif
 
 #if !defined(OS_CFGREG_OSUSBLED_LED_PORT_CONFIG)
-#define OS_CFGREG_OSUSBLED_LED_PORT_CONFIG                     DDRA
+#define OS_CFGREG_OSUSBLED_LED_PORT_CONFIG              DDRA
 #endif
 #if !defined(OS_CFGREG_OSUSBLED_LED_PORT_WRITE)
-#define OS_CFGREG_OSUSBLED_LED_PORT_WRITE                          PORTA
+#define OS_CFGREG_OSUSBLED_LED_PORT_WRITE               PORTA
 #endif
 #if !defined(OS_CFGPIN_OSUSBLED_LED_PIN)
-#define OS_CFGPIN_OSUSBLED_LED_PIN                           2
+#define OS_CFGPIN_OSUSBLED_LED_PIN                      2
 #endif
 
 #if !defined(OS_CONFIG_BLINK_LED_PORT_CONFIG)
