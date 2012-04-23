@@ -16,7 +16,7 @@
 // the main timer functionality
 // all timing intervals of this timer are expressed in scheduler ticks.
 class OSTimerTicks : public OSTimer
-  {
+{
 public:
   // constructor
   OSTimerTicks();
@@ -24,42 +24,63 @@ public:
   // transform  the microseconds number into ticks number
   // possible issues: the result is approximative, the higher the tick rate the better the approximation
   // and the result should fit the range of OSTimerTicks_t, otherwise results are erroneous
-  inline static OSTimerTicks_t microsToTicks(uint_t micros) __attribute__((always_inline));
+  inline static OSTimerTicks_t
+  microsToTicks(uint_t micros) __attribute__((always_inline));
 
   // called each time a tick expire
   // increment the current ticks number, and call the OSTimer::interruptTick.
-  void interruptServiceRoutine(void);
+  void
+  interruptServiceRoutine(void);
 
-  inline static void interruptContextHandler(void) __attribute__((always_inline));
+  inline static void
+  interruptContextHandler(void) __attribute__((always_inline));
 
   // TODO: delete if not needed
   // static OSTimerTicks_t ms_secondTicks;
+
+#if defined(OS_INCLUDE_OSTIMERTICKS_UPTIME)
+
+  static uint32_t
+  getUptime(void);
+
+#endif
 
 protected:
   // OSScheduler calls OSTimerTicks::initialise() from OSScheduler::start()
   friend class OSScheduler;
 
   // initialise and it is called from OSScheduler::start()
-  static void init(void);
+  static void
+  init(void);
 
   // initialise the low level timer (implementation related)
-  static void implInit(void);
+  static void
+  implInit(void);
 
   // clear the interrupt flag; used in interruptServiceRoutine (implementation related)
-  static void implAcknowledgeInterrupt(void);
+  static void
+  implAcknowledgeInterrupt(void);
 
 private:
   // contain the timeouts (expressed in ticks) for every alarm
   static OSTimerStruct_t volatile m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
-  };
+
+#if defined(OS_INCLUDE_OSTIMERTICKS_UPTIME)
+  // current seconds number
+  static uint32_t volatile ms_uptime;
+#endif
+
+};
 
 // transform  the microseconds number into ticks number
-inline OSTimerTicks_t OSTimerTicks::microsToTicks(uint_t micros)
-  {
-    return (((micros)+(OS_CFGINT_TICK_RATE_HZ-1))/OS_CFGINT_TICK_RATE_HZ);
-  }
+inline OSTimerTicks_t
+OSTimerTicks::microsToTicks(uint_t micros)
+{
+  return (((micros) + (OS_CFGINT_TICK_RATE_HZ - 1)) / OS_CFGINT_TICK_RATE_HZ);
+}
 
-inline  void OSTimerTicks::interruptContextHandler(void)
+inline void
+OSTimerTicks::interruptContextHandler(void)
 {
   // the current interrupt level disabled in here
 #if !defined(OS_EXCLUDE_OSTIMERTICKS_ISR_PREEMPTION)
