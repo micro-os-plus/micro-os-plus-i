@@ -146,6 +146,10 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
       unsigned char c;
       CANPacket can_packet;
 
+#if defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_TICKS)
+      can_packet.uptimeTicks = 0;
+#endif
+
       e = get_reg(DeviceMCP2510::CANINTE);
       f = get_reg(DeviceMCP2510::CANINTF);
 
@@ -153,7 +157,7 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
       if (c == 0)
         break; // no more irqs
 
-      if (c & DeviceMCP2510::MERRF)
+      if ((c & DeviceMCP2510::MERRF) != 0)
         {
           // Message Error
 #ifdef DEBUG_CAN_MERR
@@ -163,7 +167,7 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
           clear_intf_bits(DeviceMCP2510::MERRF);
         }
 
-      if (c & DeviceMCP2510::ERRIF)
+      if ((c & DeviceMCP2510::ERRIF) != 0)
         {
           // Error (multiple sources as shown in EFLG)
           e = get_reg(DeviceMCP2510::EFLG);
@@ -185,7 +189,7 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
           clear_intf_bits(DeviceMCP2510::ERRIF);
         }
 
-      if (c & DeviceMCP2510::WAKIF)
+      if ((c & DeviceMCP2510::WAKIF) != 0)
         {
           // Wake Up
           OSDeviceDebug::putString(" WAKIF ");
@@ -194,7 +198,7 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
           clear_intf_bits(DeviceMCP2510::WAKIF);
         }
 
-      if (c & DeviceMCP2510::TX0IF)
+      if ((c & DeviceMCP2510::TX0IF) != 0)
         {
           // Transmit Buffer 0
 #ifdef CAN_PUT_TX0_INCLUDED
@@ -220,7 +224,7 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
 #endif
         }
 
-      if (c & DeviceMCP2510::TX1IF)
+      if ((c & DeviceMCP2510::TX1IF) != 0)
         {
           // Transmit Buffer 1
 #ifdef CAN_TX1_ISR_INCLUDED
@@ -246,7 +250,7 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
 #endif /* CAN_TX1_ISR_INCLUDED */
         }
 
-      if (c & DeviceMCP2510::TX2IF)
+      if ((c & DeviceMCP2510::TX2IF) != 0)
         {
           // Transmit Buffer 2
 #ifdef CAN_TX2_ISR_INCLUDED
@@ -274,7 +278,7 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
 #endif /* CAN_TX2_ISR_INCLUDED */
         }
 
-      if (c & DeviceMCP2510::RX0IF)
+      if ((c & DeviceMCP2510::RX0IF) != 0)
         {
           // Receive Buffer 0
 #ifdef _DEBUG
@@ -287,6 +291,19 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
 #if defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_SECONDS)
           OSTimerSeconds::getUptime(&can_packet.uptimeSeconds, &can_packet.uptimeTicks);
 #endif /* defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_SECONDS) */
+
+#if defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_TICKS)
+          can_packet.uptimeTicks = OSTimerTicks::getUptime();
+
+          if (false && can_packet.id > 0)
+            {
+              OSDeviceDebug::putString(" a");
+              OSDeviceDebug::putHex(can_packet.id);
+              OSDeviceDebug::putChar(':');
+              OSDeviceDebug::putHex(can_packet.uptimeTicks);
+              OSDeviceDebug::putChar(' ');
+            }
+#endif
 
 #if 0
           if (can_packet.id != 0)
@@ -301,7 +318,7 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
           OSScheduler::eventNotify(pThis->getReadEvent());
         }
 
-      if (c & DeviceMCP2510::RX1IF)
+      if ((c & DeviceMCP2510::RX1IF) != 0)
         {
           // Receive Buffer 1
 #ifdef _DEBUG
@@ -310,6 +327,24 @@ DeviceCAN_MCP2510::interruptServiceRoutine(void)
 #endif
           get_RX1(&can_packet);
           //can_clear_intf_bits(RX1IF); // included
+
+#if defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_SECONDS)
+          OSTimerSeconds::getUptime(&can_packet.uptimeSeconds, &can_packet.uptimeTicks);
+#endif /* defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_SECONDS) */
+
+#if defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_TICKS)
+          can_packet.uptimeTicks = OSTimerTicks::getUptime();
+
+          if (false && can_packet.id > 0)
+            {
+              OSDeviceDebug::putString(" b");
+              OSDeviceDebug::putHex(can_packet.id);
+              OSDeviceDebug::putChar(':');
+              OSDeviceDebug::putHex(can_packet.uptimeTicks);
+              OSDeviceDebug::putChar(' ');
+            }
+
+#endif
 
 #if 0
           if (can_packet.id != 0)
@@ -344,7 +379,7 @@ DeviceCAN_MCP2510::implCanRead(void)
 int
 DeviceCAN_MCP2510::implAvailableRead(void)
 {
-  return 0; // TODO:
+  return m_rxBuf.length();
 }
 
 bool
@@ -357,6 +392,14 @@ int
 DeviceCAN_MCP2510::implReadPacket(CANPacket *p)
 {
   m_rxBuf.get((unsigned char*) p);
+  if (false && p->id > 0)
+    {
+      OSDeviceDebug::putString(" c");
+      OSDeviceDebug::putHex(p->id);
+      OSDeviceDebug::putChar(':');
+      OSDeviceDebug::putHex(p->uptimeTicks);
+      OSDeviceDebug::putChar(' ');
+    }
   return 0;
 }
 
@@ -441,23 +484,27 @@ DeviceCAN_MCP2510::get_ICOD(void)
 void
 DeviceCAN_MCP2510::get_RX0(CANPacket *pc)
 {
-  unsigned char i, j, len;
-  unsigned short id;
-  unsigned char* p;
+  unsigned char b;
+  uint16_t id;
 
-  i = _get_reg(DeviceMCP2510::RXB0SIDH);
-  id = i << 8;
-  i = _get_reg(DeviceMCP2510::RXB0SIDL);
-  id |= i;
+  b = _get_reg(DeviceMCP2510::RXB0SIDH);
+  id = b;
+  id <<= 8;
+  b = _get_reg(DeviceMCP2510::RXB0SIDL);
+  id |= b;
   pc->id = id >> 5;
 
-  i = _get_reg(DeviceMCP2510::RXB0DLC);
-  len = i & 0xF;
+  b = _get_reg(DeviceMCP2510::RXB0DLC);
+
+  uint_t len;
+  len = b & 0xF;
   if (len > 8)
     len = 8;
 
   pc->len = len;
 
+  uint_t j;
+  unsigned char* p;
   for (p = pc->data, j = 0; len != 0; ++j, ++p, --len)
     {
       *p = _get_reg(DeviceMCP2510::RXB0D0 + j);
@@ -474,18 +521,19 @@ DeviceCAN_MCP2510::get_RX0(CANPacket *pc)
 void
 DeviceCAN_MCP2510::get_RX1(CANPacket *pc)
 {
-  unsigned char i, j, len;
-  unsigned short id;
+  unsigned char b, j, len;
+  uint16_t id;
   unsigned char* p;
 
-  i = _get_reg(DeviceMCP2510::RXB1SIDH);
-  id = i << 8;
-  i = _get_reg(DeviceMCP2510::RXB1SIDL);
-  id |= i;
+  b = _get_reg(DeviceMCP2510::RXB1SIDH);
+  id = b;
+  id <<= 8;
+  b = _get_reg(DeviceMCP2510::RXB1SIDL);
+  id |= b;
   pc->id = id >> 5;
 
-  i = _get_reg(DeviceMCP2510::RXB1DLC);
-  len = i & 0xF;
+  b = _get_reg(DeviceMCP2510::RXB1DLC);
+  len = b & 0xF;
   if (len > 8)
     len = 8;
 
