@@ -13,22 +13,27 @@
 #include "portable/devices/block/include/CANPacket.h"
 
 #if defined(DEBUG)
-void CANPacket::dump(void)
-  {
-    unsigned char i;
-    unsigned char* p;
+void
+CANPacket::dump(void)
+{
+  unsigned char i;
+  unsigned char* p;
 
-    i = len & 0x0F;
-    OSDeviceDebug::putHex(id);
-    OSDeviceDebug::putChar(' ');
-    OSDeviceDebug::putDec((unsigned short)i, 0);
-    for (p = data; i != 0; --i)
-      {
-        OSDeviceDebug::putChar(' ');
-        OSDeviceDebug::putHex(*p++);
-      }
-    OSDeviceDebug::putNewLine();
-  }
+  i = len & 0x0F;
+  OSDeviceDebug::putHex(id);
+  OSDeviceDebug::putChar(' ');
+  OSDeviceDebug::putDec((unsigned short) i, 0);
+  for (p = data; i != 0; --i)
+    {
+      OSDeviceDebug::putChar(' ');
+      OSDeviceDebug::putHex(*p++);
+    }
+#if defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_TICKS)
+  OSDeviceDebug::putChar(' ');
+  OSDeviceDebug::putHex (uptimeTicks);
+#endif
+  OSDeviceDebug::putNewLine();
+}
 #endif /* defined(DEBUG) */
 
 #endif /* defined(OS_INCLUDE_OSDEVICECAN) */
