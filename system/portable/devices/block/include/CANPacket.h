@@ -22,7 +22,9 @@ public:
 #if defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_SECONDS)
   unsigned long uptimeSeconds;
   OSTimerTicks_t uptimeTicks;
-#endif /* defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_SECONDS) */
+#elif defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_TICKS)
+  uint32_t uptimeTicks;
+#endif
 
 };
 
