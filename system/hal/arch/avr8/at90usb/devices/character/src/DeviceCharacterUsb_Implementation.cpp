@@ -174,6 +174,8 @@ DeviceCharacterUsb::implWriteBytes(const unsigned char* pBuf, int size)
 
 #if defined(OS_DEBUG_DEVICECHARACTERUSB_WRITE)
 
+          unsigned char b;
+          b = pBuf[i];
           OSDeviceDebug::putChar('}');
           if (b >= ' ')
           OSDeviceDebug::putChar(b);
