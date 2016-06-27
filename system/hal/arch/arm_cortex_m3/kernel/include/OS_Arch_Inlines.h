@@ -7,7 +7,7 @@
 #ifndef HAL_ARCH_OS_INLINES_H_
 #define HAL_ARCH_OS_INLINES_H_
 
-inline void OSImpl::returnFromInterrupt(void)
+inline void OSCPUImpl::returnFromInterrupt(void)
   {
     asm volatile (
         " movw lr, #0xFFFD      \n"
@@ -20,7 +20,7 @@ inline void OSImpl::returnFromInterrupt(void)
       ; // noreturn
   }
 
-inline void OSImpl::returnFromSubroutine(void)
+inline void OSCPUImpl::returnFromSubroutine(void)
   {
     asm volatile
     (
@@ -32,12 +32,12 @@ inline void OSImpl::returnFromSubroutine(void)
       ; // noreturn
   }
 
-inline void OSImpl::NOP(void)
+inline void OSCPUImpl::nop(void)
   {
     asm volatile(" nop"::);
   }
 
-inline void OSImpl::interruptsEnable(void)
+inline void OSCPUImpl::interruptsEnable(void)
   {
     asm volatile
     (
@@ -46,7 +46,7 @@ inline void OSImpl::interruptsEnable(void)
   );
   }
 
-inline void OSImpl::interruptsDisable(void)
+inline void OSCPUImpl::interruptsDisable(void)
   {
     asm volatile
     (
@@ -55,7 +55,8 @@ inline void OSImpl::interruptsDisable(void)
   );
   }
 
-inline void OSImpl::interruptsClearMask(void)
+#if 0
+inline void OSCPUImpl::interruptsClearMask(void)
   {
     asm volatile
     (
@@ -64,15 +65,13 @@ inline void OSImpl::interruptsClearMask(void)
         :::"r0"
   );
   }
+#endif
 
-inline void OSImpl::interruptsSetMask(void)
-  {
-    asm volatile
-    (
-        " mov r0, %0            \n"
-        " msr basepri, r0       \n"
-        ::"i"(configMAX_SYSCALL_INTERRUPT_PRIORITY):"r0"
-  );
-  }
+inline void
+OSCPUImpl::stackInit(void)
+{
+
+}
+
 
 #endif /* HAL_ARCH_OS_INLINES_H_ */

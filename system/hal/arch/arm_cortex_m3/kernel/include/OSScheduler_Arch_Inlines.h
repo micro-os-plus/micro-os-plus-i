@@ -18,6 +18,7 @@
  * switch in OSScheduler::contextSwitch().
  */
 
+#if 0
 inline void OSScheduler::contextSave(void)
   {
     // push all registers to stack
@@ -34,7 +35,7 @@ inline void OSScheduler::contextSave(void)
         "                       \n"
         " push {r3, lr}         \n" /* save return addr on caller Stack */
         :::"r0", "r2", "r3"
-  );
+    );
   }
 
 /*
@@ -55,9 +56,53 @@ inline void OSScheduler::contextRestore(void)
         " ldmia r0!, {r4-r11}   \n" /* pop new thread registers */
         " msr psp, r0           \n" /* restore process stack */
         :::"r0", "r2", "r3"
-  );
+    );
+  }
+#endif
+
+#if defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING)
+
+inline void
+OSSchedulerImpl::registersSave(void)
+  {
+    asm volatile
+    (
+        " mrs r0, psp           \n" /* load r0 with current process stack */
+        " stmdb r0!, {r4-r11}   \n" /* push the remaining registers on process stack. */
+        :
+        :
+        : "r0"
+    );
   }
 
+/*
+ * Restore the R0-R7 registers from the stack.
+ */
+
+inline void
+OSSchedulerImpl::registersRestore(void)
+  {
+    asm volatile
+    (
+        " ldmia r0!, {r4-r11}   \n" /* pop new thread registers */
+        " msr psp, r0           \n" /* restore process stack */
+        :
+        :
+        : "r0"
+    );
+  }
+
+// save the critical section nesting counter
+inline void
+OSSchedulerImpl::criticalSectionNestingSave(void)
+  {};
+
+// restore the critical section nesting counter
+inline void
+OSSchedulerImpl::criticalSectionNestingRestore(void)
+  {};
+
+#endif /* defined(OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING) */
 
 /*
  * Critical section management.
@@ -67,42 +112,49 @@ inline void OSScheduler::contextRestore(void)
  * Notice: The function context is addressed via R11, not SP, so using the
  * stack as temporary storage should be safe.
  */
-inline void OSCriticalSection::enter(void)
-  {
+inline void
+OSCriticalSection::enter(void)
+{
 #if !defined(OS_EXCLUDE_MULTITASKING)
-    asm volatile
-    (
-        " mrs r0, primask       \n"
-        " push {r0}             \n"
-        " cpsid i               \n"
-        : : : "r0"
+  asm volatile
+  (
+      " mrs r0, primask       \n"
+      " push {r0}             \n"
+      " cpsid i               \n"
+      :
+      :
+      : "r0"
   );
 #endif
-  }
+}
 
 /*
  * Pop BASEPRI from the stack, restore interrupts to previous status
  */
-inline void OSCriticalSection::exit(void)
-  {
+inline void
+OSCriticalSection::exit(void)
+{
 #if !defined(OS_EXCLUDE_MULTITASKING)
-    asm volatile
-    (
-        " pop {r0}              \n"
-        " msr primask, r0       \n"
-        : : : "r0"
+  asm volatile
+  (
+      " pop {r0}              \n"
+      " msr primask, r0       \n"
+      :
+      :
+      : "r0"
   );
 #endif
-  }
+}
 
 // release processor to next ready thread
-inline void OSScheduler::yieldImpl(void)
-  {
-    asm volatile
-    (
-        " svc 0                 \n"
-        :::
+inline void
+OSSchedulerImpl::yield(void)
+{
+  asm volatile
+  (
+      " svc 0                 \n"
+      :::
   );
-  }
+}
 
 #endif /* HAL_ARCH_OSSCHEDULER_INLINES_H_ */

@@ -13,7 +13,7 @@
 					<externalSetting/>
 				</externalSettings>
 				<extensions>
-					<extension id="com.atmel.avr.toolchain.avr32gcc.elf32-avr32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -25,15 +25,45 @@
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="${ProjName}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.GmakeErrorParser" id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963" name="Debug-Olimex-STM32-H103" parent="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
 					<folderInfo id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963." name="/" resourcePath="">
-						<toolChain errorParsers="" id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.toolchain.debug.2127219579" name="ARM Windows GCC (Sourcery G++ Lite)">
-							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.option.debugging.level.1331863707" name="Debug level" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.option.debugging.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.debugging.level.max" valueType="enumerated"/>
-							<targetPlatform binaryParser="com.atmel.avr.toolchain.avr32gcc.elf32-avr32" id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.platform.debug.663920310" isAbstract="false" name="Windows Platform"/>
-							<builder buildPath="${workspace_loc:/minimal/D}" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.CWDLocator" id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.builder.debug.1510365307" keepEnvironmentInBuildfile="false" name="ARM Sourcery Windows GNU Make builder"/>
+						<toolChain id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.toolchain.base.90883180" name="ARM Mac OS X GCC (Sourcery G++ Lite)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.toolchain.base">
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.processor.1947497114" name="Processor" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.processor" value="org.eclipse.cdt.cross.arm.gnu.base.option.mcpu.cortex-m3" valueType="enumerated"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.thumb.1685666864" name="Thumb (-mthumb)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.thumb"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.thumbinterwork.1868839985" name="Thumb interwork (-mthumb-interwork)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.thumbinterwork"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.endiannes.1568288725" name="Endiannes" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.endiannes"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.fpu.abi.32771238" name="Float ABI" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.fpu.abi"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.fpu.unit.603288697" name="FPU Type" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.fpu.unit"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.level.1690055257" name="Debug level" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.debugging.level.max" valueType="enumerated"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.format.2138329972" name="Debug format" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.format"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.other.1831183659" name="Other debugging flags" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.other"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.prof.667886043" name="Generate prof information (-p)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.prof"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.gprof.1578560972" name="Generate gprof information (-pg)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.gprof"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.createflash.1754509440" name="Create Flash Image" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.createflash"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.createlisting.603797375" name="Create Extended Listing" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.createlisting"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.printsize.2026931328" name="Print Size" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.printsize"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF" id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.platform.base.534236032" isAbstract="false" name="Mac OS X Platform" osList="macosx" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.platform.base"/>
+							<builder buildPath="${workspace_loc:/test-blinkX3BusyWait/Debug-Olimex-STM32-H103}" id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.builder.base.1766501829" keepEnvironmentInBuildfile="false" name="ARM Sourcery Mac OS X GNU Make builder" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.builder.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.1723069060" name="ARM Sourcery Mac OS X GCC Assembler" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base">
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.input.704228070" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.410484240" name="ARM Sourcery Mac OS X GCC C Compiler" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base">
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.level.1585995086" name="Optimization level" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.optimization.level.none" valueType="enumerated"/>
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.input.986912782" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.572857179" name="ARM Sourcery Mac OS X GCC C++ Compiler" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base">
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.level.81460182" name="Optimization level" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.optimization.level.none" valueType="enumerated"/>
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.input.1675378695" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.linker.base.194689673" name="ARM Sourcery Mac OS X GCC C Linker" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.linker.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.linker.base.345170811" name="ARM Sourcery Mac OS X GCC C++ Linker" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.linker.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.archiver.base.896212712" name="ARM Sourcery Mac OS X GCC Archiver" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.archiver.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.createflash.base.1640999658" name="ARM Sourcery Mac OS X GNU Create Flash Image" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.createflash.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.createlisting.base.2115175358" name="ARM Sourcery Mac OS X GNU Create Listing" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.createlisting.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.printsize.base.1360810907" name="ARM Sourcery Mac OS X GNU Print Size" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.printsize.base"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry excluding="hal/arch/avr8|hal/arch/avr32|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/Parser.cpp|portable/misc/src/SimpleCli.cpp|portable/tasks|portable/stdlib|portable/devices" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/devices/character/src|portable/misc/src/Parser.cpp|portable/misc/src/SimpleCli.cpp|portable/tasks|portable/stdlib|portable/devices" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -63,7 +93,7 @@
 				</macros>
 				<externalSettings/>
 				<extensions>
-					<extension id="com.atmel.avr.toolchain.avr32gcc.elf32-avr32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -75,15 +105,45 @@
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="${ProjName}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.GmakeErrorParser" id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.860054315" name="Release-Olimex-STM32-H103" parent="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.860054315" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
 					<folderInfo id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.860054315." name="/" resourcePath="">
-						<toolChain errorParsers="" id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.toolchain.debug.5810441" name="ARM Windows GCC (Sourcery G++ Lite)">
-							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.option.debugging.level.1770695976" name="Debug level" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.option.debugging.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.debugging.level.default" valueType="enumerated"/>
-							<targetPlatform binaryParser="com.atmel.avr.toolchain.avr32gcc.elf32-avr32" id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.platform.debug.1446837167" isAbstract="false" name="Windows Platform"/>
-							<builder buildPath="${workspace_loc:/minimal/D}" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.CWDLocator" id="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.builder.debug.1152961914" keepEnvironmentInBuildfile="false" name="ARM Sourcery Windows GNU Make builder"/>
+						<toolChain id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.toolchain.base.899635805" name="ARM Mac OS X GCC (Sourcery G++ Lite)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.toolchain.base">
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.processor.1413460087" name="Processor" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.processor"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.thumb.1174499071" name="Thumb (-mthumb)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.thumb"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.thumbinterwork.1646563927" name="Thumb interwork (-mthumb-interwork)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.thumbinterwork"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.endiannes.1771639221" name="Endiannes" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.endiannes"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.fpu.abi.1969490808" name="Float ABI" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.fpu.abi"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.fpu.unit.379617265" name="FPU Type" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.fpu.unit"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.level.667307025" name="Debug level" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.level"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.format.1407112068" name="Debug format" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.format"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.other.198051230" name="Other debugging flags" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.other"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.prof.1265950946" name="Generate prof information (-p)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.prof"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.gprof.1566469011" name="Generate gprof information (-pg)" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.gprof"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.createflash.1106892136" name="Create Flash Image" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.createflash"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.createlisting.1008303532" name="Create Extended Listing" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.createlisting"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.printsize.1222679537" name="Print Size" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.addtools.printsize"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF" id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.platform.base.718841258" isAbstract="false" name="Mac OS X Platform" osList="macosx" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.platform.base"/>
+							<builder buildPath="${workspace_loc:/test-blinkX3BusyWait/Release-Olimex-STM32-H103}" id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.builder.base.506081545" keepEnvironmentInBuildfile="false" name="ARM Sourcery Mac OS X GNU Make builder" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.builder.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.1127630015" name="ARM Sourcery Mac OS X GCC Assembler" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base">
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.input.706382382" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.260354101" name="ARM Sourcery Mac OS X GCC C Compiler" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base">
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.level.551792492" name="Optimization level" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.optimization.level.none" valueType="enumerated"/>
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.input.933378493" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.139195293" name="ARM Sourcery Mac OS X GCC C++ Compiler" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base">
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.level.1644529194" name="Optimization level" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.optimization.level.none" valueType="enumerated"/>
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.input.2133005012" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.linker.base.1065330738" name="ARM Sourcery Mac OS X GCC C Linker" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.linker.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.linker.base.273576670" name="ARM Sourcery Mac OS X GCC C++ Linker" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.linker.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.archiver.base.929098519" name="ARM Sourcery Mac OS X GCC Archiver" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.archiver.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.createflash.base.1090989487" name="ARM Sourcery Mac OS X GNU Create Flash Image" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.createflash.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.createlisting.base.812984885" name="ARM Sourcery Mac OS X GNU Create Listing" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.createlisting.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.printsize.base.2039754157" name="ARM Sourcery Mac OS X GNU Print Size" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.printsize.base"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry excluding="hal/arch/avr8|hal/arch/avr32|hal/arch/avr32/uc3/devices/character/src|portable/misc/src/Parser.cpp|portable/misc/src/SimpleCli.cpp|portable/tasks|portable/stdlib|portable/devices" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/devices/character/src|portable/misc/src/Parser.cpp|portable/misc/src/SimpleCli.cpp|portable/tasks|portable/stdlib|portable/devices" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -119,16 +179,16 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildArtefactType="de.innot.avreclipse.buildArtefactType.app" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=de.innot.avreclipse.buildArtefactType.app" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526" name="Debug-Template-Avr8" parent="de.innot.avreclipse.configuration.app.debug">
+				<configuration artifactName="${ProjName}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526" name="Debug-Template-Avr8" parent="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526">
 					<folderInfo id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526." name="/" resourcePath="">
-						<toolChain errorParsers="" id="de.innot.avreclipse.toolchain.winavr.app.debug.1079353365" name="AVR-GCC Toolchain" superClass="de.innot.avreclipse.toolchain.winavr.app.debug">
+						<toolChain errorParsers="" id="de.innot.avreclipse.toolchain.winavr.app.debug.1079353365" name="AVR-GCC Toolchain">
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.objcopy.flash.app.debug.1798028374" name="Generate HEX file for Flash memory" superClass="de.innot.avreclipse.toolchain.options.toolchain.objcopy.flash.app.debug" value="true" valueType="boolean"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.objcopy.eeprom.app.debug.1369762749" name="Generate HEX file for EEPROM" superClass="de.innot.avreclipse.toolchain.options.toolchain.objcopy.eeprom.app.debug"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.objdump.app.debug.1022413207" name="Generate Extended Listing (Source + generated Assembler)" superClass="de.innot.avreclipse.toolchain.options.toolchain.objdump.app.debug"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.size.app.debug.1353455337" name="Print Size" superClass="de.innot.avreclipse.toolchain.options.toolchain.size.app.debug"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.avrdude.app.debug.1152687495" name="AVRDude" superClass="de.innot.avreclipse.toolchain.options.toolchain.avrdude.app.debug"/>
-							<targetPlatform binaryParser="com.atmel.avr.toolchain.avr32gcc.elf32-avr32" id="de.innot.avreclipse.targetplatform.winavr.app.debug.845146662" name="AVR Cross-Target" superClass="de.innot.avreclipse.targetplatform.winavr.app.debug"/>
-							<builder buildPath="${workspace_loc:/minimal/Debug}" errorParsers="org.eclipse.cdt.core.MakeErrorParser" id="de.innot.avreclipse.target.builder.winavr.app.debug.1043180404" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="AVR GNU Make Builder" superClass="de.innot.avreclipse.target.builder.winavr.app.debug">
+							<targetPlatform binaryParser="com.atmel.avr.toolchain.avr32gcc.elf32-avr32" id="de.innot.avreclipse.targetplatform.winavr.app.debug.845146662" name="AVR Cross-Target"/>
+							<builder buildPath="${workspace_loc:/minimal/Debug}" errorParsers="org.eclipse.cdt.core.MakeErrorParser" id="de.innot.avreclipse.target.builder.winavr.app.debug.1043180404" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="AVR GNU Make Builder">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug-Atmel-STK525"/>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release-Atmel-STK525"/>
@@ -136,77 +196,11 @@
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release-Olimex-STM32-H103"/>
 								</outputEntries>
 							</builder>
-							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="de.innot.avreclipse.tool.assembler.winavr.app.debug.767136121" name="AVR Assembler" superClass="de.innot.avreclipse.tool.assembler.winavr.app.debug">
-								<option id="de.innot.avreclipse.assembler.option.debug.level.434839075" name="Generate Debugging Info" superClass="de.innot.avreclipse.assembler.option.debug.level" value="de.innot.avreclipse.assembler.option.debug.level.g3" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.asm.option.include.paths.1503037319" name="#include paths for preprocessor(-I)" superClass="de.innot.avreclipse.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.assembler.option.debug.type.1519948998" name="Debug Info Format" superClass="de.innot.avreclipse.assembler.option.debug.type" value="de.innot.avreclipse.assembler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.asm.option.flags.53310698" name="Other GCC Flags" superClass="de.innot.avreclipse.asm.option.flags" value="-Wa,-adhlns=&quot;$@.lst&quot;" valueType="string"/>
-								<inputType id="de.innot.avreclipse.tool.assembler.input.2016280689" superClass="de.innot.avreclipse.tool.assembler.input"/>
-							</tool>
-							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="de.innot.avreclipse.tool.compiler.winavr.app.debug.1129323048" name="AVR Compiler" superClass="de.innot.avreclipse.tool.compiler.winavr.app.debug">
-								<option id="de.innot.avreclipse.compiler.option.debug.level.517909087" name="Generate Debugging Info" superClass="de.innot.avreclipse.compiler.option.debug.level" value="de.innot.avreclipse.compiler.option.debug.level.g3" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.optimize.2006689667" name="Optimization Level" superClass="de.innot.avreclipse.compiler.option.optimize" value="de.innot.avreclipse.compiler.optimize.one" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.def.2137286630" name="Define Syms (-D)" superClass="de.innot.avreclipse.compiler.option.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
-									<listOptionValue builtIn="false" value="DEBUG=1"/>
-									<listOptionValue builtIn="false" value="OS_CONFIG_DEBUG_DEVICE_I2C=1"/>
-								</option>
-								<option id="de.innot.avreclipse.compiler.option.incpath.501579578" name="Include Paths (-I)" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.compiler.option.std.1019530501" name="Language Standard" superClass="de.innot.avreclipse.compiler.option.std" value="de.innot.avreclipse.compiler.option.std.gnu99" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.language.ubitfields.727201477" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.compiler.option.language.ubitfields" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.language.uchar.1114269309" name="char is unsigned (-funsigned-char)" superClass="de.innot.avreclipse.compiler.option.language.uchar" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.optimize.shortenums.1863439937" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.compiler.option.optimize.shortenums" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.optimize.packstruct.808967877" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.compiler.option.optimize.packstruct" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.debug.type.791452832" name="Debug Info Format" superClass="de.innot.avreclipse.compiler.option.debug.type" value="de.innot.avreclipse.compiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.otherflags.1584275845" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra  -Wa,-adhlns=&quot;$@.lst&quot; -fmessage-length=0" valueType="string"/>
-								<inputType id="de.innot.avreclipse.compiler.winavr.input.1854824167" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
-							</tool>
-							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="de.innot.avreclipse.tool.cppcompiler.app.debug.17752979" name="AVR C++ Compiler" superClass="de.innot.avreclipse.tool.cppcompiler.app.debug">
-								<option id="de.innot.avreclipse.cppcompiler.option.debug.level.1265511228" name="Generate Debugging Info" superClass="de.innot.avreclipse.cppcompiler.option.debug.level" value="de.innot.avreclipse.cppcompiler.option.debug.level.g3" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.optimize.193696488" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize" value="de.innot.avreclipse.cppcompiler.optimize.one" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.def.1965582558" name="Define Syms (-D)" superClass="de.innot.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
-									<listOptionValue builtIn="false" value="DEBUG=1"/>
-									<listOptionValue builtIn="false" value="OS_CONFIG_DEBUG_DEVICE_I2C=1"/>
-								</option>
-								<option id="de.innot.avreclipse.cppcompiler.option.incpath.1844582244" name="Include Paths (-I)" superClass="de.innot.avreclipse.cppcompiler.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.cppcompiler.option.debug.type.1994149492" name="Debug Info Format" superClass="de.innot.avreclipse.cppcompiler.option.debug.type" value="de.innot.avreclipse.cppcompiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.optimize.packstruct.601914334" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.packstruct" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.optimize.shortenums.1537354357" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.shortenums" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.language.uchar.371520379" name="char is unsigned (-funsigned-char)" superClass="de.innot.avreclipse.cppcompiler.option.language.uchar" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.language.ubitfields.1300304" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.cppcompiler.option.language.ubitfields" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.otherflags.530980112" name="Other flags" superClass="de.innot.avreclipse.cppcompiler.option.otherflags" value="-Wextra -fno-rtti -Wabi -fmessage-length=0 -fno-inline-functions  -Wa,-adhlns=&quot;$@.lst&quot;" valueType="string"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.std.1500547186" name="Language Standard" superClass="de.innot.avreclipse.cppcompiler.option.std" value="de.innot.avreclipse.cppcompiler.option.std.gnucpp98" valueType="enumerated"/>
-								<inputType id="de.innot.avreclipse.cppcompiler.input.720469452" superClass="de.innot.avreclipse.cppcompiler.input"/>
-							</tool>
-							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.1134522454" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug"/>
-							<tool errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.tool.cpplinker.app.debug.1103368270" name="AVR C++ Linker" superClass="de.innot.avreclipse.tool.cpplinker.app.debug">
-								<option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.1896287649" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="-Xlinker --cref  -Xlinker --gc-section" valueType="string"/>
-								<inputType id="de.innot.avreclipse.tool.cpplinker.input.2108636812" name="OBJ Files" superClass="de.innot.avreclipse.tool.cpplinker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
-							<tool id="de.innot.avreclipse.tool.archiver.winavr.base.1060678881" name="AVR Archiver" superClass="de.innot.avreclipse.tool.archiver.winavr.base"/>
-							<tool errorParsers="" id="de.innot.avreclipse.tool.objdump.winavr.app.debug.450317999" name="AVR Create Extended Listing" superClass="de.innot.avreclipse.tool.objdump.winavr.app.debug"/>
-							<tool errorParsers="" id="de.innot.avreclipse.tool.objcopy.flash.winavr.app.debug.416719706" name="AVR Create Flash image" superClass="de.innot.avreclipse.tool.objcopy.flash.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.objcopy.eeprom.winavr.app.debug.1730503452" name="AVR Create EEPROM image" superClass="de.innot.avreclipse.tool.objcopy.eeprom.winavr.app.debug"/>
-							<tool errorParsers="" id="de.innot.avreclipse.tool.size.winavr.app.debug.582414897" name="Print Size" superClass="de.innot.avreclipse.tool.size.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.avrdude.app.debug.1670762563" name="AVRDude" superClass="de.innot.avreclipse.tool.avrdude.app.debug"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="hal/arch/avr32/uc3/devices/character/src|portable/misc/src/Parser.cpp|portable/misc/src/SimpleCli.cpp|portable/tasks|portable/stdlib|portable/devices" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -244,7 +238,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildArtefactType="de.innot.avreclipse.buildArtefactType.app" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=de.innot.avreclipse.buildArtefactType.app" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287" name="Debug-Template-Avr32" parent="de.innot.avreclipse.configuration.app.debug">
+				<configuration artifactName="${ProjName}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287" name="Debug-Template-Avr32" parent="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287">
 					<folderInfo id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287." name="/" resourcePath="">
 						<toolChain id="avr32.managedbuild.toolchain.gnu.base.1937229077" name="32-bit AVR/GNU C/C++ Toolchain">
 							<targetPlatform binaryParser="com.atmel.avr.toolchain.avr32gcc.elf32-avr32" id="avr32.managedbuild.target.gnu.platform.base.1982089507" name="%PlatformName.Dbg"/>
@@ -252,8 +246,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="hal/arch/avr32/uc3/devices/character/src|portable/misc/src/Parser.cpp|portable/misc/src/SimpleCli.cpp|portable/tasks|portable/stdlib|portable/devices" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -299,8 +293,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry excluding="hal/boards/Atmel|hal/arch/avr32/uc3/devices/character/src|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block|hal/arch/arm_cortex_m3|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/devices/character/src|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block|hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -333,8 +327,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry excluding="hal/boards/Atmel|hal/arch/avr32/uc3/devices/character/src|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block|hal/arch/arm_cortex_m3|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr32/uc3/devices/character/src|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block|hal/arch/TEMPLATE_ARCH|hal/arch/arm_cortex_m3|hal/arch/avr8|hal/boards/TEMPLATE_MANUFACTURER|hal/boards/Metrilog|hal/boards/Olimex|hal/boards/AVI" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -352,7 +346,6 @@
 				</macros>
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -360,16 +353,16 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildArtefactType="de.innot.avreclipse.buildArtefactType.app" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=de.innot.avreclipse.buildArtefactType.app" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324" name="Debug-Atmel-STK525" parent="de.innot.avreclipse.configuration.app.debug">
+				<configuration artifactName="${ProjName}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324" name="Debug-Atmel-STK525" parent="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324">
 					<folderInfo id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324." name="/" resourcePath="">
-						<toolChain errorParsers="" id="de.innot.avreclipse.toolchain.winavr.app.debug.1347889495" name="AVR-GCC Toolchain" superClass="de.innot.avreclipse.toolchain.winavr.app.debug">
+						<toolChain errorParsers="" id="de.innot.avreclipse.toolchain.winavr.app.debug.1347889495" name="AVR-GCC Toolchain">
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.objcopy.flash.app.debug.362944799" name="Generate HEX file for Flash memory" superClass="de.innot.avreclipse.toolchain.options.toolchain.objcopy.flash.app.debug" value="true" valueType="boolean"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.objcopy.eeprom.app.debug.1371908409" name="Generate HEX file for EEPROM" superClass="de.innot.avreclipse.toolchain.options.toolchain.objcopy.eeprom.app.debug"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.objdump.app.debug.367252744" name="Generate Extended Listing (Source + generated Assembler)" superClass="de.innot.avreclipse.toolchain.options.toolchain.objdump.app.debug"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.size.app.debug.599485422" name="Print Size" superClass="de.innot.avreclipse.toolchain.options.toolchain.size.app.debug"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.avrdude.app.debug.348017000" name="AVRDude" superClass="de.innot.avreclipse.toolchain.options.toolchain.avrdude.app.debug"/>
-							<targetPlatform id="de.innot.avreclipse.targetplatform.winavr.app.debug.561120613" name="AVR Cross-Target" superClass="de.innot.avreclipse.targetplatform.winavr.app.debug"/>
-							<builder buildPath="${workspace_loc:/minimal/Debug}" errorParsers="org.eclipse.cdt.core.MakeErrorParser" id="de.innot.avreclipse.target.builder.winavr.app.debug.3239814" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="AVR GNU Make Builder" superClass="de.innot.avreclipse.target.builder.winavr.app.debug">
+							<targetPlatform id="de.innot.avreclipse.targetplatform.winavr.app.debug.561120613" name="AVR Cross-Target"/>
+							<builder buildPath="${workspace_loc:/minimal/Debug}" errorParsers="org.eclipse.cdt.core.MakeErrorParser" id="de.innot.avreclipse.target.builder.winavr.app.debug.3239814" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="AVR GNU Make Builder">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug-Atmel-STK525"/>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release-Atmel-STK525"/>
@@ -377,78 +370,11 @@
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release-Olimex-STM32-H103"/>
 								</outputEntries>
 							</builder>
-							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="de.innot.avreclipse.tool.assembler.winavr.app.debug.898433675" name="AVR Assembler" superClass="de.innot.avreclipse.tool.assembler.winavr.app.debug">
-								<option id="de.innot.avreclipse.assembler.option.debug.level.1119541676" name="Generate Debugging Info" superClass="de.innot.avreclipse.assembler.option.debug.level" value="de.innot.avreclipse.assembler.option.debug.level.g3" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.asm.option.include.paths.1102842563" name="#include paths for preprocessor(-I)" superClass="de.innot.avreclipse.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.assembler.option.debug.type.254435772" name="Debug Info Format" superClass="de.innot.avreclipse.assembler.option.debug.type" value="de.innot.avreclipse.assembler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.asm.option.flags.2021916599" name="Other GCC Flags" superClass="de.innot.avreclipse.asm.option.flags" value="-Wa,-adhlns=&quot;$@.lst&quot;" valueType="string"/>
-								<inputType id="de.innot.avreclipse.tool.assembler.input.159913481" superClass="de.innot.avreclipse.tool.assembler.input"/>
-							</tool>
-							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="de.innot.avreclipse.tool.compiler.winavr.app.debug.1146087096" name="AVR Compiler" superClass="de.innot.avreclipse.tool.compiler.winavr.app.debug">
-								<option id="de.innot.avreclipse.compiler.option.debug.level.639863082" name="Generate Debugging Info" superClass="de.innot.avreclipse.compiler.option.debug.level" value="de.innot.avreclipse.compiler.option.debug.level.g3" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.optimize.1515491027" name="Optimization Level" superClass="de.innot.avreclipse.compiler.option.optimize" value="de.innot.avreclipse.compiler.optimize.one" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.def.1971753942" name="Define Syms (-D)" superClass="de.innot.avreclipse.compiler.option.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
-									<listOptionValue builtIn="false" value="DEBUG=1"/>
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_DEBUG_DEVICE_${DBGDEV}=1&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.compiler.option.incpath.410738812" name="Include Paths (-I)" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.compiler.option.std.23435730" name="Language Standard" superClass="de.innot.avreclipse.compiler.option.std" value="de.innot.avreclipse.compiler.option.std.gnu99" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.language.ubitfields.1710771034" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.compiler.option.language.ubitfields" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.language.uchar.1001016671" name="char is unsigned (-funsigned-char)" superClass="de.innot.avreclipse.compiler.option.language.uchar" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.optimize.shortenums.825497833" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.compiler.option.optimize.shortenums" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.optimize.packstruct.715842620" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.compiler.option.optimize.packstruct" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.debug.type.1268166277" name="Debug Info Format" superClass="de.innot.avreclipse.compiler.option.debug.type" value="de.innot.avreclipse.compiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.otherflags.1078259038" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra -fmessage-length=0  -Wa,-adhlns=&quot;$@.lst&quot; -ffunction-sections -fdata-sections  -finline-small-functions" valueType="string"/>
-								<inputType id="de.innot.avreclipse.compiler.winavr.input.63096343" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
-							</tool>
-							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="de.innot.avreclipse.tool.cppcompiler.app.debug.490485692" name="AVR C++ Compiler" superClass="de.innot.avreclipse.tool.cppcompiler.app.debug">
-								<option id="de.innot.avreclipse.cppcompiler.option.debug.level.501638025" name="Generate Debugging Info" superClass="de.innot.avreclipse.cppcompiler.option.debug.level" value="de.innot.avreclipse.cppcompiler.option.debug.level.g3" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.optimize.691057095" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize" value="de.innot.avreclipse.cppcompiler.optimize.one" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.def.373063582" name="Define Syms (-D)" superClass="de.innot.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
-									<listOptionValue builtIn="false" value="DEBUG=1"/>
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_DEBUG_DEVICE_${DBGDEV}=1&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.cppcompiler.option.incpath.381265561" name="Include Paths (-I)" superClass="de.innot.avreclipse.cppcompiler.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.cppcompiler.option.debug.type.1359715793" name="Debug Info Format" superClass="de.innot.avreclipse.cppcompiler.option.debug.type" value="de.innot.avreclipse.cppcompiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.optimize.packstruct.2033045249" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.packstruct" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.optimize.shortenums.796380637" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.shortenums" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.language.uchar.1070371993" name="char is unsigned (-funsigned-char)" superClass="de.innot.avreclipse.cppcompiler.option.language.uchar" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.language.ubitfields.106324317" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.cppcompiler.option.language.ubitfields" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.otherflags.311552032" name="Other flags" superClass="de.innot.avreclipse.cppcompiler.option.otherflags" value="-Wextra -fmessage-length=0  -Wa,-adhlns=&quot;$@.lst&quot;  -ffunction-sections -fdata-sections  -fno-rtti  -Wabi  -finline-small-functions" valueType="string"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.std.879016880" name="Language Standard" superClass="de.innot.avreclipse.cppcompiler.option.std" value="de.innot.avreclipse.cppcompiler.option.std.gnucpp98" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.language.noexceptions.708949980" name="Do not use Exceptions (-fno-exceptions)" superClass="de.innot.avreclipse.cppcompiler.option.language.noexceptions" value="true" valueType="boolean"/>
-								<inputType id="de.innot.avreclipse.cppcompiler.input.2074385781" superClass="de.innot.avreclipse.cppcompiler.input"/>
-							</tool>
-							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.1495298542" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug"/>
-							<tool errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.tool.cpplinker.app.debug.1504241676" name="AVR C++ Linker" superClass="de.innot.avreclipse.tool.cpplinker.app.debug">
-								<option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.1284949227" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="-Xlinker --gc-section" valueType="string"/>
-								<inputType id="de.innot.avreclipse.tool.cpplinker.input.417309531" name="OBJ Files" superClass="de.innot.avreclipse.tool.cpplinker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
-							<tool id="de.innot.avreclipse.tool.archiver.winavr.base.1119174359" name="AVR Archiver" superClass="de.innot.avreclipse.tool.archiver.winavr.base"/>
-							<tool errorParsers="" id="de.innot.avreclipse.tool.objdump.winavr.app.debug.1096338156" name="AVR Create Extended Listing" superClass="de.innot.avreclipse.tool.objdump.winavr.app.debug"/>
-							<tool errorParsers="" id="de.innot.avreclipse.tool.objcopy.flash.winavr.app.debug.964437342" name="AVR Create Flash image" superClass="de.innot.avreclipse.tool.objcopy.flash.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.objcopy.eeprom.winavr.app.debug.1818225127" name="AVR Create EEPROM image" superClass="de.innot.avreclipse.tool.objcopy.eeprom.winavr.app.debug"/>
-							<tool errorParsers="" id="de.innot.avreclipse.tool.size.winavr.app.debug.77488289" name="Print Size" superClass="de.innot.avreclipse.tool.size.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.avrdude.app.debug.1210852888" name="AVRDude" superClass="de.innot.avreclipse.tool.avrdude.app.debug"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry excluding="hal/arch/avr8/devices/misc|hal/arch/avr8/at90can|hal/arch/avr8/at90usb/devices/usb|hal/arch/avr8/at90usb/devices/character|hal/arch/avr8/devices/memory|hal/arch/avr8/devices/character|hal/arch/avr8/devices/block|hal/arch/arm_cortex_m3|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr8/devices/misc|hal/arch/avr8/at90can|hal/arch/avr8/at90usb/devices/usb|hal/arch/avr8/at90usb/devices/character|hal/arch/TEMPLATE_ARCH|hal/arch/avr8/devices/memory|hal/arch/avr8/devices/character|hal/arch/avr8/devices/block|hal/arch/avr32|hal/arch/arm_cortex_m3|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -465,91 +391,32 @@
 				</macros>
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildArtefactType="de.innot.avreclipse.buildArtefactType.app" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=de.innot.avreclipse.buildArtefactType.app" description="" id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056.771369642" name="Release-Atmel-STK525" parent="de.innot.avreclipse.configuration.app.debug">
+				<configuration artifactName="${ProjName}" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="" id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056.771369642" name="Release-Atmel-STK525" parent="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056.771369642">
 					<folderInfo id="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056.771369642." name="/" resourcePath="">
-						<toolChain id="de.innot.avreclipse.toolchain.winavr.app.debug.1558973891" name="AVR-GCC Toolchain" superClass="de.innot.avreclipse.toolchain.winavr.app.debug">
+						<toolChain id="de.innot.avreclipse.toolchain.winavr.app.debug.1558973891" name="AVR-GCC Toolchain">
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.objcopy.flash.app.debug.1533744816" name="Generate HEX file for Flash memory" superClass="de.innot.avreclipse.toolchain.options.toolchain.objcopy.flash.app.debug" value="true" valueType="boolean"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.objcopy.eeprom.app.debug.658064212" name="Generate HEX file for EEPROM" superClass="de.innot.avreclipse.toolchain.options.toolchain.objcopy.eeprom.app.debug"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.objdump.app.debug.1828048508" name="Generate Extended Listing (Source + generated Assembler)" superClass="de.innot.avreclipse.toolchain.options.toolchain.objdump.app.debug"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.size.app.debug.1487783090" name="Print Size" superClass="de.innot.avreclipse.toolchain.options.toolchain.size.app.debug"/>
 							<option id="de.innot.avreclipse.toolchain.options.toolchain.avrdude.app.debug.1871831270" name="AVRDude" superClass="de.innot.avreclipse.toolchain.options.toolchain.avrdude.app.debug"/>
-							<targetPlatform id="de.innot.avreclipse.targetplatform.winavr.app.debug.2000290713" name="AVR Cross-Target" superClass="de.innot.avreclipse.targetplatform.winavr.app.debug"/>
-							<builder buildPath="${workspace_loc:/minimal/Debug}" id="de.innot.avreclipse.target.builder.winavr.app.debug.413722310" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="AVR GNU Make Builder" superClass="de.innot.avreclipse.target.builder.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.assembler.winavr.app.debug.2011029528" name="AVR Assembler" superClass="de.innot.avreclipse.tool.assembler.winavr.app.debug">
-								<option id="de.innot.avreclipse.assembler.option.debug.level.48174563" name="Generate Debugging Info" superClass="de.innot.avreclipse.assembler.option.debug.level"/>
-								<option id="de.innot.avreclipse.asm.option.include.paths.1970467373" name="#include paths for preprocessor(-I)" superClass="de.innot.avreclipse.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.assembler.option.debug.type.741554168" name="Debug Info Format" superClass="de.innot.avreclipse.assembler.option.debug.type" value="de.innot.avreclipse.assembler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.asm.option.flags.42195046" name="Other GCC Flags" superClass="de.innot.avreclipse.asm.option.flags" value=" -Wa,-adhlns=&quot;$@.lst&quot;" valueType="string"/>
-								<inputType id="de.innot.avreclipse.tool.assembler.input.69840670" superClass="de.innot.avreclipse.tool.assembler.input"/>
-							</tool>
-							<tool id="de.innot.avreclipse.tool.compiler.winavr.app.debug.876751130" name="AVR Compiler" superClass="de.innot.avreclipse.tool.compiler.winavr.app.debug">
-								<option id="de.innot.avreclipse.compiler.option.debug.level.1579757234" name="Generate Debugging Info" superClass="de.innot.avreclipse.compiler.option.debug.level" value="de.innot.avreclipse.compiler.option.debug.level.g2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.optimize.1442415261" name="Optimization Level" superClass="de.innot.avreclipse.compiler.option.optimize" value="de.innot.avreclipse.compiler.optimize.size" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.def.491874024" name="Define Syms (-D)" superClass="de.innot.avreclipse.compiler.option.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.compiler.option.incpath.1879167954" name="Include Paths (-I)" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.compiler.option.std.1890364267" name="Language Standard" superClass="de.innot.avreclipse.compiler.option.std" value="de.innot.avreclipse.compiler.option.std.gnu99" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.language.ubitfields.1914245776" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.compiler.option.language.ubitfields" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.language.uchar.1119615017" name="char is unsigned (-funsigned-char)" superClass="de.innot.avreclipse.compiler.option.language.uchar" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.optimize.shortenums.1615149342" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.compiler.option.optimize.shortenums" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.optimize.packstruct.1839402981" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.compiler.option.optimize.packstruct" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.compiler.option.debug.type.137475519" name="Debug Info Format" superClass="de.innot.avreclipse.compiler.option.debug.type" value="de.innot.avreclipse.compiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.compiler.option.otherflags.1632937300" name="Other flags" superClass="de.innot.avreclipse.compiler.option.otherflags" value="-Wextra -fmessage-length=0 -Wa,-adhlns=&quot;$@.lst&quot; -ffunction-sections -fdata-sections  -finline-functions -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize" valueType="string"/>
-								<inputType id="de.innot.avreclipse.compiler.winavr.input.633923072" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
-							</tool>
-							<tool id="de.innot.avreclipse.tool.cppcompiler.app.debug.1598195605" name="AVR C++ Compiler" superClass="de.innot.avreclipse.tool.cppcompiler.app.debug">
-								<option id="de.innot.avreclipse.cppcompiler.option.debug.level.959587034" name="Generate Debugging Info" superClass="de.innot.avreclipse.cppcompiler.option.debug.level" value="de.innot.avreclipse.cppcompiler.option.debug.level.g2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.optimize.1289983669" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize" value="de.innot.avreclipse.cppcompiler.optimize.size" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.def.454192543" name="Define Syms (-D)" superClass="de.innot.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.cppcompiler.option.incpath.1398826263" name="Include Paths (-I)" superClass="de.innot.avreclipse.cppcompiler.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
-								</option>
-								<option id="de.innot.avreclipse.cppcompiler.option.debug.type.1368384352" name="Debug Info Format" superClass="de.innot.avreclipse.cppcompiler.option.debug.type" value="de.innot.avreclipse.cppcompiler.option.debug.level.dwarf-2" valueType="enumerated"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.optimize.packstruct.1576261503" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.packstruct" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.optimize.shortenums.1673586862" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.shortenums" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.language.uchar.1628937057" name="char is unsigned (-funsigned-char)" superClass="de.innot.avreclipse.cppcompiler.option.language.uchar" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.language.ubitfields.1111040408" name="bitfields are unsigned (-funsigned-bitfields)" superClass="de.innot.avreclipse.cppcompiler.option.language.ubitfields" value="false" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.otherflags.1153804202" name="Other flags" superClass="de.innot.avreclipse.cppcompiler.option.otherflags" value="-Wextra -fmessage-length=0 -Wa,-adhlns=&quot;$@.lst&quot; -ffunction-sections -fdata-sections  -fno-rtti -Wabi -finline-functions  -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize" valueType="string"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.std.1049243149" name="Language Standard" superClass="de.innot.avreclipse.cppcompiler.option.std" value="de.innot.avreclipse.cppcompiler.option.std.gnucpp98" valueType="enumerated"/>
-								<inputType id="de.innot.avreclipse.cppcompiler.input.1801715836" superClass="de.innot.avreclipse.cppcompiler.input"/>
-							</tool>
-							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.250452233" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.cpplinker.app.debug.93349001" name="AVR C++ Linker" superClass="de.innot.avreclipse.tool.cpplinker.app.debug">
-								<option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.341552361" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="-Xlinker --gc-section" valueType="string"/>
-								<inputType id="de.innot.avreclipse.tool.cpplinker.input.1243627501" name="OBJ Files" superClass="de.innot.avreclipse.tool.cpplinker.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
-							<tool id="de.innot.avreclipse.tool.archiver.winavr.base.1781958326" name="AVR Archiver" superClass="de.innot.avreclipse.tool.archiver.winavr.base"/>
-							<tool id="de.innot.avreclipse.tool.objdump.winavr.app.debug.1381919133" name="AVR Create Extended Listing" superClass="de.innot.avreclipse.tool.objdump.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.objcopy.flash.winavr.app.debug.48183296" name="AVR Create Flash image" superClass="de.innot.avreclipse.tool.objcopy.flash.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.objcopy.eeprom.winavr.app.debug.686330873" name="AVR Create EEPROM image" superClass="de.innot.avreclipse.tool.objcopy.eeprom.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.size.winavr.app.debug.423452522" name="Print Size" superClass="de.innot.avreclipse.tool.size.winavr.app.debug"/>
-							<tool id="de.innot.avreclipse.tool.avrdude.app.debug.505897475" name="AVRDude" superClass="de.innot.avreclipse.tool.avrdude.app.debug"/>
+							<targetPlatform id="de.innot.avreclipse.targetplatform.winavr.app.debug.2000290713" name="AVR Cross-Target"/>
+							<builder buildPath="${workspace_loc:/minimal/Debug}" id="de.innot.avreclipse.target.builder.winavr.app.debug.413722310" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="AVR GNU Make Builder"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry excluding="hal/arch/avr8/devices/misc|hal/arch/avr8/at90can|hal/arch/avr8/at90usb/devices/usb|hal/arch/avr8/at90usb/devices/character|hal/arch/avr8/devices/memory|hal/arch/avr8/devices/character|hal/arch/avr8/devices/block|hal/arch/arm_cortex_m3|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 						<entry excluding="system.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry excluding="hal/arch/avr8/devices/misc|hal/arch/avr8/at90can|hal/arch/avr8/at90usb/devices/usb|hal/arch/avr8/at90usb/devices/character|hal/arch/TEMPLATE_ARCH|hal/arch/avr8/devices/memory|hal/arch/avr8/devices/character|hal/arch/avr8/devices/block|hal/arch/avr32|hal/arch/arm_cortex_m3|portable/tasks|portable/stdlib|portable/misc/src/SimpleCli.cpp|portable/misc/src/Parser.cpp|portable/misc/src/CircularByteBuffer.cpp|portable/misc/src/CircularBlockBuffer.cpp|portable/kernel/src/ostream_OSTask.cpp|portable/fs|portable/devices/usb|portable/devices/sdi12|portable/devices/misc|portable/devices/memory|portable/devices/character|portable/devices/block" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -639,8 +506,113 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="micro-os-plus;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
+			</storageModule>
+		</cconfiguration>
+		<cconfiguration id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809" moduleId="org.eclipse.cdt.core.settings" name="Debug-Olimex-STM32-H103-OSX">
+				<macros>
+					<stringMacro name="BOARD" type="VALUE_TEXT" value="OLIMEX_STM32_H103"/>
+				</macros>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.cross.arm.gnu.buildArtefactType.application" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.cross.arm.gnu.buildArtefactType.application" description="" id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809" name="Debug-Olimex-STM32-H103-OSX" parent="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug">
+					<folderInfo id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809." name="/" resourcePath="">
+						<toolChain id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.toolchain.debug.73930910" name="ARM Mac OS X GCC (Sourcery G++ Lite)" nonInternalBuilderId="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.builder.debug" resourceTypeBasedDiscovery="true" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.toolchain.debug">
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.level.15759853" name="Debug level" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.debugging.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.debugging.level.max" valueType="enumerated"/>
+							<option id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.processor.360068976" name="Processor" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.option.target.processor" value="org.eclipse.cdt.cross.arm.gnu.base.option.mcpu.cortex-m3" valueType="enumerated"/>
+							<targetPlatform id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.platform.debug.460444320" isAbstract="false" name="Mac OS X Platform" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.platform.debug"/>
+							<builder buildPath="${workspace_loc:/test-blinkX3BusyWait/Debug-Olimex-STM32-H103-OSX}" id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.builder.debug.1610815975" keepEnvironmentInBuildfile="false" name="ARM Sourcery Mac OS X GNU Make builder" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.builder.debug"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.assembler.debug.260151577" name="ARM Sourcery Mac OS X GCC Assembler" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.assembler.debug">
+								<option id="org.eclipse.cdt.cross.arm.gnu.assembler.option.preprocessor.def.2031814269" name="Defined symbols (-D)" superClass="org.eclipse.cdt.cross.arm.gnu.assembler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
+									<listOptionValue builtIn="false" value="DEBUG=1"/>
+								</option>
+								<option id="org.eclipse.cdt.cross.arm.gnu.assembler.option.warnings.extrawarn.438790717" name="Extra warnings (-Wextra)" superClass="org.eclipse.cdt.cross.arm.gnu.assembler.option.warnings.extrawarn" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.assembler.option.include.paths.1946135531" name="Include paths (-I)" superClass="org.eclipse.cdt.cross.arm.gnu.assembler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
+								</option>
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.input.559848153" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.c.compiler.debug.443254468" name="ARM Sourcery Mac OS X GCC C Compiler" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.c.compiler.debug">
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.level.864588106" name="Optimization level" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.optimization.level.none" valueType="enumerated"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.preprocessor.def.811250544" name="Defined symbols (-D)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
+									<listOptionValue builtIn="false" value="DEBUG=1"/>
+								</option>
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.misc.std.1046828123" name="Language Standard" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.misc.std" value="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.misc.std.gnu99" valueType="enumerated"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.warnings.extrawarn.1315667986" name="Extra warnings (-Wextra)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.functionsections.986598714" name="Function sections (-ffunction-sections)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.functionsections" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.datasections.1126310709" name="Data sections (-fdata-sections)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.optimization.datasections" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.other.otherflags.235193423" name="Other flags" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.other.otherflags" value="-c -fmessage-length=0 -finline-small-functions" valueType="string"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.misc.signedchar.1586193143" name="'char' is signed (-fsigned-char)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.misc.signedchar" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.include.paths.769697131" name="Include paths (-I)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
+								</option>
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.input.2028797046" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.cpp.compiler.debug.372072129" name="ARM Sourcery Mac OS X GCC C++ Compiler" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.cpp.compiler.debug">
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.level.904464089" name="Optimization level" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.level" value="org.eclipse.cdt.cross.arm.gnu.base.option.optimization.level.none" valueType="enumerated"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.preprocessor.def.531416688" name="Defined symbols (-D)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="&quot;OS_CONFIG_BOARD_${BOARD}=1&quot;"/>
+									<listOptionValue builtIn="false" value="DEBUG=1"/>
+								</option>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.functionsections.1383813776" name="Function sections (-ffunction-sections)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.functionsections" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.datasections.1125845798" name="Data sections (-fdata-sections)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.datasections" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.warnings.extrawarn.1255316168" name="Extra warnings (-Wextra)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.warnings.abi.841574310" name="ABI warnings (-Wabi)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.warnings.abi" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.other.otherflags.181571419" name="Other flags" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.other.otherflags" value="-c -fmessage-length=0 -finline-small-functions" valueType="string"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.misc.signedchar.1165625557" name="'char' is signed (-fsigned-char)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.misc.signedchar" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.include.paths.149935561" name="Include paths (-I)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
+								</option>
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.input.477652070" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.input"/>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.c.linker.debug.680549700" name="ARM Sourcery Mac OS X GCC C Linker" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.c.linker.debug"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.cpp.linker.debug.1905907489" name="ARM Sourcery Mac OS X GCC C++ Linker" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.cpp.linker.debug">
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.other.cref.321273907" name="Cross Reference (-Xlinker --cref)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.other.cref" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.other.printmap.1419798027" name="Print link map (-Xlinker --print-map)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.other.printmap" value="false" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.gcsections.1365813734" name="Remove unused sections (-Xlinker --gc-sections)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.gcsections" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nostart.882347858" name="Do not use standard start files (-nostartfiles)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.nostart" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.libs.1888023792" name="Libraries (-l)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.libs" valueType="libs"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.scriptfile.477597990" name="Script file (-T)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.scriptfile" value="/Users/ilg/My Files/MacBookPro Vault/Projects/uOS/micro-os-plus.git/system/hal/boards/Olimex/stm32_h103/stm32_h103_rom.ld" valueType="string"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.linker.option.other.verbose.1443822014" name="Verbose (-v)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.linker.option.other.verbose" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.paths.1905082993" name="Library search path (-L)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/micro-os-plus/system&quot;"/>
+								</option>
+								<inputType id="org.eclipse.cdt.cross.arm.gnu.cpp.linker.input.422473481" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.archiver.base.623236990" name="ARM Sourcery Mac OS X GCC Archiver" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.archiver.base"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.createflash.debug.33948024" name="ARM Sourcery Mac OS X GNU Create Flash Image" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.createflash.debug"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.createlisting.debug.1302327149" name="ARM Sourcery Mac OS X GNU Create Listing" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.createlisting.debug"/>
+							<tool id="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.printsize.debug.1129509277" name="ARM Sourcery Mac OS X GNU Print Size" superClass="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.printsize.debug"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="hal/boards/Metrilog|hal/boards/AVI|hal/boards/Atmel|hal/arch/avr8|hal/arch/avr32|hal/arch/TEMPLATE_ARCH" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="micro-os-plus"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -652,7 +624,39 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="t1.cdt.managedbuild.target.gnu.cygwin.exe.904662215" name="Executable (Gnu on Windows)" projectType="cdt.managedbuild.target.gnu.cygwin.exe"/>
 	</storageModule>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release-Atmel-STK525">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+		<configuration configurationName="Debug-Template-Avr8">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+		<configuration configurationName="Release-Atmel-EVK1104">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+		<configuration configurationName="Debug-Atmel-EVK1104">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+		<configuration configurationName="Release-Olimex-STM32-H103">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+		<configuration configurationName="Debug-Olimex-STM32-H103">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+		<configuration configurationName="Debug-Olimex-STM32-H103-OSX">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+		<configuration configurationName="Debug-Atmel-STK525">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+		<configuration configurationName="Debug-Template-Avr32">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+		<configuration configurationName="Debug-Atmel-EVK1104 X">
+			<resource resourceType="PROJECT" workspacePath="/test-blinkX3BusyWait"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
@@ -781,7 +785,93 @@
 				</scannerInfoProvider>
 			</profile>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480.1008420392;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480.1008420392.;avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.722205687;avr32.managedbuild.tool.gnu.cpp.compiler.input.1561897306">
+		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480.1008420392;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480.1008420392.;avr32.managedbuild.tool.gnu.c.compiler.exe.debug.684876509;avr32.managedbuild.tool.gnu.c.compiler.input.247322483">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.1986002634;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.1986002634.;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.1417113875;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.input.2099575738">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287.1921792745;de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287.1921792745.;avr32.managedbuild.tool.gnu.cpp.compiler.base.846786828;avr32.managedbuild.tool.gnu.cpp.compiler.input.345760379">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileCPP"/>
 			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 				<buildOutputProvider>
@@ -824,8 +914,438 @@
 				</scannerInfoProvider>
 			</profile>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480.1008420392;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480.1008420392.;avr32.managedbuild.tool.gnu.c.compiler.exe.debug.684876509;avr32.managedbuild.tool.gnu.c.compiler.input.247322483">
+		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.706056922;avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.1020751832;avr32.managedbuild.tool.gnu.cpp.compiler.input.434257703">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileCPP"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.;avr32.managedbuild.tool.gnu.c.compiler.exe.debug.195045998;avr32.managedbuild.tool.gnu.c.compiler.input.1339390958">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324;de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324.;de.innot.avreclipse.tool.compiler.winavr.app.debug.1146087096;de.innot.avreclipse.compiler.winavr.input.63096343">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.1723069060;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.input.704228070">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.1848692409;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.1848692409.;avr32.managedbuild.tool.gnu.c.compiler.exe.debug.905784612;avr32.managedbuild.tool.gnu.c.compiler.input.710048955">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.1986002634;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.1986002634.;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.1721262924;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.input.1505387061">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.debug.1468448745.1659156229;cdt.managedbuild.config.gnu.cross.exe.debug.1468448745.1659156229.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1618558795;cdt.managedbuild.tool.gnu.cpp.compiler.input.1918129039">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="avr32-g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.assembler.debug.368843651;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.assembler.base.input.1166356372">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCWinManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287.1921792745;de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287.1921792745.;avr32.managedbuild.tool.gnu.c.compiler.base.1087042935;avr32.managedbuild.tool.gnu.c.compiler.input.22178829">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056.771369642;de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056.771369642.;de.innot.avreclipse.tool.cppcompiler.app.debug.1598195605;de.innot.avreclipse.cppcompiler.input.1801715836">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileCPP"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809.;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.cpp.compiler.debug.372072129;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.input.477652070">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCManagedMakePerProjectProfileCPP"/>
 			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 				<buildOutputProvider>
 					<openAction enabled="true" filePath=""/>
@@ -910,7 +1430,7 @@
 				</scannerInfoProvider>
 			</profile>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.139370708;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.139370708.;avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.664909951;avr32.managedbuild.tool.gnu.cpp.compiler.input.1050678770">
+		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480.1008420392;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.15169480.1008420392.;avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.722205687;avr32.managedbuild.tool.gnu.cpp.compiler.input.1561897306">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileCPP"/>
 			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 				<buildOutputProvider>
@@ -953,7 +1473,50 @@
 				</scannerInfoProvider>
 			</profile>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287.1921792745;de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287.1921792745.;avr32.managedbuild.tool.gnu.cpp.compiler.base.846786828;avr32.managedbuild.tool.gnu.cpp.compiler.input.345760379">
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.410484240;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.input.986912782">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCManagedMakePerProjectProfileC"/>
+			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+				<buildOutputProvider>
+					<openAction enabled="true" filePath=""/>
+					<parser enabled="true"/>
+				</buildOutputProvider>
+				<scannerInfoProvider id="specsFile">
+					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+					<parser enabled="true"/>
+				</scannerInfoProvider>
+			</profile>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.139370708;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.139370708.;avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.664909951;avr32.managedbuild.tool.gnu.cpp.compiler.input.1050678770">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileCPP"/>
 			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 				<buildOutputProvider>
@@ -1039,94 +1602,8 @@
 				</scannerInfoProvider>
 			</profile>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.706056922;avr32.managedbuild.tool.gnu.cpp.compiler.exe.debug.1020751832;avr32.managedbuild.tool.gnu.cpp.compiler.input.434257703">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileCPP"/>
-			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324;de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1302535324.;de.innot.avreclipse.tool.compiler.winavr.app.debug.1146087096;de.innot.avreclipse.compiler.winavr.input.63096343">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileC"/>
-			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.;avr32.managedbuild.tool.gnu.c.compiler.exe.debug.195045998;avr32.managedbuild.tool.gnu.c.compiler.input.1339390958">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileC"/>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809.;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.c.compiler.debug.443254468;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.c.compiler.base.input.2028797046">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCManagedMakePerProjectProfileC"/>
 			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 				<buildOutputProvider>
 					<openAction enabled="true" filePath=""/>
@@ -1211,8 +1688,8 @@
 				</scannerInfoProvider>
 			</profile>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.1848692409;avr32.managedbuild.config.gnu.exe.debug.1986685014.1606926152.1848692409.;avr32.managedbuild.tool.gnu.c.compiler.exe.debug.905784612;avr32.managedbuild.tool.gnu.c.compiler.input.710048955">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileC"/>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.debug.1819006809.;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.elf.assembler.debug.260151577;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.assembler.base.input.559848153">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCManagedMakePerProjectProfileC"/>
 			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 				<buildOutputProvider>
 					<openAction enabled="true" filePath=""/>
@@ -1240,49 +1717,6 @@
 				</buildOutputProvider>
 				<scannerInfoProvider id="specsFile">
 					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.exe.debug.1468448745.1659156229;cdt.managedbuild.config.gnu.cross.exe.debug.1468448745.1659156229.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1618558795;cdt.managedbuild.tool.gnu.cpp.compiler.input.1918129039">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
-			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="avr32-g++" useDefault="true"/>
 					<parser enabled="true"/>
 				</scannerInfoProvider>
 			</profile>
@@ -1469,8 +1903,8 @@
 				</scannerInfoProvider>
 			</profile>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.assembler.debug.368843651;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.assembler.base.input.1166356372">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCWinManagedMakePerProjectProfileC"/>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.1986002634;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.1986002634.;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.851679831;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.input.326707710">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCManagedMakePerProjectProfileCPP"/>
 			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 				<buildOutputProvider>
 					<openAction enabled="true" filePath=""/>
@@ -1512,51 +1946,8 @@
 				</scannerInfoProvider>
 			</profile>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287.1921792745;de.innot.avreclipse.configuration.app.debug.1445805257.275369450.2051561526.1847993287.1921792745.;avr32.managedbuild.tool.gnu.c.compiler.base.1087042935;avr32.managedbuild.tool.gnu.c.compiler.input.22178829">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atmel.avr32.debug.AVR32ManagedMakePerProjectProfileC"/>
-			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-			<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
-				<buildOutputProvider>
-					<openAction enabled="true" filePath=""/>
-					<parser enabled="true"/>
-				</buildOutputProvider>
-				<scannerInfoProvider id="specsFile">
-					<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
-					<parser enabled="true"/>
-				</scannerInfoProvider>
-			</profile>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056.771369642;de.innot.avreclipse.configuration.app.debug.1445805257.275369450.1475943056.771369642.;de.innot.avreclipse.tool.cppcompiler.app.debug.1598195605;de.innot.avreclipse.cppcompiler.input.1801715836">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="de.innot.avreclipse.core.AVRGCCManagedMakePerProjectProfileCPP"/>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963;org.eclipse.cdt.cross.arm.gnu.sourcery.windows.elf.debug.1654689963.;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.572857179;org.eclipse.cdt.cross.arm.gnu.sourcery.macosx.cpp.compiler.base.input.1675378695">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.cross.arm.gnu.ARM_CS_GCCManagedMakePerProjectProfileCPP"/>
 			<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 				<buildOutputProvider>
 					<openAction enabled="true" filePath=""/>
@@ -1599,4 +1990,5 @@
 			</profile>
 		</scannerConfigBuildInfo>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

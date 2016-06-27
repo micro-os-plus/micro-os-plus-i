@@ -36,7 +36,7 @@ inline void
 LedVar::init(void)
 {
   // init led port as output
-  OS_GPIO_PIN_CONFIG_ENABLE(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
+  OS_GPIO_PIN_CONFIG_ENABLE(APP_CONFIG_LED_PORT, m_iBit);
   OS_GPIO_PIN_CONFIG_OUTPUT(APP_CONFIG_LED_PORT_CONFIG, m_iBit);
 
 #if defined(APP_CONFIG_LED_ISACTIVE_LOW)

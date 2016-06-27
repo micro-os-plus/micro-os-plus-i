@@ -310,6 +310,47 @@
 #define OS_INCLUDE_OSTREAM_LONG                         (1)
 #endif
 
+// ----- GPIO active led defaults ----------------------------------------------------
+
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG) && defined(OS_CONFIG_ACTIVE_LED_PORT)
+#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG OS_CONFIG_ACTIVE_LED_PORT
+#endif
+
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_WRITE) && defined(OS_CONFIG_ACTIVE_LED_PORT)
+#define OS_CONFIG_ACTIVE_LED_PORT_WRITE OS_CONFIG_ACTIVE_LED_PORT
+#endif
+
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_READ) && defined(OS_CONFIG_ACTIVE_LED_PORT)
+#define OS_CONFIG_ACTIVE_LED_PORT_READ OS_CONFIG_ACTIVE_LED_PORT
+#endif
+
+// ----- Debug leds defaults ----------------------------------------------------
+
+#if !defined(OS_CONFIG_DEBUG_LED1_PORT_CONFIG) && defined(OS_CONFIG_DEBUG_LED1_PORT)
+#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG OS_CONFIG_DEBUG_LED1_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_LED1_PORT_WRITE) && defined(OS_CONFIG_DEBUG_LED1_PORT)
+#define OS_CONFIG_DEBUG_LED1_PORT_WRITE OS_CONFIG_DEBUG_LED1_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_LED1_PORT_READ) && defined(OS_CONFIG_DEBUG_LED1_PORT)
+#define OS_CONFIG_DEBUG_LED1_PORT_READ OS_CONFIG_DEBUG_LED1_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_LED2_PORT_CONFIG) && defined(OS_CONFIG_DEBUG_LED2_PORT)
+#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG OS_CONFIG_DEBUG_LED2_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_LED2_PORT_WRITE) && defined(OS_CONFIG_DEBUG_LED2_PORT)
+#define OS_CONFIG_DEBUG_LED2_PORT_WRITE OS_CONFIG_DEBUG_LED2_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_LED2_PORT_READ) && defined(OS_CONFIG_DEBUG_LED2_PORT)
+#define OS_CONFIG_DEBUG_LED2_PORT_READ OS_CONFIG_DEBUG_LED2_PORT
+#endif
+
+
 // ----- PROGMEM --------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_SEPARATE_PROGMEM)

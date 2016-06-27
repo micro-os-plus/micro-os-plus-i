@@ -101,6 +101,10 @@ private:
 
 #include "hal/arch/avr8/kernel/include/OSCPUImpl_Inlines.h"
 
+#elif defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
+
+#include "hal/arch/arm_cortex_m3/kernel/include/OSCPUImpl_Inlines.h"
+
 #else
 #error "Missing OS_CONFIG_ARCH_* definition"
 #endif

@@ -14,7 +14,7 @@
 TaskBlink::TaskBlink(const char *pName, unsigned char iLed, schedTicks_t rate) :
   OSThread(pName, m_stack, sizeof(m_stack)), m_oLed(iLed)
 {
-  debug.putConstructor_P(PSTR("TaskBlink"), this);
+  debug.putConstructor("TaskBlink", this);
 
   m_rate = rate;
 }

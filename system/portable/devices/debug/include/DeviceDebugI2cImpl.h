@@ -252,6 +252,33 @@ DeviceDebugI2cImpl::implWDReset(void)
 }
 
 // ---------------------------------------------------------------------------
+// Default definitions for _CONFIG, _WRITE, _READ based on the generic port
+
+#if !defined(OS_CONFIG_DEBUG_SCL_PORT_CONFIG) && defined(OS_CONFIG_DEBUG_SCL_PORT)
+#define OS_CONFIG_DEBUG_SCL_PORT_CONFIG  OS_CONFIG_DEBUG_SCL_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_SCL_PORT_WRITE) && defined(OS_CONFIG_DEBUG_SCL_PORT)
+#define OS_CONFIG_DEBUG_SCL_PORT_WRITE  OS_CONFIG_DEBUG_SCL_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_SCL_PORT_READ) && defined(OS_CONFIG_DEBUG_SCL_PORT)
+#define OS_CONFIG_DEBUG_SCL_PORT_READ  OS_CONFIG_DEBUG_SCL_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_SDA_PORT_CONFIG) && defined(OS_CONFIG_DEBUG_SDA_PORT)
+#define OS_CONFIG_DEBUG_SDA_PORT_CONFIG  OS_CONFIG_DEBUG_SDA_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_SDA_PORT_WRITE) && defined(OS_CONFIG_DEBUG_SDA_PORT)
+#define OS_CONFIG_DEBUG_SDA_PORT_WRITE  OS_CONFIG_DEBUG_SDA_PORT
+#endif
+
+#if !defined(OS_CONFIG_DEBUG_SDA_PORT_READ) && defined(OS_CONFIG_DEBUG_SDA_PORT)
+#define OS_CONFIG_DEBUG_SDA_PORT_READ  OS_CONFIG_DEBUG_SDA_PORT
+#endif
+
+// ---------------------------------------------------------------------------
 // Implementation of the bitbanged i2c master.
 
 inline void

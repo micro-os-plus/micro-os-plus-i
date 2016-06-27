@@ -28,8 +28,8 @@ delayWithYield(schedTicks_t n);
 #if defined(OS_CONFIG_BOARD_OLIMEX_STM32_H103)
 
 #define APP_CONFIG_LED_PORT             GPIOC
-#define APP_CONFIG_LED_PORT_CONFIG      GPIOC->CRH
-#define APP_CONFIG_LED_PORT_TOGGLE      GPIOC->ODR
+#define APP_CONFIG_LED_PORT_CONFIG      APP_CONFIG_LED_PORT
+#define APP_CONFIG_LED_PORT_WRITE       APP_CONFIG_LED_PORT
 
 #define APP_CONFIG_LED1                 10
 #define APP_CONFIG_LED2                 9

@@ -564,6 +564,7 @@ inline void OSScheduler::setAllowDeepSleep(bool flag)
 
 #if defined(OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE)
 
+#if 0
 inline void
 OSScheduler::contextSave(void)
   {
@@ -577,6 +578,7 @@ OSScheduler::contextRestore(void)
     OSSchedulerImpl::stackPointerRestore();
     OSSchedulerImpl::registersRestore();
   }
+#endif
 
 #endif
 
@@ -625,6 +627,8 @@ OSScheduler::interruptExit(void)
 #endif /* OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING */
 
 #if !defined(OS_EXCLUDE_OSSCHEDULER_LED_ACTIVE)
+
+#if defined(BABURIBA)
 /*
  * Manage the activity LED
  */
@@ -688,6 +692,8 @@ OSScheduler::ledActiveOff(void)
     }
   OSCriticalSection::exit();
 }
+
+#endif
 
 #endif /* ! OS_EXCLUDE_OSSCHEDULER_LED_ACTIVE */
 

@@ -10,6 +10,9 @@
 typedef unsigned long OSStack_t;
 typedef unsigned long* pfnVector_t;
 
+typedef unsigned long OSResetBits_t;    // TODO: check if ok
+typedef unsigned long OSInterruptsMask_t; // TODO: check if ok
+
 #if !defined(OS_CFGINT_BUSYWAIT_CALIBRATION)
 #if defined(DEBUG)
 #define OS_CFGINT_BUSYWAIT_CALIBRATION	         (9129)
@@ -21,10 +24,16 @@ typedef unsigned long* pfnVector_t;
 #define PROGMEM
 #define PSTR(_S_) ((const char*)_S_)
 
+#define putString_P putString
+#define putConstructor_P putConstructor
+#define putConstructorWithIndex_P putConstructorWithIndex
+#define putDestructor_P putDestructor
+
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_LONG            (1)
 #define OS_INCLUDE_OSDEVICEDEBUG_PUTHEX_INT             (1)
-#define OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE     (1)
-#define OS_INCLUDE_OSSCHEDULER_CONTEXTSWITCHREQUEST   (1)
+//#define OS_INCLUDE_OSSCHEDULER_CONTEXTSAVE_RESTORE      (1)
+#define OS_INCLUDE_OSSCHEDULERIMPL_CONTEXT_PROCESSING   (1)
+#define OS_INCLUDE_OSSCHEDULER_CONTEXTSWITCHREQUEST     (1)
 #define OS_INLINE_INTERRUPTS_ENABLE_DISABLE             (1)
 
 #if !defined(OS_CFGINT_STACK_MINIMAL_SIZE)

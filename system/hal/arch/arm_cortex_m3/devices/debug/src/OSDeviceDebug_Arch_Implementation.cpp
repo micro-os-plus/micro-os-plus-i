@@ -11,6 +11,7 @@
 
 #include "portable/kernel/include/OS.h"
 
+#if 0
 void OSDeviceDebug::putString_P(const char* PROGMEM pc)
   {
     if (pc == 0)
@@ -38,6 +39,7 @@ void OSDeviceDebug::putString_P(const char* PROGMEM pc)
       }
     OSCriticalSection::exit();
   }
+#endif
 
 #endif /* defined(DEBUG) */
 #endif /* defined(OS_CONFIG_ARCH_ARM_CORTEX_M3) */

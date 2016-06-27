@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-#if defined(OS_CONFIG_ARCH_TEMPLATE_ARCH)
+#if defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 
 
 /* init value for the stack pointer. defined in linker script */

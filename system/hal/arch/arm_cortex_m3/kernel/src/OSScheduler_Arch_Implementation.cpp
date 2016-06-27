@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-#if defined(OS_CONFIG_ARCH_TEMPLATE)
+#if defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 
 OSStack_t* OSScheduler::stackInitialise(OSStack_t* pStackTop, void(*pCode)(
     void*), void* pParams, unsigned char id)

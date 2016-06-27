@@ -141,6 +141,7 @@ private:
 
 // When we can use the stack, the enter()/exit() calls are inlined
 
+#if defined(BABURIBA)
 inline void
 OSCriticalSection::enter(void)
   {
@@ -173,6 +174,7 @@ OSCriticalSection::exit(void)
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) */
   }
+#endif
 
 // ----------------------------------------------------------------------------
 

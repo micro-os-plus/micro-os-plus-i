@@ -18,9 +18,9 @@
 #define OS_CFGLONG_OSCILLATOR_HZ			(8000000UL)
 #endif
 
-//#if !defined(OS_CFGINT_CLOCK_PRESCALER)
-//#define OS_CFGINT_CLOCK_PRESCALER			(1)
-//#endif
+#if !defined(OS_CFGINT_CLOCK_PRESCALER)
+#define OS_CFGINT_CLOCK_PRESCALER			(1)
+#endif
 
 
 #if !defined(OS_CFGINT_TICK_RATE_HZ)
@@ -49,9 +49,6 @@
 
 #if !defined(OS_CONFIG_ACTIVE_LED_PORT)
 #define OS_CONFIG_ACTIVE_LED_PORT			GPIOC
-#endif
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
-#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG                OS_CONFIG_ACTIVE_LED_PORT->CRH
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
 #define OS_CONFIG_ACTIVE_LED_BIT			12
@@ -82,9 +79,6 @@
 #if !defined(OS_CONFIG_DEBUG_LED1_PORT)
 #define OS_CONFIG_DEBUG_LED1_PORT                       GPIOC
 #endif
-#if !defined(OS_CONFIG_DEBUG_LED1_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED1_PORT_CONFIG                OS_CONFIG_DEBUG_LED1_PORT->CRH
-#endif
 #if !defined(OS_CONFIG_DEBUG_LED1_BIT)
 #define OS_CONFIG_DEBUG_LED1_BIT                        10
 #endif
@@ -92,11 +86,12 @@
 #if !defined(OS_CONFIG_DEBUG_LED2_PORT)
 #define OS_CONFIG_DEBUG_LED2_PORT                       GPIOC
 #endif
-#if !defined(OS_CONFIG_DEBUG_LED2_PORT_CONFIG)
-#define OS_CONFIG_DEBUG_LED2_PORT_CONFIG                OS_CONFIG_DEBUG_LED2_PORT->CRH
-#endif
 #if !defined(OS_CONFIG_DEBUG_LED2_BIT)
 #define OS_CONFIG_DEBUG_LED2_BIT                        9
+#endif
+
+#if defined(DEBUG) && !defined(OS_CONFIG_DEBUG_DEVICE_I2C)
+#define OS_CONFIG_DEBUG_DEVICE_I2C                      (1)
 #endif
 
 #endif /* HAL_BOARD_OS_DEFINES_H_ */

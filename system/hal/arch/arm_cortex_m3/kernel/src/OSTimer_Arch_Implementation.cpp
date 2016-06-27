@@ -8,7 +8,7 @@
 
 #if !defined(OS_EXCLUDE_MULTITASKING)
 
-#if defined(OS_CONFIG_ARCH_TEMPLATE)
+#if defined(OS_CONFIG_ARCH_ARM_CORTEX_M3)
 
 #include "portable/kernel/include/OS.h"
 

@@ -6,7 +6,7 @@
 
 #include "portable/kernel/include/OS.h"
 
-#if defined(OS_CONFIG_FAMILY_TEMPLATE)
+#if defined(OS_CONFIG_FAMILY_STM32F10X)
 
 
 void __init_data_and_bss(void) __attribute__((noinline));

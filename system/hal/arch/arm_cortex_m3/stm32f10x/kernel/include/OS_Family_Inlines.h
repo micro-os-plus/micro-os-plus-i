@@ -7,7 +7,7 @@
 #ifndef HAL_FAMILY_OS_INLINES_H_
 #define HAL_FAMILY_OS_INLINES_H_
 
-inline void OSImpl::CPUidle(void)
+inline void OSCPUImpl::idle(void)
   {
     asm volatile(" wfi"::);
 
@@ -17,7 +17,7 @@ inline void OSImpl::CPUidle(void)
 #endif
   }
 
-inline void OSImpl::CPUsleep(void)
+inline void OSCPUImpl::sleep(void)
   {
     asm volatile(" wfi"::);
 
@@ -27,7 +27,7 @@ inline void OSImpl::CPUsleep(void)
 #endif
   }
 
-inline void OSImpl::CPUdeepSleep(void)
+inline void OSCPUImpl::deepSleep(void)
   {
     asm volatile(" wfi"::);
 
@@ -37,14 +37,14 @@ inline void OSImpl::CPUdeepSleep(void)
 #endif
   }
 
-inline void OSImpl::WDTreset(void)
+inline void OSCPUImpl::watchdogReset(void)
   {
-    IWDG_ReloadCounter();
+    //IWDG_ReloadCounter();
   }
 
 // as per manual, JMP 0 is not recommended since
 // registers are not set to their initial status
-inline void OSImpl::SOFTreset(void)
+inline void OSCPUImpl::softReset(void)
   {
 #if false
     wdt_enable(WDTO_15MS);
