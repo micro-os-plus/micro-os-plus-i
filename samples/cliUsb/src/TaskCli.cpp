@@ -25,6 +25,11 @@ TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev) :
   debug.putConstructor_P(PSTR("TaskCli"), this);
 }
 
+TaskCli::~TaskCli()
+{
+  debug.putDestructor_P(PSTR("TaskCli"), this);
+}
+
 // ----------------------------------------------------------------------------
 
 static const char prompt[] = "> ";
@@ -35,6 +40,7 @@ static const char prompt[] = "> ";
  * I/O is done via standard streams routed to the attached device.
  *
  */
+
 
 void
 TaskCli::threadMain(void)
@@ -109,21 +115,21 @@ TaskCli::threadMain(void)
           c = cli.readLine(cin, cout);
           if (c == std::traits::eof())
             {
-              if (os.isDebug)
+              if (os.isDebug())
                 clog << "disconnected" << std::endl;
 
               break;
             }
           else if (c == OSReturn::OS_TIMEOUT)
             {
-              if (os.isDebug)
+              if (os.isDebug())
                 clog << "timeout" << std::endl;
 
               break;
             }
           else if (c < 0)
             {
-              if (os.isDebug)
+              if (os.isDebug())
                 clog << "error -" << std::dec << (int) (-c) << std::endl;
 
               break;

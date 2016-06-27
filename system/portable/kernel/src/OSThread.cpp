@@ -28,6 +28,11 @@ OSThread::OSThread(const char* pName, OSThreadMainPtr_t entryPoint,
   OSThread::initialise(pName, entryPoint, pParameters, pStack, stackSize, priority);
 }
 
+OSThread::~OSThread()
+{
+  OSDeviceDebug::putConstructor_P(PSTR("OSThread"), this);
+}
+
 // The stack size is in multiples of OSStack_t
 void
 OSThread::initialise(const char* pName, OSThreadMainPtr_t entryPoint,
@@ -437,6 +442,12 @@ OSThread::eventWaitPrepare(OSEvent_t event)
     {
       OSDeviceDebug::putString(" waitAny ");
     }
+#endif
+
+#if defined(OS_INCLUDE_OSTHREAD_EVENTWAITPREPARE)
+  OSDeviceDebug::putString_P(PSTR(" eWP("));
+  OSDeviceDebug::putHex(event);
+  OSDeviceDebug::putString_P(PSTR(") "));
 #endif
 
   // Mark that the thread is waiting on the given event

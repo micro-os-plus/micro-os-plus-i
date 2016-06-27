@@ -70,6 +70,8 @@ public:
       const OSStack_t* pStack, OSStackSize_t stackSize,
       OSThreadPriority_t priority = OSThread::DEFAULT_PRIORITY);
 
+  virtual ~OSThread();
+
   // Thread main() function.
   // Overridden by actual implementation.
   virtual void

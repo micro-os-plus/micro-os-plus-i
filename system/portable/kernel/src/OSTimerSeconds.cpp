@@ -22,16 +22,32 @@ OSTime_t volatile OSTimerSeconds::ms_uptime;
 #endif
 
 OSTimerSeconds::OSTimerSeconds() :
-OSTimer((OSTimerStruct_t*)&m_array[0], sizeof(m_array)/sizeof(m_array[0]))
-  {
-    OSDeviceDebug::putConstructor_P(PSTR("OSTimerSeconds"), this);
+    OSTimer((OSTimerStruct_t*) &m_array[0],
+        sizeof(m_array) / sizeof(m_array[0]))
+{
+  OSDeviceDebug::putConstructor_P(PSTR("OSTimerSeconds"), this);
 
-    ms_schedulerTicks = 0;
+  ms_schedulerTicks = 0;
 #if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
-    ms_uptime = 0;
+  ms_uptime = 0;
 #endif
-    ;
-  }
+  ;
+}
+
+#if defined(OS_INCLUDE_OSTIMERSECONDS_UPTIME)
+
+void
+OSTimerSeconds::getUptime(unsigned long* pSeconds, OSTimerTicks_t* pTicks)
+{
+  OSCriticalSection::enter();
+    {
+      *pSeconds = ms_uptime;
+      *pTicks = ms_schedulerTicks;
+    }
+  OSCriticalSection::exit();
+}
+
+#endif
 
 #if defined(OS_INCLUDE_OSTHREAD_VIRTUALWATCHDOG)
 void OSTimerSeconds::checkVirtualWatchdogs(void)

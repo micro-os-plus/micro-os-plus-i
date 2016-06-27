@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2007-2011 Liviu Ionescu.
+ *      Copyright (C) 2007-2012 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -11,8 +11,9 @@
 #endif
 
 TaskDbgIn::TaskDbgIn(const char *pName, OSDeviceCharacter& outDev,
-    OSDeviceCharacter& inDev2) :
-  OSThread(pName, m_stack, sizeof(m_stack)), m_outDev(outDev), m_inDev2(inDev2)
+    OSDeviceCharacter& inDev2, std::ostream& cout) :
+    OSThread(pName, m_stack, sizeof(m_stack)), m_outDev(outDev), m_inDev2(
+        inDev2), m_cout(cout)
 {
   debug.putConstructor_P(PSTR("TaskDbgIn"), this);
 }
@@ -52,14 +53,20 @@ TaskDbgIn::threadMain(void)
       inDev = &m_inDev2;
 #endif
 
-      //m_taskCli.resume();
     }
   os.sched.lock.exit();
+
+  // A delay, to allow the CLI task to initialise the port
+
+  os.sched.timerTicks.sleep(1000);
 
   // thread endless loop
   for (;;)
     {
       inDev->open();
+
+      bool isNewLineFound;
+      isNewLineFound = false;
 
       for (; inDev->isOpened() && inDev->isConnected();)
         {
@@ -98,20 +105,75 @@ TaskDbgIn::threadMain(void)
 
           if (cnt > 0)
             {
-              if (outDev.isConnected())
-                {
-                  outDev.writeBytes(m_buff, cnt);
-                  outDev.flush();
-                }
-              else
-                {
-                  if (os.isDebug())
-                    {
-                      for (int i = 0; i < cnt; ++i)
-                        clog.put(m_buff[i]);
+#if true
+              debug.putChar('|');
+              debug.putDec((unsigned short)cnt);
+#endif
 
+#if true
+              int first;
+              first = 0;
+
+              int last;
+              for (; first < cnt; first = last + 1)
+                {
+                  if (isNewLineFound)
+                    {
+                      unsigned long seconds;
+                      OSTimerTicks_t ticks;
+                      os.sched.timerSeconds.getUptime(&seconds, &ticks);
+
+                      unsigned long minutes;
+                      minutes = seconds / 60;
+
+                      seconds %= 60;
+
+#if true
+                      os.sched.lock.enter();
+                        {
+                          m_cout.width(2);
+                          m_cout << std::dec << minutes << ':';
+                          m_cout.width(2);
+                          m_cout << std::dec << seconds << '.';
+                          m_cout.width(3);
+                          m_cout << std::dec << ticks << ": ";
+                         }
+                      os.sched.lock.exit();
+#endif
+                      isNewLineFound = false;
+                    }
+
+                  last = cnt - 1;
+                  int i;
+                  for (i = first; i < cnt; ++i)
+                    {
+                      if (m_buff[i] == '\n')
+                        {
+                          isNewLineFound = true;
+                          last = i;
+                          break;
+                        }
+                    }
+                  if (outDev.isConnected() && outDev.isOpened())
+                    {
+                      outDev.writeBytes(&m_buff[first], last - first + 1);
+                      outDev.flush();
+                    }
+                  else
+                    {
+                      if (os.isDebug())
+                        {
+                          for (int j = first; j <= last; ++j)
+                            clog.put(m_buff[j]);
+                        }
                     }
                 }
+              //outDev.writeByte('|');
+
+#else
+              outDev.writeBytes(&m_buff[0], cnt);
+              outDev.flush();
+#endif
             }
         }
       inDev->close();

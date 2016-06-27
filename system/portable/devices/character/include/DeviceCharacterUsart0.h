@@ -35,6 +35,9 @@ public:
   DeviceCharacterUsart0(unsigned char* pRxBuf, unsigned short rxBufSize,
       unsigned char* pTxBuf, unsigned short txBufSize);
 
+  virtual
+  ~DeviceCharacterUsart0();
+
 private:
   virtual int
   implPortInit(void);

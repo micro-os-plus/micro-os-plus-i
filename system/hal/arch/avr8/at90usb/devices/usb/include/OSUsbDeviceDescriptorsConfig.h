@@ -43,7 +43,12 @@
 
 #define STRING_INDEX_MAN        0x01
 #define STRING_INDEX_PROD       0x02
+
+#if defined(OS_EXCLUDE_USBSERIALNUMBER)
+#define STRING_INDEX_SN         0x00
+#else
 #define STRING_INDEX_SN         0x03
+#endif
 
 #if defined(OS_INCLUDE_USB_CDC_DUAL_CONFIGURATION)
 #define NB_CONFIGURATION        2 // number of configurations
@@ -185,6 +190,10 @@
 }
 
 #define USB_PN_LENGTH           19
+#if false
+#define USB_PRODUCT_NAME \
+L"AVR8 AT90USB128 CDC"
+#else
 #define USB_PRODUCT_NAME \
 { Usb_unicode('A') \
   ,Usb_unicode('V') \
@@ -206,6 +215,9 @@
   ,Usb_unicode('D') \
   ,Usb_unicode('C') \
 }
+#endif
+
+#if !defined(OS_EXCLUDE_USBSERIALNUMBER)
 
 #define USB_SN_LENGTH         13
 #define USB_SERIAL_NUMBER \
@@ -224,6 +236,8 @@
   Usb_unicode('.'),\
   Usb_unicode('A') \
 }
+
+#endif
 
 // ----------------------------------------------------------------------------
 

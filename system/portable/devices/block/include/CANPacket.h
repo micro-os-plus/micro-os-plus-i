@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2008-2011 Liviu Ionescu.
+ *      Copyright (C) 2008-2012 Liviu Ionescu.
  *
  *      This file is part of the uOS++ distribution.
  */
@@ -18,6 +18,13 @@ public:
 
   void
   dump(void);
+
+#if defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_SECONDS)
+  unsigned long uptimeSeconds;
+  OSTimerTicks_t uptimeTicks;
+#elif defined(OS_INCLUDE_CANPACKET_TIMESTAMP_UPTIME_TICKS)
+  uint32_t uptimeTicks;
+#endif
 
 };
 

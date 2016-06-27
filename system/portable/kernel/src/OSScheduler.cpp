@@ -215,12 +215,11 @@ int
 OSScheduler::eventNotify(OSEvent_t event, OSEventWaitReturn_t ret)
 {
 #if defined(DEBUG) && defined(OS_DEBUG_OSSCHEDULER_EVENTNOTIFY)
-  OSDeviceDebug::putString("eventNotify(");
+  OSDeviceDebug::putString("eN(");
   OSDeviceDebug::putHex((unsigned short)event);
   OSDeviceDebug::putString(",");
   OSDeviceDebug::putHex((unsigned short)ret);
-  OSDeviceDebug::putString(")");
-  OSDeviceDebug::putNewLine();
+  OSDeviceDebug::putString(") ");
 #endif
 #if false
   if (event == OSEvent::OS_NONE)

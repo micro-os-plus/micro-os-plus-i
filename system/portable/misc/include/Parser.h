@@ -78,16 +78,25 @@ public:
   convertHex(uint16_t* pShort);
   OSReturn_t
   convertHex(uint32_t* pLong);
+
+#if !defined(OS_CONFIG_ARCH_AVR8)
+
   OSReturn_t
   convertHex(uint_t* pChar);
+
+#endif
 
   OSReturn_t
   convertUnsigned(uint16_t* pShort);
   OSReturn_t
   convertUnsigned(uint32_t* pLong);
+
+#if !defined(OS_CONFIG_ARCH_AVR8)
+
   OSReturn_t
   convertUnsigned(uint_t* pInt);
 
+#endif
 
   OSReturn_t
   convertSigned(int32_t* pLong);
@@ -97,6 +106,9 @@ public:
 
   OSReturn_t
   convertFixedPrecision(int32_t* pLong, uint_t prec);
+
+  OSReturn_t
+  convertFixedPrecision(uint32_t* pLong, uint_t prec);
 
   int
   compareStringWithToken(const char* pStr);
@@ -125,8 +137,13 @@ public:
   convertSigned(uchar_t* pStr, int32_t* pLong);
   static OSReturn_t
   convertUnsigned(uchar_t* pStr, uint32_t* pLong);
+
+#if !defined(OS_CONFIG_ARCH_AVR8)
+
   static OSReturn_t
   convertUnsigned(uchar_t* pStr, uint_t* pInt);
+
+#endif
 
   static OSReturn_t
   convertFixedPrecision(uchar_t* pStr, int32_t* pLong, uint_t prec,

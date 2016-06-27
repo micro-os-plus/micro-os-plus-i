@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2011 Liviu Ionescu.
+ *	Copyright (C) 2007-2012 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -19,9 +19,10 @@
  */
 
 TaskCli::TaskCli(const char *pName, OSDeviceCharacter& dev,
-    OSDeviceCharacter& devIn) :
-  OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(&m_dev), m_cout(
-      &m_dev), m_cli(m_line, sizeof(m_line)), m_devIn(devIn)
+    OSDeviceCharacter& devIn, std::istream& cin,
+    std::ostream& cout) :
+  OSThread(pName, m_stack, sizeof(m_stack)), m_dev(dev), m_cin(cin), m_cout(
+      cout), m_cli(m_line, sizeof(m_line)), m_devIn(devIn)
 {
   debug.putConstructor_P(PSTR("TaskCli"), this);
 

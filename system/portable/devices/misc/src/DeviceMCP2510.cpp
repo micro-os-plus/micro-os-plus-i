@@ -27,7 +27,7 @@ void DeviceMCP2510::init()
 
     // be sure we wait the 128 Osc cycles
     for (unsigned int i = (128); i > 0; --i)
-    OS::NOP();
+    OSCPU::nop();
     //cmdReset();
   }
 
@@ -46,7 +46,7 @@ void DeviceMCP2510::cmdReset(void)
 
     // be sure we wait the 128 Osc cycles
     for (unsigned int i = (128); i > 0; --i)
-    OS::NOP();
+    OSCPU::nop();
   }
 
 void DeviceMCP2510::cmdWrite(unsigned char addr, unsigned char data)

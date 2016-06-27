@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2007-2011 Liviu Ionescu.
+ *	Copyright (C) 2007-2012 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -16,22 +16,30 @@
 DeviceCharacterUsb devUsb;
 
 // ----------------------------------------------------------------------------
+
+std::istream cin(&devUsb);
+std::ostream cout(&devUsb);
+
+// ----------------------------------------------------------------------------
 // Input active object, must be the first one to init I2C
 
 // I2C buffers
 unsigned char tx_store[OS_CFGINT_DEVICECHARACTERI2C_TXBUF_SIZE];
-unsigned char rx_store[OS_CFGINT_DEVICECHARACTERMI2C_RXBUF_SIZE];
+unsigned char rx_store[OS_CFGINT_DEVICECHARACTERI2C_RXBUF_SIZE];
 
 DeviceCharacterI2C devI2C(tx_store, sizeof(tx_store), rx_store,
     sizeof(rx_store));
 
-TaskDbgIn taskDbgIn("input", devUsb, devI2C);
-
 // ----------------------------------------------------------------------------
-// Cli Task
+// CLI thread
 
 // active object
-TaskCli taskCli("usb", devUsb, devI2C);
+TaskCli taskCli("usb", devUsb, devI2C, cin, cout);
+
+// ----------------------------------------------------------------------------
+// I2C input thread
+
+TaskDbgIn taskDbgIn("input", devUsb, devI2C, cout);
 
 // ----------------------------------------------------------------------------
 // Blink Task

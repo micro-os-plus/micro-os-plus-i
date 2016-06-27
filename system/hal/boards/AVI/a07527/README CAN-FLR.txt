@@ -4,3 +4,5 @@ micro SD cards.
 Devices based on this board:
 
 - CANFLR, Flight Data Recorder with USB download capabilities.
+- USB-CAN, CAN bus interface for USB hosts
+

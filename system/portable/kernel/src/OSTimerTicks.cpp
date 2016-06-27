@@ -15,13 +15,24 @@
 // static members
 OSTimerStruct_t volatile OSTimerTicks::m_array[OS_CFGINT_OSTIMERTICKS_SIZE];
 
+#if defined(OS_INCLUDE_OSTIMERTICKS_UPTIME)
+// current seconds number
+uint32_t volatile OSTimerTicks::ms_uptime;
+#endif
+
 // TODO: delete if not needed
 // OSTimerTicks_t OSTimerTicks::ms_secondTicks;
 
 OSTimerTicks::OSTimerTicks() :
-  OSTimer((OSTimerStruct_t*) &m_array[0], sizeof(m_array) / sizeof(m_array[0]))
+    OSTimer((OSTimerStruct_t*) &m_array[0],
+        sizeof(m_array) / sizeof(m_array[0]))
 {
   OSDeviceDebug::putConstructor_P(PSTR("OSTimerTicks"), this);
+
+#if defined(OS_INCLUDE_OSTIMERTICKS_UPTIME)
+  ms_uptime = 0;
+#endif
+
 }
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
@@ -30,6 +41,7 @@ OSTimerTicks::OSTimerTicks() :
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
 static int i;
+static int s;
 #endif
 
 void
@@ -44,6 +56,7 @@ OSTimerTicks::init(void)
 
 #if defined(DEBUG) && defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
   i = 0;
+  s = 0;
 #endif
 
 #if defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED)
@@ -66,6 +79,10 @@ OSTimerTicks::interruptServiceRoutine(void)
 
   interruptTick();
 
+#if defined(OS_INCLUDE_OSTIMERTICKS_UPTIME)
+  ++ms_uptime;
+#endif
+
   OSScheduler::interruptTick();
 
 #if defined(OS_INCLUDE_SDI12SENSOR)
@@ -79,6 +96,17 @@ OSTimerTicks::interruptServiceRoutine(void)
       OSTimerSeconds::ms_schedulerTicks = 0;
 
       OSScheduler::timerSeconds.interruptServiceRoutine();
+
+#if defined(OS_DEBUG_OSTIMERTICKS_ISR_MARK_SECONDS)
+
+      if (++s == 60)
+        {
+          s = 0;
+          // Mark every minute by a new line
+          OSDeviceDebug::putNewLine();
+        }
+
+#endif
     }
 
 #endif /* defined(OS_INCLUDE_OSSCHEDULER_TIMERSECONDS_SOFT) */
@@ -99,5 +127,15 @@ OSTimerTicks::interruptServiceRoutine(void)
 #endif /* defined(OS_INCLUDE_OSTIMERTICKS_ISR_DEBUGLED) */
 
 }
+
+#if defined(OS_INCLUDE_OSTIMERTICKS_UPTIME)
+
+uint32_t
+OSTimerTicks::getUptime(void)
+{
+  return ms_uptime;
+}
+
+#endif
 
 #endif /* !defined(OS_EXCLUDE_MULTITASKING) && !defined(OS_EXCLUDE_OSTIMER) */

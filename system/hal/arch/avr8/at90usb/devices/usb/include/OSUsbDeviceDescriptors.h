@@ -172,7 +172,7 @@ typedef struct
 
 //_____ U S B   S E R I A L   N U M B E R   D E S C R I P T O R _____________
 
-
+#if !defined(OS_EXCLUDE_USBSERIALNUMBER)
 //struct usb_st_serial_number
 typedef struct
 {
@@ -180,6 +180,8 @@ typedef struct
   unsigned char bDescriptorType; // STRING descriptor type
   unsigned short wstring[USB_SN_LENGTH]; // unicode characters
 } S_usb_serial_number;
+
+#endif
 
 #endif
 
@@ -194,7 +196,10 @@ extern PROGMEM S_usb_manufacturer_string_descriptor
     usb_user_manufacturer_string_descriptor;
 extern PROGMEM S_usb_product_string_descriptor
     usb_user_product_string_descriptor;
+
+#if !defined(OS_EXCLUDE_USBSERIALNUMBER)
 extern PROGMEM S_usb_serial_number usb_user_serial_number;
+#endif
 
 #endif
 

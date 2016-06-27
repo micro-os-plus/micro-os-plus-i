@@ -14,60 +14,78 @@
 #include <string.h>
 
 CircularBlockBuffer::CircularBlockBuffer()
-  {
-    OSDeviceDebug::putConstructor_P(PSTR("CircularBlockBuffer"), this);
-  }
+{
+  OSDeviceDebug::putConstructor_P(PSTR("CircularBlockBuffer"), this);
+}
 
 CircularBlockBuffer::CircularBlockBuffer(unsigned char* pBuf,
     unsigned short blklen, unsigned short blocks, unsigned short highWM,
     unsigned short lowWM)
-  {
-    OSDeviceDebug::putConstructor_P(PSTR("CircularBlockBuffer"), this);
+{
+  OSDeviceDebug::putConstructor_P(PSTR("CircularBlockBuffer"), this);
 
-    init(pBuf, blklen, blocks, highWM, lowWM);
-  }
+  init(pBuf, blklen, blocks, highWM, lowWM);
+}
 
-void CircularBlockBuffer::init(unsigned char* pBuf, unsigned short blklen,
+void
+CircularBlockBuffer::init(unsigned char* pBuf, unsigned short blklen,
     unsigned short blocks, unsigned short highWM, unsigned short lowWM)
-  {
-    m_pBuf = pBuf;
-    m_blkLen = blklen;
-    m_szBlks = blocks;
-    m_highWM = highWM;
-    m_lowWM = lowWM;
+{
+  m_pBuf = pBuf;
+  m_blkLen = blklen;
+  m_szBlks = blocks;
+  m_highWM = highWM;
+  m_lowWM = lowWM;
 
-    clear();
-  }
+  clear();
+}
 
-void CircularBlockBuffer::clear(void)
-  {
-    m_pPut = m_pGet = m_pBuf;
-    m_len = 0;
-  }
+void
+CircularBlockBuffer::clear(void)
+{
+  m_pPut = m_pGet = m_pBuf;
+  m_len = 0;
+}
 
-void CircularBlockBuffer::put(unsigned char* pc)
-  {
-    memcpy(m_pPut, pc, m_blkLen);
-    m_pPut += m_blkLen;
+void
+CircularBlockBuffer::put(unsigned char* pc)
+{
+#if defined(OS_DEBUG_CIRCULARBLOCKBUFFER_PUT)
 
-    if (((unsigned short)(m_pPut - m_pBuf))/m_blkLen >= m_szBlks)
-      m_pPut = m_pBuf;
+  OSDeviceDebug::putChar(' ');
 
-    m_len++;
-  }
+  uint_t i;
+  for (i = 0; i < m_blkLen; ++i)
+    {
+      OSDeviceDebug::putHex(pc[i]);
+    }
 
-unsigned char* CircularBlockBuffer::get(unsigned char* pc)
-  {
-    memcpy(pc, m_pGet, m_blkLen);
-    m_pGet += m_blkLen;
+  OSDeviceDebug::putChar(' ');
 
-    if (((unsigned short)(m_pGet - m_pBuf))/m_blkLen >= m_szBlks)
-      m_pGet = m_pBuf;
+#endif
 
-    m_len--;
+  memcpy(m_pPut, pc, m_blkLen);
+  m_pPut += m_blkLen;
 
-    return pc;
-  }
+  if (((unsigned short) (m_pPut - m_pBuf)) / m_blkLen >= m_szBlks)
+    m_pPut = m_pBuf;
+
+  m_len++;
+}
+
+unsigned char*
+CircularBlockBuffer::get(unsigned char* pc)
+{
+  memcpy(pc, m_pGet, m_blkLen);
+  m_pGet += m_blkLen;
+
+  if (((unsigned short) (m_pGet - m_pBuf)) / m_blkLen >= m_szBlks)
+    m_pGet = m_pBuf;
+
+  m_len--;
+
+  return pc;
+}
 
 #endif
 

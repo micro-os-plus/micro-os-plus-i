@@ -8,7 +8,7 @@
 
 // DEPRECATED
 
-#if false && defined(OS_INCLUDE_DEVICECHARACTERUSART1)
+#if  defined(OS_INCLUDE_DEVICECHARACTERUSART1)
 
 #include "portable/devices/character/include/DeviceCharacterUsart1.h"
 

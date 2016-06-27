@@ -1,5 +1,5 @@
 /*
- *	Copyright (C) 2008-2011 Liviu Ionescu.
+ *	Copyright (C) 2008-2012 Liviu Ionescu.
  *
  *	This file is part of the uOS++ distribution.
  */
@@ -7,7 +7,7 @@
 #ifndef HAL_BOARD_OS_DEFINES_H_
 #define HAL_BOARD_OS_DEFINES_H_
 
-#define OS_CONFIG_ARCH_AVR8                              1
+#define OS_CONFIG_ARCH_AVR8                             1
 #define OS_CONFIG_FAMILY_AT90CAN			1
 #define OS_CONFIG_VARIANT_AT90CAN128                    1
 #if !defined(OS_CONFIG_BOARD_AVI_A07521)
@@ -32,21 +32,21 @@
 #define OS_CFGINT_TIMER_CLOCK_SELECT                    (3)
 #endif
 
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT_INIT)
-#define OS_CONFIG_ACTIVE_LED_PORT_INIT                  DDRA
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_CONFIG)
+#define OS_CONFIG_ACTIVE_LED_PORT_CONFIG                DDRA
 #endif
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT)
-#define OS_CONFIG_ACTIVE_LED_PORT			PORTA
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_WRITE)
+#define OS_CONFIG_ACTIVE_LED_PORT_WRITE			PORTA
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
 #define OS_CONFIG_ACTIVE_LED_BIT			7
 #endif
 
-#if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)
-#define OS_CONFIG_BLINK_LED_PORT_INIT                   DDRA
+#if !defined(OS_CONFIG_BLINK_LED_PORT_CONFIG)
+#define OS_CONFIG_BLINK_LED_PORT_CONFIG                 DDRA
 #endif
-#if !defined(OS_CONFIG_BLINK_LED_PORT)
-#define OS_CONFIG_BLINK_LED_PORT                        PORTA
+#if !defined(OS_CONFIG_BLINK_LED_PORT_WRITE)
+#define OS_CONFIG_BLINK_LED_PORT_WRITE                  PORTA
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_BIT)
 #define OS_CONFIG_BLINK_LED_BIT                         6

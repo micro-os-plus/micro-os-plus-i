@@ -7,6 +7,11 @@
 #ifndef COMMANDLINEINTERFACE_H_
 #define COMMANDLINEINTERFACE_H_
 
+#include "portable/kernel/include/OS_Defines.h"
+
+#if defined(OS_INCLUDE_COMMANDLINEINTERFACE)
+
+
 #include "portable/kernel/include/OS.h"
 
 #include "portable/devices/character/include/OSDeviceCharacter.h"
@@ -117,5 +122,7 @@ CommandLineInterface::getParser(void)
 {
   return m_parser;
 }
+
+#endif /* defined(OS_INCLUDE_COMMANDLINEINTERFACE) */
 
 #endif /* COMMANDLINEINTERFACE_H_ */

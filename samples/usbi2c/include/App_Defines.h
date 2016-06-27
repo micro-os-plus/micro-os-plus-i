@@ -18,9 +18,13 @@
 // Notice: do not use parenthesis! (the values will be stringified)
 #define APP_CFGINT_VERSION_MAJOR                        2
 #define APP_CFGINT_VERSION_MINOR                        4
-#define APP_CFGINT_VERSION_REVISION                     1743
+#define APP_CFGINT_VERSION_REVISION                     1745
 
 // ----------------------------------------------------------------------------
+
+#define APP_CFGINT_TASKCLI_EXTRA_STACK_SIZE             (150)
+#define APP_CFGINT_TASKDBGIN_EXTRA_STACK_SIZE           (150)
+
 
 #if defined(OS_CONFIG_BOARD_AVI_A07523)
 

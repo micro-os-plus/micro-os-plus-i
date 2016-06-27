@@ -47,8 +47,8 @@
 
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY    191 /* equivalent to 0xa0, or priority 5. */
 
-#if !defined(OS_CONFIG_ACTIVE_LED_PORT)
-#define OS_CONFIG_ACTIVE_LED_PORT			GPIOC
+#if !defined(OS_CONFIG_ACTIVE_LED_PORT_WRITE)
+#define OS_CONFIG_ACTIVE_LED_PORT_WRITE			GPIOC
 #endif
 #if !defined(OS_CONFIG_ACTIVE_LED_BIT)
 #define OS_CONFIG_ACTIVE_LED_BIT			12
@@ -65,10 +65,10 @@
 #define OS_CFGPIN_OSUSBLED_LED_PIN                           PORTD7
 #endif
 
-#if !defined(OS_CONFIG_BLINK_LED_PORT_INIT)
-#define OS_CONFIG_BLINK_LED_PORT_INIT                   DDRD
+#if !defined(OS_CONFIG_BLINK_LED_PORT_CONFIG)
+#define OS_CONFIG_BLINK_LED_PORT_CONFIG                   DDRD
 #endif
-#if !defined(OS_CONFIG_BLINK_LED_PORT)
+#if !defined(OS_CONFIG_BLINK_LED_PORT_WRITE)
 #define OS_CONFIG_BLINK_LED_PORT                        PORTD
 #endif
 #if !defined(OS_CONFIG_BLINK_LED_BIT)

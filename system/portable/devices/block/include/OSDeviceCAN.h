@@ -23,6 +23,8 @@ public:
       unsigned short rxHWM, unsigned short rxLWM, CANPacket *pTxBuf,
       unsigned short txBufSize, unsigned short txHWM, unsigned short txLWM);
 
+  ~OSDeviceCAN();
+
   void
   init(unsigned char mode);
 

@@ -23,6 +23,7 @@
 //#define OS_INCLUDE_OSDEVICECHARACTERBUFFERED            1
 
 #define OS_INCLUDE_DEVICECHARACTERUSB                   1
+#define OS_EXCLUDE_USBSERIALNUMBER                      (1)
 
 #define OS_INCLUDE_OSTHREAD_GETSTACKUSED                  1
 //#define OS_INCLUDE_OSTHREAD_GETPROGRAMCOUNTER             1
@@ -92,8 +93,8 @@
 //#define OS_DEBUG_OSDEVICECHARACTER_WRITEBYTE            1
 
 #define OS_DEBUG_OSUSBDEVICE_REQUEST                    1
-#define OS_DEBUG_DEVICECHARACTERUSB_WRITE               1
-#define OS_DEBUG_DEVICECHARACTERUSB_READ                1
+//#define OS_DEBUG_DEVICECHARACTERUSB_WRITE               1
+//#define OS_DEBUG_DEVICECHARACTERUSB_READ                1
 #define OS_CFGINT_OSUSBDEVICE_IRQ_PRIORITY    (0)
 
 #endif /* defined(DEBUG) */

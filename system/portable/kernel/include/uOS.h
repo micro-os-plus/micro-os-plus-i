@@ -39,6 +39,10 @@
 #include "portable/devices/character/include/OSDeviceCharacter.h"
 #endif
 
+#if defined(OS_INCLUDE_OSDEVICECHARACTERBUFFERED)
+#include "portable/devices/character/include/OSDeviceCharacterBuffered.h"
+#endif
+
 #if false
 #if defined(OS_INCLUDE_DEVICECHARACTERUSART)
 #include "portable/devices/character/include/DeviceCharacterUsart.h"

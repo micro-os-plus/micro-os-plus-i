@@ -12,7 +12,7 @@
 inline void
 TaskPitpalac::ledInit(void)
 {
-  BlinkLed::init();
+  BlinkLed::initialise();
 }
 
 inline void

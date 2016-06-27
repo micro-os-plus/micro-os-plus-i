@@ -18,6 +18,8 @@ public:
   // active object constructor
   TaskCli(const char *pName, OSDeviceCharacter& dev);
 
+  virtual ~TaskCli();
+
   // actual thread main code
   virtual void threadMain(void);
 

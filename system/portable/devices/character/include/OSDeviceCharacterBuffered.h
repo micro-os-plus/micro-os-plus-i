@@ -22,6 +22,9 @@ public:
   OSDeviceCharacterBuffered(unsigned char* pRxBuf, unsigned short rxBufSize,
       unsigned char* pTxBuf, unsigned short txBufSize);
 
+  virtual
+  ~OSDeviceCharacterBuffered();
+
   void
   init(unsigned char* pTxBuf, unsigned short txBufSize, unsigned short txHWM,
       unsigned short txLWM, unsigned char* pRxBuf, unsigned short rxBufSize,
@@ -40,8 +43,11 @@ protected:
   CircularByteBuffer m_txBuf;
 
   bool m_sending;
+  bool m_isReceiving;
 
 private:
+  void resumeReceptionIfBelowLowWM(void);
+
   // open/close
   virtual int
   implOpen(void);
@@ -62,6 +68,9 @@ private:
   implReadByte(void);
   virtual int
   implReadBytes(unsigned char* pBuf, int size);
+
+  virtual void
+  implResumeReception(void);
 
   // write
   virtual bool
