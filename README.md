@@ -1,4 +1,4 @@
-# µOS++ - the first edition
+# micro-os-plus-i - µOS++ (the fist edition)
 
 This project is the original µOS++, written in the mid 2000s,
 initially for AVR-8 and later ported to AVR-32.
