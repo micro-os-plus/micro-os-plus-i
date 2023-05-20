@@ -12,3 +12,6 @@ Aviation Instruments SRL.
 It was followed by **µOS++ SE** (second edition), in 2013,
 which was more modular and included an experimental 
 configuration mechanism inspired by eCos CDL.
+
+The project is now archived, and preserved for historical
+reasons.
